@@ -24,6 +24,7 @@ export enum OrderStatusEnum {
   COMPLETED = "COMPLETED",
   IN_PROGRESS = "IN_PROGRESS",
   PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
 }
 
 export enum OrderTypeEnum {
@@ -37,4 +38,12 @@ export enum UserRoleEnum {
   AGENT = "AGENT",
   CUSTOMER = "CUSTOMER",
   SUPPORT = "SUPPORT",
+}
+
+//Payment
+export enum PaymentStatusEnum {
+  NOT_PAID = 'NOT_PAID',
+  PAID = 'PAID',
+  ERROR = 'ERROR',
+  REFUNDED = 'REFUNDED',
 }
