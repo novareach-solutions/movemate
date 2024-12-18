@@ -7,6 +7,8 @@ import {
 import { Socket } from "socket.io";
 
 import configuration from "../../config/configuration";
+import { ChatService } from "../../modules/chat/chat.service";
+import { TChatMessageInput } from "../../modules/chat/chat.types";
 import { BaseSocketGateway } from "./base.socket";
 
 const config = configuration();
@@ -16,19 +18,25 @@ const config = configuration();
   cors: { origin: config.corsOrigin },
 })
 export class ChatSupportGateway extends BaseSocketGateway {
+  constructor(private readonly chatService: ChatService) {
+    super();
+  }
+
   @SubscribeMessage("sendMessage")
-  handleSendMessage(
-    @MessageBody() data: any,
+  async handleSendMessage(
+    @MessageBody() data: TChatMessageInput,
     @ConnectedSocket() _client: Socket,
-  ): void {
-    this.sendMessageToRoom(data.room, "newMessage", data);
+  ): Promise<void> {
+    await this.chatService.saveChat(data);
+    this.sendMessageToRoom(data.channelId, "newMessage", data);
   }
 
   @SubscribeMessage("sendPrivateMessage")
-  handleSendPrivateMessage(
-    @MessageBody() data: any,
+  async handleSendPrivateMessage(
+    @MessageBody() data: TChatMessageInput,
     @ConnectedSocket() _client: Socket,
-  ): void {
-    this.sendMessageToClient(data.userId, "privateMessage", data);
+  ): Promise<void> {
+    await this.chatService.saveChat(data);
+    this.sendMessageToClient(data.channelId, "privateMessage", data);
   }
 }
