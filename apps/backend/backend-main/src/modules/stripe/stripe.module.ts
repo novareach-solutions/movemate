@@ -1,19 +1,16 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { JwtModule } from "@nestjs/jwt";
+import { JwtService } from "@nestjs/jwt";
 
+import { PaymentService } from "./payment.service";
 import { StripeController } from "./stripe.controller";
 import { StripeService } from "./stripe.service";
+import { WalletService } from "./wallet.service";
 
 @Module({
-  imports: [
-    ConfigModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: "60s" },
-    }),
-  ],
-  providers: [StripeService],
+  imports: [ConfigModule],
   controllers: [StripeController],
+  providers: [StripeService, PaymentService, WalletService, JwtService],
+  exports: [StripeService],
 })
 export class StripeModule {}

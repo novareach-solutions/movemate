@@ -1,15 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import Stripe from "stripe";
 
-import { User } from "../../entity/User";
+import { Agent } from "../../entity/Agent";
 import { logger } from "../../logger";
+import { MissingStripeApiKeyException } from "../../shared/errors/stripe";
 import {
-  MissingStripeApiKeyException,
-  StripeCustomerCreationException,
-  StripePaymentIntentCreationException,
-} from "../../shared/errors/stripe";
-import { dbReadRepo } from "../database/database.service";
+  TConnectAccountRequest,
+  TCreateSubscriptionRequest,
+  TCreateVirtualCardRequest,
+} from "../../shared/types/payment.types";
+import { dbReadRepo, dbRepo } from "../database/database.service";
 
 @Injectable()
 export class StripeService {
@@ -26,80 +27,291 @@ export class StripeService {
     });
   }
 
-  /**
-   * Creates a Stripe customer for the given user ID.
-   * valiates whether user existsm or not, and then creates a Stripe customer.
-   * @param userId The ID of the user to create a customer for.
-   * @returns The created Stripe customer.
-   */
-  async createCustomer(userId: number): Promise<Stripe.Customer> {
-    logger.debug(
-      `StripeService.createCustomer: Creating customer for user ${userId}`,
-    );
-
-    const user = await dbReadRepo(User).findOne({ where: { id: userId } });
-    if (!user) {
-      throw new StripeCustomerCreationException("User not found");
-    }
-
-    try {
-      const customer = await this.stripe.customers.create({
-        email: user.email,
-        metadata: { userId: user.id.toString() },
-      });
-      return customer;
-    } catch (error) {
-      logger.error(
-        `StripeService.createCustomer: Error creating customer for user ${userId}`,
-        error,
-      );
-      throw new StripeCustomerCreationException(error.message);
-    }
-  }
-
-  /**
-   * Creates a Stripe payment intent for the given user ID, amount, currency, and description.
-   * Validates whether user exists or not, and then creates a Stripe payment intent.
-   * @param userId The ID of the user to create a payment intent for.
-   * @param amount The amount of the payment in cents.
-   * @param currency The three-letter currency code for the payment.
-   * @param description The description of the payment.
-   * @returns The created Stripe payment intent.
-   */
-  async createPaymentIntent(
-    userId: number,
-    amount: number,
-    currency: string = "usd",
-    description: string,
-  ): Promise<Stripe.PaymentIntent> {
-    logger.debug(
-      `StripeService.createPaymentIntent: Creating payment intent for user ID ${userId}`,
-    );
-
-    const user = await dbReadRepo(User).findOneOrFail({
-      where: { id: userId },
-    });
-
+  async createPaymentIntent(params: {
+    amount: number;
+    currency: string;
+    description?: string;
+  }): Promise<Stripe.PaymentIntent> {
     try {
       const paymentIntent = await this.stripe.paymentIntents.create({
-        amount,
-        currency,
-        description,
-        metadata: {
-          userId: user.id.toString(),
+        amount: Math.round(params.amount * 100),
+        currency: params.currency,
+        description: params.description,
+        automatic_payment_methods: {
+          enabled: true,
         },
       });
+
       logger.info(
-        `StripeService.createPaymentIntent: Payment intent created with ID ${paymentIntent.id}`,
+        `StripeService.createPaymentIntent: Created payment intent ${paymentIntent.id}`,
       );
       return paymentIntent;
     } catch (error) {
       logger.error(
-        `StripeService.createPaymentIntent: Failed to create payment intent. Error: ${error}`,
+        `StripeService.createPaymentIntent: Failed to create payment intent`,
+        error,
       );
-      throw new StripePaymentIntentCreationException(
-        `Failed to create payment intent: ${error.message}`,
+      throw error;
+    }
+  }
+
+  async createConnectedAccount(data: TConnectAccountRequest): Promise<{
+    accountId: string;
+    accountLink: string;
+  }> {
+    try {
+      const agent = await dbReadRepo(Agent).findOne({
+        where: { id: data.agentId },
+      });
+
+      if (!agent) {
+        logger.error(
+          `StripeService.createConnectedAccount: Agent ${data.agentId} not found`,
+        );
+        throw new NotFoundException("Agent not found");
+      }
+
+      // Create Stripe Connect account
+      const account = await this.stripe.accounts.create({
+        type: "express",
+        country: data.country,
+        email: data.email,
+        capabilities: {
+          transfers: { requested: true },
+          card_payments: { requested: true },
+        },
+        business_type: data.businessType || "individual",
+      });
+
+      // Update agent with Stripe account ID
+      await dbRepo(Agent).update(agent.id, {
+        stripeAccountId: account.id,
+      });
+
+      // Create account link for onboarding
+      const accountLink = await this.stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: `${this.configService.get("APP_URL")}/stripe/refresh-account-link`,
+        return_url: `${this.configService.get("APP_URL")}/stripe/return-account-link`,
+        type: "account_onboarding",
+      });
+
+      logger.info(
+        `StripeService.createConnectedAccount: Created account ${account.id} for agent ${agent.id}`,
       );
+
+      return {
+        accountId: account.id,
+        accountLink: accountLink.url,
+      };
+    } catch (error) {
+      logger.error(
+        `StripeService.createConnectedAccount: Failed to create connected account`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async createAccountLink(agentId: number): Promise<{
+    url: string;
+    expiresAt: string;
+  }> {
+    try {
+      const agent = await dbReadRepo(Agent).findOne({
+        where: { id: agentId },
+      });
+
+      if (!agent?.stripeAccountId) {
+        logger.error(
+          `StripeService.createAccountLink: No Stripe account found for agent ${agentId}`,
+        );
+        throw new NotFoundException("No Stripe account found for agent");
+      }
+
+      const accountLink = await this.stripe.accountLinks.create({
+        account: agent.stripeAccountId,
+        refresh_url: `${this.configService.get("APP_URL")}/stripe/refresh-account-link`,
+        return_url: `${this.configService.get("APP_URL")}/stripe/return-account-link`,
+        type: "account_onboarding",
+      });
+
+      logger.info(
+        `StripeService.createAccountLink: Created account link for agent ${agentId}`,
+      );
+
+      return {
+        url: accountLink.url,
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes
+      };
+    } catch (error) {
+      logger.error(
+        `StripeService.createAccountLink: Failed to create account link`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async createVirtualCard(data: TCreateVirtualCardRequest): Promise<{
+    cardDetails: any;
+    amount: number;
+  }> {
+    try {
+      const card = await this.stripe.issuing.cards.create({
+        type: "virtual",
+        currency: "aud",
+        spending_controls: {
+          spending_limits: [
+            {
+              amount: Math.round(data.amount * 100),
+              interval: "per_authorization",
+            },
+          ],
+        },
+      });
+
+      logger.info(
+        `StripeService.createVirtualCard: Created virtual card for order ${data.orderId}`,
+      );
+
+      return {
+        cardDetails: {
+          last4: card.last4,
+          expiryMonth: card.exp_month,
+          expiryYear: card.exp_year,
+        },
+        amount: data.amount,
+      };
+    } catch (error) {
+      logger.error(
+        `StripeService.createVirtualCard: Failed to create virtual card`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async createSubscription(data: TCreateSubscriptionRequest): Promise<{
+    clientSecret: string;
+    subscriptionId: string;
+  }> {
+    const intervalMap = {
+      daily: "day",
+      weekly: "week",
+      monthly: "month",
+      yearly: "year",
+    };
+
+    try {
+      const agent = await dbReadRepo(Agent).findOne({
+        where: { id: data.agentId },
+      });
+
+      if (!agent?.stripeAccountId) {
+        logger.error(
+          `StripeService.createSubscription: No Stripe account found for agent ${data.agentId}`,
+        );
+        throw new NotFoundException("No Stripe account found for agent");
+      }
+
+      // Create product if it doesn't exist
+      const product = await this.stripe.products.create({
+        name: `${data.plan} Subscription`,
+      });
+
+      // Create price
+      const price = await this.stripe.prices.create({
+        product: product.id,
+        unit_amount: Math.round(data.amount * 100),
+        currency: "aud",
+        recurring: {
+          interval: intervalMap[data.plan.toLowerCase()],
+        },
+      });
+
+      // Create subscription
+      const subscription = await this.stripe.subscriptions.create({
+        customer: agent.stripeAccountId,
+        items: [{ price: price.id }],
+        payment_behavior: "default_incomplete",
+        expand: ["latest_invoice.payment_intent"],
+      });
+
+      logger.info(
+        `StripeService.createSubscription: Created subscription for agent ${agent.id}`,
+      );
+
+      return {
+        subscriptionId: subscription.id,
+        clientSecret: (subscription.latest_invoice as any).payment_intent
+          .client_secret,
+      };
+    } catch (error) {
+      logger.error(
+        `StripeService.createSubscription: Failed to create subscription`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async createTransfer(params: {
+    amount: number;
+    destination: string;
+    isExpress: boolean;
+  }): Promise<Stripe.Transfer> {
+    try {
+      const transferParams: Stripe.TransferCreateParams = {
+        amount: Math.round(params.amount * 100),
+        currency: "aud",
+        destination: params.destination,
+      };
+
+      if (params.isExpress) {
+        // Add instant payout options for express transfers
+        transferParams.metadata = {
+          instant: "true",
+        };
+      }
+
+      const transfer = await this.stripe.transfers.create(transferParams);
+
+      logger.info(
+        `StripeService.createTransfer: Created transfer ${transfer.id} to ${params.destination}`,
+      );
+      return transfer;
+    } catch (error) {
+      logger.error(
+        `StripeService.createTransfer: Failed to create transfer to ${params.destination}`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  async handleWebhook(
+    signature: string,
+    rawBody: Buffer,
+  ): Promise<Stripe.Event> {
+    try {
+      const webhookSecret = this.configService.get("STRIPE_WEBHOOK_SECRET");
+      const event = await this.stripe.webhooks.constructEvent(
+        rawBody,
+        signature,
+        webhookSecret,
+      );
+
+      logger.info(
+        `StripeService.handleWebhook: Processed webhook event ${event.type}`,
+      );
+      return event;
+    } catch (error) {
+      logger.error(
+        `StripeService.handleWebhook: Webhook verification failed`,
+        error,
+      );
+      throw error;
     }
   }
 }
