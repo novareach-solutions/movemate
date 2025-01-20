@@ -56,9 +56,9 @@ export default (): Record<string, any> => ({
     chatSupport: parseInt(process.env.CHAT_SUPPORT_PORT, 10) || 3003,
     notification: parseInt(process.env.NOTIFICATION_PORT, 10) || 3004,
     firebaseNotification:
-      parseInt(process.env.FIREBASE_NOTIFICATION_PORT, 10) || 3005, 
+      parseInt(process.env.FIREBASE_NOTIFICATION_PORT, 10) || 3005,
   },
-  firebase: { 
+  firebase: {
     projectId: process.env.FIREBASE_PROJECT_ID,
     privateKey: process.env.FIREBASE_PRIVATE_KEY,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
