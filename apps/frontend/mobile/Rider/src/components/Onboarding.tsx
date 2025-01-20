@@ -17,6 +17,8 @@ import {colors} from '../theme/colors';
 import {images} from '../assets/images/images';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {
+  AppScreens,
+  AppScreensParamList,
   BuyFromStore,
   BuyFromStoreParamList,
 } from '../navigation/ScreenNames';
@@ -42,7 +44,7 @@ const slides: Slide[] = [
 
 const Onboarding: React.FC = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const navigation = useNavigation<NavigationProp<BuyFromStoreParamList>>();
+  const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
   const updateSlidePosition = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
     const currentIndex = Math.round(contentOffsetX / width);
@@ -50,7 +52,7 @@ const Onboarding: React.FC = () => {
   };
 
   const handleNavigation = () => {
-    navigation.navigate(BuyFromStore.ItemsReviewScreen);
+    navigation.navigate(AppScreens.Profile);
   };
   const Footer = () => (
     <View style={styles.footer}>
