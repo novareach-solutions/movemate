@@ -1,18 +1,35 @@
+import introImage1 from '../images/IntroImage1.png';
+import introImage2 from '../images/IntroImage2.png';
+import introImage3 from '../images/IntroImage3.png';
+import introImage4 from '../images/IntroImage4.png';
+import logo from '../images/Logo.png';
+import location from '../images/Location.png';
+import notificatons from './Notification.png';
+import orders from './Orders.png';
+import home from './Home.png';
+import account from './Account.png';
+import towTruck from './TowTruck.png';
+import store from './Store.png';
+import shoppingCart from './ShoppingCart.png';
+import packageImg from './Package.png';
+import banner from './Banner.png';
+import banner2 from './banner2.png';
+
 export const images = {
-    introImage1: require('../images/IntroImage1.png'),
-    introImage2: require('../images/IntroImage2.png'),
-    introImage3: require('../images/IntroImage3.png'),
-    introImage4: require('../images/IntroImage4.png'),
-    logo: require('../images/Logo.png'),
-    location: require('../images/Location.png'),
-    notificatons: require('./Notification.png'),
-    orders: require('./Orders.png'),
-    home: require('./Home.png'),
-    account: require('./Account.png'),
-    towTruck: require('./TowTruck.png'),
-    store: require('./Store.png'),
-    shoppingCart: require('./ShoppingCart.png'),
-    package: require('./Package.png'),
-    banner: require('./Banner.png'),
-    banner2: require('./banner2.png'),
+  introImage1,
+  introImage2,
+  introImage3,
+  introImage4,
+  logo,
+  location,
+  notificatons,
+  orders,
+  home,
+  account,
+  towTruck,
+  store,
+  shoppingCart,
+  package: packageImg,
+  banner,
+  banner2,
 };
