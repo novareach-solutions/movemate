@@ -12,8 +12,7 @@ export class RequiredDocument extends BaseEntity {
   description: string;
 
   @Column({
-    type: "enum",
-    enum: AgentTypeEnum,
+    type: "varchar",
     nullable: false,
   })
   agentType: AgentTypeEnum;
