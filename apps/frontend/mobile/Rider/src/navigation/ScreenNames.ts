@@ -2,7 +2,7 @@ export type AuthScreensParamList = {
   OnboardingScreen: undefined;
   LoginScreen: undefined;
   OtpScreen: {
-    phoneNumber:string
+    phoneNumber: string;
   };
   SelectServiceScreen: undefined;
 };
