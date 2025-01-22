@@ -34,7 +34,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
 
   const handleTakePhoto = () => {
     setIsTakingPhoto(true);
-    console.log('Take Photo button clicked',isTakingPhoto); // Replace this with your camera logic
+    console.log('Take Photo button clicked', isTakingPhoto); // Replace this with your camera logic
   };
 
   const handleOrderDelivered = () => {

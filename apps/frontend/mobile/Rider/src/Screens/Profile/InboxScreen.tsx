@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,12 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
+import {colors} from '../../theme/colors';
+import {typography} from '../../theme/typography';
 
 const InboxScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Notifications' | 'Messages'>(
-    'Notifications'
+    'Notifications',
   );
 
   const notifications = [
@@ -32,8 +32,7 @@ const InboxScreen: React.FC = () => {
     },
     {
       id: '3',
-      message:
-        'Earn an extra $50 for completing 5 trips today.',
+      message: 'Earn an extra $50 for completing 5 trips today.',
       date: '1/11/2024',
       resolved: false,
     },
@@ -53,12 +52,10 @@ const InboxScreen: React.FC = () => {
     },
   ];
 
-  const filteredNotifications = notifications.filter(
-    (item) => !item.resolved
-  );
-  const resolvedNotifications = notifications.filter((item) => item.resolved);
+  const filteredNotifications = notifications.filter(item => !item.resolved);
+  const resolvedNotifications = notifications.filter(item => item.resolved);
 
-  const renderNotification = ({ item }: { item: typeof notifications[0] }) => (
+  const renderNotification = ({item}: {item: (typeof notifications)[0]}) => (
     <View style={styles.notificationItem}>
       <View style={styles.notificationContent}>
         <Text style={styles.notificationMessage}>{item.message}</Text>
@@ -71,7 +68,6 @@ const InboxScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      
 
       {/* Tabs */}
       <View style={styles.tabsContainer}>
@@ -80,30 +76,23 @@ const InboxScreen: React.FC = () => {
             styles.tab,
             activeTab === 'Notifications' && styles.activeTab,
           ]}
-          onPress={() => setActiveTab('Notifications')}
-        >
+          onPress={() => setActiveTab('Notifications')}>
           <Text
             style={[
               styles.tabText,
               activeTab === 'Notifications' && styles.activeTabText,
-            ]}
-          >
+            ]}>
             Notifications
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'Messages' && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab('Messages')}
-        >
+          style={[styles.tab, activeTab === 'Messages' && styles.activeTab]}
+          onPress={() => setActiveTab('Messages')}>
           <Text
             style={[
               styles.tabText,
               activeTab === 'Messages' && styles.activeTabText,
-            ]}
-          >
+            ]}>
             Messages
           </Text>
         </TouchableOpacity>
@@ -116,14 +105,14 @@ const InboxScreen: React.FC = () => {
             <FlatList
               data={filteredNotifications}
               renderItem={renderNotification}
-              keyExtractor={(item) => item.id}
+              keyExtractor={item => item.id}
               contentContainerStyle={styles.notificationList}
             />
             <Text style={styles.resolvedText}>Resolved</Text>
             <FlatList
               data={resolvedNotifications}
               renderItem={renderNotification}
-              keyExtractor={(item) => item.id}
+              keyExtractor={item => item.id}
               contentContainerStyle={styles.notificationList}
             />
           </View>

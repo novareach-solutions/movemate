@@ -1,5 +1,12 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image, TextStyle} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  TextStyle,
+} from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {images} from '../assets/images/images';

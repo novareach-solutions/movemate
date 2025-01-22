@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,13 +7,13 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { images } from '../../assets/images/images';
+import {colors} from '../../theme/colors';
+import {typography} from '../../theme/typography';
+import {images} from '../../assets/images/images';
 
 const ReferFriendsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Invite Friend' | 'Status'>(
-    'Invite Friend'
+    'Invite Friend',
   );
 
   return (
@@ -21,28 +21,27 @@ const ReferFriendsScreen: React.FC = () => {
       {/* Tabs */}
       <View style={styles.tabsContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'Invite Friend' && styles.activeTab]}
-          onPress={() => setActiveTab('Invite Friend')}
-        >
+          style={[
+            styles.tab,
+            activeTab === 'Invite Friend' && styles.activeTab,
+          ]}
+          onPress={() => setActiveTab('Invite Friend')}>
           <Text
             style={[
               styles.tabText,
               activeTab === 'Invite Friend' && styles.activeTabText,
-            ]}
-          >
+            ]}>
             Invite Friend
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'Status' && styles.activeTab]}
-          onPress={() => setActiveTab('Status')}
-        >
+          onPress={() => setActiveTab('Status')}>
           <Text
             style={[
               styles.tabText,
               activeTab === 'Status' && styles.activeTabText,
-            ]}
-          >
+            ]}>
             Status
           </Text>
         </TouchableOpacity>
@@ -52,12 +51,16 @@ const ReferFriendsScreen: React.FC = () => {
         <View style={styles.content}>
           {/* Friends Circle */}
           <View style={styles.circleImageContainer}>
-            <Image source={images.referPlaceholder} style={styles.circleImage} />
+            <Image
+              source={images.referPlaceholder}
+              style={styles.circleImage}
+            />
           </View>
 
-          <View style={{
-            width: "100%"
-          }}>
+          <View
+            style={{
+              width: '100%',
+            }}>
             {/* Referral Card */}
             <View style={styles.referralCard}>
               <Image source={images.currencyCoin} style={styles.icon} />
@@ -77,7 +80,7 @@ const ReferFriendsScreen: React.FC = () => {
       )}
 
       {activeTab === 'Status' && (
-        <View style={{ flex: 1, paddingHorizontal: 20 }}>
+        <View style={{flex: 1, paddingHorizontal: 20}}>
           {/* Summary Card */}
           <View style={styles.summaryCard}>
             <Image source={images.rewardCoin} style={styles.icon} />
@@ -93,14 +96,16 @@ const ReferFriendsScreen: React.FC = () => {
 
           {/* Referral Status List */}
           <Text style={styles.referralStatusHeading}>Your Referral Status</Text>
-          <View style={{ flex: 1 }}>
+          <View style={{flex: 1}}>
             <View style={styles.statusItem}>
               <View>
                 <Text style={styles.amountText}>$30</Text>
                 <Text style={styles.dateText}>1/11/2024</Text>
               </View>
               <View style={[styles.statusBadge, styles.pendingBadge]}>
-                <Text style={[styles.statusText, styles.pendingText]}>Pending</Text>
+                <Text style={[styles.statusText, styles.pendingText]}>
+                  Pending
+                </Text>
               </View>
             </View>
             <View style={styles.statusItem}>
@@ -109,7 +114,9 @@ const ReferFriendsScreen: React.FC = () => {
                 <Text style={styles.dateText}>1/11/2024</Text>
               </View>
               <View style={[styles.statusBadge, styles.earnedBadge]}>
-                <Text style={[styles.statusText, styles.earnedText]}>Earned</Text>
+                <Text style={[styles.statusText, styles.earnedText]}>
+                  Earned
+                </Text>
               </View>
             </View>
             <View style={styles.statusItem}>
@@ -118,7 +125,9 @@ const ReferFriendsScreen: React.FC = () => {
                 <Text style={styles.dateText}>1/11/2024</Text>
               </View>
               <View style={[styles.statusBadge, styles.pendingBadge]}>
-                <Text style={[styles.statusText, styles.pendingText]}>Pending</Text>
+                <Text style={[styles.statusText, styles.pendingText]}>
+                  Pending
+                </Text>
               </View>
             </View>
             <View style={styles.statusItem}>
@@ -127,13 +136,14 @@ const ReferFriendsScreen: React.FC = () => {
                 <Text style={styles.dateText}>1/11/2024</Text>
               </View>
               <View style={[styles.statusBadge, styles.earnedBadge]}>
-                <Text style={[styles.statusText, styles.earnedText]}>Earned</Text>
+                <Text style={[styles.statusText, styles.earnedText]}>
+                  Earned
+                </Text>
               </View>
             </View>
           </View>
         </View>
       )}
-
     </View>
   );
 };
@@ -227,8 +237,8 @@ const styles = StyleSheet.create({
     color: colors.text.primaryGrey,
     fontSize: typography.fontSize.small,
     fontWeight: 'bold',
-    
-  }, summaryCard: {
+  },
+  summaryCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.white,
@@ -292,7 +302,6 @@ const styles = StyleSheet.create({
   earnedText: {
     color: colors.white,
   },
-
 });
 
 export default ReferFriendsScreen;

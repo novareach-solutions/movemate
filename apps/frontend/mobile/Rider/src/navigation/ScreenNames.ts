@@ -92,4 +92,3 @@ export const ProfileScreens = {
   AppSettings: 'AppSettingsScreen',
   SubscriptionPlans: 'SubscriptionPlansScreen',
 } as const;
-

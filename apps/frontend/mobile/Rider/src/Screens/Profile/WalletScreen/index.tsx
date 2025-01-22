@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,12 @@ import {
   ScrollView,
   TextStyle,
 } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { images } from '../../../assets/images/images';
+import {colors} from '../../../theme/colors';
+import {typography} from '../../../theme/typography';
+import {images} from '../../../assets/images/images';
 import ProfileScreen from '..';
-import { ProfileScreens } from '../../../navigation/ScreenNames';
-import { useNavigation } from '@react-navigation/native';
+import {ProfileScreens} from '../../../navigation/ScreenNames';
+import {useNavigation} from '@react-navigation/native';
 
 const historyData = [
   {
@@ -37,22 +37,25 @@ const historyData = [
 ];
 
 const WalletScreen: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'Wallet' | 'Virtual Card'>('Wallet');
+  const [activeTab, setActiveTab] = useState<'Wallet' | 'Virtual Card'>(
+    'Wallet',
+  );
   const [payoutFilter, setPayoutFilter] = useState('Week');
   const navigation = useNavigation();
 
-
-  const renderHistoryCard = (item: typeof historyData[0], index: number) => (
+  const renderHistoryCard = (item: (typeof historyData)[0], index: number) => (
     <View key={index} style={styles.historyCard}>
       <View style={styles.historyDetailsContainer}>
         <Text style={styles.historyAmount}>{item.amount}</Text>
         <Text style={styles.historyDetails}>{item.cardDetails}</Text>
-        <View style={{
-          flexDirection: "row",
-          gap: 10,
-          alignItems: "center",
-          marginTop: 30
-        }}><Text style={styles.viewDetails}>View details</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            gap: 10,
+            alignItems: 'center',
+            marginTop: 30,
+          }}>
+          <Text style={styles.viewDetails}>View details</Text>
           <Image source={images.arrow} />
         </View>
       </View>
@@ -72,27 +75,23 @@ const WalletScreen: React.FC = () => {
       <View style={styles.tabsContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'Wallet' && styles.activeTab]}
-          onPress={() => setActiveTab('Wallet')}
-        >
+          onPress={() => setActiveTab('Wallet')}>
           <Text
             style={[
               styles.tabText,
               activeTab === 'Wallet' && styles.activeTabText,
-            ]}
-          >
+            ]}>
             Wallet
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'Virtual Card' && styles.activeTab]}
-          onPress={() => setActiveTab('Virtual Card')}
-        >
+          onPress={() => setActiveTab('Virtual Card')}>
           <Text
             style={[
               styles.tabText,
               activeTab === 'Virtual Card' && styles.activeTabText,
-            ]}
-          >
+            ]}>
             Virtual Card
           </Text>
         </TouchableOpacity>
@@ -105,7 +104,9 @@ const WalletScreen: React.FC = () => {
             <Text style={styles.balanceLabel}>Available balance</Text>
             <Text style={styles.balanceAmount}>$62.14</Text>
             <TouchableOpacity style={styles.manageMethods}>
-              <Text style={styles.manageMethodsText}>Manage payment methods</Text>
+              <Text style={styles.manageMethodsText}>
+                Manage payment methods
+              </Text>
               <Image source={images.whiteArrow} style={styles.arrowIcon} />
             </TouchableOpacity>
           </View>
@@ -113,14 +114,17 @@ const WalletScreen: React.FC = () => {
           {/* Payout Scheduled */}
           <View style={styles.payoutSchedule}>
             <Image source={images.payoutCalender} />
-            <Text style={styles.payoutScheduleText}>Payout scheduled: 9th Dec</Text>
+            <Text style={styles.payoutScheduleText}>
+              Payout scheduled: 9th Dec
+            </Text>
           </View>
 
           {/* Pay Out Button */}
-          <TouchableOpacity onPress={() => {
-            navigation.navigate(ProfileScreens.Payout);
-
-          }} style={styles.payoutButton}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(ProfileScreens.Payout);
+            }}
+            style={styles.payoutButton}>
             <Text style={styles.payoutButtonText}>Pay out</Text>
           </TouchableOpacity>
 
@@ -138,7 +142,9 @@ const WalletScreen: React.FC = () => {
 
       {activeTab === 'Virtual Card' && (
         <View style={styles.virtualCardContent}>
-          <Text style={styles.virtualCardText}>Virtual Card feature coming soon!</Text>
+          <Text style={styles.virtualCardText}>
+            Virtual Card feature coming soon!
+          </Text>
         </View>
       )}
     </View>

@@ -18,10 +18,12 @@ const DetailRow: React.FC<DetailRowProps> = ({icon, label, value}) => {
           styles.detailText,
           icon
             ? {
-                fontWeight: typography.fontWeight.regular as TextStyle['fontWeight'],
+                fontWeight: typography.fontWeight
+                  .regular as TextStyle['fontWeight'],
               }
             : {
-                fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+                fontWeight: typography.fontWeight
+                  .bold as TextStyle['fontWeight'],
               },
         ]}>
         {label}
