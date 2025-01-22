@@ -34,7 +34,7 @@ async function bootstrap(): Promise<void> {
     origin: config.corsOrigin,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With","onboarding_token"],
   });
   // Configure WebSocket adapter
   app.useWebSocketAdapter(new IoAdapter(app));
