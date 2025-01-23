@@ -18,6 +18,7 @@ import { UserModule } from "./modules/user/user.module";
 import { AuthGuard } from "./shared/guards/auth.guard";
 import { OnboardingGuard } from "./shared/guards/onboarding.guard";
 import { RoleGuard } from "./shared/guards/roles.guard";
+import { MediaModule } from "./modules/media/media.module";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { RoleGuard } from "./shared/guards/roles.guard";
     SendAPackageModule,
     TerminusModule,
     HttpModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService, RoleGuard, OnboardingGuard, AuthGuard, JwtService],
