@@ -17,10 +17,7 @@ import {typography} from '../../theme/typography';
 import {images} from '../../assets/images/images';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {
-  AppScreens,
-  AppScreensParamList,
-} from '../../navigation/ScreenNames';
+import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -43,7 +40,9 @@ const InfoRow: React.FC<{iconSource: any; text: string; bold?: boolean}> = ({
     <Text
       style={[
         styles.infoText,
-        bold ? {fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],} : {},
+        bold
+          ? {fontWeight: typography.fontWeight.bold as TextStyle['fontWeight']}
+          : {},
       ]}>
       {text}
     </Text>

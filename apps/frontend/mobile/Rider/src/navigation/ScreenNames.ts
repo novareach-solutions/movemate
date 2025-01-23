@@ -21,6 +21,7 @@ export type AppScreensParamList = {
   FAQScreenScreen: undefined;
   CancellationReasonScreen: undefined;
   ChatScreen: undefined;
+  ProfileScreen: undefined;
 };
 
 export const AppScreens = {
@@ -30,6 +31,7 @@ export const AppScreens = {
   FAQScreen: 'FAQScreenScreen',
   CancellationReason: 'CancellationReasonScreen',
   Chat: 'ChatScreen',
+  Profile: 'ProfileScreen',
 } as const;
 
 export type DeliverAPackageParamList = {
@@ -60,4 +62,33 @@ export type BuyFromStoreParamList = {
 
 export const BuyFromStore = {
   ItemsReviewScreen: 'ItemsReviewScreen',
+} as const;
+
+export type ProfileScreensParamList = {
+  InboxScreen: undefined;
+  EarningsScreen: undefined;
+  WalletScreen: undefined;
+  EarningModeScreen: undefined;
+  ReferFriendsScreen: undefined;
+  RewardsScreen: undefined;
+  AccountScreen: undefined;
+  LogoutScreen: undefined;
+};
+
+export const ProfileScreens = {
+  Inbox: 'InboxScreen',
+  Earnings: 'EarningsScreen',
+  Wallet: 'WalletScreen',
+  EarningMode: 'EarningModeScreen',
+  ReferFriends: 'ReferFriendsScreen',
+  Rewards: 'RewardsScreen',
+  Account: 'AccountScreen',
+  Logout: 'LogoutScreen',
+  Payout: 'PayoutScreen',
+  Vehicles: 'VehiclesScreen',
+  Documents: 'DocumentsScreen',
+  BankDetails: 'BankDetailsScreen',
+  ManageAccount: 'ManageAccountScreen',
+  AppSettings: 'AppSettingsScreen',
+  SubscriptionPlans: 'SubscriptionPlansScreen',
 } as const;
