@@ -51,7 +51,8 @@ const Onboarding: React.FC = () => {
   };
 
   const handleNavigation = () => {
-    navigation.navigate(DeliverAPackage.Home);
+    // navigation.navigate(AuthScreens.Login);
+    navigation.navigate(DeliverAPackage.AddProfilePhoto);
   };
   const Footer = () => (
     <View style={styles.footer}>

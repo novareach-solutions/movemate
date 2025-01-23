@@ -13,14 +13,23 @@ import {colors} from '../../theme/colors';
 import StepIndicator from '../../components/StepIndicator';
 import {useNavigation} from '@react-navigation/native';
 import {DeliverAPackage} from '../../navigation/ScreenNames';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import { setSignupData } from '../../redux/slices/authSlice';
 
 const EnterABNScreen: React.FC = () => {
   const [abn, setAbn] = useState('');
-
+const dispatch = useAppDispatch();
+const signupData = useAppSelector((state) => state.auth.signupData);
+console.log('signupData>>>>', signupData)
   const navigation = useNavigation();
 
-  const handleContinue = () => {
+  const handleContinue = async() => {
     console.log({abn});
+    const abnDetails = {
+      abnNumber: abn,
+    };
+
+     await dispatch(setSignupData(abnDetails));
     navigation.navigate(DeliverAPackage.AddProfilePhoto);
   };
 

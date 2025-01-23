@@ -8,23 +8,42 @@ import {
   DeliverAPackage,
   DeliverAPackageParamList,
 } from '../../navigation/ScreenNames';
+import { useAppDispatch } from '../../redux/hook';
+import { setSignupData } from '../../redux/slices/authSlice';
 
 type FormFields = {
+  role: 'AGENT', 
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber:"+919908625158";
   address: string;
   suburb: string;
   state: string;
-  postalCode: string;
+  postalCode: number;
 };
 
 const DAPCompleteProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
-
-  const handleFormSubmit = (formData: FormFields) => {
+ const dispatch = useAppDispatch();
+  const handleFormSubmit = async(formData: FormFields) => {
     console.log('Form submitted:', formData);
-    navigation.navigate(DeliverAPackage.UploadDocuments);
+    const user = {
+      role: 'AGENT', // Assign a default role if not provided
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phoneNumber: "+919908625158",
+      email: formData.email,
+      street: formData.address,
+      suburb: formData.suburb,
+      state: formData.state,
+      postalCode:Number(formData.postalCode), // Ensure correct type if needed
+    };
+
+    console.log('user', user)
+  
+    await dispatch(setSignupData({ user }));
+    navigation.navigate(DeliverAPackage.EnterVehicleDetails);
   };
 
   return (

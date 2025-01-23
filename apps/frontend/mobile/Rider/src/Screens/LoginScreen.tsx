@@ -16,6 +16,8 @@ import {typography} from '../theme/typography';
 import {images} from '../assets/images/images';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
+import { requestOtp } from '../redux/slices/authSlice';
+import { useAppDispatch } from '../redux/hook';
 
 const {width} = Dimensions.get('window');
 
@@ -25,6 +27,7 @@ const Login: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isFilled, setIsFilled] = useState(false);
   const [isFocused, setIsFocused] = useState(false); // Track focus state
+  const dispatch = useAppDispatch();
 
   const handlePhoneNumberChange = (number: string) => {
     setIsFocused(true);
@@ -32,8 +35,16 @@ const Login: React.FC = () => {
     setIsFilled(number.length > 0);
   };
 
-  const handleSendCode = () => {
-    navigation.navigate(AuthScreens.Otp, {phoneNumber});
+  const handleSendCode = async() => {
+    try {
+      console.log('phoneNumber', phoneNumber)
+      await dispatch(requestOtp({ phone: phoneNumber })).unwrap();
+      console.log('Request Otp successful');
+      // Navigate to the otp screen
+      navigation.navigate(AuthScreens.Otp, {phoneNumber});
+    } catch {
+      console.log('Request Otp failed');
+    }
   };
 
   const dismissKeyboard = () => {
@@ -125,10 +136,14 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: colors.white,
     borderRadius: 8,
+    height: '100%',
+    paddingVertical: 0, 
   },
   textInputStyle: {
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
+    height: '100%',
+    textAlignVertical: 'center',
   },
   button: {
     marginTop: 40,

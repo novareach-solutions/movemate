@@ -15,6 +15,8 @@ import {colors} from '../../theme/colors';
 import StepIndicator from '../../components/StepIndicator';
 import {DeliverAPackage} from '../../navigation/ScreenNames';
 import {useNavigation} from '@react-navigation/native';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import { setSignupData } from '../../redux/slices/authSlice';
 
 const EnterVehicleDetailsScreen: React.FC = () => {
   const [make, setMake] = useState('');
@@ -22,10 +24,20 @@ const EnterVehicleDetailsScreen: React.FC = () => {
   const [year, setYear] = useState('');
   const vehicleMakes = ['Toyota', 'Honda', 'Ford', 'BMW'];
   const vehicleModels = ['Corolla', 'Civic', 'Mustang', 'X5'];
-
+  const signupData = useAppSelector((state) => state.auth.signupData);
+   const dispatch = useAppDispatch();
+  console.log('signupData', signupData)
   const navigation = useNavigation();
 
-  const handleContinue = () => {
+  const handleContinue = async() => {
+    const vehicleDetails = {
+      vehicleMake: make,
+      vehicleModel: model,
+      vehicleYear: Number(year),
+      agentType: "DELIVERY",
+    };
+
+     await dispatch(setSignupData(vehicleDetails));
     console.log({make, model, year});
     navigation.navigate(DeliverAPackage.EnterABN);
   };

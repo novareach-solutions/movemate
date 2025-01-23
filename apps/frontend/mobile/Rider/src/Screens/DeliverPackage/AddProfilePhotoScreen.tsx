@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,17 +11,48 @@ import TitleDescription from '../../components/TitleDescription';
 import UploadPhoto from '../../components/UploadPhoto';
 import {colors} from '../../theme/colors';
 import {formStyles} from '../../theme/form';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import { agentSignup, setSignupData } from '../../redux/slices/authSlice';
 // import {useNavigation} from '@react-navigation/native';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const AddProfilePhotoScreen: React.FC = () => {
   // const navigation = useNavigation();
-
+  const [image,setImage] =  useState('');
+ const dispatch = useAppDispatch();
+   const signupData = useAppSelector((state) => state.auth.signupData);
   const handleUpload = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true
+    }).then(image => {
+      console.log(image);
+      setImage(image.path);
+    });
+
+
     console.log('Upload button pressed');
+    const profilePhotoDetails = {
+      profilePhoto: 'https://example.com/profile-photo1.jpg',
+    };
+
+    dispatch(setSignupData(profilePhotoDetails));
     // Logic for opening the file picker or camera
   };
 
-  const handleContinue = () => {
+  const handleContinue = async() => {
+    if (signupData) {
+       try {
+              await dispatch(agentSignup(signupData)).unwrap();
+              console.log('Signup Success');
+
+              // Navigate to the otp screen
+              // navigation.navigate(AuthScreens.SelectService);
+            } catch {
+              console.log('Signup failed');
+            }
+          }
     console.log('Continue button pressed');
   };
 
@@ -33,7 +64,7 @@ const AddProfilePhotoScreen: React.FC = () => {
           title="Add your Profile Photo"
           description="We encourage you to upload a latest picture"
         />
-        <UploadPhoto onUpload={handleUpload} />
+        <UploadPhoto onUpload={handleUpload} image={image} />
       </View>
       {/* Footer */}
       <View style={styles.footer}>
