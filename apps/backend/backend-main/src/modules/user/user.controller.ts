@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -19,7 +20,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { DeleteResult, UpdateResult } from "typeorm";
-
+import { Response } from "express";
 import { User } from "../../entity/User";
 import { Roles } from "../../shared/decorators/roles.decorator";
 import { UserRoleEnum } from "../../shared/enums";
@@ -34,10 +35,14 @@ import {
 } from "./dto/user.dto";
 import { UserService } from "./user.service";
 import { TCreateUser, TGetUserProfile, TUpdateUser } from "./user.types";
+import { ConfigService } from "@nestjs/config";
 @ApiTags("Users")
 @Controller("user")
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService,
+  ) { }
 
   /**
    * Create a new user.
@@ -88,7 +93,8 @@ export class UserController {
   async createUser(
     @Body() createUserDto: TCreateUser,
     @Req() request: ICustomRequest,
-  ): Promise<IApiResponse<number>> {
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<IApiResponse<{ accessToken: string }>> {
     const phoneNumberFromGuard = request.user.phoneNumber;
     if (
       createUserDto.phoneNumber &&
@@ -100,11 +106,21 @@ export class UserController {
     }
     createUserDto.phoneNumber = phoneNumberFromGuard;
     createUserDto.role = UserRoleEnum.CUSTOMER;
-    const userId = await this.userService.createUser(createUserDto);
+
+    const { accessToken, refreshToken } =
+      await this.userService.createUser(createUserDto);
+
+    response.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: this.configService.get<string>("ENVIRONMENT") === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
+    });
+
     return {
       success: true,
       message: "User created successfully.",
-      data: userId,
+      data: { accessToken },
     };
   }
 

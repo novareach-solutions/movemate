@@ -33,8 +33,7 @@ export class MediaService {
       Bucket: this.bucketName,
       Key: `${Date.now()}-${file.originalname}`,
       Body: file.buffer,
-      ContentType: file.mimetype,
-      ACL: "public-read",
+      ContentType: file.mimetype
     };
 
     try {
