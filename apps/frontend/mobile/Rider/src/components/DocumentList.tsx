@@ -38,7 +38,6 @@ const DocumentList: React.FC<DocumentListProps> = ({
   onCardPress,
 }) => {
   const navigation = useNavigation();
-
   const renderItem = ({item}: {item: Document}) => (
     <TouchableOpacity
       style={styles.card}

@@ -36,7 +36,7 @@ console.log('signupData>>>>', signupData)
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <StepIndicator current={3} total={4} />
+        <StepIndicator current={3} total={5} />
         <View style={styles.content}>
           <TitleDescription
             title="Enter your ABN details"

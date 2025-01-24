@@ -49,7 +49,7 @@ const DAPCompleteProfileScreen = () => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View style={styles.container}>
-        <StepIndicator current={1} total={4} />
+        <StepIndicator current={1} total={5} />
         <ProfileForm
           title="Complete your Profile"
           description="Add your details to get started"

@@ -32,7 +32,7 @@ const UploadPhoto: React.FC<UploadPhotoProps> = ({onUpload, image}) => {
         )}
       </View>
       <TouchableOpacity style={styles.uploadButton} onPress={onUpload}>
-        <Text style={styles.uploadButtonText}>Upload</Text>
+        <Text style={styles.uploadButtonText}>{image ? "Retry" : "Upload"}</Text>
       </TouchableOpacity>
     </View>
   );

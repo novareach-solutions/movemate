@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -48,11 +48,16 @@ const Onboarding: React.FC = () => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
     const currentIndex = Math.round(contentOffsetX / width);
     setCurrentSlideIndex(currentIndex);
-  };
+  };  
 
   const handleNavigation = () => {
-    // navigation.navigate(AuthScreens.Login);
-    navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    navigation.navigate(AuthScreens.Login);
+    // navigation.navigate(DeliverAPackage.CompleteProfile);
+    // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
+    // navigation.navigate(DeliverAPackage.EnterABN);
+    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    // navigation.navigate(DeliverAPackage.UploadDocuments);
+
   };
   const Footer = () => (
     <View style={styles.footer}>

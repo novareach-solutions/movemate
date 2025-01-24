@@ -11,6 +11,8 @@ const apiEndpoints = {
     agentSignup:createEndpoint('/auth/signup'),
     fetchProfile: '/profile',
     fetchVehicles: '/vehicles',
+    uploadMedia:createEndpoint('/media/upload'),
+    agentDoc:createEndpoint('/agent/document'),
   };
   
   export default apiEndpoints;

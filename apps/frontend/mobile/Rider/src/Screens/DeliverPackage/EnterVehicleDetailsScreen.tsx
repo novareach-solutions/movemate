@@ -45,7 +45,7 @@ const EnterVehicleDetailsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <StepIndicator current={3} total={4} />
+        <StepIndicator current={2} total={5} />
         <ScrollView>
           <TitleDescription
             title="Enter your vehicle details"

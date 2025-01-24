@@ -6279,6 +6279,11 @@ react-native-screens@^4.3.0, "react-native-screens@>= 4.0.0":
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
+react-native-simple-toast@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.npmjs.org/react-native-simple-toast/-/react-native-simple-toast-3.3.2.tgz"
+  integrity sha512-jtZa5VXLDc3Rr+1a2eYyviakxOXP8U9AFYp1VWlslApi0wkiNeyAQ4yLZbIY8nayrbHTUSkERiDzKoCsy9v7Dw==
+
 react-native-svg@^15.10.1:
   version "15.11.1"
   resolved "https://registry.npmjs.org/react-native-svg/-/react-native-svg-15.11.1.tgz"
@@ -6311,7 +6316,7 @@ react-native-web@*, react-native-web@0.9.x:
     prop-types "^15.6.0"
     react-timer-mixin "^0.13.4"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.65 <1.0", react-native@>=0.40.0, react-native@>=0.57, react-native@>=0.69.9, react-native@0.76.5:
+react-native@*, "react-native@^0.0.0-0 || >=0.65 <1.0", react-native@>=0.40.0, react-native@>=0.57, react-native@>=0.69.9, react-native@>=0.71.0, react-native@0.76.5:
   version "0.76.5"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.76.5.tgz"
   integrity sha512-op2p2kB+lqMF1D7AdX4+wvaR0OPFbvWYs+VBE7bwsb99Cn9xISrLRLAgFflZedQsa5HvnOGrULhtnmItbIKVVw==

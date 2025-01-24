@@ -12,7 +12,6 @@ import {colors} from '../theme/colors';
 import {formStyles} from '../theme/form';
 
 interface DocumentUploadProps {
-  stepIndicator: {current: number; total: number};
   title: string;
   guidelines: string[];
   uploadInstructions: string[];
@@ -20,7 +19,6 @@ interface DocumentUploadProps {
 }
 
 const DocumentUpload: React.FC<DocumentUploadProps> = ({
-  stepIndicator,
   title,
   guidelines,
   uploadInstructions,
@@ -29,10 +27,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <StepIndicator
-          current={stepIndicator.current}
-          total={stepIndicator.total}
-        />
+      
         <TitleDescription
           title={title}
           description="Follow the guidelines below to upload"

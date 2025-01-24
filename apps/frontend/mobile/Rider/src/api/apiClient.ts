@@ -2,6 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiEndpoints from './apiEndPoints';
 import { generateCurlCommand } from '../utils/generateCurl';
+import { Alert } from 'react-native'; // Import Alert from React Native
 
 const apiClient = axios.create({
   baseURL: apiEndpoints.baseURL,
@@ -11,35 +12,30 @@ const apiClient = axios.create({
 // Request Interceptor
 apiClient.interceptors.request.use(
   async (config) => {
-    // Retrieve tokens from AsyncStorage
     const accessToken = await AsyncStorage.getItem('accessToken');
     const onboardingToken = await AsyncStorage.getItem('onboardingToken');
 
-    // Add Authorization header if accessToken exists
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-    // Add Onboarding-Token header if onboardingToken exists
     if (onboardingToken) {
       config.headers['onboarding_token'] = onboardingToken;
     }
+    config.headers['Content-Type'] = 'text/plain';
 
-    // Generate and log cURL command
     const curlCommand = generateCurlCommand(config);
     console.log('cURL Command:', curlCommand);
-
-    console.log('Request Headers:', config.headers); // Debugging headers
+    console.log('Request Headers:', config.headers);
     return config;
   },
   (error) => Promise.reject(error),
 );
 
-// Add a response interceptor
+// Response Interceptor
 apiClient.interceptors.response.use(
   (response) => {
-    // Log response headers
-    console.log('Response Headers:', response.headers); 
+    console.log('Response Headers:', response.headers);
     return response;
   },
   async (error) => {
@@ -61,11 +57,13 @@ apiClient.interceptors.response.use(
         } catch (err) {
           console.error('Token Refresh Error:', err);
           await AsyncStorage.clear();
+          Alert.alert('Session Expired', 'Please log in again.');
           // Redirect to login screen
           return Promise.reject(err);
         }
       } else {
         await AsyncStorage.clear();
+        Alert.alert('Session Expired', 'Please log in again.');
         // Redirect to login screen
         return Promise.reject(error);
       }
@@ -74,11 +72,15 @@ apiClient.interceptors.response.use(
     // Handle 403 Forbidden errors
     if (error.response.status === 403) {
       await AsyncStorage.clear();
+      Alert.alert('Access Denied', 'You are not authorized to access this resource.');
       console.warn('Access forbidden: Logging out');
       return Promise.reject(error);
     }
 
+    // General error handling
+    const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
     console.error('Response Error:', error);
+    Alert.alert('Error', errorMessage); // Show alert with error message
     return Promise.reject(error);
   },
 );

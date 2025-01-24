@@ -4,6 +4,10 @@ import apiClient from '../../api/apiClient';
 import apiEndpoints from '../../api/apiEndPoints';
 import axios from 'axios';
 import { saveToken } from '../../utils/manageToken';
+import { SimpleToast } from '../../utils/helpers';
+
+const dummyImageApi = 'https://api.escuelajs.co/api/v1/files/upload';
+
 interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
@@ -40,28 +44,59 @@ interface AgentSignupPayload {
   profilePhoto: string;
 }
 
+interface agentDoc {
+  name:string;
+  description:string;
+  url:string;
+}
+
 // otp request
 export const requestOtp = createAsyncThunk(
   apiEndpoints.requestOtp,
   async ({ phone }: { phone: string }) => {
     try {
-      const response = await apiClient.post(apiEndpoints.requestOtp, { phoneNumber:phone });
-      console.log('OTPresponse', response)
-      // console.log('OTPresponse', response)
+      const response = await apiClient.post(apiEndpoints.requestOtp, { phoneNumber: phone });
+      SimpleToast(response.data.message);
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Axios error: Has response, request, and other properties
-        console.error('API Error:', error.response?.data || error.message);
-        throw error;
-      } else {
-        // Non-Axios error: Handle accordingly
-        console.error('Unexpected Error:', error);
-        throw new Error('An unexpected error occurred');
+        // Axios error: Handle cases with and without a response
+        if (error.response) {
+          // The server responded with a status code outside the range of 2xx
+          console.error('API Error:', error.response.data);
+          throw new Error(error.response.data?.message || 'Request failed');
+        } else if (error.request) {
+          // The request was made, but no response was received
+          console.error('No response received:', error.request);
+          throw new Error('No response from server. Please try again later.');
+        }
       }
+
+      // Non-Axios error (unexpected issues)
+      console.error('Unexpected Error:', error);
+      throw new Error('An unexpected error occurred. Please try again.');
     }
   }
-); 
+);
+
+// uploadMedia
+export const uploadMedia = createAsyncThunk(
+  dummyImageApi,
+  async (formData: FormData, { rejectWithValue }) => {
+    try {
+      const headers = {
+        'Content-Type': 'multipart/form-data',
+      };
+      const response = await axios.post(dummyImageApi, formData, {
+        headers,
+      });
+
+      return response.data; // Assuming response contains the public URL
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 // verify otp    
 export const verifyOtp = createAsyncThunk(
@@ -77,7 +112,6 @@ export const verifyOtp = createAsyncThunk(
        }
  
        return response.data;
-      return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // Axios error: Has response, request, and other properties
@@ -116,7 +150,19 @@ export const agentSignup = createAsyncThunk(
   }
 );
 
-
+export const uploadAgentDoc = createAsyncThunk(
+  apiEndpoints.agentDoc,
+  async (payload: agentDoc) => {
+    console.log('payload', payload)
+    try {
+      const response = await apiClient.post(apiEndpoints.agentDoc, payload);
+      return response.data;
+    } catch (error) {
+        console.error('Unexpected Error:', error);
+        throw new Error('An unexpected error occurred');
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: 'auth',
