@@ -8,30 +8,44 @@ import {
   Image,
   Keyboard,
   TouchableWithoutFeedback,
-  TextStyle,
+  TextStyle,ActivityIndicator
 } from 'react-native';
 import PhoneInput from 'react-native-phone-number-input';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {images} from '../assets/images/images';
+import { useNavigation } from '@react-navigation/native';
+import { AuthScreens } from '../navigation/ScreenNames';
+import { useAppDispatch } from '../redux/hook';
+import { requestOtp } from '../redux/slices/authSlice';
+
 
 const {width} = Dimensions.get('window');
 
 const Login: React.FC = () => {
   const phoneInput = useRef<PhoneInput>(null);
-  // const navigation = useNavigation();
+  const navigation = useNavigation();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isFilled, setIsFilled] = useState(false);
   const [isFocused, setIsFocused] = useState(false); // Track focus state
-
+  const [loading, setLoading] = useState(false); 
+  const dispatch = useAppDispatch();
   const handlePhoneNumberChange = (number: string) => {
     setIsFocused(true);
     setPhoneNumber(number);
-    setIsFilled(number.length > 0); // Change button style when input is filled
+    setIsFilled(number.length > 0);
   };
 
-  const handleSendCode = () => {
-    // navigation.navigate(AuthScreens.OtpScreen, {phoneNumber});
+  const handleSendCode = async () => {
+    setLoading(true); 
+    try {
+      await dispatch(requestOtp({ phone: phoneNumber })).unwrap();
+      navigation.navigate(AuthScreens.OtpScreen, { phoneNumber });
+    } catch {
+      console.log('Request OTP failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const dismissKeyboard = () => {
@@ -65,21 +79,27 @@ const Login: React.FC = () => {
           }}
         />
 
-        <TouchableOpacity
-          style={[
-            styles.button,
-            isFilled ? styles.buttonFilled : styles.buttonOutlined,
-          ]}
-          onPress={handleSendCode}
-          disabled={!isFilled}>
+<TouchableOpacity
+        style={[
+          styles.button,
+          isFilled ? styles.buttonFilled : styles.buttonOutlined,
+        ]}
+        onPress={handleSendCode}
+        disabled={!isFilled || loading} // Disable button during loading
+      >
+        {loading ? (
+          <ActivityIndicator color={colors.white} /> // Render spinner
+        ) : (
           <Text
             style={[
               styles.buttonText,
               isFilled ? styles.buttonTextFilled : styles.buttonTextOutlined,
-            ]}>
+            ]}
+          >
             Send Code
           </Text>
-        </TouchableOpacity>
+        )}
+      </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
   );

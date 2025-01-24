@@ -13,6 +13,10 @@ import {
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {RootNavigationProp, RootRouteProp} from '../navigation/type';
+import { useNavigation } from '@react-navigation/native';
+import { AuthScreens } from '../navigation/ScreenNames';
+import { verifyOtp } from '../redux/slices/authSlice';
+import { useAppDispatch } from '../redux/hook';
 
 type OtpScreenProps = {
   route: RootRouteProp<'OtpScreen'>;
@@ -21,10 +25,12 @@ type OtpScreenProps = {
 
 const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
   const {phoneNumber} = route.params;
-  const [otp, setOtp] = useState<string[]>(['', '', '', '']);
+  const [otp, setOtp] = useState<string[]>(['', '', '', '','','']);
   const [timer, setTimer] = useState(60);
+   const navigation = useNavigation();
   const [error, setError] = useState(false);
   const inputs = useRef<TextInput[]>([]);
+  const dispatch = useAppDispatch();
   useEffect(() => {
     const interval = setInterval(() => {
       setTimer(prev => (prev > 0 ? prev - 1 : 0));
@@ -38,33 +44,33 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
     setOtp(newOtp);
 
     // Focus handling
-    if (value && index < 3) {
+    if (value && index < 5) {
       inputs.current[index + 1]?.focus();
     } else if (!value && index > 0) {
       inputs.current[index - 1]?.focus();
     }
   };
 
-  const handleVerify = () => {
-    if (error) {
-      setError(false);
-      // setTimer(60);
-      setOtp(['', '', '', '']);
-      inputs.current[0]?.focus();
-    }
+  const handleVerify = async() => {
+    // if (error) {
+    //   setError(false);
+    //   // setTimer(60);
+    //   setOtp(['', '', '', '','','']);
+    //   inputs.current[0]?.focus();
+    // }
     const enteredOtp = otp.join('');
-    if (enteredOtp !== '1234') {
-      setError(true);
-    } else {
-      // navigation.navigate(AuthScreens.CompleteProfileScreen);
-      setError(false);
+    try {
+      await dispatch(verifyOtp({ phone: phoneNumber,otp:enteredOtp })).unwrap();
+      // Navigate to the otp screen
+      navigation.navigate(AuthScreens.CompleteProfileScreen);
+    } catch {
+      console.log('Otp verification failed');
     }
   };
-  console.log(error);
 
   const handleResend = () => {
     setTimer(60);
-    setOtp(['', '', '', '']);
+    setOtp(['', '', '', '','','']);
     setError(false);
     inputs.current[0]?.focus();
   };

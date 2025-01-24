@@ -11,10 +11,14 @@ import {
   KeyboardTypeOptions,
   SafeAreaView,
   TextStyle,
+  ActivityIndicator,Alert
 } from 'react-native';
 import Header from '../components/Header';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
+import { useNavigation } from '@react-navigation/native';
+import { useAppDispatch } from '../redux/hook';
+import { userSignup } from '../redux/slices/authSlice';
 type FormFields = {
   firstName: string;
   lastName: string;
@@ -28,8 +32,9 @@ type FormFields = {
 type Errors = Partial<Record<keyof FormFields, string>>;
 
 const CompleteProfileScreen = () => {
-  // const navigation = useNavigation();
-
+  const navigation = useNavigation();
+const dispatch = useAppDispatch();
+const [loading, setLoading] = useState(false); 
   const [form, setForm] = useState<FormFields>({
     firstName: '',
     lastName: '',
@@ -62,10 +67,26 @@ const CompleteProfileScreen = () => {
   //   return Object.keys(newErrors).length === 0;
   // };
 
-  const handleSubmit = () => {
-    // if (validateForm()) {
-    //   navigation.navigate(AppScreens.AppLayoutScreen);
-    // }
+  const handleSubmit = async() => {
+
+    const payload = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      street: form.address,
+      suburb: form.suburb,
+      state: form.state,
+      postalCode: Number(form.postalCode)
+    }
+     setLoading(true); 
+        try {
+          await dispatch(userSignup(payload)).unwrap();
+          Alert.alert('Session Expired', 'Please log in again.');
+        } catch {
+          console.log('Request OTP failed');
+        } finally {
+          setLoading(false);
+        }
   };
 
   const handleInputChange = (field: keyof FormFields, value: string) => {
@@ -121,23 +142,28 @@ const CompleteProfileScreen = () => {
               </View>
             ))}
 
-            <TouchableOpacity
-              style={[
-                styles.button,
-                Object.values(form).every(value => value) &&
-                  styles.buttonEnabled,
-              ]}
-              onPress={handleSubmit}
-              disabled={!Object.values(form).every(value => value)}>
-              <Text
-                style={[
-                  styles.buttonText,
-                  Object.values(form).every(value => value) &&
-                    styles.buttonTextEnabled,
-                ]}>
-                Sign Up
-              </Text>
-            </TouchableOpacity>
+<TouchableOpacity
+  style={[
+    styles.button,
+    Object.values(form).every(value => value) &&
+      styles.buttonEnabled,
+  ]}
+  onPress={handleSubmit}
+  disabled={!Object.values(form).every(value => value) || loading}>
+  {loading ? (
+    <ActivityIndicator color={colors.white} /> 
+  ) : (
+    <Text
+      style={[
+        styles.buttonText,
+        Object.values(form).every(value => value) &&
+          styles.buttonTextEnabled,
+      ]}>
+      Sign Up
+    </Text>
+  )}
+</TouchableOpacity>
+
 
             <View style={styles.footer}>
               <Text style={styles.footerText}>

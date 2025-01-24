@@ -15,6 +15,8 @@ import {
 import {typography} from '../theme/typography';
 import {colors} from '../theme/colors';
 import {images} from '../assets/images/images';
+import { useNavigation } from '@react-navigation/native';
+import { AuthScreens } from '../navigation/ScreenNames';
 const {width, height} = Dimensions.get('window');
 
 interface Slide {
@@ -62,7 +64,7 @@ const slides: Slide[] = [
 
 const Onboarding: React.FC = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  // const navigation = useNavigation();
+  const navigation = useNavigation();
   const updateSlidePosition = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
     const currentIndex = Math.round(contentOffsetX / width);
@@ -70,7 +72,8 @@ const Onboarding: React.FC = () => {
   };
 
   const handleNavigation = () => {
-    // navigation.navigate(AuthScreens.LoginScreen);
+    navigation.navigate(AuthScreens.LoginScreen);
+    // navigation.navigate(AuthScreens.CompleteProfileScreen);
   };
   const Footer = () => (
     <View style={styles.footer}>
