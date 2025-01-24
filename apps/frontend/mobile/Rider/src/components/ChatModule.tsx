@@ -30,12 +30,7 @@ interface ChatModuleProps {
   onReport?: () => void;
 }
 
-const ChatModule: React.FC<ChatModuleProps> = ({
-  messages,
-  onSend,
-  headerTitle,
-  onReport,
-}) => {
+const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
   const [inputText, setInputText] = useState('');
 
   const handleSend = () => {

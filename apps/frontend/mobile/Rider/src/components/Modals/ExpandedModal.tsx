@@ -9,14 +9,15 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Dimensions,
+  TextStyle,
 } from 'react-native';
 import {colors} from '../../theme/colors';
 import {formStyles} from '../../theme/form';
 import {typography} from '../../theme/typography';
 import {images} from '../../assets/images/images';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
-import {useNavigation} from '@react-navigation/native';
-import {AppScreens} from '../../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -39,14 +40,16 @@ const InfoRow: React.FC<{iconSource: any; text: string; bold?: boolean}> = ({
     <Text
       style={[
         styles.infoText,
-        bold ? {fontWeight: typography.fontWeight.bold as any} : {},
+        bold
+          ? {fontWeight: typography.fontWeight.bold as TextStyle['fontWeight']}
+          : {},
       ]}>
       {text}
     </Text>
   </View>
 );
 
-const ExpandedModal: React.FC<ExpandedModalProps> = ({
+const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   isVisible,
   onClose,
   driverName,
@@ -57,7 +60,7 @@ const ExpandedModal: React.FC<ExpandedModalProps> = ({
   const [height] = useState(new Animated.Value(SCREEN_HEIGHT * 0.2)); // Start with 20% height
   const [isExpanded, setIsExpanded] = useState(false);
   const [isConfirmPhotoVisible, setIsConfirmPhotoVisible] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
 
   const handleExpand = () => {
     setIsExpanded(true);
@@ -247,7 +250,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: typography.fontSize.semiMedium,
-    fontWeight: typography.fontWeight.bold as any,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.text.primary,
     marginBottom: 10,
     textAlign: 'center',
@@ -260,7 +263,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     fontSize: typography.fontSize.medium,
-    fontWeight: typography.fontWeight.bold as any,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.text.primary,
     marginBottom: 5,
   },
@@ -284,7 +287,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
     fontFamily: typography.fontFamily.regular,
-    fontWeight: typography.fontWeight.bold as any,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
   },
   itemsContainer: {
     padding: 20,
@@ -296,7 +299,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
     marginBottom: 5,
-    fontWeight: typography.fontWeight.bold as any,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
   },
   location: {
     flexDirection: 'row',
@@ -341,7 +344,7 @@ const styles = StyleSheet.create({
   },
   confirmPhotoTitle: {
     fontSize: typography.fontSize.large,
-    fontWeight: typography.fontWeight.bold as any,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.text.primary,
     marginBottom: 20,
   },
@@ -364,4 +367,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExpandedModal;
+export default OrderExpandedModal;
