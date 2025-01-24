@@ -22,6 +22,7 @@ export type AppScreensParamList = {
   CancellationReasonScreen: undefined;
   ChatScreen: undefined;
   ProfileScreen: undefined;
+  ComingSoonScreen: undefined;
 };
 
 export const AppScreens = {
@@ -32,6 +33,7 @@ export const AppScreens = {
   CancellationReason: 'CancellationReasonScreen',
   Chat: 'ChatScreen',
   Profile: 'ProfileScreen',
+  ComingSoon: 'ComingSoonScreen',
 } as const;
 
 export type DeliverAPackageParamList = {
@@ -91,4 +93,5 @@ export const ProfileScreens = {
   ManageAccount: 'ManageAccountScreen',
   AppSettings: 'AppSettingsScreen',
   SubscriptionPlans: 'SubscriptionPlansScreen',
+  ReplaceVehicle: 'ReplaceVehicleScreen',
 } as const;

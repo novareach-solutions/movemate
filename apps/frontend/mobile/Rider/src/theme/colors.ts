@@ -7,7 +7,7 @@ export const colors = {
   lightPurple: 'rgba(129, 35, 173, 0.22)',
   green: 'rgba(34, 165, 110, 1)',
   darkGreen: 'rgb(1, 73, 43)',
-  lightButtonBackground: 'rgba(129, 35, 173, 0.05)',
+  lightButtonBackground: '#fafafa',
   black: 'rgba(24, 24, 27, 1)',
   yellow: '#FFFCAA',
   text: {

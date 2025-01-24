@@ -4,7 +4,7 @@ import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
 import {images} from '../../../assets/images/images';
 import {useNavigation} from '@react-navigation/native';
-import {ProfileScreens} from '../../../navigation/ScreenNames';
+import {AppScreens, ProfileScreens} from '../../../navigation/ScreenNames';
 
 const AccountScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -14,7 +14,7 @@ const AccountScreen: React.FC = () => {
       id: 1,
       title: 'Vehicles',
       icon: images.vehicleIcon,
-      screen: ProfileScreens.Vehicles,
+      screen: ProfileScreens.ReplaceVehicle,
     },
     {
       id: 2,
@@ -26,7 +26,7 @@ const AccountScreen: React.FC = () => {
       id: 3,
       title: 'Bank Details',
       icon: images.bankIcon,
-      screen: ProfileScreens.BankDetails,
+      screen: AppScreens.ComingSoon,
     },
     {
       id: 4,
@@ -38,7 +38,7 @@ const AccountScreen: React.FC = () => {
       id: 5,
       title: 'App Settings',
       icon: images.settingsIcon,
-      screen: ProfileScreens.AppSettings,
+      screen: AppScreens.ComingSoon,
     },
   ];
 
