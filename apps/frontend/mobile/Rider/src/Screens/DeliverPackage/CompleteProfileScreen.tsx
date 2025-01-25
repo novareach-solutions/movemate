@@ -10,13 +10,13 @@ import {
 } from '../../navigation/ScreenNames';
 import { useAppDispatch } from '../../redux/hook';
 import { setSignupData } from '../../redux/slices/authSlice';
+import Header from '../../components/Header';
 
 type FormFields = {
   role: 'AGENT', 
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber:"+919908625158";
   address: string;
   suburb: string;
   state: string;
@@ -29,15 +29,14 @@ const DAPCompleteProfileScreen = () => {
   const handleFormSubmit = async(formData: FormFields) => {
     console.log('Form submitted:', formData);
     const user = {
-      role: 'AGENT', // Assign a default role if not provided
+      role: 'AGENT',
       firstName: formData.firstName,
       lastName: formData.lastName,
-      phoneNumber: "+919908625158",
       email: formData.email,
       street: formData.address,
       suburb: formData.suburb,
       state: formData.state,
-      postalCode:Number(formData.postalCode), // Ensure correct type if needed
+      postalCode:Number(formData.postalCode), 
     };
 
     console.log('user', user)
@@ -48,6 +47,8 @@ const DAPCompleteProfileScreen = () => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+     
+      <Header logo />
       <View style={styles.container}>
         <StepIndicator current={1} total={5} />
         <ProfileForm

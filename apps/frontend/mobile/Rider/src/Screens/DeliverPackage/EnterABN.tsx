@@ -15,6 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 import {DeliverAPackage} from '../../navigation/ScreenNames';
 import { useAppDispatch, useAppSelector } from '../../redux/hook';
 import { setSignupData } from '../../redux/slices/authSlice';
+import Header from '../../components/Header';
 
 const EnterABNScreen: React.FC = () => {
   const [abn, setAbn] = useState('');
@@ -35,6 +36,8 @@ console.log('signupData>>>>', signupData)
 
   return (
     <SafeAreaView style={styles.safeArea}>
+            <Header logo isBack />
+
       <View style={styles.container}>
         <StepIndicator current={3} total={5} />
         <View style={styles.content}>

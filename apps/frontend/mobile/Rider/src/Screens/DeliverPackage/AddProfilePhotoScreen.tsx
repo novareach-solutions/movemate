@@ -17,6 +17,7 @@ import { agentSignup, setSignupData, uploadMedia } from '../../redux/slices/auth
 import ImagePicker from 'react-native-image-crop-picker';
 import ConfirmPhotoModal from '../../components/Modals/ConfirmPhotoModal';
 import PhotoPickerModal from '../../components/common/PhotoPickerModal';
+import Header from '../../components/Header';
 
 const AddProfilePhotoScreen: React.FC = () => {
   // const navigation = useNavigation();
@@ -114,8 +115,8 @@ const AddProfilePhotoScreen: React.FC = () => {
   const handleContinue = async() => {
     if (signupData) {
        try {
+        console.log("signup initatiated")
               await dispatch(agentSignup(signupData)).unwrap();
-              console.log('Signup Success');
             } catch {
               console.log('Signup failed');
             }
@@ -125,6 +126,7 @@ const AddProfilePhotoScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <Header logo isBack />
       <View style={styles.container}>
         <StepIndicator current={4} total={5} />
         <TitleDescription
@@ -139,7 +141,7 @@ const AddProfilePhotoScreen: React.FC = () => {
           style={[formStyles.button, formStyles.buttonEnabled]}
           onPress={handleContinue}>
           <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
-            Continue
+            Create Account
           </Text>
         </TouchableOpacity>
         <Text style={formStyles.footerText}>

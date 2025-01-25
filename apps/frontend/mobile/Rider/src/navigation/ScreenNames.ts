@@ -3,6 +3,7 @@ export type AuthScreensParamList = {
   LoginScreen: undefined;
   OtpScreen: {
     phoneNumber: string;
+    login?: boolean
   };
   SelectServiceScreen: undefined;
 };
@@ -12,6 +13,7 @@ export const AuthScreens = {
   Login: 'LoginScreen',
   Otp: 'OtpScreen',
   SelectService: 'SelectServiceScreen',
+  SignupNumber: 'SignupNumberScreen',
 } as const;
 
 export type AppScreensParamList = {

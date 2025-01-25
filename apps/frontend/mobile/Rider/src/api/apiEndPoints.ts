@@ -8,7 +8,7 @@ const apiEndpoints = {
     veryfyOtp:createEndpoint('/auth/otp/verify'),
     login: createEndpoint('/auth/login'),
     refreshToken: createEndpoint('/auth/refresh_token'),
-    agentSignup:createEndpoint('/auth/signup'),
+    agentSignup:createEndpoint('/agent/signup'),
     fetchProfile: '/profile',
     fetchVehicles: '/vehicles',
     uploadMedia:createEndpoint('/media/upload'),

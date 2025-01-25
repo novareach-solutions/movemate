@@ -10,12 +10,13 @@ import {
 } from 'react-native';
 import StepIndicator from './StepIndicator';
 import TitleDescription from './TitleDescription';
-import {colors} from '../theme/colors';
-import {formStyles} from '../theme/form';
-import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
-import {DeliverAPackage} from '../navigation/ScreenNames';
-import {useNavigation} from '@react-navigation/native';
+import { colors } from '../theme/colors';
+import { formStyles } from '../theme/form';
+import { typography } from '../theme/typography';
+import { images } from '../assets/images/images';
+import { DeliverAPackage } from '../navigation/ScreenNames';
+import { useNavigation } from '@react-navigation/native';
+import Header from './Header';
 
 interface Document {
   id: string;
@@ -23,7 +24,7 @@ interface Document {
 }
 
 interface DocumentListProps {
-  stepIndicator: {current: number; total: number};
+  stepIndicator: { current: number; total: number };
   title: string;
   description: string;
   documents: Document[];
@@ -38,7 +39,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
   onCardPress,
 }) => {
   const navigation = useNavigation();
-  const renderItem = ({item}: {item: Document}) => (
+  const renderItem = ({ item }: { item: Document }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => onCardPress(item.title)}>
@@ -48,7 +49,8 @@ const DocumentList: React.FC<DocumentListProps> = ({
   );
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+      <Header logo isBack />
       <View style={styles.container}>
         <StepIndicator
           current={stepIndicator.current}

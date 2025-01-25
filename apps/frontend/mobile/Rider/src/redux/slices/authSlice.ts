@@ -1,3 +1,5 @@
+// authSlice.ts
+
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiClient from '../../api/apiClient';
@@ -15,7 +17,6 @@ interface AuthState {
   signupData: AgentSignupPayload | null;
 }
 
-// Initial state
 const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
@@ -23,13 +24,11 @@ const initialState: AuthState = {
   signupData: null,
 };
 
-// Payload structure for signup
 interface AgentSignupPayload {
   user: {
     role: string;
     firstName: string;
     lastName: string;
-    phoneNumber: string;
     email: string;
     street: string;
     suburb: string;
@@ -44,44 +43,39 @@ interface AgentSignupPayload {
   profilePhoto: string;
 }
 
-interface agentDoc {
-  name:string;
-  description:string;
-  url:string;
+interface AgentDoc {
+  name: string;
+  description: string;
+  url: string;
 }
 
-// otp request
+// Request OTP
 export const requestOtp = createAsyncThunk(
-  apiEndpoints.requestOtp,
+  'auth/requestOtp',
   async ({ phone }: { phone: string }) => {
     try {
       const response = await apiClient.post(apiEndpoints.requestOtp, { phoneNumber: phone });
       SimpleToast(response.data.message);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       if (axios.isAxiosError(error)) {
-        // Axios error: Handle cases with and without a response
         if (error.response) {
-          // The server responded with a status code outside the range of 2xx
           console.error('API Error:', error.response.data);
           throw new Error(error.response.data?.message || 'Request failed');
         } else if (error.request) {
-          // The request was made, but no response was received
           console.error('No response received:', error.request);
           throw new Error('No response from server. Please try again later.');
         }
       }
-
-      // Non-Axios error (unexpected issues)
       console.error('Unexpected Error:', error);
       throw new Error('An unexpected error occurred. Please try again.');
     }
   }
 );
 
-// uploadMedia
+// Upload Media
 export const uploadMedia = createAsyncThunk(
-  dummyImageApi,
+  'auth/uploadMedia',
   async (formData: FormData, { rejectWithValue }) => {
     try {
       const headers = {
@@ -98,27 +92,25 @@ export const uploadMedia = createAsyncThunk(
   }
 );
 
-// verify otp    
+// Verify OTP
 export const verifyOtp = createAsyncThunk(
-  apiEndpoints.veryfyOtp,
-  async ({ phone,otp }: { phone: string;otp: string }) => {
+  'auth/verifyOtp',
+  async ({ phone, otp }: { phone: string; otp: string }) => {
     try {
-      const response = await apiClient.post(apiEndpoints.veryfyOtp, { phoneNumber:phone,otp });
-       // Store onboarding token if present in the response headers
-       const onboardingToken = response.headers['onboarding_token'];
-       if (onboardingToken) {
-         await saveToken('onboardingToken', onboardingToken);
-         console.log('Onboarding Token Stored:', onboardingToken);
-       }
- 
-       return response.data;
-    } catch (error) {
+      const response = await apiClient.post(apiEndpoints.veryfyOtp, { phoneNumber: phone, otp });
+      // Store onboarding token if present in the response headers
+      const onboardingToken = response.headers['onboarding_token'];
+      if (onboardingToken) {
+        await saveToken('onboardingToken', onboardingToken);
+        console.log('Onboarding Token Stored:', onboardingToken);
+      }
+
+      return response.data;
+    } catch (error: any) {
       if (axios.isAxiosError(error)) {
-        // Axios error: Has response, request, and other properties
         console.error('API Error:', error.response?.data || error.message);
-        throw error;
+        throw new Error(error.response?.data?.message || 'OTP verification failed');
       } else {
-        // Non-Axios error: Handle accordingly
         console.error('Unexpected Error:', error);
         throw new Error('An unexpected error occurred');
       }
@@ -126,40 +118,80 @@ export const verifyOtp = createAsyncThunk(
   }
 );
 
-// agent signup
+// Login
+export const login = createAsyncThunk(
+  'auth/login',
+  async (
+    { phone, otp }: { phone: string; otp: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await apiClient.post(
+        apiEndpoints.login,
+        { phoneNumber: phone, otp },
+        {
+          headers: {
+            role: 'AGENT',
+          },
+        }
+      );
+      // Assuming the response contains tokens
+      const { accessToken, refreshToken } = response.data;
+      if (accessToken && refreshToken) {
+        await saveToken('accessToken', accessToken);
+        await saveToken('refreshToken', refreshToken);
+      }
+      SimpleToast('Login successful!');
+      return response.data;
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error('API Error:', error.response.data);
+          return rejectWithValue(error.response.data?.message || 'Login failed');
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+          return rejectWithValue('No response from server. Please try again later.');
+        }
+      }
+      console.error('Unexpected Error:', error);
+      return rejectWithValue('An unexpected error occurred. Please try again.');
+    }
+  }
+);
+
+// Agent Signup
 export const agentSignup = createAsyncThunk(
-  apiEndpoints.agentSignup,
-  async (payload: AgentSignupPayload) => {
-    console.log('payload', payload)
+  'auth/agentSignup',
+  async (payload: AgentSignupPayload, { rejectWithValue }) => {
+    console.log('payload', payload);
     try {
       const response = await apiClient.post(apiEndpoints.agentSignup, payload);
       await AsyncStorage.setItem('accessToken', response.data.accessToken);
-      // await AsyncStorage.setItem('refreshToken', response.data.
+      SimpleToast(response.data.message);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       if (axios.isAxiosError(error)) {
-        // Axios error: Has response, request, and other properties
         console.error('API Error:', error.response?.data || error.message);
-        throw error;
+        return rejectWithValue(error.response?.data?.message || 'Signup failed');
       } else {
-        // Non-Axios error: Handle accordingly
         console.error('Unexpected Error:', error);
-        throw new Error('An unexpected error occurred');
+        return rejectWithValue('An unexpected error occurred. Please try again.');
       }
     }
   }
 );
 
+// Upload Agent Document
 export const uploadAgentDoc = createAsyncThunk(
-  apiEndpoints.agentDoc,
-  async (payload: agentDoc) => {
-    console.log('payload', payload)
+  'auth/uploadAgentDoc',
+  async (payload: AgentDoc, { rejectWithValue }) => {
+    console.log('payload', payload);
     try {
       const response = await apiClient.post(apiEndpoints.agentDoc, payload);
       return response.data;
-    } catch (error) {
-        console.error('Unexpected Error:', error);
-        throw new Error('An unexpected error occurred');
+    } catch (error: any) {
+      console.error('Unexpected Error:', error);
+      return rejectWithValue('An unexpected error occurred');
     }
   }
 );
@@ -174,16 +206,14 @@ const authSlice = createSlice({
     },
     setSignupData: (state, action: PayloadAction<Partial<AgentSignupPayload>>) => {
       if (state.signupData) {
-         // Merge with existing data
         state.signupData = { ...state.signupData, ...action.payload };
       } else {
-         // Initialize if null
         state.signupData = action.payload as AgentSignupPayload;
       }
     },
-    
   },
   extraReducers: (builder) => {
+    // Handle agentSignup
     builder
       .addCase(agentSignup.pending, (state) => {
         state.loading = true;
@@ -197,9 +227,52 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+
+    // Handle requestOtp
+    builder
+      .addCase(requestOtp.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(requestOtp.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(requestOtp.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Handle verifyOtp
+    builder
+      .addCase(verifyOtp.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyOtp.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(verifyOtp.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Handle login
+    builder
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+      })
+      .addCase(login.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
-// Export the reducer
-export const { logout,setSignupData } = authSlice.actions;
+// Export the actions and reducer
+export const { logout, setSignupData } = authSlice.actions;
 export default authSlice.reducer;

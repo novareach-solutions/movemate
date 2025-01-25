@@ -14,6 +14,7 @@ import {colors} from '../../theme/colors';
 import HelpButton from '../../components/HelpButton';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
+import Header from '../../components/Header';
 
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
@@ -60,6 +61,8 @@ const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+            <Header logo isBack />
+
       {/* Map Image */}
       <View style={styles.mapContainer}>
         <Image source={images.map} style={styles.mapImage} />

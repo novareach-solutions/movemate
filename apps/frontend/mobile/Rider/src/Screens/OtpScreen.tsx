@@ -1,4 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
+// OtpScreen.tsx
+
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -10,28 +12,30 @@ import {
   SafeAreaView,
   TextStyle,
 } from 'react-native';
-import {colors} from '../theme/colors';
-import {typography} from '../theme/typography';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
 import TitleDescription from '../components/TitleDescription';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AuthScreens, AuthScreensParamList, DeliverAPackage } from '../navigation/ScreenNames';
 import { useAppDispatch } from '../redux/hook';
-import { verifyOtp } from '../redux/slices/authSlice';
+import { verifyOtp, login } from '../redux/slices/authSlice'; 
+import Header from '../components/Header';
 
 interface OtpScreenProps {
   route: {
-    params: {phoneNumber: string};
+    params: { phoneNumber: string; login: boolean };
   };
 }
 
-const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
-  const {phoneNumber} = route.params;
-  const [otp, setOtp] = useState<string[]>(['', '', '', '','','']);
+const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
+  const { phoneNumber, login: isLogin } = route.params;
+  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [error, setError] = useState(false);
   const inputs = useRef<TextInput[]>([]);
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
- const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     const interval = setInterval(() => {
       setTimer(prev => (prev > 0 ? prev - 1 : 0));
@@ -52,29 +56,40 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
     }
   };
 
-  const handleVerify = async() => {
+  const handleVerify = async () => {
     const enteredOtp = otp.join('');
 
     try {
-          console.log('phoneNumber', phoneNumber)
-          await dispatch(verifyOtp({ phone: phoneNumber,otp:enteredOtp })).unwrap();
-          console.log('OTP Verified Successfully!');
-          // Navigate to the otp screen
-          navigation.navigate(AuthScreens.SelectService);
-        } catch {
-          console.log('Otp verification failed');
-        }
+      if (isLogin) {
+        // Dispatch login thunk
+        const response = await dispatch(login({ phone: phoneNumber, otp: enteredOtp })).unwrap();
+        console.log('Login Successful!', response);
+        // Navigate to the main app screen or dashboard
+        navigation.navigate(DeliverAPackage.Home); 
+      } else {
+        // Dispatch verifyOtp thunk
+        await dispatch(verifyOtp({ phone: phoneNumber, otp: enteredOtp })).unwrap();
+        console.log('OTP Verified Successfully!');
+        // Navigate to the next screen after OTP verification
+        navigation.navigate(AuthScreens.SelectService);
+      }
+    } catch (err: any) {
+      console.log('OTP Verification/Login failed', err);
+      setError(true);
+    }
   };
 
   const handleResend = () => {
     setTimer(60);
-    setOtp(['', '', '', '','','']);
+    setOtp(['', '', '', '', '', '']);
     setError(false);
     inputs.current[0]?.focus();
+    // Optionally, you can dispatch requestOtp again here
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+      <Header logo isBack />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <TitleDescription
@@ -82,7 +97,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
             description={`Enter the code sent to: ${phoneNumber}`}
           />
 
-          <View style={{marginBottom: 30}}>
+          <View style={{ marginBottom: 30 }}>
             <View style={styles.otpContainer}>
               {otp.map((digit, index) => (
                 <TextInput
@@ -91,10 +106,10 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
                   style={[
                     styles.input,
                     error
-                      ? {borderColor: colors.error}
+                      ? { borderColor: colors.error }
                       : digit
-                        ? {borderColor: colors.purple}
-                        : {borderColor: colors.border.primary},
+                        ? { borderColor: colors.purple }
+                        : { borderColor: colors.border.primary },
                   ]}
                   keyboardType="numeric"
                   maxLength={1}
@@ -106,7 +121,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
 
             {error && (
               <Text
-                style={{fontSize: 14, color: colors.error, marginVertical: 10}}>
+                style={{ fontSize: 14, color: colors.error, marginVertical: 10 }}>
                 Incorrect code, please try again
               </Text>
             )}
@@ -123,7 +138,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
                 styles.buttonText,
                 otp.every(digit => digit) && styles.buttonTextFilled,
               ]}>
-              Verify Now
+              {isLogin ? 'Login' : 'Verify Now'}
             </Text>
           </TouchableOpacity>
 
