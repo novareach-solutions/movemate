@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   TextInput,
@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import TitleDescription from '../../components/TitleDescription';
 import Dropdown from '../../components/Dropdown';
-import { formStyles } from '../../theme/form';
-import { colors } from '../../theme/colors';
+import {formStyles} from '../../theme/form';
+import {colors} from '../../theme/colors';
 import StepIndicator from '../../components/StepIndicator';
-import { DeliverAPackage } from '../../navigation/ScreenNames';
-import { useNavigation } from '@react-navigation/native';
-import { useAppDispatch, useAppSelector } from '../../redux/hook';
-import { setSignupData } from '../../redux/slices/authSlice';
+import {DeliverAPackage} from '../../navigation/ScreenNames';
+import {useNavigation} from '@react-navigation/native';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
+import {setSignupData} from '../../redux/slices/authSlice';
 import Header from '../../components/Header';
 
 const EnterVehicleDetailsScreen: React.FC = () => {
@@ -25,9 +25,9 @@ const EnterVehicleDetailsScreen: React.FC = () => {
   const [year, setYear] = useState('');
   const vehicleMakes = ['Toyota', 'Honda', 'Ford', 'BMW'];
   const vehicleModels = ['Corolla', 'Civic', 'Mustang', 'X5'];
-  const signupData = useAppSelector((state) => state.auth.signupData);
+  const signupData = useAppSelector(state => state.auth.signupData);
   const dispatch = useAppDispatch();
-  console.log('signupData', signupData)
+  console.log('signupData', signupData);
   const navigation = useNavigation();
 
   const handleContinue = async () => {
@@ -35,11 +35,11 @@ const EnterVehicleDetailsScreen: React.FC = () => {
       vehicleMake: make,
       vehicleModel: model,
       vehicleYear: Number(year),
-      agentType: "DELIVERY",
+      agentType: 'DELIVERY',
     };
 
     await dispatch(setSignupData(vehicleDetails));
-    console.log({ make, model, year });
+    console.log({make, model, year});
     navigation.navigate(DeliverAPackage.EnterABN);
   };
 

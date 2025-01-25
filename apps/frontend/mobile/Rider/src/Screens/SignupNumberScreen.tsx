@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, {useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -11,16 +11,16 @@ import {
   TextStyle,
 } from 'react-native';
 import PhoneInput from 'react-native-phone-number-input';
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
-import { images } from '../assets/images/images';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AuthScreens, AuthScreensParamList } from '../navigation/ScreenNames';
-import { requestOtp } from '../redux/slices/authSlice';
-import { useAppDispatch } from '../redux/hook';
+import {colors} from '../theme/colors';
+import {typography} from '../theme/typography';
+import {images} from '../assets/images/images';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
+import {requestOtp} from '../redux/slices/authSlice';
+import {useAppDispatch} from '../redux/hook';
 import Header from '../components/Header';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const SignupNumberScreen: React.FC = () => {
   const phoneInput = useRef<PhoneInput>(null);
@@ -38,8 +38,8 @@ const SignupNumberScreen: React.FC = () => {
 
   const handleSendCode = async () => {
     try {
-      await dispatch(requestOtp({ phone: phoneNumber })).unwrap();
-      navigation.navigate(AuthScreens.Otp, { phoneNumber });
+      await dispatch(requestOtp({phone: phoneNumber})).unwrap();
+      navigation.navigate(AuthScreens.Otp, {phoneNumber});
     } catch {
       console.log('Request Otp failed');
     }
@@ -53,7 +53,6 @@ const SignupNumberScreen: React.FC = () => {
     <View>
       <Header isBack />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
-
         <View style={styles.container}>
           <Image source={images.logo} style={styles.logo} />
           <Text style={styles.heading}>Create an Account</Text>
@@ -68,7 +67,7 @@ const SignupNumberScreen: React.FC = () => {
             onChangeFormattedText={handlePhoneNumberChange}
             containerStyle={[
               styles.phoneContainer,
-              isFocused && { borderColor: colors.purple },
+              isFocused && {borderColor: colors.purple},
             ]}
             textContainerStyle={styles.textInput}
             textInputStyle={styles.textInputStyle}
@@ -95,7 +94,8 @@ const SignupNumberScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
         </View>
-      </TouchableWithoutFeedback></View>
+      </TouchableWithoutFeedback>
+    </View>
   );
 };
 

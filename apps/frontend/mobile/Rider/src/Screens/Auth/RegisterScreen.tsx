@@ -16,8 +16,8 @@ import {typography} from '../../theme/typography';
 import {images} from '../../assets/images/images';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, AuthScreensParamList} from '../../navigation/ScreenNames';
-import { useAppDispatch } from '../../redux/hook';
-import { requestOtp } from '../../redux/slices/authSlice';
+import {useAppDispatch} from '../../redux/hook';
+import {requestOtp} from '../../redux/slices/authSlice';
 
 const {width} = Dimensions.get('window');
 
@@ -35,9 +35,9 @@ const Register: React.FC = () => {
     setIsFilled(number.length > 0);
   };
 
-  const handleSendCode = async() => {
+  const handleSendCode = async () => {
     try {
-      await dispatch(requestOtp({ phone: phoneNumber })).unwrap();
+      await dispatch(requestOtp({phone: phoneNumber})).unwrap();
       console.log('Request Otp successful');
       // Navigate to the otp screen
       navigation.navigate(AuthScreens.Otp, {phoneNumber});
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 8,
     height: '100%',
-    paddingVertical: 0, 
+    paddingVertical: 0,
   },
   textInputStyle: {
     fontSize: typography.fontSize.medium,

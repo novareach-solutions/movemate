@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,18 +9,22 @@ import {
   Animated,
 } from 'react-native';
 import StatCard from '../../components/StatCard';
-import {images} from '../../assets/images/images';
-import {colors} from '../../theme/colors';
+import { images } from '../../assets/images/images';
+import { colors } from '../../theme/colors';
 import HelpButton from '../../components/HelpButton';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AppScreens, AppScreensParamList } from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
+import DeliveryModal from '../../components/Modals/DeliveryModal';
+import ExpandedModal from '../../components/Modals/ExpandedModal';
+import EarningsModal from '../../components/Modals/EarningsModal';
+import OrderModal from '../../components/Modals/OrderModal';
 
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
-  //   const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
-  //   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
+  const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
+  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
 
   const toggleStatus = () => {
@@ -32,36 +36,38 @@ const HomeScreen: React.FC = () => {
     }).start();
   };
 
-  //   // Show the `DeliveryModal` after 3 seconds
-  //   useEffect(() => {
-  //     const timer = setTimeout(() => {
-  //       setIsOrderModalVisible(true);
-  //     }, 3000);
+  // Show the `DeliveryModal` after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsOrderModalVisible(true);
+    }, 8000);
 
-  //     return () => clearTimeout(timer);
-  //   }, []);
+    return () => clearTimeout(timer);
+  }, []);
 
-  //   const handleTakePhoto = () => {
-  //     console.log('Taking a photo for proof...');
-  //     // Add your camera logic here
-  //   };
+  const handleTakePhoto = () => {
+    console.log('Taking a photo for proof...');
+    // Add your camera logic here
+  };
 
-  //   const handleOrderDelivered = () => {
-  //     console.log('Order marked as delivered.');
-  //     setIsOrderModalVisible(false); // Close DeliveryModal
-  //   };
+  const handleOrderDelivered = () => {
+    console.log('Order marked as delivered.');
+    setIsOrderModalVisible(false); 
+  };
 
-  //     // Handle "Accept Order" button press
-  //   const handleAcceptOrder = () => {
-  //     setIsOrderModalVisible(false); // Close `OrderModal`
-  //     setTimeout(() => {
-  //       setIsExpandedModalVisible(true); // Open `ExpandedModal` with a slight delay
-  //     }, 300);
-  //   };
+  // Handle "Accept Order" button press
+  const handleAcceptOrder = () => {
+    setIsOrderModalVisible(false); 
+    setTimeout(() => {
+      setIsExpandedModalVisible(true); 
+    }, 300);
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-            <Header logo isBack />
+
+      <Header logo home />
+
 
       {/* Map Image */}
       <View style={styles.mapContainer}>
@@ -90,7 +96,7 @@ const HomeScreen: React.FC = () => {
       </View>
 
       {/* Sliding Drawer */}
-      <Animated.View style={[styles.drawer, {height: drawerHeight}]}>
+      <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
         <View style={styles.statsContainer}>
           <StatCard icon={images.money} value="$50" label="EARNINGS" />
           <StatCard icon={images.cart} value="7" label="ORDERS" />
@@ -111,7 +117,7 @@ const HomeScreen: React.FC = () => {
       </View>
 
       {/* Order Modal */}
-      {/* <OrderModal
+      <OrderModal
         isVisible={isOrderModalVisible}
         onClose={handleAcceptOrder} // Trigger handleAcceptOrder on close
         earnings="$21.89"
@@ -120,7 +126,7 @@ const HomeScreen: React.FC = () => {
         distance="7.6 Km"
         pickupAddress="Yocha (Tom Roberts Parade)"
         dropoffAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
-      /> */}
+      />
 
       {/* Earnings Modal */}
       {/* <EarningsModal
@@ -135,23 +141,23 @@ const HomeScreen: React.FC = () => {
 
       {/* Delivery Modal */}
       {/* <DeliveryModal
-                isVisible={isOrderModalVisible}
-                onClose={() => setIsOrderModalVisible(false)}
-                driverName="Alexander V."
-                deliveryAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
-                deliveryInstructions={['Do not ring the bell', 'Drop-off at the door']}
-                itemsToDeliver={['Documents']}
-            /> */}
+        isVisible={isOrderModalVisible}
+        onClose={() => setIsOrderModalVisible(false)}
+        driverName="Alexander V."
+        deliveryAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
+        deliveryInstructions={['Do not ring the bell', 'Drop-off at the door']}
+        itemsToDeliver={['Documents']}
+      /> */}
 
       {/*Order Expanded Modal */}
-      {/* <OrderExpandedModal
+      <ExpandedModal
         isVisible={isExpandedModalVisible}
         onClose={() => setIsExpandedModalVisible(false)} // Close ExpandedModal
         driverName="Alexander V."
         pickupAddress="Yocha (Tom Roberts Parade)"
         pickupNotes="Deliver to the back door, main gate is locked."
         items={['Documents', 'Laptop', 'Bag']}
-      /> */}
+      />
     </SafeAreaView>
   );
 };
@@ -218,7 +224,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    shadowOffset: {width: 0, height: -2},
+    shadowOffset: { width: 0, height: -2 },
     paddingHorizontal: 20,
     paddingTop: 10,
   },

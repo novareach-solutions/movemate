@@ -8,12 +8,12 @@ import {
   DeliverAPackage,
   DeliverAPackageParamList,
 } from '../../navigation/ScreenNames';
-import { useAppDispatch } from '../../redux/hook';
-import { setSignupData } from '../../redux/slices/authSlice';
+import {useAppDispatch} from '../../redux/hook';
+import {setSignupData} from '../../redux/slices/authSlice';
 import Header from '../../components/Header';
 
 type FormFields = {
-  role: 'AGENT', 
+  role: 'AGENT';
   firstName: string;
   lastName: string;
   email: string;
@@ -25,8 +25,8 @@ type FormFields = {
 
 const DAPCompleteProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
- const dispatch = useAppDispatch();
-  const handleFormSubmit = async(formData: FormFields) => {
+  const dispatch = useAppDispatch();
+  const handleFormSubmit = async (formData: FormFields) => {
     console.log('Form submitted:', formData);
     const user = {
       role: 'AGENT',
@@ -36,18 +36,17 @@ const DAPCompleteProfileScreen = () => {
       street: formData.address,
       suburb: formData.suburb,
       state: formData.state,
-      postalCode:Number(formData.postalCode), 
+      postalCode: Number(formData.postalCode),
     };
 
-    console.log('user', user)
-  
-    await dispatch(setSignupData({ user }));
+    console.log('user', user);
+
+    await dispatch(setSignupData({user}));
     navigation.navigate(DeliverAPackage.EnterVehicleDetails);
   };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
-     
       <Header logo />
       <View style={styles.container}>
         <StepIndicator current={1} total={5} />

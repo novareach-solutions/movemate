@@ -11,11 +11,11 @@ import {
   Keyboard,
   TextStyle,
 } from 'react-native';
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
-import { images } from '../assets/images/images';
+import {colors} from '../theme/colors';
+import {typography} from '../theme/typography';
+import {images} from '../assets/images/images';
 import TitleDescription from '../components/TitleDescription';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {
   DeliverAPackage,
   DeliverAPackageParamList,
@@ -47,7 +47,7 @@ const services = [
 
 const SelectServiceScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
-  const renderService = ({ item }: { item: (typeof services)[0] }) => (
+  const renderService = ({item}: {item: (typeof services)[0]}) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => navigation.navigate(DeliverAPackage.CompleteProfile)}>
@@ -61,7 +61,7 @@ const SelectServiceScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <Header logo />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
@@ -92,11 +92,11 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   serviceText: {
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   list: {
     paddingTop: 10,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   card: {
     flexDirection: 'row',
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     marginBottom: 15,
     gap: 20,
   },

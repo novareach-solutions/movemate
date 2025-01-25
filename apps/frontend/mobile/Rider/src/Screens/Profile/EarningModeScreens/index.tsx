@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {colors} from '../../../theme/colors';
-import {typography} from '../../../theme/typography';
-import {ProfileScreens} from '../../../navigation/ScreenNames';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { colors } from '../../../theme/colors';
+import { typography } from '../../../theme/typography';
+import { ProfileScreens } from '../../../navigation/ScreenNames';
+import { useNavigation } from '@react-navigation/native';
+import Header from '../../../components/Header';
 
 const EarningsModeScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Subscription' | 'Commission'>(
@@ -75,45 +76,46 @@ const EarningsModeScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        {activeTab === 'Subscription'
-          ? 'Boost Earnings with'
-          : 'Deliver and earn with'}
-      </Text>
-      <Text style={styles.subtitle}>
-        {activeTab === 'Subscription' ? '0% Commission!' : '10% Commission!'}
-      </Text>
 
-      {/* Tabs */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'Subscription' && styles.activeTab]}
-          onPress={() => setActiveTab('Subscription')}>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'Subscription' && styles.activeTabText,
-            ]}>
-            Subscription
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'Commission' && styles.activeTab]}
-          onPress={() => setActiveTab('Commission')}>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'Commission' && styles.activeTabText,
-            ]}>
-            Commission
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.container}>
+        <Text style={styles.title}>
+          {activeTab === 'Subscription'
+            ? 'Boost Earnings with'
+            : 'Deliver and earn with'}
+        </Text>
+        <Text style={styles.subtitle}>
+          {activeTab === 'Subscription' ? '0% Commission!' : '10% Commission!'}
+        </Text>
+
+        {/* Tabs */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'Subscription' && styles.activeTab]}
+            onPress={() => setActiveTab('Subscription')}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'Subscription' && styles.activeTabText,
+              ]}>
+              Subscription
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'Commission' && styles.activeTab]}
+            onPress={() => setActiveTab('Commission')}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'Commission' && styles.activeTabText,
+              ]}>
+              Commission
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Dynamic Content */}
+        {renderContent()}
       </View>
-
-      {/* Dynamic Content */}
-      {renderContent()}
-    </View>
   );
 };
 
@@ -167,7 +169,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 5},
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,

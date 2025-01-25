@@ -27,7 +27,6 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-      
         <TitleDescription
           title={title}
           description="Follow the guidelines below to upload"

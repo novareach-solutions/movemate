@@ -16,7 +16,7 @@ import {typography} from '../theme/typography';
 import {colors} from '../theme/colors';
 import {images} from '../assets/images/images';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import { AuthScreens, DeliverAPackage } from '../navigation/ScreenNames';
+import {AuthScreens, DeliverAPackage} from '../navigation/ScreenNames';
 
 const {width, height} = Dimensions.get('window');
 
@@ -46,7 +46,7 @@ const Onboarding: React.FC = () => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
     const currentIndex = Math.round(contentOffsetX / width);
     setCurrentSlideIndex(currentIndex);
-  };  
+  };
 
   const handleNavigation = () => {
     navigation.navigate(AuthScreens.SignupNumber);
@@ -55,16 +55,14 @@ const Onboarding: React.FC = () => {
     // navigation.navigate(DeliverAPackage.EnterABN);
     // navigation.navigate(DeliverAPackage.AddProfilePhoto);
     // navigation.navigate(DeliverAPackage.UploadDocuments);
-
   };
   const handleLogin = () => {
-    navigation.navigate(AuthScreens.Login);
+    navigation.navigate(DeliverAPackage.Home);
     // navigation.navigate(DeliverAPackage.CompleteProfile);
     // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
     // navigation.navigate(DeliverAPackage.EnterABN);
     // navigation.navigate(DeliverAPackage.AddProfilePhoto);
     // navigation.navigate(DeliverAPackage.UploadDocuments);
-
   };
 
   return (

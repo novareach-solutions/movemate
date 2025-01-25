@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  SafeAreaView,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {colors} from '../../theme/colors';
-import {typography} from '../../theme/typography';
-import {ProfileScreens} from '../../navigation/ScreenNames';
-import {images} from '../../assets/images/images';
+import { useNavigation } from '@react-navigation/native';
+import { colors } from '../../theme/colors';
+import { typography } from '../../theme/typography';
+import { ProfileScreens } from '../../navigation/ScreenNames';
+import { images } from '../../assets/images/images';
+import Header from '../../components/Header';
 
 const profileData = [
   {
@@ -25,7 +27,7 @@ const profileData = [
     id: '2',
     title: 'Earnings',
     icon: images.profileEarnings,
-    screen: ProfileScreens.Earnings,
+    screen: ProfileScreens.EarningMode,
   },
   {
     id: '3',
@@ -69,7 +71,7 @@ const profileData = [
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation();
 
-  const renderItem = ({item}: {item: (typeof profileData)[0]}) => (
+  const renderItem = ({ item }: { item: (typeof profileData)[0] }) => (
     <TouchableOpacity
       style={[styles.listItem]}
       onPress={() => navigation.navigate(item.screen as never)}>
@@ -87,38 +89,43 @@ const ProfileScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Profile Header */}
-      <View style={styles.header}>
-        <Image
-          source={{uri: 'https://i.pravatar.cc/100'}}
-          style={styles.profileImage}
+    
+      <View style={styles.container}>
+      <Header logo isBack />
+
+
+        {/* Profile Header */}
+        <View style={styles.header}>
+          <Image
+            source={{ uri: 'https://i.pravatar.cc/100' }}
+            style={styles.profileImage}
+          />
+          <View>
+            <Text style={styles.profileName}>John Doe</Text>
+            <Text style={styles.profileDetails}>+61 6783940545</Text>
+            <Text style={styles.membership}>
+              Membership valid till 23rd February
+            </Text>
+          </View>
+        </View>
+
+        {/* Subscription Plan */}
+        <TouchableOpacity style={styles.subscriptionPlan}>
+          <Text style={styles.subscriptionText}>Weekly subscription plan</Text>
+          <View style={styles.subscriptionBadge}>
+            <Text style={styles.subscriptionBadgeText}>ACTIVE</Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* Menu List */}
+        <FlatList
+          data={profileData}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContainer}
         />
-        <View>
-          <Text style={styles.profileName}>John Doe</Text>
-          <Text style={styles.profileDetails}>+61 6783940545</Text>
-          <Text style={styles.membership}>
-            Membership valid till 23rd February
-          </Text>
-        </View>
       </View>
-
-      {/* Subscription Plan */}
-      <TouchableOpacity style={styles.subscriptionPlan}>
-        <Text style={styles.subscriptionText}>Weekly subscription plan</Text>
-        <View style={styles.subscriptionBadge}>
-          <Text style={styles.subscriptionBadgeText}>ACTIVE</Text>
-        </View>
-      </TouchableOpacity>
-
-      {/* Menu List */}
-      <FlatList
-        data={profileData}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContainer}
-      />
-    </View>
+    
   );
 };
 

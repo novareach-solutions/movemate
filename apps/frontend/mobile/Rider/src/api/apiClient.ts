@@ -1,8 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiEndpoints from './apiEndPoints';
-import { generateCurlCommand } from '../utils/generateCurl';
-import { Alert } from 'react-native'; // Import Alert from React Native
+import {generateCurlCommand} from '../utils/generateCurl';
+import {Alert} from 'react-native'; // Import Alert from React Native
 
 const apiClient = axios.create({
   baseURL: apiEndpoints.baseURL,
@@ -11,7 +11,7 @@ const apiClient = axios.create({
 
 // Request Interceptor
 apiClient.interceptors.request.use(
-  async (config) => {
+  async config => {
     const accessToken = await AsyncStorage.getItem('accessToken');
     const onboardingToken = await AsyncStorage.getItem('onboardingToken');
 
@@ -29,16 +29,16 @@ apiClient.interceptors.request.use(
     console.log('Request Headers:', config.headers);
     return config;
   },
-  (error) => Promise.reject(error),
+  error => Promise.reject(error),
 );
 
 // Response Interceptor
 apiClient.interceptors.response.use(
-  (response) => {
+  response => {
     console.log('Response Headers:', response.headers);
     return response;
   },
-  async (error) => {
+  async error => {
     const originalRequest = error.config;
 
     // Handle 401 Unauthorized errors and refresh tokens
@@ -47,7 +47,7 @@ apiClient.interceptors.response.use(
       const refreshToken = await AsyncStorage.getItem('refreshToken');
       if (refreshToken) {
         try {
-          const { data } = await axios.post(apiEndpoints.refreshToken, {
+          const {data} = await axios.post(apiEndpoints.refreshToken, {
             refreshToken,
           });
           await AsyncStorage.setItem('accessToken', data.accessToken);
@@ -72,13 +72,17 @@ apiClient.interceptors.response.use(
     // Handle 403 Forbidden errors
     if (error.response.status === 403) {
       await AsyncStorage.clear();
-      Alert.alert('Access Denied', 'You are not authorized to access this resource.');
+      Alert.alert(
+        'Access Denied',
+        'You are not authorized to access this resource.',
+      );
       console.warn('Access forbidden: Logging out');
       return Promise.reject(error);
     }
 
     // General error handling
-    const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
+    const errorMessage =
+      error.response?.data?.message || error.message || 'An error occurred';
     console.error('Response Error:', error);
     Alert.alert('Error', errorMessage); // Show alert with error message
     return Promise.reject(error);
