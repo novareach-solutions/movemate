@@ -11,6 +11,7 @@ import { GatewayModule } from "./modules/gateway/gateway.module";
 import { SendAPackageModule } from "./modules/order/sendPackage/sendPackage.module";
 import { RedisModule } from "./modules/redis/redis.module";
 import { SupportModule } from "./modules/support/support.module";
+import { TrackingModule } from "./modules/tracking/tracking.module";
 import { UserModule } from "./modules/user/user.module";
 import { AuthGuard } from "./shared/guards/auth.guard";
 import { OnboardingGuard } from "./shared/guards/onboarding.guard";
@@ -28,10 +29,11 @@ import { RoleGuard } from "./shared/guards/roles.guard";
     AuthModule,
     AgentModule,
     SupportModule,
-    GatewayModule,
     UserModule,
+    GatewayModule,
     SendAPackageModule,
+    TrackingModule, // Ensure TrackingModule is imported here
   ],
-  providers: [RoleGuard, OnboardingGuard, AuthGuard, JwtService],
+  providers: [JwtService, AuthGuard, OnboardingGuard, RoleGuard],
 })
 export class AppModule {}
