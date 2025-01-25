@@ -6,7 +6,7 @@ import { AgentDocument } from "../../entity/AgentDocument";
 import { RequiredDocument } from "../../entity/RequiredDocument";
 import { User } from "../../entity/User";
 import { logger } from "../../logger";
-import { AgentStatusEnum, ApprovalStatusEnum } from "../../shared/enums";
+import { AgentStatusEnum, AgentTypeEnum, ApprovalStatusEnum } from "../../shared/enums";
 import {
   UserAlreadyExistsError,
   UserDocumentAlreadyExistsError,
@@ -19,15 +19,19 @@ import { dbReadRepo, dbRepo } from "../database/database.service";
 import { RedisService } from "../redis/redis.service";
 import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
 import { radii } from "./agents.constants";
+import { TokenService } from "../auth/utils/generateTokens";
 
 @Injectable()
 export class AgentService {
   constructor(
     private readonly redisService: RedisService,
     private readonly notificationGateway: AgentNotificationGateway,
+    private readonly tokenService: TokenService,
   ) {}
 
-  async createAgent(agent: TAgent): Promise<Agent> {
+  async createAgent(
+    agent: TAgent,
+  ): Promise<{ agent: Agent; accessToken: string; refreshToken: string }> {
     const { abnNumber, user } = agent;
     const queryRunner: QueryRunner =
       dbRepo(Agent).manager.connection.createQueryRunner();
@@ -87,12 +91,21 @@ export class AgentService {
       });
 
       const savedAgent = await queryRunner.manager.save(Agent, newAgent);
+
+      // Generate tokens
+      const accessToken = this.tokenService.generateAccessToken(
+        savedUser.id,
+        savedUser.phoneNumber,
+        savedUser.role,
+      );
+      const refreshToken = this.tokenService.generateRefreshToken(savedUser.id);
+
       logger.debug(
         `AgentService.createAgent: Agent with ID ${savedAgent.id} created successfully.`,
       );
       await queryRunner.commitTransaction();
 
-      return savedAgent;
+      return { agent: savedAgent, accessToken, refreshToken };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       logger.error(`AgentService.createAgent: Error occurred - ${error}`);
@@ -519,4 +532,51 @@ export class AgentService {
     // );
     // this.notificationGateway.sendMessageToRoom("agents", "ORDER_TAKEN", { orderId, agentId });
   }
+
+  async createRequiredDocument(createRequiredDocumentDto: {
+    name: string;
+    description?: string;
+    agentType: AgentTypeEnum;
+    isRequired: boolean;
+    isExpiry: boolean;
+  }): Promise<RequiredDocument> {
+    const { name, description, agentType, isRequired } =
+      createRequiredDocumentDto;
+
+    logger.debug(
+      `AgentService.createRequiredDocument: Checking if document with name ${name} already exists for agent type ${agentType}.`,
+    );
+
+    const existingDocument = await dbReadRepo(RequiredDocument).findOne({
+      where: { name, agentType },
+    });
+
+    if (existingDocument) {
+      logger.error(
+        `AgentService.createRequiredDocument: Document with name ${name} already exists for agent type ${agentType}.`,
+      );
+      throw new UserAlreadyExistsError(
+        `Document with name ${name} already exists for agent type ${agentType}.`,
+      );
+    }
+
+    logger.debug(
+      `AgentService.createRequiredDocument: Creating new required document.`,
+    );
+
+    const newDocument = dbRepo(RequiredDocument).create({
+      name,
+      description,
+      agentType,
+      isRequired
+    });
+
+    const savedDocument = await dbRepo(RequiredDocument).save(newDocument);
+
+    logger.debug(
+      `AgentService.createRequiredDocument: Required document with ID ${savedDocument.id} created successfully.`,
+    );
+    return savedDocument;
+  }
+
 }
