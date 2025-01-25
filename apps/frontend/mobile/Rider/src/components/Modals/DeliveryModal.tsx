@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -6,14 +6,12 @@ import {
   StyleSheet,
   Modal,
   Image,
-  Dimensions,
+  TextStyle,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { formStyles } from '../../theme/form';
-import { typography } from '../../theme/typography';
-import { images } from '../../assets/images/images';
-
-const SCREEN_HEIGHT = Dimensions.get('window').height;
+import {colors} from '../../theme/colors';
+import {formStyles} from '../../theme/form';
+import {typography} from '../../theme/typography';
+import {images} from '../../assets/images/images';
 
 interface DeliveryModalProps {
   isVisible: boolean;
@@ -36,7 +34,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
 
   const handleTakePhoto = () => {
     setIsTakingPhoto(true);
-    console.log('Take Photo button clicked'); // Replace this with your camera logic
+    console.log('Take Photo button clicked', isTakingPhoto); // Replace this with your camera logic
   };
 
   const handleOrderDelivered = () => {
@@ -49,8 +47,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
       visible={isVisible}
       animationType="slide"
       onRequestClose={onClose}
-      transparent
-    >
+      transparent>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           {/* Header Section */}
@@ -100,15 +97,15 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
           {/* Proof of Delivery */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Proof of Delivery</Text>
-            <Text style={styles.proofText}>Take a photo to confirm delivery</Text>
+            <Text style={styles.proofText}>
+              Take a photo to confirm delivery
+            </Text>
             <TouchableOpacity
               style={[formStyles.button, formStyles.buttonEnabled]}
-              onPress={handleTakePhoto}
-            >
+              onPress={handleTakePhoto}>
               <Image source={images.camera} style={styles.cameraIcon} />
               <Text
-                style={[formStyles.buttonText, formStyles.buttonTextEnabled]}
-              >
+                style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
                 Take Photo
               </Text>
             </TouchableOpacity>
@@ -117,8 +114,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
           {/* Order Delivered Button */}
           <TouchableOpacity
             style={[formStyles.button, formStyles.buttonSuccess]}
-            onPress={handleOrderDelivered}
-          >
+            onPress={handleOrderDelivered}>
             <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
               Order Delivered
             </Text>
@@ -142,7 +138,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
@@ -152,7 +148,7 @@ const styles = StyleSheet.create({
   },
   driverName: {
     fontSize: typography.fontSize.large,
-    fontWeight: typography.fontWeight.bold as any,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.text.primary,
   },
   deliveryAddress: {
@@ -175,7 +171,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: typography.fontSize.medium,
-    fontWeight: typography.fontWeight.bold as any,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.text.primary,
     marginBottom: 10,
   },
