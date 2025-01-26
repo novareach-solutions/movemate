@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -40,10 +41,14 @@ import {
   UpdateAgentProfileDto,
   UpdateAgentStatusDto,
 } from "./dto/agent.dto";
+import { ConfigService } from "@nestjs/config";
+import { Response } from "express";
+import { RequiredDocument } from "../../entity/RequiredDocument";
+
 @ApiTags("Agent")
 @Controller("agent")
 export class AgentController {
-  constructor(private readonly agentService: AgentService) {}
+  constructor(private readonly agentService: AgentService, private readonly configService: ConfigService) { }
 
   @Post("signup")
   @UseGuards(OnboardingGuard)
@@ -105,7 +110,8 @@ export class AgentController {
   async create(
     @Req() request: ICustomRequest,
     @Body() agent: TAgent,
-  ): Promise<IApiResponse<Agent>> {
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<IApiResponse<{ agent: Agent; accessToken: string }>> {
     const phoneNumberFromGuard = request.user.phoneNumber;
     if (
       agent.user.phoneNumber &&
@@ -116,11 +122,23 @@ export class AgentController {
       );
     }
     agent.user.phoneNumber = phoneNumberFromGuard;
-    const data = await this.agentService.createAgent(agent);
+    const {
+      agent: createdAgent,
+      accessToken,
+      refreshToken,
+    } = await this.agentService.createAgent(agent);
+
+    response.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: this.configService.get<string>("ENVIRONMENT") === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
+    });
+
     return {
       success: true,
       message: "Agent created successfully.",
-      data,
+      data: { agent: createdAgent, accessToken },
     };
   }
 
@@ -715,4 +733,29 @@ export class AgentController {
       data: null,
     };
   }
+
+  @Post("required-document")
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
+  async createRequiredDocument(
+    @Body()
+    createRequiredDocumentDto: {
+      name: string;
+      description?: string;
+      agentType: AgentTypeEnum;
+      isRequired: boolean;
+      isExpiry: boolean;
+    },
+  ): Promise<IApiResponse<RequiredDocument>> {
+    const requiredDocument = await this.agentService.createRequiredDocument(
+      createRequiredDocumentDto,
+    );
+    return {
+      success: true,
+      message: "Required document created successfully.",
+      data: requiredDocument,
+    };
+  }
 }
+
+
