@@ -11,7 +11,11 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {colors} from '../../theme/colors';
 import {typography} from '../../theme/typography';
-import {ProfileScreens} from '../../navigation/ScreenNames';
+import {
+  AppScreens,
+  AuthScreens,
+  ProfileScreens,
+} from '../../navigation/ScreenNames';
 import {images} from '../../assets/images/images';
 import Header from '../../components/Header';
 
@@ -27,7 +31,7 @@ const profileData = [
     id: '2',
     title: 'Earnings',
     icon: images.profileEarnings,
-    screen: ProfileScreens.EarningMode,
+    screen: AppScreens.ComingSoon,
   },
   {
     id: '3',
@@ -51,7 +55,7 @@ const profileData = [
     id: '6',
     title: 'Rewards',
     icon: images.profileRewards,
-    screen: ProfileScreens.Rewards,
+    screen: AppScreens.ComingSoon,
   },
   {
     id: '7',
@@ -63,7 +67,7 @@ const profileData = [
     id: '8',
     title: 'Log Out',
     icon: images.profileLogout,
-    screen: ProfileScreens.Logout,
+    screen: AuthScreens.Onboarding,
     isLogout: true,
   },
 ];
@@ -108,7 +112,11 @@ const ProfileScreen: React.FC = () => {
       </View>
 
       {/* Subscription Plan */}
-      <TouchableOpacity style={styles.subscriptionPlan}>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate(ProfileScreens.EarningMode);
+        }}
+        style={styles.subscriptionPlan}>
         <Text style={styles.subscriptionText}>Weekly subscription plan</Text>
         <View style={styles.subscriptionBadge}>
           <Text style={styles.subscriptionBadgeText}>ACTIVE</Text>

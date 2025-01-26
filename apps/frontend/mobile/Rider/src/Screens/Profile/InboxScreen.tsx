@@ -99,7 +99,7 @@ const InboxScreen: React.FC = () => {
       </View>
 
       {/* Content */}
-      <ScrollView>
+      <View>
         {activeTab === 'Notifications' && (
           <View>
             <FlatList
@@ -122,7 +122,7 @@ const InboxScreen: React.FC = () => {
             <Text style={styles.emptyMessage}>No messages available.</Text>
           </View>
         )}
-      </ScrollView>
+      </View>
 
       {/* Footer Note */}
       <Text style={styles.footerNote}>

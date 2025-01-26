@@ -33,6 +33,8 @@ import DocumentsScreen from '../Screens/Profile/AccountScreen/DocumentsScreen';
 import ManageAccountScreen from '../Screens/Profile/AccountScreen/ManageAccountScreen';
 import EarningsModeScreen from '../Screens/Profile/EarningModeScreens';
 import SubscriptionPlansScreen from '../Screens/Profile/EarningModeScreens/SubscriptionPlansScreen';
+import ComingSoonScreen from '../Screens/ComingSoon';
+import ReplaceVehicleScreen from '../Screens/Profile/AccountScreen/ReplaceVehicleScreen';
 import SignupNumberScreen from '../Screens/SignupNumberScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import ChatScreen from '../Screens/ChatScreen';
@@ -159,6 +161,11 @@ const App = () => {
           component={SubscriptionPlansScreen as React.FC}
           options={{headerShown: true}}
         />
+        <Stack.Screen
+          name={ProfileScreens.ReplaceVehicle}
+          component={ReplaceVehicleScreen}
+          options={{headerShown: true}}
+        />
 
         {/* App */}
         <Stack.Screen
@@ -185,6 +192,11 @@ const App = () => {
           name={AppScreens.Chat}
           component={ChatScreen}
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={AppScreens.ComingSoon}
+          component={ComingSoonScreen}
+          options={{headerShown: true}}
         />
       </Stack.Navigator>
     </NavigationContainer>
