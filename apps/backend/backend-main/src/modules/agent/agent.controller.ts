@@ -10,10 +10,8 @@ import {
   Req,
   Res,
   UseGuards,
-  UseInterceptors,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { FileInterceptor } from "@nestjs/platform-express";
 import { Response } from "express";
 import { UpdateResult } from "typeorm";
 
@@ -21,6 +19,7 @@ import { Agent } from "../../entity/Agent";
 import { RequiredDocument } from "../../entity/RequiredDocument";
 import { Roles } from "../../shared/decorators/roles.decorator";
 import {
+  AgentStatusEnum,
   AgentTypeEnum,
   ApprovalStatusEnum,
   UserRoleEnum,
@@ -29,7 +28,6 @@ import { UnauthorizedError } from "../../shared/errors/authErrors";
 import { AuthGuard } from "../../shared/guards/auth.guard";
 import { OnboardingGuard } from "../../shared/guards/onboarding.guard";
 import { RoleGuard } from "../../shared/guards/roles.guard";
-import { FileToUrlInterceptor } from "../../shared/interceptors/file-to-url.interceptor";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { AgentService } from "./agent.service";
 import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
@@ -58,7 +56,6 @@ export class AgentController {
       );
     }
     agent.user.phoneNumber = phoneNumberFromGuard;
-
     const {
       agent: createdAgent,
       accessToken,
@@ -116,7 +113,6 @@ export class AgentController {
   @Post("document")
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
-  @UseInterceptors(FileInterceptor("file"), FileToUrlInterceptor)
   async submitOwnDocument(
     @Body() submitDocumentDto: TAgentDocument,
     @Req() request: ICustomRequest,
@@ -149,6 +145,23 @@ export class AgentController {
       success: true,
       message: "Document removed successfully.",
       data: null,
+    };
+  }
+
+  @Patch("status")
+  @UseGuards(AuthGuard)
+  @Roles(UserRoleEnum.AGENT)
+  async setOwnAgentStatus(
+    @Body() body: { status: AgentStatusEnum },
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<UpdateResult>> {
+    const { status } = body;
+    const agentId = request.user.agent.id;
+    const data = await this.agentService.setAgentStatus(agentId, status);
+    return {
+      success: true,
+      message: `Agent status updated to ${status}.`,
+      data,
     };
   }
 
@@ -250,8 +263,8 @@ export class AgentController {
   }
 
   @Post("required-document")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.ADMIN)
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async createRequiredDocument(
     @Body()
     createRequiredDocumentDto: {
