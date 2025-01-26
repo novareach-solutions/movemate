@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,13 +12,13 @@ import {
   ImageSourcePropType,
   TextStyle,
 } from 'react-native';
-import {typography} from '../theme/typography';
-import {colors} from '../theme/colors';
-import {images} from '../assets/images/images';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AuthScreens, DeliverAPackage} from '../navigation/ScreenNames';
+import { typography } from '../theme/typography';
+import { colors } from '../theme/colors';
+import { images } from '../assets/images/images';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AuthScreens, DeliverAPackage } from '../navigation/ScreenNames';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface Slide {
   id: number;
@@ -57,7 +57,7 @@ const Onboarding: React.FC = () => {
     // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
   const handleLogin = () => {
-    navigation.navigate(DeliverAPackage.Home);
+    navigation.navigate(AuthScreens.Login);
     // navigation.navigate(DeliverAPackage.CompleteProfile);
     // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
     // navigation.navigate(DeliverAPackage.EnterABN);
@@ -73,7 +73,7 @@ const Onboarding: React.FC = () => {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={updateSlidePosition}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <View style={styles.slide}>
             <Image source={item.image} style={styles.image} />
             <Text style={styles.title}>
@@ -101,8 +101,8 @@ const Onboarding: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: colors.white},
-  slide: {width, alignItems: 'flex-start', justifyContent: 'flex-start'},
+  container: { flex: 1, backgroundColor: colors.white },
+  slide: { width, alignItems: 'flex-start', justifyContent: 'flex-start' },
   image: {
     resizeMode: 'cover',
     width: '100%',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 20,
   },
-  subtitle: {color: colors.purple},
+  subtitle: { color: colors.purple },
   description: {
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
