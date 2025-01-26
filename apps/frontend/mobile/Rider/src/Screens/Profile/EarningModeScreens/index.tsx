@@ -1,9 +1,16 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
 import {ProfileScreens} from '../../../navigation/ScreenNames';
 import {useNavigation} from '@react-navigation/native';
+import Header from '../../../components/Header';
 
 const EarningsModeScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Subscription' | 'Commission'>(

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import {typography} from '../theme/typography';
 import {colors} from '../theme/colors';
 import {images} from '../assets/images/images';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AppScreens, AppScreensParamList} from '../navigation/ScreenNames';
+import {AuthScreens, DeliverAPackage} from '../navigation/ScreenNames';
 
 const {width, height} = Dimensions.get('window');
 
@@ -40,7 +40,7 @@ const slides: Slide[] = [
 
 const Onboarding: React.FC = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
+  const navigation = useNavigation();
 
   const updateSlidePosition = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
@@ -49,11 +49,20 @@ const Onboarding: React.FC = () => {
   };
 
   const handleNavigation = () => {
-    navigation.navigate(AppScreens.Profile);
+    navigation.navigate(AuthScreens.SignupNumber);
+    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
+    // navigation.navigate(DeliverAPackage.EnterABN);
+    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
-
   const handleLogin = () => {
-    // navigation.navigate(AppScreens.Login);
+    navigation.navigate(AuthScreens.Login);
+    // navigation.navigate(DeliverAPackage.CompleteProfile);
+    // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
+    // navigation.navigate(DeliverAPackage.EnterABN);
+    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
 
   return (

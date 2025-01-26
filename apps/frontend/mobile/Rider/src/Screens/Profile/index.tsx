@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  SafeAreaView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {colors} from '../../theme/colors';
@@ -16,6 +17,7 @@ import {
   ProfileScreens,
 } from '../../navigation/ScreenNames';
 import {images} from '../../assets/images/images';
+import Header from '../../components/Header';
 
 const profileData = [
   {
@@ -92,6 +94,8 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <Header logo isBack />
+
       {/* Profile Header */}
       <View style={styles.header}>
         <Image

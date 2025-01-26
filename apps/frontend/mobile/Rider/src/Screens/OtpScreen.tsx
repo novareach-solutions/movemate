@@ -1,3 +1,5 @@
+// OtpScreen.tsx
+
 import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
@@ -14,21 +16,29 @@ import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import TitleDescription from '../components/TitleDescription';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
+import {
+  AuthScreens,
+  AuthScreensParamList,
+  DeliverAPackage,
+} from '../navigation/ScreenNames';
+import {useAppDispatch} from '../redux/hook';
+import {verifyOtp, login} from '../redux/slices/authSlice';
+import Header from '../components/Header';
 
 interface OtpScreenProps {
   route: {
-    params: {phoneNumber: string};
+    params: {phoneNumber: string; login: boolean};
   };
 }
 
 const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
-  const {phoneNumber} = route.params;
-  const [otp, setOtp] = useState<string[]>(['', '', '', '']);
+  const {phoneNumber, login: isLogin} = route.params;
+  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [error, setError] = useState(false);
   const inputs = useRef<TextInput[]>([]);
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -43,33 +53,51 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
     setOtp(newOtp);
 
     // Focus handling
-    if (value && index < 3) {
+    if (value && index < 5) {
       inputs.current[index + 1]?.focus();
     } else if (!value && index > 0) {
       inputs.current[index - 1]?.focus();
     }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const enteredOtp = otp.join('');
-    if (enteredOtp !== '1234') {
+
+    try {
+      if (isLogin) {
+        // Dispatch login thunk
+        const response = await dispatch(
+          login({phone: phoneNumber, otp: enteredOtp}),
+        ).unwrap();
+        console.log('Login Successful!', response);
+        // Navigate to the main app screen or dashboard
+        navigation.navigate(DeliverAPackage.Home);
+      } else {
+        // Dispatch verifyOtp thunk
+        await dispatch(
+          verifyOtp({phone: phoneNumber, otp: enteredOtp}),
+        ).unwrap();
+        console.log('OTP Verified Successfully!');
+        // Navigate to the next screen after OTP verification
+        navigation.navigate(AuthScreens.SelectService);
+      }
+    } catch (err: any) {
+      console.log('OTP Verification/Login failed', err);
       setError(true);
-    } else {
-      setError(false);
-      console.log('OTP Verified Successfully!');
-      navigation.navigate(AuthScreens.SelectService);
     }
   };
 
   const handleResend = () => {
     setTimer(60);
-    setOtp(['', '', '', '']);
+    setOtp(['', '', '', '', '', '']);
     setError(false);
     inputs.current[0]?.focus();
+    // Optionally, you can dispatch requestOtp again here
   };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+      <Header logo isBack />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <TitleDescription
@@ -118,7 +146,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
                 styles.buttonText,
                 otp.every(digit => digit) && styles.buttonTextFilled,
               ]}>
-              Verify Now
+              {isLogin ? 'Login' : 'Verify Now'}
             </Text>
           </TouchableOpacity>
 

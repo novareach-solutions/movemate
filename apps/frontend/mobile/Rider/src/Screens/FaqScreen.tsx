@@ -8,6 +8,7 @@ import {
   Dimensions,
   Image,
   TextStyle,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
@@ -16,6 +17,7 @@ import {images} from '../assets/images/images';
 import FAQModal from '../components/Modals/FaqModal';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AppScreens, AppScreensParamList} from '../navigation/ScreenNames';
+import Header from '../components/Header';
 
 interface FAQ {
   question: string;
@@ -65,37 +67,40 @@ const FAQScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.subHeader}>Having trouble with your order?</Text>
+    <View style={{flex: 1}}>
+      <Header logo isBack />
+      <View style={styles.container}>
+        <Text style={styles.subHeader}>Having trouble with your order?</Text>
 
-      {/* FAQ List */}
-      <FlatList
-        data={FAQs}
-        renderItem={renderFAQItem}
-        keyExtractor={(item, index) => `faq-${index}`}
-        style={styles.faqList}
-      />
-
-      {/* Cancel Order Button */}
-      <TouchableOpacity
-        style={[formStyles.button, styles.cancelButton]}
-        onPress={() => {
-          navigation.navigate(AppScreens.CancellationReason);
-        }}>
-        <Text style={[formStyles.buttonText, styles.cancelButtonText]}>
-          Cancel Order
-        </Text>
-      </TouchableOpacity>
-
-      {/* FAQ Modal */}
-      {selectedFAQ && (
-        <FAQModal
-          isVisible={!!selectedFAQ}
-          onClose={() => setSelectedFAQ(null)}
-          question={selectedFAQ.question}
-          answer={selectedFAQ.answer}
+        {/* FAQ List */}
+        <FlatList
+          data={FAQs}
+          renderItem={renderFAQItem}
+          keyExtractor={(item, index) => `faq-${index}`}
+          style={styles.faqList}
         />
-      )}
+
+        {/* Cancel Order Button */}
+        <TouchableOpacity
+          style={[formStyles.button, styles.cancelButton]}
+          onPress={() => {
+            navigation.navigate(AppScreens.CancellationReason);
+          }}>
+          <Text style={[formStyles.buttonText, styles.cancelButtonText]}>
+            Cancel Order
+          </Text>
+        </TouchableOpacity>
+
+        {/* FAQ Modal */}
+        {selectedFAQ && (
+          <FAQModal
+            isVisible={!!selectedFAQ}
+            onClose={() => setSelectedFAQ(null)}
+            question={selectedFAQ.question}
+            answer={selectedFAQ.answer}
+          />
+        )}
+      </View>
     </View>
   );
 };

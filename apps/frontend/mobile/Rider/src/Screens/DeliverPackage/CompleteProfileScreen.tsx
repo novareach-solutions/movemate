@@ -8,29 +8,48 @@ import {
   DeliverAPackage,
   DeliverAPackageParamList,
 } from '../../navigation/ScreenNames';
+import {useAppDispatch} from '../../redux/hook';
+import {setSignupData} from '../../redux/slices/authSlice';
+import Header from '../../components/Header';
 
 type FormFields = {
+  role: 'AGENT';
   firstName: string;
   lastName: string;
   email: string;
   address: string;
   suburb: string;
   state: string;
-  postalCode: string;
+  postalCode: number;
 };
 
 const DAPCompleteProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
-
-  const handleFormSubmit = (formData: FormFields) => {
+  const dispatch = useAppDispatch();
+  const handleFormSubmit = async (formData: FormFields) => {
     console.log('Form submitted:', formData);
-    navigation.navigate(DeliverAPackage.UploadDocuments);
+    const user = {
+      role: 'AGENT',
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      street: formData.address,
+      suburb: formData.suburb,
+      state: formData.state,
+      postalCode: Number(formData.postalCode),
+    };
+
+    console.log('user', user);
+
+    await dispatch(setSignupData({user}));
+    navigation.navigate(DeliverAPackage.EnterVehicleDetails);
   };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+      <Header logo />
       <View style={styles.container}>
-        <StepIndicator current={1} total={4} />
+        <StepIndicator current={1} total={5} />
         <ProfileForm
           title="Complete your Profile"
           description="Add your details to get started"
