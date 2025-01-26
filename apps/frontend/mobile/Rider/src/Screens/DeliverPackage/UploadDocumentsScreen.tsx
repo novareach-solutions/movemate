@@ -7,9 +7,9 @@ const DAPUploadDocumentsScreen = () => {
   const navigation = useNavigation();
 
   const documents = [
-    {id: '1', title: 'Police Verification'},
-    {id: '2', title: 'Driver’s License'},
-    {id: '3', title: 'Australian ID Proof'},
+    {id: '1', title: 'Police Verification', value: 'POLICE_VERIFICATION'},
+    {id: '2', title: 'Driver’s License', value: 'DRIVER_LICENSE'},
+    {id: '3', title: 'Australian ID Proof', value: 'AUSTRALIAN_ID_PROOF'},
   ];
 
   const handleCardPress = (title: string) => {
@@ -18,7 +18,7 @@ const DAPUploadDocumentsScreen = () => {
 
   return (
     <DocumentList
-      stepIndicator={{current: 2, total: 4}}
+      stepIndicator={{current: 5, total: 5}}
       title="Upload your Official Documents"
       description="Add your details to get started"
       documents={documents}

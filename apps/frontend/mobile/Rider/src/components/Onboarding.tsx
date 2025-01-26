@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,13 +12,13 @@ import {
   ImageSourcePropType,
   TextStyle,
 } from 'react-native';
-import {typography} from '../theme/typography';
-import {colors} from '../theme/colors';
-import {images} from '../assets/images/images';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AppScreens, AppScreensParamList} from '../navigation/ScreenNames';
+import { typography } from '../theme/typography';
+import { colors } from '../theme/colors';
+import { images } from '../assets/images/images';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AuthScreens, DeliverAPackage } from '../navigation/ScreenNames';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface Slide {
   id: number;
@@ -40,7 +40,7 @@ const slides: Slide[] = [
 
 const Onboarding: React.FC = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
+  const navigation = useNavigation();
 
   const updateSlidePosition = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
@@ -49,11 +49,20 @@ const Onboarding: React.FC = () => {
   };
 
   const handleNavigation = () => {
-    navigation.navigate(AppScreens.Profile);
+    navigation.navigate(AuthScreens.SignupNumber);
+    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
+    // navigation.navigate(DeliverAPackage.EnterABN);
+    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
-
   const handleLogin = () => {
-    // navigation.navigate(AppScreens.Login);
+    navigation.navigate(AuthScreens.Login);
+    // navigation.navigate(DeliverAPackage.CompleteProfile);
+    // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
+    // navigation.navigate(DeliverAPackage.EnterABN);
+    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
 
   return (
@@ -64,7 +73,7 @@ const Onboarding: React.FC = () => {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={updateSlidePosition}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <View style={styles.slide}>
             <Image source={item.image} style={styles.image} />
             <Text style={styles.title}>
@@ -92,8 +101,8 @@ const Onboarding: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: colors.white},
-  slide: {width, alignItems: 'flex-start', justifyContent: 'flex-start'},
+  container: { flex: 1, backgroundColor: colors.white },
+  slide: { width, alignItems: 'flex-start', justifyContent: 'flex-start' },
   image: {
     resizeMode: 'cover',
     width: '100%',
@@ -107,7 +116,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 20,
   },
-  subtitle: {color: colors.purple},
+  subtitle: { color: colors.purple },
   description: {
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,

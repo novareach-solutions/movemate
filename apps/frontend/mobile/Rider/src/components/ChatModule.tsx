@@ -14,6 +14,7 @@ import {
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {images} from '../assets/images/images';
+import Header from './Header';
 
 interface Message {
   id: string;
@@ -79,6 +80,7 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Header logo isBack />
       {/* Messages */}
       <FlatList
         data={messages}

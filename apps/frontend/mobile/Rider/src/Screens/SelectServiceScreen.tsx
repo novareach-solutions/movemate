@@ -20,6 +20,7 @@ import {
   DeliverAPackage,
   DeliverAPackageParamList,
 } from '../navigation/ScreenNames';
+import Header from '../components/Header';
 
 const services = [
   {
@@ -61,12 +62,16 @@ const SelectServiceScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+      <Header logo />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <TitleDescription
-            title="Choose Your Service"
-            description="Select the service you want to offer"
-          />
+          <View style={styles.serviceText}>
+            <TitleDescription
+              title="Choose Your Service"
+              description="Select the service you want to offer"
+            />
+          </View>
+
           <FlatList
             data={services}
             renderItem={renderService}
@@ -82,12 +87,16 @@ const SelectServiceScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    // padding: 20,
     backgroundColor: colors.white,
     marginTop: 60,
   },
+  serviceText: {
+    paddingHorizontal: 20,
+  },
   list: {
     paddingTop: 10,
+    paddingHorizontal: 20,
   },
   card: {
     flexDirection: 'row',

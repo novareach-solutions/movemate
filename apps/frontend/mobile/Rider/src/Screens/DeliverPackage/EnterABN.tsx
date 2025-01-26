@@ -13,21 +13,33 @@ import {colors} from '../../theme/colors';
 import StepIndicator from '../../components/StepIndicator';
 import {useNavigation} from '@react-navigation/native';
 import {DeliverAPackage} from '../../navigation/ScreenNames';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
+import {setSignupData} from '../../redux/slices/authSlice';
+import Header from '../../components/Header';
 
 const EnterABNScreen: React.FC = () => {
   const [abn, setAbn] = useState('');
-
+  const dispatch = useAppDispatch();
+  const signupData = useAppSelector(state => state.auth.signupData);
+  console.log('signupData>>>>', signupData);
   const navigation = useNavigation();
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     console.log({abn});
+    const abnDetails = {
+      abnNumber: abn,
+    };
+
+    await dispatch(setSignupData(abnDetails));
     navigation.navigate(DeliverAPackage.AddProfilePhoto);
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <Header logo isBack />
+
       <View style={styles.container}>
-        <StepIndicator current={3} total={4} />
+        <StepIndicator current={3} total={5} />
         <View style={styles.content}>
           <TitleDescription
             title="Enter your ABN details"

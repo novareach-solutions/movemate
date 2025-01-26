@@ -22,12 +22,12 @@ import Header from '../components/Header';
 
 const {width} = Dimensions.get('window');
 
-const LoginScreen: React.FC = () => {
+const SignupNumberScreen: React.FC = () => {
   const phoneInput = useRef<PhoneInput>(null);
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isFilled, setIsFilled] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false); // Track focus state
   const dispatch = useAppDispatch();
 
   const handlePhoneNumberChange = (number: string) => {
@@ -39,7 +39,7 @@ const LoginScreen: React.FC = () => {
   const handleSendCode = async () => {
     try {
       await dispatch(requestOtp({phone: phoneNumber})).unwrap();
-      navigation.navigate(AuthScreens.Otp, {phoneNumber, login: true});
+      navigation.navigate(AuthScreens.Otp, {phoneNumber});
     } catch {
       console.log('Request Otp failed');
     }
@@ -55,7 +55,7 @@ const LoginScreen: React.FC = () => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <Image source={images.logo} style={styles.logo} />
-          <Text style={styles.heading}>Login</Text>
+          <Text style={styles.heading}>Create an Account</Text>
           <Text style={styles.subheading}>
             Enter phone number and we’ll send you a verification code
           </Text>
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: typography.fontSize.large,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
-    color: colors.black,
+    color: colors.purple,
     textAlign: 'left',
     marginBottom: 10,
   },
@@ -175,4 +175,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default SignupNumberScreen;

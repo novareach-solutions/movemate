@@ -16,6 +16,7 @@ import {typography} from '../theme/typography';
 import {images} from '../assets/images/images';
 import {DeliverAPackage} from '../navigation/ScreenNames';
 import {useNavigation} from '@react-navigation/native';
+import Header from './Header';
 
 interface Document {
   id: string;
@@ -38,7 +39,6 @@ const DocumentList: React.FC<DocumentListProps> = ({
   onCardPress,
 }) => {
   const navigation = useNavigation();
-
   const renderItem = ({item}: {item: Document}) => (
     <TouchableOpacity
       style={styles.card}
@@ -50,6 +50,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+      <Header logo isBack />
       <View style={styles.container}>
         <StepIndicator
           current={stepIndicator.current}

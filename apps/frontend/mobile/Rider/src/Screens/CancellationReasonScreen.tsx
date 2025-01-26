@@ -13,6 +13,7 @@ import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {formStyles} from '../theme/form';
 import {images} from '../assets/images/images';
+import Header from '../components/Header';
 
 const CancellationReasonScreen: React.FC = () => {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
@@ -29,6 +30,7 @@ const CancellationReasonScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Header logo isBack />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={styles.header}>Cancellation Reason</Text>
         <Text style={styles.subHeader}>Why are you canceling this order?</Text>
