@@ -7,15 +7,27 @@ import {
 import { Socket } from "socket.io";
 
 import configuration from "../../config/configuration";
+import { logger } from "../../logger";
 import { BaseSocketGateway } from "./base.socket";
 
 const config = configuration();
 
-@WebSocketGateway({
-  port: config.websocketPorts.customerNotification,
+@WebSocketGateway(config.websocketPorts.customerNotification, {
   cors: { origin: config.corsOrigin },
 })
 export class CustomerNotificationGateway extends BaseSocketGateway {
+  @SubscribeMessage("joinRoom")
+  async handleJoinRoom(
+    @MessageBody() data: { customerId: number },
+    @ConnectedSocket() client: Socket,
+  ): Promise<void> {
+    const room = `customer:${data.customerId}`;
+    await this.joinRoom(room, client);
+    logger.info(
+      `CustomerNotificationGateway: Customer ${data.customerId} joined room ${room}`,
+    );
+  }
+
   @SubscribeMessage("agentAcceptedRequest")
   handleAgentAcceptedRequest(
     @MessageBody() data: any,

@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { Between } from "typeorm";
+import { Between, In } from "typeorm";
 
 import { DropLocation } from "../../../entity/DropLocation";
 import { OrderReview } from "../../../entity/OrderReview";
@@ -28,11 +28,19 @@ import {
   SendPackageOrderNotCompletedError,
   SendPackageReviewCommentRequiredError,
 } from "../../../shared/errors/sendAPackage";
+import { UserHasRunningOrderError } from "../../../shared/errors/user";
+import { CustomerNotificationGateway } from "../../../shared/gateways/customer.notification.gateway";
+import { parseTimeToMinutes } from "../../../utils/timeFns";
 import { dbReadRepo, dbRepo } from "../../database/database.service";
+import { PricingService } from "../../pricing/pricing.service";
 import { TSendPackageOrder } from "./sendPackage.types";
 
 @Injectable()
 export class SendAPackageService {
+  constructor(
+    private readonly pricingService: PricingService,
+    private readonly customerNotificationGateway: CustomerNotificationGateway,
+  ) {}
   async create(data: TSendPackageOrder): Promise<SendPackageOrder> {
     logger.debug(
       "SendAPackageService.create: Creating a new send package order",
@@ -42,6 +50,29 @@ export class SendAPackageService {
     await queryRunner.startTransaction();
 
     try {
+      // Check if the user already has a running order
+      const existingRunningOrder = await queryRunner.manager.findOne(
+        SendPackageOrder,
+        {
+          where: {
+            customerId: data.customerId,
+            status: In([
+              OrderStatusEnum.PENDING,
+              OrderStatusEnum.IN_PROGRESS,
+              OrderStatusEnum.ACCEPTED,
+            ]),
+          },
+        },
+      );
+
+      if (existingRunningOrder) {
+        logger.error(
+          `SendAPackageService.create: User with ID ${data.customerId} already has a running order with ID ${existingRunningOrder.id}`,
+        );
+        throw new UserHasRunningOrderError(`You already have a running order.`);
+      }
+
+      // Check or create PickupLocation
       let pickupLocation = await queryRunner.manager.findOne(PickupLocation, {
         where: {
           latitude: data.pickupLocation.latitude,
@@ -92,6 +123,14 @@ export class SendAPackageService {
         );
       }
 
+      const estimatedTimeInMinutes = parseTimeToMinutes(data.estimatedTime);
+
+      const price = this.pricingService.calculateFare({
+        distance: data.estimatedDistance,
+        estimatedTime: estimatedTimeInMinutes,
+        packageWeight: 3, // Static value for now
+      });
+
       const sendPackageOrder = queryRunner.manager.create(SendPackageOrder, {
         senderName: data.senderName,
         senderPhoneNumber: data.senderPhoneNumber,
@@ -104,7 +143,7 @@ export class SendAPackageService {
         estimatedDistance: data.estimatedDistance,
         estimatedTime: data.estimatedTime,
         customerId: data.customerId,
-        price: data.price,
+        price,
         type: OrderTypeEnum.DELIVERY,
         status: OrderStatusEnum.PENDING,
         paymentStatus: PaymentStatusEnum.NOT_PAID,
@@ -129,6 +168,11 @@ export class SendAPackageService {
           ...error,
         },
       );
+
+      if (error instanceof UserHasRunningOrderError) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(
         "Failed to create send package order",
       );
@@ -292,7 +336,7 @@ export class SendAPackageService {
     agentId: number,
   ): Promise<SendPackageOrder> {
     logger.debug(
-      `SendAPackageService.acceptOrder: Agent attempting to accept order ID ${orderId}`,
+      `SendPackageService.acceptOrder: Agent attempting to accept order ID ${orderId}`,
     );
 
     const order = await dbRepo(SendPackageOrder).findOne({
@@ -305,7 +349,13 @@ export class SendAPackageService {
 
     if (order.status !== OrderStatusEnum.PENDING) {
       throw new SendPackageAgentAcceptError(
-        `Order ID ${orderId} cannot be accepted in its current status`,
+        `This Order cannot be accepted in its current status`,
+      );
+    }
+
+    if (order.agentId) {
+      throw new SendPackageAgentAcceptError(
+        `This Order cannot be accepted as it is already assigned`,
       );
     }
 
@@ -315,8 +365,12 @@ export class SendAPackageService {
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
     logger.debug(
-      `SendAPackageService.acceptOrder: Order ID ${orderId} accepted successfully`,
+      `SendPackageService.acceptOrder: Order ID ${orderId} accepted successfully`,
     );
+
+    // Notify customer about acceptance
+    await this.notifyCustomerOrderAccepted(updatedOrder);
+
     return updatedOrder;
   }
 
@@ -499,5 +553,23 @@ export class SendAPackageService {
       `SendAPackageService.getAllOrders: Retrieved ${orders.length} orders`,
     );
     return orders;
+  }
+
+  // private methods
+  private notifyCustomerOrderAccepted(order: SendPackageOrder): void {
+    const notificationData = {
+      orderId: order.id,
+      agentId: order.agentId,
+      message: `Your order has been accepted by Agent ID ${order.agentId}.`,
+      timestamp: new Date(),
+    };
+    this.customerNotificationGateway.sendMessageToClient(
+      order.customerId.toString(),
+      "agentAcceptedRequest",
+      notificationData,
+    );
+    logger.debug(
+      `SendPackageService.notifyCustomerOrderAccepted: Notified customer ID ${order.customerId} about order acceptance.`,
+    );
   }
 }

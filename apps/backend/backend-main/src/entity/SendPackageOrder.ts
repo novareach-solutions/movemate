@@ -42,16 +42,14 @@ export class SendPackageOrder extends BaseEntity {
   deliveryInstructions: string;
 
   @Column({
-    type: "enum",
-    enum: OrderStatusEnum,
+    type: "varchar",
     default: OrderStatusEnum.PENDING,
     nullable: false,
   })
   status: OrderStatusEnum;
 
   @Column({
-    type: "enum",
-    enum: OrderTypeEnum,
+    type: "varchar",
     default: OrderTypeEnum.DELIVERY,
     nullable: false,
   })
@@ -83,7 +81,7 @@ export class SendPackageOrder extends BaseEntity {
   estimatedDistance: number;
 
   @Column({ type: "time", nullable: false })
-  estimatedTime: number;
+  estimatedTime: string;
 
   @ManyToOne(() => User, (user) => user.id, { nullable: true })
   @JoinColumn({ name: "customerId" })
@@ -117,8 +115,7 @@ export class SendPackageOrder extends BaseEntity {
   cancellationReason: string;
 
   @Column({
-    type: "enum",
-    enum: UserRoleEnum,
+    type: "varchar",
     nullable: true,
   })
   canceledBy: UserRoleEnum;
@@ -136,8 +133,7 @@ export class SendPackageOrder extends BaseEntity {
   completedAt: Date;
 
   @Column({
-    type: "enum",
-    enum: PaymentStatusEnum,
+    type: "varchar",
     default: PaymentStatusEnum.NOT_PAID,
     nullable: false,
   })

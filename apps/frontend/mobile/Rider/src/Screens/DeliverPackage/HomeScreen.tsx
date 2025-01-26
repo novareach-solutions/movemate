@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,11 +9,11 @@ import {
   Animated,
 } from 'react-native';
 import StatCard from '../../components/StatCard';
-import { images } from '../../assets/images/images';
-import { colors } from '../../theme/colors';
+import {images} from '../../assets/images/images';
+import {colors} from '../../theme/colors';
 import HelpButton from '../../components/HelpButton';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AppScreens, AppScreensParamList } from '../../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
 import DeliveryModal from '../../components/Modals/DeliveryModal';
 import ExpandedModal from '../../components/Modals/ExpandedModal';
@@ -52,22 +52,20 @@ const HomeScreen: React.FC = () => {
 
   const handleOrderDelivered = () => {
     console.log('Order marked as delivered.');
-    setIsOrderModalVisible(false); 
+    setIsOrderModalVisible(false);
   };
 
   // Handle "Accept Order" button press
   const handleAcceptOrder = () => {
-    setIsOrderModalVisible(false); 
+    setIsOrderModalVisible(false);
     setTimeout(() => {
-      setIsExpandedModalVisible(true); 
+      setIsExpandedModalVisible(true);
     }, 300);
-  }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-
       <Header logo home />
-
 
       {/* Map Image */}
       <View style={styles.mapContainer}>
@@ -96,7 +94,7 @@ const HomeScreen: React.FC = () => {
       </View>
 
       {/* Sliding Drawer */}
-      <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
+      <Animated.View style={[styles.drawer, {height: drawerHeight}]}>
         <View style={styles.statsContainer}>
           <StatCard icon={images.money} value="$50" label="EARNINGS" />
           <StatCard icon={images.cart} value="7" label="ORDERS" />
@@ -224,7 +222,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: {width: 0, height: -2},
     paddingHorizontal: 20,
     paddingTop: 10,
   },

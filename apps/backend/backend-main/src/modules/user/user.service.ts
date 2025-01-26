@@ -8,9 +8,9 @@ import {
   UserNotFoundError,
 } from "../../shared/errors/user";
 import { filterEmptyValues } from "../../utils/filter";
+import { TokenService } from "../auth/utils/generateTokens";
 import { dbReadRepo, dbRepo } from "../database/database.service";
 import { TCreateUser, TGetUserProfile, TUpdateUser } from "./user.types";
-import { TokenService } from "../auth/utils/generateTokens";
 
 @Injectable()
 export class UserService {

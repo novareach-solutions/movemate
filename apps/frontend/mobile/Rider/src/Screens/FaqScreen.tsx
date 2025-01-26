@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,13 +10,13 @@ import {
   TextStyle,
   SafeAreaView,
 } from 'react-native';
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
-import { formStyles } from '../theme/form';
-import { images } from '../assets/images/images';
+import {colors} from '../theme/colors';
+import {typography} from '../theme/typography';
+import {formStyles} from '../theme/form';
+import {images} from '../assets/images/images';
 import FAQModal from '../components/Modals/FaqModal';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AppScreens, AppScreensParamList } from '../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AppScreens, AppScreensParamList} from '../navigation/ScreenNames';
 import Header from '../components/Header';
 
 interface FAQ {
@@ -57,7 +57,7 @@ const FAQScreen: React.FC = () => {
   const [selectedFAQ, setSelectedFAQ] = useState<FAQ | null>(null);
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
 
-  const renderFAQItem = ({ item }: { item: FAQ }) => (
+  const renderFAQItem = ({item}: {item: FAQ}) => (
     <TouchableOpacity
       style={styles.faqItem}
       onPress={() => setSelectedFAQ(item)}>
@@ -67,8 +67,8 @@ const FAQScreen: React.FC = () => {
   );
 
   return (
-   <View style={{flex:1}}>
-        <Header logo isBack />
+    <View style={{flex: 1}}>
+      <Header logo isBack />
       <View style={styles.container}>
         <Text style={styles.subHeader}>Having trouble with your order?</Text>
 
@@ -100,7 +100,8 @@ const FAQScreen: React.FC = () => {
             answer={selectedFAQ.answer}
           />
         )}
-      </View></View>
+      </View>
+    </View>
   );
 };
 

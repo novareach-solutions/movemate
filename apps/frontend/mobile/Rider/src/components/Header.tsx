@@ -1,11 +1,11 @@
 // Header.tsx
 
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { colors } from '../theme/colors';
-import { images } from '../assets/images/images';
-import { AppScreens, AuthScreensParamList } from '../navigation/ScreenNames'; 
+import {View, TouchableOpacity, StyleSheet, Image} from 'react-native';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
+import {colors} from '../theme/colors';
+import {images} from '../assets/images/images';
+import {AppScreens, AuthScreensParamList} from '../navigation/ScreenNames';
 
 interface HeaderProps {
   isBack?: boolean;
@@ -13,11 +13,11 @@ interface HeaderProps {
   home?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ isBack, logo, home }) => {
+const Header: React.FC<HeaderProps> = ({isBack, logo, home}) => {
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
 
   const handleHomePress = () => {
-    navigation.navigate(AppScreens.Profile); 
+    navigation.navigate(AppScreens.Profile);
   };
 
   return (
@@ -26,8 +26,7 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home }) => {
       {isBack && (
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
+          onPress={() => navigation.goBack()}>
           <Image source={images.arrow} style={styles.arrow} />
         </TouchableOpacity>
       )}
@@ -41,10 +40,7 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home }) => {
 
       {/* Home/Profile Button */}
       {home && (
-        <TouchableOpacity
-          style={styles.homeButton}
-          onPress={handleHomePress}
-        >
+        <TouchableOpacity style={styles.homeButton} onPress={handleHomePress}>
           <Image source={images.profileAccount} style={styles.profileIcon} />
         </TouchableOpacity>
       )}
@@ -68,7 +64,7 @@ const styles = StyleSheet.create({
     left: 20,
   },
   arrow: {
-    transform: [{ rotate: '180deg' }],
+    transform: [{rotate: '180deg'}],
     resizeMode: 'contain',
   },
   logoContainer: {
@@ -80,7 +76,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 100, 
+    width: 100,
     height: 40,
     resizeMode: 'contain',
   },
