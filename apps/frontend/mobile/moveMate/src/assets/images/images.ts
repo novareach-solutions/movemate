@@ -14,6 +14,23 @@ import shoppingCart from './ShoppingCart.png';
 import packageImg from './Package.png';
 import banner from './Banner.png';
 import banner2 from './banner2.png';
+import sapbanner from "./SAPBanner.png";
+import locaionSteps from "./LocationSteps.png";
+import gps from "./GPS.png";
+import locationBorder from "./LocationBorder.png";
+import masterCard from "./MasterCard.png";
+import applePay from "./ApplePay.png";
+import paypal from "./Paypal.png";
+import profileAccount from "./ProfileAccount.png";
+import arrow from "./Arrow.png";
+import doNotRing from "./DoNotRing.png";
+import doorDropOff from "./DoorDropOff.png";
+import pickUpNotesIcon from "./PickUpNotesIcon.png";
+import phone from "./Phone.png";
+import visaIcon from "./VisaIcon.png";
+import cart from "./Cart.png";
+import map from "./Map.png";
+
 
 export const images = {
   introImage1,
@@ -32,4 +49,12 @@ export const images = {
   package: packageImg,
   banner,
   banner2,
+  sapbanner,
+  locaionSteps,
+  gps,
+  locationBorder,
+  masterCard,
+  applePay,
+  paypal,
+  profileAccount,arrow,doNotRing,doorDropOff,pickUpNotesIcon,phone,visaIcon,cart,map
 };

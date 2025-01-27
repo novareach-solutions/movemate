@@ -8,6 +8,7 @@ export type AuthStackParamList = {
   OtpScreen: {phoneNumber: string};
   CompleteProfileScreen: undefined;
   PrivacyPolicyScreen: undefined;
+  CustomerScreens:undefined;
 };
 
 // App Stack Param List

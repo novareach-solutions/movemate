@@ -1,7 +1,7 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {AuthScreens, AppScreens} from './ScreenNames';
+import {AuthScreens, AppScreens, CustomerScreens} from './ScreenNames';
 import Onboarding from '../components/Onboarding';
 import Login from '../Screens/LoginScreen';
 import OtpScreen from '../Screens/OtpScreen';
@@ -9,6 +9,15 @@ import CompleteProfileScreen from '../Screens/CompleteProfileScreen';
 import PrivacyPolicyScreen from '../Screens/PrivacyPolicyScreen';
 import {RootStackParamList} from './type';
 import AppLayoutScreen from '../Screens/AppLayoutScreen';
+import AddCardScreen from '../Screens/Customer/SendAPackage/AddCardScreen';
+import PaymentSelectionScreen from '../Screens/Customer/SendAPackage/PaymentSelectionScreen';
+import CheckoutScreen from '../Screens/Customer/SendAPackage/CheckOutScreen';
+import EnterLocationDetailsScreen from '../Screens/Customer/SendAPackage/EnterLocationDetailsScreen';
+import SAPDetailsScreen from '../Screens/Customer/SendAPackage/DetailsScreen';
+import OrderScreen from '../Screens/Customer/OrderScreen';
+import NotificationScreen from '../Screens/Customer/NotificationScreen';
+import CustomerAccountScreen from '../Screens/Customer/AccountSceen';
+import CustomerHomeScreen from '../Screens/Customer/HomeScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -44,12 +53,61 @@ const AppNavigator = () => {
         />
 
         {/* App Screens */}
-        <Stack.Screen
+        {/* <Stack.Screen
           name={AppScreens.AppLayoutScreen}
           component={AppLayoutScreen}
           options={{headerShown: false}}
+        /> */}
+      
+
+      <Stack.Screen
+          name={CustomerScreens.CustomerHomeScreen}
+          component={CustomerHomeScreen}
+          options={{ headerShown: false }}
         />
-      </Stack.Navigator>
+        <Stack.Screen
+          name={CustomerScreens.CustomerAccountScreen}
+          component={CustomerAccountScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.NotificationScreen}
+          component={NotificationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.OrderScreen}
+          component={OrderScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.SAPDetailsScreen}
+          component={SAPDetailsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.EnterLocationDetailsScreen}
+          component={EnterLocationDetailsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.CheckoutScreen}
+          component={CheckoutScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.PaymentSelectionScreen}
+          component={PaymentSelectionScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.AddCardScreen}
+          component={AddCardScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen name={CustomerScreens.AppLayoutScreen} component={AppLayoutScreen} options={{ headerShown: false }} />
+        </Stack.Navigator>
     </NavigationContainer>
   );
 };

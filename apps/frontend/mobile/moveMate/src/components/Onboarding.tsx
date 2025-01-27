@@ -16,7 +16,7 @@ import {typography} from '../theme/typography';
 import {colors} from '../theme/colors';
 import {images} from '../assets/images/images';
 import { useNavigation } from '@react-navigation/native';
-import { AuthScreens } from '../navigation/ScreenNames';
+import { AuthScreens, CustomerScreens } from '../navigation/ScreenNames';
 const {width, height} = Dimensions.get('window');
 
 interface Slide {
@@ -75,6 +75,10 @@ const Onboarding: React.FC = () => {
     navigation.navigate(AuthScreens.LoginScreen);
     // navigation.navigate(AuthScreens.CompleteProfileScreen);
   };
+  const handleLogin = () => {
+    navigation.navigate(AuthScreens.LoginScreen);
+    // navigation.navigate(AuthScreens.CompleteProfileScreen);
+  };
   const Footer = () => (
     <View style={styles.footer}>
       <View style={styles.indicatorContainer}>
@@ -96,7 +100,7 @@ const Onboarding: React.FC = () => {
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={handleNavigation}
+        onPress={handleLogin}
         style={[
           styles.button,
           {
