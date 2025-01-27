@@ -6,12 +6,13 @@ import {
   StyleSheet,
   SafeAreaView,
   Image,
-  Animated,
+  Animated, PermissionsAndroid, Platform, Alert
 } from 'react-native';
 import StatCard from '../../components/StatCard';
 import { images } from '../../assets/images/images';
 import { colors } from '../../theme/colors';
 import HelpButton from '../../components/HelpButton';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AppScreens, AppScreensParamList } from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
@@ -19,13 +20,55 @@ import DeliveryModal from '../../components/Modals/DeliveryModal';
 import ExpandedModal from '../../components/Modals/ExpandedModal';
 import EarningsModal from '../../components/Modals/EarningsModal';
 import OrderModal from '../../components/Modals/OrderModal';
+import Geolocation, { GeoPosition, GeoError } from "react-native-geolocation-service";
 
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [drawerHeight] = useState(new Animated.Value(0));
   const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
+  const hasLocationPermission = async (): Promise<boolean> => {
+    if (Platform.OS === "ios") {
+      return true;
+    }
+
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        return true;
+      }
+
+      Alert.alert("Permission Denied", "Location permission is required to use this feature.");
+      return false;
+    } catch (err) {
+      console.error("Permission request error:", err);
+      return false;
+    }
+  };
+
+  const getCurrentLocation = async () => {
+    const permission = await hasLocationPermission();
+    if (!permission) return;
+
+    Geolocation.getCurrentPosition(
+      (position: GeoPosition) => {
+        setLocation(position.coords);
+      },
+      (error: GeoError) => {
+        Alert.alert("Error", `Unable to get location: ${error.message}`);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+      }
+    );
+  };
 
   const toggleStatus = () => {
     setIsOnline(!isOnline);
@@ -37,13 +80,22 @@ const HomeScreen: React.FC = () => {
   };
 
   // Show the `DeliveryModal` after 3 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsOrderModalVisible(true);
-    }, 8000);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setIsOrderModalVisible(true);
+  //   }, 8000);
 
-    return () => clearTimeout(timer);
-  }, []);
+  //   return () => clearTimeout(timer);
+  // }, []);
+
+  useEffect(() => {
+   getCurrentLocation();
+  }, [])
+
+  useEffect(()=>{
+    console.log('location', location)
+  },[location])
+  
 
   const handleTakePhoto = () => {
     console.log('Taking a photo for proof...');
@@ -66,13 +118,27 @@ const HomeScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
 
-      <Header logo home />
+      {/* <Header logo home /> */}
 
 
       {/* Map Image */}
-      <View style={styles.mapContainer}>
+      {/* <View style={styles.mapContainer}>
         <Image source={images.map} style={styles.mapImage} />
-      </View>
+      </View> */}
+
+<View style={{flex:1}}>
+     <MapView
+       provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+       style={{flex:1}}
+       region={{
+         latitude: 37.78825,
+         longitude: -122.4324,
+         latitudeDelta: 0.015,
+         longitudeDelta: 0.0121,
+       }}
+     >
+     </MapView>
+   </View>
 
       {/* Status Button */}
       <View style={styles.statusContainer}>
@@ -96,7 +162,7 @@ const HomeScreen: React.FC = () => {
       </View>
 
       {/* Sliding Drawer */}
-      <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
+      {/* <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
         <View style={styles.statsContainer}>
           <StatCard icon={images.money} value="$50" label="EARNINGS" />
           <StatCard icon={images.cart} value="7" label="ORDERS" />
@@ -106,7 +172,7 @@ const HomeScreen: React.FC = () => {
             label="DISTANCE"
           />
         </View>
-      </Animated.View>
+      </Animated.View> */}
 
       <View style={styles.helpButtonContainer}>
         <HelpButton
@@ -117,7 +183,7 @@ const HomeScreen: React.FC = () => {
       </View>
 
       {/* Order Modal */}
-      <OrderModal
+      {/* <OrderModal
         isVisible={isOrderModalVisible}
         onClose={handleAcceptOrder} // Trigger handleAcceptOrder on close
         earnings="$21.89"
@@ -126,7 +192,7 @@ const HomeScreen: React.FC = () => {
         distance="7.6 Km"
         pickupAddress="Yocha (Tom Roberts Parade)"
         dropoffAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
-      />
+      /> */}
 
       {/* Earnings Modal */}
       {/* <EarningsModal
@@ -150,14 +216,14 @@ const HomeScreen: React.FC = () => {
       /> */}
 
       {/*Order Expanded Modal */}
-      <ExpandedModal
+      {/* <ExpandedModal
         isVisible={isExpandedModalVisible}
         onClose={() => setIsExpandedModalVisible(false)} // Close ExpandedModal
         driverName="Alexander V."
         pickupAddress="Yocha (Tom Roberts Parade)"
         pickupNotes="Deliver to the back door, main gate is locked."
         items={['Documents', 'Laptop', 'Bag']}
-      />
+      /> */}
     </SafeAreaView>
   );
 };
@@ -234,8 +300,8 @@ const styles = StyleSheet.create({
   },
   helpButtonContainer: {
     position: 'absolute',
-    top: 12,
-    right: 12,
+    top: 70,
+    right: 25,
   },
 });
 
