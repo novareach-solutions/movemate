@@ -26,7 +26,7 @@ const DocumentsScreen: React.FC = () => {
   const documents = [
     {
       id: 1,
-      title: "Driver's License",
+      title: "Driver License",
       status: 'Approved',
       reUpload: true,
     },

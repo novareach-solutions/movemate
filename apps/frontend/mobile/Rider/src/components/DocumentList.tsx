@@ -65,7 +65,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
         />
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate(DeliverAPackage.EnterVehicleDetails)
+            navigation.navigate(DeliverAPackage.Home)
           }
           style={[formStyles.button, formStyles.buttonEnabled]}>
           <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>

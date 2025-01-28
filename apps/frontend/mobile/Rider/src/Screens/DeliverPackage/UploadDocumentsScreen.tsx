@@ -8,8 +8,8 @@ const DAPUploadDocumentsScreen = () => {
 
   const documents = [
     {id: '1', title: 'Police Verification', value: 'POLICE_VERIFICATION'},
-    {id: '2', title: 'Driver’s License', value: 'DRIVER_LICENSE'},
-    {id: '3', title: 'Australian ID Proof', value: 'AUSTRALIAN_ID_PROOF'},
+    {id: '2', title: 'Driver License', value: 'DRIVER_LICENSE'},
+    {id: '3', title: 'Australian ID', value: 'AUSTRALIAN_ID'},
   ];
 
   const handleCardPress = (title: string) => {

@@ -130,7 +130,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
             {error && (
               <Text
                 style={{fontSize: 14, color: colors.error, marginVertical: 10}}>
-                Incorrect code, please try again
+                An error, please try again
               </Text>
             )}
           </View>

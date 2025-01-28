@@ -9,6 +9,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   TextStyle,
+  SafeAreaView,
 } from 'react-native';
 import PhoneInput from 'react-native-phone-number-input';
 import {colors} from '../theme/colors';
@@ -50,7 +51,9 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <View>
+  <SafeAreaView style={{
+      flex:1
+    }}>
       <Header isBack />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
@@ -95,7 +98,7 @@ const LoginScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
-    </View>
+    </SafeAreaView>
   );
 };
 

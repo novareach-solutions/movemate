@@ -48,7 +48,7 @@ const DAPUploadDocumentDetailsScreen = () => {
           .then(response => {
             console.log('response', response);
             if (response) {
-              const uploadedImage = response.location;
+              const uploadedImage = response.url;
               navigation.navigate(AppScreens.DocumentReview, {
                 title,
                 uploadedImage,
@@ -66,7 +66,9 @@ const DAPUploadDocumentDetailsScreen = () => {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{
+      flex:1
+    }}>
       <Header logo isBack />
       <DocumentUpload
         title={title}

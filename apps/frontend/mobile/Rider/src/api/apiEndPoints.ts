@@ -1,4 +1,4 @@
-const baseURL = 'http://18.225.92.240:3000';
+const baseURL = 'http://192.168.29.63:3000';
 
 const createEndpoint = (path: string) => `${baseURL}${path}`;
 
