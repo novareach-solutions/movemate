@@ -19,6 +19,7 @@ import {typography} from '../theme/typography';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch } from '../redux/hook';
 import { userSignup } from '../redux/slices/authSlice';
+import { CustomerScreens } from '../navigation/ScreenNames';
 type FormFields = {
   firstName: string;
   lastName: string;
@@ -81,7 +82,8 @@ const [loading, setLoading] = useState(false);
      setLoading(true); 
         try {
           await dispatch(userSignup(payload)).unwrap();
-          Alert.alert('Session Expired', 'Please log in again.');
+          navigation.navigate(CustomerScreens.CustomerHomeScreen);
+          // Alert.alert('Session Expired', 'Please log in again.');
         } catch {
           console.log('Request OTP failed');
         } finally {
@@ -171,9 +173,9 @@ const [loading, setLoading] = useState(false);
                 <Text style={styles.link}>Terms of Service</Text> and{' '}
                 <Text
                   style={styles.link}
-                  // onPress={() =>
-                  //   navigation.navigate(AuthScreens.PrivacyPolicyScreen)
-                  // }
+                  onPress={() =>
+                    navigation.navigate(AuthScreens.PrivacyPolicyScreen)
+                  }
                 >
                   Privacy Policy
                 </Text>

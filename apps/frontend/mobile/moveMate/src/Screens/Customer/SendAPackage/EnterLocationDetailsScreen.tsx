@@ -162,23 +162,22 @@ const EnterLocationDetailsScreen = () => {
     };
     
 
-    //     try {
-    //       const response = await dispatch(createOrder(payload)).unwrap();
-    //       if(response){
+        try {
+          const response = await dispatch(createOrder(payload)).unwrap();
+          if(response){
 
-    //         dispatch(updatePkgId(response?.data?.id))
-    //       }
-    //       Alert.alert("Success", "Order confirmed!");
+            dispatch(updatePkgId(response?.data?.id))
+          }
+          Alert.alert("Success", "Order confirmed!");
 
-    //       navigation.navigate(CustomerScreens.CheckoutScreen);
-    //           // Reset form (optional)
-    // resetForm();
-    //     } catch {
-    //       console.log('Request OTP failed');
-    //     }
+          navigation.navigate(CustomerScreens.CheckoutScreen);
+              // Reset form (optional)
+    resetForm();
+        } catch {
+          console.log('Request OTP failed');
+        }
     // Console log the object
-    console.log("Send Package Order:", payload);
-    navigation.navigate(CustomerScreens.CheckoutScreen);
+ 
 
     // Optionally, navigate to another screen or reset the form
 
