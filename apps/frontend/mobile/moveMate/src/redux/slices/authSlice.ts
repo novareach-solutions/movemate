@@ -10,6 +10,7 @@ const dummyImageApi = 'https://api.escuelajs.co/api/v1/files/upload';
 
 interface AuthState {
   isAuthenticated: boolean;
+  isLogin:boolean;
   loading: boolean;
   error: string | null;
 }
@@ -17,6 +18,7 @@ interface AuthState {
 // Initial state
 const initialState: AuthState = {
   isAuthenticated: false,
+  isLogin:false,
   loading: false,
   error: null,
 };
@@ -113,6 +115,38 @@ export const verifyOtp = createAsyncThunk(
     }
   }
 );
+// Login otp   
+export const Login = createAsyncThunk(
+  apiEndpoints.login,
+  async ({ phone,otp }: { phone: string;otp: string }) => {
+    try {
+      const response = await apiClient.post(apiEndpoints.login, { phoneNumber:phone,otp });
+       // Store onboarding token if present in the response headers
+       const onboardingToken = response.headers['onboarding_token'];
+       const accessToken = response.headers['access_token'];
+       if (onboardingToken) {
+         await saveToken('onboardingToken', onboardingToken);
+         console.log('Onboarding Token Stored:', onboardingToken);
+       }
+       if (accessToken) {
+         await saveToken('accessToken', accessToken);
+         console.log('accessToken Stored:', accessToken);
+       }
+ 
+       return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // Axios error: Has response, request, and other properties
+        console.error('API Error:', error.response?.data || error.message);
+        throw error;
+      } else {
+        // Non-Axios error: Handle accordingly
+        console.error('Unexpected Error:', error);
+        throw new Error('An unexpected error occurred');
+      }
+    }
+  }
+);
 
 // user signup
 export const userSignup = createAsyncThunk(
@@ -160,6 +194,9 @@ const authSlice = createSlice({
       AsyncStorage.clear();
       state.isAuthenticated = false;
     },
+    setIsLogin:(state,action)=>{
+      state.isLogin = action.payload;
+    }
     
   },
   extraReducers: (builder) => {
@@ -180,5 +217,5 @@ const authSlice = createSlice({
 });
 
 // Export the reducer
-export const { logout } = authSlice.actions;
+export const { logout,setIsLogin } = authSlice.actions;
 export default authSlice.reducer;

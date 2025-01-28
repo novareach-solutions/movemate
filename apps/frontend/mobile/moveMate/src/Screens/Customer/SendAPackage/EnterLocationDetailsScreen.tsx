@@ -19,8 +19,32 @@ import PackageTypeModal from "../../../components/Modals/PackageTypeModal"; // N
 import SenderReceiverModal from "../../../components/Modals/SenderRecieverModal";
 import { CustomerScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
+import { useAppDispatch } from "../../../redux/hook";
+import { createOrder, updatePickupLoaction, updatePkgId } from "../../../redux/slices/deliverAPackageSlice";
 
 const EnterLocationDetailsScreen = () => {
+  interface orderPayload {
+    senderName: string;
+    senderPhoneNumber: string;
+    receiverName: string;
+    receiverPhoneNumber: string;
+    packageType: string;
+    deliveryInstructions: string;
+    pickupLocation: {
+        addressLine1: string;
+        addressLine2: string;
+        landmark: string;
+        latitude: number;
+        longitude: number;
+      };
+      dropLocation: {
+        addressLine1: string;
+        latitude: number;
+        longitude: number;
+      };
+    estimatedDistance: number;
+    estimatedTime: number;
+}
   const [isLocationModalVisible, setIsLocationModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalPlaceholder, setModalPlaceholder] = useState("");
@@ -34,6 +58,8 @@ const EnterLocationDetailsScreen = () => {
   const [isReceiverModalVisible, setIsReceiverModalVisible] = useState(false);
   const [senderDetails, setSenderDetails] = useState<{ name: string; phoneNumber: string } | null>(null);
   const [receiverDetails, setReceiverDetails] = useState<{ name: string; phoneNumber: string } | null>(null);
+
+    const dispatch = useAppDispatch();
 
   // States for Package Type Modal
   const [isPackageTypeModalVisible, setIsPackageTypeModalVisible] = useState(false);
@@ -57,7 +83,12 @@ const EnterLocationDetailsScreen = () => {
     setIsLocationModalVisible(false);
     if (locationData) {
       if (currentType === "pickup") {
+        const pickupLocation = {
+          pickupLattitude:locationData.latitude,
+          pickupLongitude:locationData.longitude
+        }
         setPickupLocation(locationData);
+        dispatch(updatePickupLoaction(pickupLocation));
       } else {
         setDropLocation(locationData);
       }
@@ -97,53 +128,62 @@ const EnterLocationDetailsScreen = () => {
     }
   };
 
-  const confirmOrder = () => {
+  console.log('pickupLocation', pickupLocation)
+
+  const confirmOrder = async() => {
     // Validate required fields
-    // if (!pickupLocation || !dropLocation) {
-    //   Alert.alert("Error", "Please provide both pickup and drop locations.");
-    //   return;
-    // }
-
-    // if (!senderDetails) {
-    //   Alert.alert("Error", "Please provide sender's details.");
-    //   return;
-    // }
-
-    // if (!receiverDetails) {
-    //   Alert.alert("Error", "Please provide receiver's details.");
-    //   return;
-    // }
-
-    // if (!packageType) {
-    //   Alert.alert("Error", "Please select what you are sending.");
-    //   return;
-    // }
-
+    if (!pickupLocation || !dropLocation || !senderDetails || !receiverDetails || !packageType) {
+      Alert.alert("Error", "Please provide all required fields.");
+      return;
+    }
+  
     // // Construct the TSendPackageOrder object
-    // const sendPackageOrder = {
-    //   senderName: senderDetails.name,
-    //   senderPhoneNumber: senderDetails.phoneNumber,
-    //   receiverName: receiverDetails.name,
-    //   receiverPhoneNumber: receiverDetails.phoneNumber,
-    //   packageType: packageType,
-    //   deliveryInstructions: pickupNotes,
-    //   pickupLocation: pickupLocation,
-    //   dropLocation: dropLocation,
-    //   estimatedDistance: 10, // Placeholder, update with actual data
-    //   estimatedTime: 30, // Placeholder, update with actual data
-    //   price: 25.0, // Placeholder, update with actual data
-    // };
+    const payload: orderPayload = {
+      senderName: senderDetails?.name ?? "", 
+      senderPhoneNumber: senderDetails?.phoneNumber ?? "",
+      receiverName: receiverDetails?.name ?? "",
+      receiverPhoneNumber: receiverDetails?.phoneNumber ?? "",
+      packageType: packageType ?? "",
+      deliveryInstructions: pickupNotes,
+      pickupLocation: {
+        addressLine1: pickupLocation?.addressLine1 ?? "",
+        addressLine2: pickupLocation?.addressLine2 ?? "",
+        landmark: pickupLocation?.landmark ?? "",
+        latitude: pickupLocation?.latitude ?? 0,
+        longitude: pickupLocation?.longitude ?? 0,
+      },
+      dropLocation: {
+        addressLine1: dropLocation?.addressLine1 ?? "",
+        latitude: dropLocation?.latitude ?? 0,
+        longitude: dropLocation?.longitude ?? 0,
+      },
+      estimatedDistance: 10, 
+      estimatedTime: 30, 
+    };
+    
 
+    //     try {
+    //       const response = await dispatch(createOrder(payload)).unwrap();
+    //       if(response){
+
+    //         dispatch(updatePkgId(response?.data?.id))
+    //       }
+    //       Alert.alert("Success", "Order confirmed!");
+
+    //       navigation.navigate(CustomerScreens.CheckoutScreen);
+    //           // Reset form (optional)
+    // resetForm();
+    //     } catch {
+    //       console.log('Request OTP failed');
+    //     }
     // Console log the object
-    // console.log("Send Package Order:", sendPackageOrder);
+    console.log("Send Package Order:", payload);
+    navigation.navigate(CustomerScreens.CheckoutScreen);
 
     // Optionally, navigate to another screen or reset the form
-    Alert.alert("Success", "Order confirmed! Check console for details.");
 
-navigation.navigate(CustomerScreens.CheckoutScreen)
     
-    // Reset form (optional)
-    resetForm();
+
   };
 
   const resetForm = () => {

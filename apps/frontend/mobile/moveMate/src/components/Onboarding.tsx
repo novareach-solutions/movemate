@@ -17,6 +17,8 @@ import {colors} from '../theme/colors';
 import {images} from '../assets/images/images';
 import { useNavigation } from '@react-navigation/native';
 import { AuthScreens, CustomerScreens } from '../navigation/ScreenNames';
+import { useAppDispatch } from '../redux/hook';
+import { setIsLogin } from '../redux/slices/authSlice';
 const {width, height} = Dimensions.get('window');
 
 interface Slide {
@@ -65,6 +67,7 @@ const slides: Slide[] = [
 const Onboarding: React.FC = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
   const updateSlidePosition = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
     const currentIndex = Math.round(contentOffsetX / width);
@@ -72,11 +75,14 @@ const Onboarding: React.FC = () => {
   };
 
   const handleNavigation = () => {
+    dispatch(setIsLogin(false))
     navigation.navigate(AuthScreens.LoginScreen);
     // navigation.navigate(AuthScreens.CompleteProfileScreen);
   };
   const handleLogin = () => {
+    dispatch(setIsLogin(true))
     navigation.navigate(AuthScreens.LoginScreen);
+    // navigation.navigate(CustomerScreens.EnterLocationDetailsScreen);
     // navigation.navigate(AuthScreens.CompleteProfileScreen);
   };
   const Footer = () => (

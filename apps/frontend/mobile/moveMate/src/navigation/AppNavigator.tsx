@@ -18,6 +18,8 @@ import OrderScreen from '../Screens/Customer/OrderScreen';
 import NotificationScreen from '../Screens/Customer/NotificationScreen';
 import CustomerAccountScreen from '../Screens/Customer/AccountSceen';
 import CustomerHomeScreen from '../Screens/Customer/HomeScreen';
+import PaymentSuccessScreen from '../Screens/Customer/SendAPackage/PaymentSuccessScreen';
+import DeliveryScreen from '../Screens/Customer/SendAPackage/DeliveryScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -103,6 +105,16 @@ const AppNavigator = () => {
         <Stack.Screen
           name={CustomerScreens.AddCardScreen}
           component={AddCardScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.PaymentSuccessScreen}
+          component={PaymentSuccessScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.DeliveryScreen}
+          component={DeliveryScreen}
           options={{ headerShown: false }}
         />
 

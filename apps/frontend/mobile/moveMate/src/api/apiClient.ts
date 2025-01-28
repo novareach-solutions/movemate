@@ -22,7 +22,7 @@ apiClient.interceptors.request.use(
     if (onboardingToken) {
       config.headers['onboarding_token'] = onboardingToken;
     }
-    config.headers['Content-Type'] = 'text/plain';
+    // config.headers['Content-Type'] = 'text/plain';
 
     const curlCommand = generateCurlCommand(config);
     console.log('cURL Command:', curlCommand);

@@ -39,6 +39,10 @@ const PaymentSelectionScreen = () => {
     { id: 2, name: "Apple Pay", icon: images.applePay },
   ];
 
+  const handlePayment =()=>{
+    navigation.navigate(CustomerScreens.PaymentSuccessScreen);
+  }
+
   return (
     <SafeAreaView style={styles.container}>
         <Header isBack />
@@ -100,7 +104,7 @@ const PaymentSelectionScreen = () => {
         </Text>
 
         {/* Proceed to Pay Button */}
-        <TouchableOpacity style={styles.payButton}>
+        <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
           <Text style={styles.payButtonText}>Proceed To Pay</Text>
         </TouchableOpacity>
       </ScrollView>

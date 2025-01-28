@@ -1,3 +1,5 @@
+import DeliveryScreen from '../Screens/Customer/SendAPackage/DeliveryScreen';
+import PaymentSuccessScreen from '../Screens/Customer/SendAPackage/PaymentSuccessScreen';
 import {AuthStackParamList, AppStackParamList} from './type';
 
 export const AuthScreens: Record<
@@ -44,5 +46,7 @@ export const CustomerScreens = {
   EnterLocationDetailsScreen: 'EnterLocationDetailsScreen',
   CheckoutScreen: 'CheckoutScreen',
   PaymentSelectionScreen: 'PaymentSelectionScreen',
+  PaymentSuccessScreen:'PaymentSuccessScreen',
   AddCardScreen: 'AddCardScreen',
+  DeliveryScreen:'DeliveryScreen'
 }

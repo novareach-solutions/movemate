@@ -13,6 +13,12 @@ const apiEndpoints = {
     fetchVehicles: '/vehicles',
     uploadMedia:createEndpoint('/media/upload'),
     agentDoc:createEndpoint('/agent/document'),
+    createOrder:createEndpoint('/order/send-package/create'),
+    cancelOrder:createEndpoint('/order/send-package/:orderId/cancel'),
+    reportAgent:createEndpoint('/order/send-package/:orderId/reportagent'),
+    leaveAReview:createEndpoint('/order/send-package/:orderId/review'),
+    getOrderDetails:createEndpoint('/order/send-package/:orderId'),
+    assignRider:createEndpoint('assign-rider/:orderId'),
   };
   
   export default apiEndpoints;

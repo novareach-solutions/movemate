@@ -14,9 +14,9 @@ import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {RootNavigationProp, RootRouteProp} from '../navigation/type';
 import { useNavigation } from '@react-navigation/native';
-import { AuthScreens } from '../navigation/ScreenNames';
-import { verifyOtp } from '../redux/slices/authSlice';
-import { useAppDispatch } from '../redux/hook';
+import { AuthScreens, CustomerScreens } from '../navigation/ScreenNames';
+import { Login, verifyOtp } from '../redux/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '../redux/hook';
 
 type OtpScreenProps = {
   route: RootRouteProp<'OtpScreen'>;
@@ -25,6 +25,7 @@ type OtpScreenProps = {
 
 const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
   const {phoneNumber} = route.params;
+  const isLogin = useAppSelector(state => state.auth.isLogin);
   const [otp, setOtp] = useState<string[]>(['', '', '', '','','']);
   const [timer, setTimer] = useState(60);
    const navigation = useNavigation();
@@ -60,9 +61,17 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
     // }
     const enteredOtp = otp.join('');
     try {
-      await dispatch(verifyOtp({ phone: phoneNumber,otp:enteredOtp })).unwrap();
-      // Navigate to the otp screen
-      navigation.navigate(AuthScreens.CompleteProfileScreen);
+      if(isLogin){
+        await dispatch(Login({ phone: phoneNumber,otp:enteredOtp })).unwrap();
+        // Navigate to the otp screen
+        navigation.navigate(CustomerScreens.CustomerHomeScreen);
+      }else{
+        await dispatch(verifyOtp({ phone: phoneNumber,otp:enteredOtp }))
+        .unwrap();
+        // Navigate to the otp screen
+        navigation.navigate(AuthScreens.CompleteProfileScreen);
+      }
+      
     } catch {
       console.log('Otp verification failed');
     }

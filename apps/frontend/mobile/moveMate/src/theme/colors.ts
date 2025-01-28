@@ -9,6 +9,8 @@ export const colors = {
   darkGreen: 'rgb(1, 73, 43)',
   black: 'rgba(24, 24, 27, 1)',
   yellow: '#FFFCAA',
+  lightGrey:'#F6F6F6',
+  red:'#D81A00',
   text: {
     primary: '#000000',
     primaryGrey: '#1D1D1D',
