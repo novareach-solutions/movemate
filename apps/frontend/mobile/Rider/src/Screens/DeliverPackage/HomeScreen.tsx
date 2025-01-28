@@ -7,43 +7,182 @@ import {
   SafeAreaView,
   Image,
   Animated,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import StatCard from '../../components/StatCard';
+import Geolocation from 'react-native-geolocation-service';
 import {images} from '../../assets/images/images';
 import {colors} from '../../theme/colors';
 import HelpButton from '../../components/HelpButton';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
-import DeliveryModal from '../../components/Modals/DeliveryModal';
-import ExpandedModal from '../../components/Modals/ExpandedModal';
-import EarningsModal from '../../components/Modals/EarningsModal';
-import OrderModal from '../../components/Modals/OrderModal';
+import {useSelector, useDispatch} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import store, {RootState} from '../../redux/store';
+import {
+  AgentStatusEnum,
+  updateAgentStatus,
+} from '../../redux/slices/agentSlice';
+import {OrderData, showOrderModal} from '../../redux/slices/orderSlice'; // Updated import
+import OrderExpandedModal from '../../components/Modals/ExpandedModal';
+import {io} from 'socket.io-client';
+import apiClient from '../../api/apiClient';
+import apiEndPoints from '../../api/apiEndPoints';
+import GetLocation from 'react-native-get-location';
 
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
-  const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
 
-  const toggleStatus = () => {
-    setIsOnline(!isOnline);
+  const SOCKET_SERVER_URL = 'http://192.168.29.63:3001';
+
+  const updateLocationAPI = async (latitude: number, longitude: number) => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      if (!accessToken) throw new Error('Access token not found.');
+
+      const response = await apiClient.patch(apiEndPoints.updateLocation, {
+        latitude,
+        longitude,
+      });
+      console.log('Location updated:', response.data);
+    } catch (error) {
+      console.error('Error updating location:', error);
+    }
+  };
+
+  useEffect(() => {
+    let locationInterval: NodeJS.Timeout | null = null;
+
+    if (isOnline) {
+      // Start updating location every 15 seconds
+      locationInterval = setInterval(() => {
+        updateLocationAPI(40.712579, -74.218993);
+      }, 15000);
+    } else if (locationInterval) {
+      // Clear interval if the agent goes offline
+      clearInterval(locationInterval);
+    }
+
+    return () => {
+      if (locationInterval) clearInterval(locationInterval);
+    };
+  }, [isOnline]);
+
+  /**
+   * Toggles the agent's online/offline status.
+   */
+  const toggleStatus = async () => {
+    if (!isAuthenticated) {
+      Alert.alert('Not Authenticated', 'Please log in to perform this action.');
+      return;
+    }
+
+    const newStatus = !isOnline;
+    setIsOnline(newStatus);
+    setIsLoading(true); // Start loading
+
+    // Animate the drawer
     Animated.timing(drawerHeight, {
-      toValue: isOnline ? 0 : 120,
+      toValue: newStatus ? 120 : 0, // If going online, show the drawer
       duration: 300,
       useNativeDriver: false,
     }).start();
+
+    // Optionally, log the current accessToken for verification
+    const currentAccessToken = await AsyncStorage.getItem('accessToken');
+    console.log('🔍 Current Access Token:', currentAccessToken); // Minimal log
+
+    // Update status on the backend
+    try {
+      const statusEnum = newStatus
+        ? AgentStatusEnum.ONLINE
+        : AgentStatusEnum.OFFLINE;
+      await updateAgentStatus(statusEnum);
+      console.log(`✅ Agent status set to ${statusEnum}`);
+      Alert.alert(
+        'Success',
+        `You are now ${newStatus ? 'Online' : 'Offline'}.`,
+      ); // **User Feedback**
+    } catch (error) {
+      console.log('Error', error);
+      // Revert the UI change if the API call fails
+      setIsOnline(!newStatus);
+      Animated.timing(drawerHeight, {
+        toValue: !newStatus ? 120 : 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+      console.error('❌ Failed to update status:', error);
+      Alert.alert('Error', 'Failed to update status. Please try again.');
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
   };
 
-  // Show the `DeliveryModal` after 3 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsOrderModalVisible(true);
-    }, 8000);
+  // Getting Order
+  const [agentId, setAgentId] = useState<string | null>(null);
 
-    return () => clearTimeout(timer);
-  }, []);
+  useEffect(() => {
+    // Fetch agentId from AsyncStorage
+    const fetchAgentId = async () => {
+      const storedAgentId = await AsyncStorage.getItem('agentId');
+      setAgentId(storedAgentId);
+    };
+
+    fetchAgentId();
+
+    // Skip WebSocket initialization if no agentId is present
+    if (!agentId) return;
+
+    const numericAgentId = parseInt(agentId, 10); // Convert agentId to a number
+
+    if (isNaN(numericAgentId)) {
+      console.error('Invalid agentId: Unable to convert to number.');
+      return;
+    }
+
+    const socket = io(SOCKET_SERVER_URL);
+
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+      socket.emit('joinRoom', {agentId: numericAgentId}); // Use the numeric agentId
+      console.log(`Joined room for agentId: ${numericAgentId}`);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from WebSocket server');
+    });
+
+    socket.on('newRequest', (data: any) => {
+      console.log('Received newRequest:', data);
+      // Dispatch the order modal with the received data
+      store.dispatch(
+        showOrderModal({
+          orderId: data.orderId,
+          earnings: data.earnings,
+          tip: data.tip,
+          time: data.time,
+          distance: data.distance,
+          pickupAddress: data.pickupAddress,
+          dropoffAddress: data.dropoffAddress,
+        }),
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [agentId]);
 
   const handleTakePhoto = () => {
     console.log('Taking a photo for proof...');
@@ -52,15 +191,12 @@ const HomeScreen: React.FC = () => {
 
   const handleOrderDelivered = () => {
     console.log('Order marked as delivered.');
-    setIsOrderModalVisible(false);
+    // No longer needed as modal is global
   };
 
   // Handle "Accept Order" button press
   const handleAcceptOrder = () => {
-    setIsOrderModalVisible(false);
-    setTimeout(() => {
-      setIsExpandedModalVisible(true);
-    }, 300);
+    // Any additional logic can be added here
   };
 
   return (
@@ -79,14 +215,22 @@ const HomeScreen: React.FC = () => {
           style={[
             styles.statusButton,
             isOnline ? styles.stopButton : styles.goButton,
-          ]}>
-          <Text
-            style={[
-              styles.statusButtonText,
-              isOnline ? styles.stopText : styles.goText,
-            ]}>
-            {isOnline ? 'Stop' : 'GO'}
-          </Text>
+          ]}
+          disabled={isLoading} // **Disable Button While Loading**
+        >
+          {isLoading ? (
+            <ActivityIndicator
+              color={isOnline ? colors.white : colors.purple}
+            />
+          ) : (
+            <Text
+              style={[
+                styles.statusButtonText,
+                isOnline ? styles.stopText : styles.goText,
+              ]}>
+              {isOnline ? 'Stop' : 'GO'}
+            </Text>
+          )}
         </TouchableOpacity>
         <Text style={styles.statusText}>
           {isOnline ? "You're Online" : "You're Offline"}
@@ -114,7 +258,8 @@ const HomeScreen: React.FC = () => {
         />
       </View>
 
-      {/* Order Modal */}
+      {/* Remove the local OrderModal */}
+      {/*
       <OrderModal
         isVisible={isOrderModalVisible}
         onClose={handleAcceptOrder} // Trigger handleAcceptOrder on close
@@ -125,30 +270,13 @@ const HomeScreen: React.FC = () => {
         pickupAddress="Yocha (Tom Roberts Parade)"
         dropoffAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
       />
+      */}
 
       {/* Earnings Modal */}
-      {/* <EarningsModal
-        isVisible={isOrderModalVisible}
-        onClose={() => setIsOrderModalVisible(false)}
-        tripTime="26 mins"
-        tripDistance="5.2 km"
-        tripPay={55}
-        tip={5}
-        totalEarnings={60}
-      /> */}
+      {/* ... existing modals ... */}
 
-      {/* Delivery Modal */}
-      {/* <DeliveryModal
-        isVisible={isOrderModalVisible}
-        onClose={() => setIsOrderModalVisible(false)}
-        driverName="Alexander V."
-        deliveryAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
-        deliveryInstructions={['Do not ring the bell', 'Drop-off at the door']}
-        itemsToDeliver={['Documents']}
-      /> */}
-
-      {/*Order Expanded Modal */}
-      <ExpandedModal
+      {/* Order Expanded Modal */}
+      <OrderExpandedModal
         isVisible={isExpandedModalVisible}
         onClose={() => setIsExpandedModalVisible(false)} // Close ExpandedModal
         driverName="Alexander V."

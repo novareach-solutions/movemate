@@ -123,7 +123,6 @@ export class AgentController {
       agentId,
       url: submitDocumentDto.url,
     };
-
     const data = await this.agentService.submitDocument(agentId, document);
     return {
       success: true,
@@ -166,8 +165,8 @@ export class AgentController {
   }
 
   @Get("profile/:id")
-// @UseGuards(AuthGuard, RoleGuard)
- // @Roles(UserRoleEnum.ADMIN)
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async getAgentProfile(
     @Param("id", ParseIntPipe) agentId: number,
   ): Promise<IApiResponse<Agent>> {
@@ -200,8 +199,8 @@ export class AgentController {
   }
 
   @Post("document/:id")
-// @UseGuards(AuthGuard, RoleGuard)
- // @Roles(UserRoleEnum.ADMIN)
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async submitAgentDocument(
     @Param("id", ParseIntPipe) agentId: number,
     @Body() submitDocumentDto: TAgentDocument,
@@ -219,8 +218,8 @@ export class AgentController {
   }
 
   @Delete("document/:id/:documentId")
-// @UseGuards(AuthGuard, RoleGuard)
- // @Roles(UserRoleEnum.ADMIN)
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async removeAgentDocument(
     @Param("id", ParseIntPipe) agentId: number,
     @Param("documentId", ParseIntPipe) documentId: number,
@@ -234,8 +233,8 @@ export class AgentController {
   }
 
   @Get("list")
-// @UseGuards(AuthGuard, RoleGuard)
- // @Roles(UserRoleEnum.ADMIN)
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async getAllAgents(): Promise<IApiResponse<Agent[]>> {
     const agents = await this.agentService.getAllAgents();
     return {
@@ -286,8 +285,8 @@ export class AgentController {
   }
 
   @Patch(":agentId/document/:documentId/approval-status")
-// @UseGuards(AuthGuard, RoleGuard)
- // @Roles(UserRoleEnum.ADMIN)
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async updateDocumentApprovalStatus(
     @Param("agentId", ParseIntPipe) agentId: number,
     @Param("documentId", ParseIntPipe) documentId: number,

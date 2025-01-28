@@ -8,8 +8,8 @@ import {
   Image,
   Modal,
 } from 'react-native';
-import {colors} from '../../theme/colors';
-import {images} from '../../assets/images/images';
+import {colors} from '../../../theme/colors';
+import {images} from '../../../assets/images/images';
 
 interface ModalComponentProps {
   isVisible: boolean;

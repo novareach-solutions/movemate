@@ -1,13 +1,27 @@
+// src/api/apiClient.ts
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import apiEndpoints from './apiEndPoints';
+import apiEndPoints from './apiEndPoints';
+import {Alert} from 'react-native';
+import store from '../redux/store';
+import {logout} from '../redux/slices/authSlice';
+import {navigate} from '../navigation/NavigationService';
+import {AuthScreens} from '../navigation/ScreenNames';
 import {generateCurlCommand} from '../utils/generateCurl';
-import {Alert} from 'react-native'; // Import Alert from React Native
 
 const apiClient = axios.create({
-  baseURL: apiEndpoints.baseURL,
+  baseURL: apiEndPoints.baseURL,
   timeout: 30000,
+  withCredentials: true,
 });
+
+// Define endpoints that do not require authentication
+const noAuthEndpoints = [
+  apiEndPoints.agentSignup,
+  apiEndPoints.requestOtp,
+  apiEndPoints.verifyOtp,
+  // Add other public endpoints here
+];
 
 // Request Interceptor
 apiClient.interceptors.request.use(
@@ -34,57 +48,46 @@ apiClient.interceptors.request.use(
 
 // Response Interceptor
 apiClient.interceptors.response.use(
-  response => {
-    console.log('Response Headers:', response.headers);
-    return response;
-  },
+  response => response,
   async error => {
     const originalRequest = error.config;
 
-    // Handle 401 Unauthorized errors and refresh tokens
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      const refreshToken = await AsyncStorage.getItem('refreshToken');
-      if (refreshToken) {
-        try {
-          const {data} = await axios.post(apiEndpoints.refreshToken, {
-            refreshToken,
-          });
-          await AsyncStorage.setItem('accessToken', data.accessToken);
-          console.log('New Access Token:', data.accessToken);
-          apiClient.defaults.headers.Authorization = `Bearer ${data.accessToken}`;
-          return apiClient(originalRequest);
-        } catch (err) {
-          console.error('Token Refresh Error:', err);
-          await AsyncStorage.clear();
-          Alert.alert('Session Expired', 'Please log in again.');
-          // Redirect to login screen
-          return Promise.reject(err);
-        }
-      } else {
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true; // Retry flag
+      try {
+        const {data} = await axios.post(
+          apiEndPoints.refreshToken,
+          {},
+          {withCredentials: true},
+        );
+
+        await AsyncStorage.setItem('accessToken', data.accessToken);
+
+        apiClient.defaults.headers.Authorization = `Bearer ${data.accessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        console.error('Token Refresh Error:', refreshError);
+
         await AsyncStorage.clear();
-        Alert.alert('Session Expired', 'Please log in again.');
-        // Redirect to login screen
-        return Promise.reject(error);
+        store.dispatch(logout());
+        Alert.alert('Session Expired', 'Please log in again.', [
+          {
+            text: 'OK',
+            onPress: () => navigate(AuthScreens.Login), // Redirect to login screen
+          },
+        ]);
+        return Promise.reject(refreshError);
       }
     }
 
-    // Handle 403 Forbidden errors
-    if (error.response.status === 403) {
-      await AsyncStorage.clear();
-      Alert.alert(
-        'Access Denied',
-        'You are not authorized to access this resource.',
-      );
-      console.warn('Access forbidden: Logging out');
-      return Promise.reject(error);
-    }
-
-    // General error handling
+    // Handle other types of errors
     const errorMessage =
-      error.response?.data?.message || error.message || 'An error occurred';
-    console.error('Response Error:', error);
-    Alert.alert('Error', errorMessage); // Show alert with error message
+      error.response?.data?.message ||
+      error.message ||
+      'An unexpected error occurred. Please try again.';
+    Alert.alert('Error', errorMessage);
+
     return Promise.reject(error);
   },
 );

@@ -38,12 +38,13 @@ import ReplaceVehicleScreen from '../Screens/Profile/AccountScreen/ReplaceVehicl
 import SignupNumberScreen from '../Screens/SignupNumberScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import ChatScreen from '../Screens/ChatScreen';
+import {navigationRef} from './NavigationService';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator initialRouteName={AuthScreens.Onboarding}>
         <Stack.Screen
           name={AuthScreens.Onboarding}

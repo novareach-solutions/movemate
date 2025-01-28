@@ -134,8 +134,8 @@ export class UserController {
    * GET /user/list
    */
   @Get("list")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.ADMIN)
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async getAllUsers(): Promise<IApiResponse<User[]>> {
     const users = await this.userService.getAllUsers();
     return {

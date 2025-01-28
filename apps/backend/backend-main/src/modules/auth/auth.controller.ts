@@ -212,11 +212,8 @@ export class AuthController {
     @Res() response: Response,
   ): Promise<void> {
     const { phoneNumber, otp } = body;
-    const { accessToken, refreshToken } = await this.authService.login(
-      phoneNumber,
-      otp,
-      role,
-    );
+    const { accessToken, refreshToken, userId, agentId } =
+      await this.authService.login(phoneNumber, otp, role);
 
     response.cookie("refresh_token", refreshToken, {
       httpOnly: true,
@@ -228,7 +225,11 @@ export class AuthController {
     response.json({
       success: true,
       message: "Login successful.",
-      data: { accessToken },
+      data: {
+        accessToken,
+        userId,
+        ...(agentId !== undefined && { agentId }),
+      },
     });
   }
 

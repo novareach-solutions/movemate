@@ -16,46 +16,46 @@ import ImagePicker from 'react-native-image-crop-picker';
 import {uploadAgentDoc, uploadMedia} from '../redux/slices/authSlice';
 import {useAppDispatch} from '../redux/hook';
 import Header from '../components/Header';
+import {images} from '../assets/images/images';
+import {SimpleToast} from '../utils/helpers';
+import {useNavigation} from '@react-navigation/native';
+import {DeliverAPackage} from '../navigation/ScreenNames';
 interface DocumentReviewProps {
   route: {
     params: {
       title: string;
       uploadedImage: string;
+      onUploadSuccess: () => any;
     };
   };
 }
 
 const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
-  const {title, uploadedImage} = route.params;
+  const {title, uploadedImage, onUploadSuccess} = route.params;
   const [image, setImage] = useState(uploadedImage);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const dispatch = useAppDispatch();
-  const documents = [
-    {id: '1', title: 'Police Verification', value: 'POLICE_VERIFICATION'},
-    {id: '2', title: 'Driver’s License', value: 'DRIVER_LICENSE'},
-    {id: '3', title: 'Australian ID Proof', value: 'AUSTRALIAN_ID_PROOF'},
-  ];
+  const navigation = useNavigation();
 
   const handleSubmit = async () => {
-    // Find the document object matching the provided title
-    const selectedDocument = documents.find(doc => doc.title === title);
-
-    // If a matching document is found, use its value; otherwise, default to a generic name
     const payload = {
-      name: selectedDocument ? selectedDocument.value : 'UNKNOWN_DOCUMENT',
-      description: selectedDocument
-        ? `${selectedDocument.title} front and back`
-        : 'Unknown document',
+      name: title.replace(' ', '_').toUpperCase(),
+      description: `${title} front and back`,
       url: image,
     };
 
     try {
       await dispatch(uploadAgentDoc(payload)).unwrap();
-      // navigate to success screen
-      console.log('Agent Doc upload successful');
-      // Navigate to the OTP screen or desired screen
+      SimpleToast('Document uploaded successfully!', true);
+
+      // Notify the parent screen of the success
+      onUploadSuccess && onUploadSuccess(title);
+
+      // Navigate to DeliverAPackage.UploadDocuments
+      navigation.navigate(DeliverAPackage.UploadDocuments);
     } catch (error) {
-      console.log('Request Otp failed', error);
+      SimpleToast('Failed to upload the document. Please try again.', true);
+      navigation.goBack();
     }
   };
 
@@ -108,7 +108,12 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
           description="Review your uploaded document below"
         />
         <View style={styles.imageContainer}>
-          <Image source={{uri: image}} style={styles.image} />
+          <Image
+            source={
+              image ? {uri: image} : images.placeholderprofile // Use a placeholder image for empty state
+            }
+            style={styles.image}
+          />
         </View>
         <View style={styles.footer}>
           <TouchableOpacity

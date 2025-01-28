@@ -23,6 +23,12 @@ import ImagePicker from 'react-native-image-crop-picker';
 import ConfirmPhotoModal from '../../components/Modals/ConfirmPhotoModal';
 import PhotoPickerModal from '../../components/common/PhotoPickerModal';
 import Header from '../../components/Header';
+import {useNavigation} from '@react-navigation/native';
+import {
+  AppScreens,
+  AuthScreens,
+  DeliverAPackage,
+} from '../../navigation/ScreenNames';
 
 const AddProfilePhotoScreen: React.FC = () => {
   // const navigation = useNavigation();
@@ -30,6 +36,7 @@ const AddProfilePhotoScreen: React.FC = () => {
   const [imgToUpload, setImgToUpload] = useState('');
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const dispatch = useAppDispatch();
+  const navigation = useNavigation();
 
   const signupData = useAppSelector(state => state.auth.signupData);
   const handleUpload = () => {
@@ -124,10 +131,14 @@ const AddProfilePhotoScreen: React.FC = () => {
   const handleContinue = async () => {
     if (signupData) {
       try {
-        console.log('signup initatiated');
+        console.log('signup initiated');
         await dispatch(agentSignup(signupData)).unwrap();
+        // Navigate to DeliverPackage.home on success
+        navigation.navigate(DeliverAPackage.UploadDocuments);
       } catch {
         console.log('Signup failed');
+        // Navigate to Appscreen.onboarding on failure
+        navigation.navigate(AuthScreens.Onboarding);
       }
     }
     console.log('Continue button pressed');

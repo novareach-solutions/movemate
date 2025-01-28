@@ -1,18 +1,24 @@
-const baseURL = 'http://18.225.92.240:3000';
+// src/api/apiEndPoints.ts
+
+const baseURL = 'http://192.168.29.63:3000'; // Replace with your actual backend URL
 
 const createEndpoint = (path: string) => `${baseURL}${path}`;
 
-const apiEndpoints = {
+const apiEndPoints = {
   baseURL,
   requestOtp: createEndpoint('/auth/otp/request'),
-  veryfyOtp: createEndpoint('/auth/otp/verify'),
+  verifyOtp: createEndpoint('/auth/otp/verify'),
   login: createEndpoint('/auth/login'),
   refreshToken: createEndpoint('/auth/refresh_token'),
   agentSignup: createEndpoint('/agent/signup'),
-  fetchProfile: '/profile',
-  fetchVehicles: '/vehicles',
+  fetchProfile: createEndpoint('/agent/profile'),
+  fetchVehicles: createEndpoint('/vehicles'),
   uploadMedia: createEndpoint('/media/upload'),
   agentDoc: createEndpoint('/agent/document'),
+  updateAgentStatus: createEndpoint('/agent/status'),
+  acceptOrder: (orderId: string) =>
+    createEndpoint(`/order/send-package/agent/${orderId}/accept`),
+  updateLocation: createEndpoint(`/agent/location`),
 };
 
-export default apiEndpoints;
+export default apiEndPoints;
