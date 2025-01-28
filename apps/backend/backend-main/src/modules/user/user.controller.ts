@@ -5,13 +5,16 @@ import {
   Get,
   Logger,
   Param,
-  ParseUUIDPipe,
+  ParseIntPipe,
   Patch,
   Post,
   Req,
+  Res,
   UseGuards,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { ApiTags } from "@nestjs/swagger";
+import { Response } from "express";
 import { DeleteResult, UpdateResult } from "typeorm";
 
 import { User } from "../../entity/User";
@@ -28,14 +31,19 @@ import { UserRoleEnum } from "../../shared/enums";
 import { UnauthorizedError } from "../../shared/errors/authErrors";
 import { AuthGuard } from "../../shared/guards/auth.guard";
 import { OnboardingGuard } from "../../shared/guards/onboarding.guard";
+import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { UserService } from "./user.service";
 import { TCreateUser, TGetUserProfile, TUpdateUser } from "./user.types";
-@ApiTags("Users")
+
+@ApiTags("User")
 @Controller("user")
 export class UserController {
   private readonly logger = new Logger(UserController.name);
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService,
+  ) {}
 
   /**
    * Create a new user.
@@ -47,7 +55,8 @@ export class UserController {
   async createUser(
     @Body() createUserDto: TCreateUser,
     @Req() request: ICustomRequest,
-  ): Promise<IApiResponse<number>> {
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<IApiResponse<{ accessToken: string }>> {
     const phoneNumberFromGuard = request.user.phoneNumber;
     if (
       createUserDto.phoneNumber &&
@@ -68,11 +77,21 @@ export class UserController {
         createUserDto,
       )}`,
     );
-    const userId = await this.userService.createUser(createUserDto);
+
+    const { accessToken, refreshToken } =
+      await this.userService.createUser(createUserDto);
+
+    response.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: this.configService.get<string>("ENVIRONMENT") === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
+    });
+
     return {
       success: true,
       message: "User created successfully.",
-      data: userId,
+      data: { accessToken },
     };
   }
 
@@ -81,7 +100,7 @@ export class UserController {
    * GET /user/me
    */
   @Get()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.CUSTOMER)
   @UserGetByIdSwagger()
   async getCurrentUser(
@@ -114,11 +133,11 @@ export class UserController {
    * GET /user/profile/:id
    */
   @Get("profile/:id")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
   @UserGetProfileByIdSwagger()
   async getUserById(
-    @Param("id", ParseUUIDPipe) id: number,
+    @Param("id", ParseIntPipe) id: number,
   ): Promise<IApiResponse<User>> {
     this.logger.debug(
       `UserController.getUserById: Retrieving user with ID ${id}`,
@@ -145,7 +164,7 @@ export class UserController {
    * POST /user/profile
    */
   @Post("profile")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
   @UserGetProfileByIdSwagger()
   async getUserProfile(
@@ -180,7 +199,7 @@ export class UserController {
    * GET /user/list
    */
   @Get("list")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
   @UserGetAllSwagger()
   async getAllUsers(): Promise<IApiResponse<User[]>> {
@@ -201,11 +220,11 @@ export class UserController {
    * PUT /user/profile/:id
    */
   @Patch("profile/:id")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
   @UserPatchProfileByIdSwagger()
   async updateUser(
-    @Param("id", ParseUUIDPipe) id: number,
+    @Param("id", ParseIntPipe) id: number,
     @Body() updateUserDto: TUpdateUser,
   ): Promise<IApiResponse<UpdateResult>> {
     this.logger.debug(
@@ -229,11 +248,11 @@ export class UserController {
    * DELETE /user/profile/:id
    */
   @Delete("profile/:id")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
   @UserDeleteProfileByIdSwagger()
   async deleteUser(
-    @Param("id", ParseUUIDPipe) id: string,
+    @Param("id", ParseIntPipe) id: string,
   ): Promise<IApiResponse<DeleteResult>> {
     this.logger.debug(`UserController.deleteUser: Deleting user with ID ${id}`);
     const result = await this.userService.deleteUser(id);

@@ -9,12 +9,16 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UseGuards,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { ApiTags } from "@nestjs/swagger";
+import { Response } from "express";
 import { UpdateResult } from "typeorm";
 
 import { Agent } from "../../entity/Agent";
+import { RequiredDocument } from "../../entity/RequiredDocument";
 import {
   AgentDeleteDocumentSwagger,
   AgentGetAllSwagger,
@@ -29,19 +33,29 @@ import {
   AgentUpdateLocationSwagger,
 } from "../../shared/decorators/agents/agent.decorators";
 import { Roles } from "../../shared/decorators/roles.decorator";
-import { AgentStatusEnum, UserRoleEnum } from "../../shared/enums";
+import {
+  AgentStatusEnum,
+  AgentTypeEnum,
+  ApprovalStatusEnum,
+  UserRoleEnum,
+} from "../../shared/enums";
 import { UnauthorizedError } from "../../shared/errors/authErrors";
 import { AuthGuard } from "../../shared/guards/auth.guard";
 import { OnboardingGuard } from "../../shared/guards/onboarding.guard";
+import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { AgentService } from "./agent.service";
 import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
+
 @ApiTags("Agent")
 @Controller("agent")
 export class AgentController {
   private readonly logger = new Logger(AgentController.name);
 
-  constructor(private readonly agentService: AgentService) {}
+  constructor(
+    private readonly agentService: AgentService,
+    private readonly configService: ConfigService,
+  ) {}
 
   // *** Agent Sign Up, Status and List Specific Controllers ***
   @Post("signup")
@@ -50,7 +64,8 @@ export class AgentController {
   async create(
     @Req() request: ICustomRequest,
     @Body() agent: TAgent,
-  ): Promise<IApiResponse<Agent>> {
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<IApiResponse<{ agent: Agent; accessToken: string }>> {
     this.logger.log(
       `AgentController.create: Attempting agent signup for phone number: ${agent.user.phoneNumber}`,
     );
@@ -69,70 +84,32 @@ export class AgentController {
       );
     }
     agent.user.phoneNumber = phoneNumberFromGuard;
-    const data = await this.agentService.createAgent(agent);
+    const {
+      agent: createdAgent,
+      accessToken,
+      refreshToken,
+    } = await this.agentService.createAgent(agent);
+
+    response.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: this.configService.get<string>("ENVIRONMENT") === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
+    });
+
     this.logger.log(
-      `AgentController.create: Agent successfully created with ID: ${data.id}`,
+      `AgentController.create: Agent successfully created with ID: ${createdAgent.id}`,
     );
 
     return {
       success: true,
       message: "Agent created successfully.",
-      data,
+      data: { agent: createdAgent, accessToken },
     };
   }
 
-  @Patch("status")
-  @UseGuards(AuthGuard)
-  @Roles(UserRoleEnum.AGENT)
-  @AgentPatchStatusSwagger()
-  async setOwnAgentStatus(
-    @Body() body: { status: AgentStatusEnum },
-    @Req() request: ICustomRequest,
-  ): Promise<IApiResponse<UpdateResult>> {
-    const { status } = body;
-    const agentId = request.user.agent.id;
-
-    this.logger.debug(
-      `AgentController.setOwnAgentStatus: Updating status for agent ${agentId} to: ${status}`,
-    );
-
-    const data = await this.agentService.setAgentStatus(agentId, status);
-
-    this.logger.log(
-      `AgentController.setOwnAgentStatus: Agent ${agentId} status updated to ${status}`,
-    );
-
-    return {
-      success: true,
-      message: `Agent status updated to ${status}.`,
-      data,
-    };
-  }
-
-  @Get("list")
-  @UseGuards(AuthGuard)
-  @Roles(UserRoleEnum.ADMIN)
-  @AgentGetAllSwagger()
-  async getAllAgents(): Promise<IApiResponse<Agent[]>> {
-    this.logger.debug(
-      "AgentController.getAllAgents: Retrieving all agents list",
-    );
-
-    const agents = await this.agentService.getAllAgents();
-
-    this.logger.log(
-      `AgentController.getAllAgents: ${agents.length} agents retrieved successfully.`,
-    );
-    return {
-      success: true,
-      message: "All agents retrieved successfully.",
-      data: agents,
-    };
-  }
-
-  // *** Agent Profile Specific Controllers ***
   @Get("profile")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
   @AgentGetProfileSwagger()
   async getOwnProfile(
@@ -155,7 +132,7 @@ export class AgentController {
   }
 
   @Patch("profile")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
   @AgentPatchProfileSwagger()
   async updateOwnProfile(
@@ -187,14 +164,46 @@ export class AgentController {
     };
   }
 
-  @Get("profile/:id")
+  @Patch("status")
   @UseGuards(AuthGuard)
+  @Roles(UserRoleEnum.AGENT)
+  @AgentPatchStatusSwagger()
+  async setOwnAgentStatus(
+    @Body() body: { status: AgentStatusEnum },
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<UpdateResult>> {
+    const { status } = body;
+    const agentId = request.user.agent.id;
+    this.logger.debug(
+      `AgentController.setOwnAgentStatus: Setting status for agent ${agentId} to ${status}`,
+    );
+    const data = await this.agentService.setAgentStatus(agentId, status);
+    this.logger.log(
+      `AgentController.setOwnAgentStatus: Status for agent ${agentId} set to ${status}.`,
+      data,
+    );
+    return {
+      success: true,
+      message: `Agent status updated to ${status}.`,
+      data,
+    };
+  }
+
+  @Get("profile/:id")
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
   @AgentGetProfileByIdSwagger()
   async getAgentProfile(
     @Param("id", ParseIntPipe) agentId: number,
   ): Promise<IApiResponse<Agent>> {
+    this.logger.debug(
+      `AgentController.getAgentProfile: Retrieving profile for agent ${agentId}`,
+    );
     const agent = await this.agentService.getAgentById(agentId);
+    this.logger.log(
+      `AgentController.getAgentProfile: Profile for agent ${agentId} retrieved successfully.`,
+      agent,
+    );
     return {
       success: true,
       message: "Agent profile retrieved successfully.",
@@ -203,7 +212,7 @@ export class AgentController {
   }
 
   @Patch("profile/:id")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
   @AgentPatchProfileByIdSwagger()
   async updateAgentProfile(
@@ -232,7 +241,7 @@ export class AgentController {
 
   // *** Document Specific Controllers ***
   @Post("document")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
   @AgentPostDocumentSwagger()
   async submitOwnDocument(
@@ -247,6 +256,7 @@ export class AgentController {
     const document: TAgentDocument = {
       ...submitDocumentDto,
       agentId,
+      url: submitDocumentDto.url,
     };
     const data = await this.agentService.submitDocument(agentId, document);
 
@@ -262,7 +272,7 @@ export class AgentController {
   }
 
   @Delete("document/:documentId")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
   @AgentDeleteDocumentSwagger()
   async removeOwnDocument(
@@ -286,7 +296,7 @@ export class AgentController {
   }
 
   @Post("document/:id")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
   @AgentPostDocumentByIdSwagger()
   async submitAgentDocument(
@@ -313,11 +323,10 @@ export class AgentController {
     };
   }
 
-  // ! Duplicate controller, should be removed. Same service is being used
+  // Seperate controller for updating document approval status for ADMIN role
   @Delete("document/:id/:documentId")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
-  @AgentDeleteDocumentSwagger()
   async removeAgentDocument(
     @Param("id", ParseIntPipe) agentId: number,
     @Param("documentId", ParseIntPipe) documentId: number,
@@ -330,9 +339,27 @@ export class AgentController {
     };
   }
 
-  // *** Agent Location Specific Controller
+  // *** Other Controllers ***
+  @Get("list")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.ADMIN)
+  @AgentGetAllSwagger()
+  async getAllAgents(): Promise<IApiResponse<Agent[]>> {
+    this.logger.debug(`AgentController.getAllAgents: Retrieving all agents.`);
+    const agents = await this.agentService.getAllAgents();
+    this.logger.log(
+      `AgentController.getAllAgents: All agents retrieved successfully.`,
+      agents,
+    );
+    return {
+      success: true,
+      message: "All agents retrieved successfully.",
+      data: agents,
+    };
+  }
+
   @Patch("location")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
   @AgentUpdateLocationSwagger()
   async updateLocation(
@@ -354,6 +381,83 @@ export class AgentController {
       success: true,
       message: "Location updated successfully.",
       data: null,
+    };
+  }
+
+  @Post("required-document")
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
+  async createRequiredDocument(
+    @Body()
+    createRequiredDocumentDto: {
+      name: string;
+      description?: string;
+      agentType: AgentTypeEnum;
+      isRequired: boolean;
+      isExpiry: boolean;
+    },
+  ): Promise<IApiResponse<RequiredDocument>> {
+    const requiredDocument = await this.agentService.createRequiredDocument(
+      createRequiredDocumentDto,
+    );
+    return {
+      success: true,
+      message: "Required document created successfully.",
+      data: requiredDocument,
+    };
+  }
+
+  @Patch(":agentId/document/:documentId/approval-status")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.ADMIN)
+  async updateDocumentApprovalStatus(
+    @Param("agentId", ParseIntPipe) agentId: number,
+    @Param("documentId", ParseIntPipe) documentId: number,
+    @Body() body: { approvalStatus: ApprovalStatusEnum },
+  ): Promise<IApiResponse<null>> {
+    const { approvalStatus } = body;
+
+    // Call service method to update the document's approval status
+    await this.agentService.updateDocumentApprovalStatus(
+      agentId,
+      documentId,
+      approvalStatus,
+    );
+
+    return {
+      success: true,
+      message: `Document approval status updated to ${approvalStatus}.`,
+      data: null,
+    };
+  }
+
+  @Post("assign-rider/:orderId")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.CUSTOMER)
+  async assignRider(
+    @Param("orderId") orderId: string,
+    @Body() body: { pickupLatitude: number; pickupLongitude: number },
+  ): Promise<IApiResponse<{ assignedAgentId: number | null }>> {
+    const { pickupLatitude, pickupLongitude } = body;
+
+    const assignedAgentId = await this.agentService.assignRider(
+      pickupLatitude,
+      pickupLongitude,
+      orderId,
+    );
+
+    if (assignedAgentId) {
+      return {
+        success: true,
+        message: `Rider assigned successfully.`,
+        data: { assignedAgentId },
+      };
+    }
+
+    return {
+      success: false,
+      message: `No rider could be assigned.`,
+      data: { assignedAgentId: null },
     };
   }
 }

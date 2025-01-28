@@ -4,7 +4,8 @@ import Redis, { RedisOptions } from "ioredis";
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
-  private readonly redisClient: Redis;
+  private readonly redisClient: Redis; // For general commands
+  private readonly subscriberClient: Redis; // For Pub/Sub
   private readonly logger = new Logger(RedisService.name);
 
   constructor(private readonly configService: ConfigService) {
@@ -13,16 +14,29 @@ export class RedisService implements OnModuleDestroy {
       port: this.configService.get<number>("REDIS_PORT"),
     };
     this.redisClient = new Redis(redisOptions);
+    this.subscriberClient = new Redis(redisOptions);
 
     this.redisClient.on("connect", () => {
-      this.logger.log("Connected to Redis server");
+      this.logger.debug("Connected to Redis server (General Client)");
+    });
+
+    this.subscriberClient.on("connect", () => {
+      this.logger.debug("Connected to Redis server (Subscriber Client)");
     });
 
     this.redisClient.on("error", (error: unknown) => {
-      this.logger.error("Error connecting to Redis:", error);
+      this.logger.error("Error connecting to Redis (General Client):", error);
+    });
+
+    this.subscriberClient.on("error", (error: unknown) => {
+      this.logger.error(
+        "Error connecting to Redis (Subscriber Client):",
+        error,
+      );
     });
   }
 
+  // Methods for general Redis commands
   async set(
     key: string,
     value: any,
@@ -52,12 +66,17 @@ export class RedisService implements OnModuleDestroy {
     return await this.redisClient.ttl(key);
   }
 
-  getClient(): Redis {
+  getSubscriberClient(): Redis {
+    return this.subscriberClient;
+  }
+
+  getGeneralClient(): Redis {
     return this.redisClient;
   }
 
   async onModuleDestroy(): Promise<void> {
     await this.redisClient.quit();
-    this.logger.log("Redis client disconnected");
+    await this.subscriberClient.quit();
+    this.logger.debug("Redis clients disconnected");
   }
 }
