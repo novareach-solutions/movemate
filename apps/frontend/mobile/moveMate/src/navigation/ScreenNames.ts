@@ -1,3 +1,4 @@
+import CancelSuccessScreen from '../Screens/Customer/SendAPackage/CancelSuccessScreen';
 import DeliveryScreen from '../Screens/Customer/SendAPackage/DeliveryScreen';
 import PaymentSuccessScreen from '../Screens/Customer/SendAPackage/PaymentSuccessScreen';
 import {AuthStackParamList, AppStackParamList} from './type';
@@ -48,5 +49,7 @@ export const CustomerScreens = {
   PaymentSelectionScreen: 'PaymentSelectionScreen',
   PaymentSuccessScreen:'PaymentSuccessScreen',
   AddCardScreen: 'AddCardScreen',
-  DeliveryScreen:'DeliveryScreen'
+  DeliveryScreen:'DeliveryScreen',
+  CancelOrderScreen:'CancelOrderScreen',
+  CancelSuccessScreen:'CancelSuccessScreen'
 }

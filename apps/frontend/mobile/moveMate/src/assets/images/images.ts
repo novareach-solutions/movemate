@@ -32,6 +32,7 @@ import cart from "./Cart.png";
 import map from "./Map.png";
 import paymentSuccess from "./paymentSuccess.png";
 import deliveryMan from "./delivery-man.png";
+import success from "./success.png"
 
 
 export const images = {
@@ -58,5 +59,5 @@ export const images = {
   masterCard,
   applePay,
   paypal,
-  profileAccount,arrow,doNotRing,doorDropOff,pickUpNotesIcon,phone,visaIcon,cart,map,paymentSuccess,deliveryMan
+  profileAccount,arrow,doNotRing,doorDropOff,pickUpNotesIcon,phone,visaIcon,cart,map,paymentSuccess,deliveryMan,success
 };
