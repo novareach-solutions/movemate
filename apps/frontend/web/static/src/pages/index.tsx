@@ -8,16 +8,20 @@ import MadeForAussies from "@/components/MadeForAussies";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import TryUsNow from "@/components/TryUsNow";
 import GetInTouch from "@/components/GetInTouch";
+import HeroSection from "@/components/HeroSection";
+import ComparisonCards from "@/components/ComparisonTable";
 
 export default function Home() {
   return (
     <>
       <Navbar />
+      <HeroSection />
       <CardsInstantSolutions />
       <WhyChooseUs />
       <MadeForAussies />
       <InstantSolutions />
       <VamooseVsOthers />
+      <ComparisonCards />
       <BeAPartner />
       <TryUsNow />
       <GetInTouch />

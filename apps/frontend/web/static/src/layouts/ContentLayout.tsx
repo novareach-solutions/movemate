@@ -36,7 +36,7 @@ const ContentLayout: React.FC<ContentLayoutProps> = ({
       className={`w-full h-full flex justify-center items-center `}
     >
       <div
-        className={`w-full h-full py-[15%] md:py-[7.5%] max-w-[90%] md:max-w-[85%] flex flex-col ${layoutClasses} justify-between items-center`}
+        className={`w-full h-full py-[15%] md:py-[7.5%] max-w-[90%] md:max-w-[95%] flex  ${layoutClasses} justify-between items-center`}
       >
         {/* Text Section */}
         <div className="w-full max-w-fit flex flex-col justify-start items-start font-sans gap-[min(5.15vw,20px)] md:gap-[min(1.305vw,25px)]">

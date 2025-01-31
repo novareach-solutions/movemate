@@ -7,13 +7,6 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   color: var(--foreground);
   background: var(--background);
@@ -27,9 +20,14 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
-} 
+}
 
-.background-linear{
-  background: rgb(104,31,139);
-background: linear-gradient(100deg, rgba(104,31,139,1) 0%, rgba(128,57,162,1) 35%, rgba(208,139,242,1) 100%);
+.background-linear {
+  background: rgb(104, 31, 139);
+  background: linear-gradient(
+    100deg,
+    rgba(104, 31, 139, 1) 0%,
+    rgba(128, 57, 162, 1) 35%,
+    rgba(208, 139, 242, 1) 100%
+  );
 }
