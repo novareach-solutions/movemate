@@ -2,6 +2,8 @@ import "@/styles/globals.css";
 import localFont from "next/font/local";
 import { Open_Sans } from "next/font/google";
 import type { AppProps } from "next/app";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const gilroy = localFont({
   src: [
@@ -32,7 +34,9 @@ const openSans = Open_Sans({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <main className={`${gilroy.variable} ${openSans.variable} font-sans`}>
+      <Navbar />
       <Component {...pageProps} />
+      <Footer />
     </main>
   );
 }

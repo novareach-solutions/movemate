@@ -1,5 +1,3 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import CardsInstantSolutions from "@/components/CardsInstantSolutions";
 import VamooseVsOthers from "@/components/VamooseVsOthers";
 import BeAPartner from "@/components/BeAPartner";
@@ -14,7 +12,6 @@ import ComparisonCards from "@/components/ComparisonTable";
 export default function Home() {
   return (
     <>
-      <Navbar />
       <HeroSection />
       <CardsInstantSolutions />
       <WhyChooseUs />
@@ -25,7 +22,6 @@ export default function Home() {
       <BeAPartner />
       <TryUsNow />
       <GetInTouch />
-      <Footer />
     </>
   );
 }
