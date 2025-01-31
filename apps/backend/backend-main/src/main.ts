@@ -1,16 +1,15 @@
+import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { IoAdapter } from "@nestjs/platform-socket.io";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { apiReference } from "@scalar/nestjs-api-reference";
 
 import { AppModule } from "./app.module";
-import configuration from "./config/configuration";
 import { CustomExceptionFilter } from "./errorFilter";
 
-const config = configuration();
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
-
+  const configService = app.get(ConfigService);
   const docConfig = new DocumentBuilder()
     .setTitle("API Documentation of Vamoose")
     .setDescription("API endpoints for the Vamoose application")
@@ -31,7 +30,7 @@ async function bootstrap(): Promise<void> {
 
   // Configure CORS
   app.enableCors({
-    origin: config.corsOrigin,
+    origin: configService.get<string>("app.corsOrigin"),
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -39,6 +38,6 @@ async function bootstrap(): Promise<void> {
   // Configure WebSocket adapter
   app.useWebSocketAdapter(new IoAdapter(app));
 
-  await app.listen(config.port ?? 3000);
+  await app.listen(configService.get<number>("app.port") ?? 3000);
 }
 void bootstrap();
