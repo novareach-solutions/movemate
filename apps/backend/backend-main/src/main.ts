@@ -48,6 +48,17 @@ async function bootstrap(): Promise<void> {
   app.useWebSocketAdapter(new IoAdapter(app));
 
   await app.listen(configService.get<number>("app.port") ?? 3000);
+
+  /**
+   * These logs for PORT and CORS Origin are used to verify if the environment
+   * variables are being correctly loaded in the application.
+   *
+   * If the application is running on the correct PORT and CORS Origin, then they
+   * can be removed from the codebase.
+   */
+  logger.log(
+    `🚩 CORS Origin is running on: ${configService.get<string>("app.corsOrigin")}`,
+  );
   logger.log(
     `🚩 Application PORT is running on: ${configService.get<number>("app.port")}`,
   );
