@@ -172,7 +172,7 @@ const AddProfilePhotoScreen: React.FC = () => {
       </View>
       {/* Photo Options Modal */}
       <PhotoPickerModal
-        visible={isPhotoOptionVisible}
+        isVisible={isPhotoOptionVisible}
         onClose={() => setIsPhotoOptionVisible(false)}
         onTakePhoto={handleTakePhoto}
         onChooseFromGallery={handleChooseFromGallery}

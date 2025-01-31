@@ -19,6 +19,13 @@ const apiEndPoints = {
   acceptOrder: (orderId: string) =>
     createEndpoint(`/order/send-package/agent/${orderId}/accept`),
   updateLocation: createEndpoint(`/agent/location`),
+  getOngoingOrder: createEndpoint('/agent/ongoingorder'),
+  verifyItemsPhoto: (orderId: number) =>
+    createEndpoint(`/order/send-package/agent/${orderId}/verify-items-photo`),
+  startOrder: (orderId: number) =>
+    createEndpoint(`/order/send-package/agent/${orderId}/start`),
+  updateOrderStatus: (orderId: number) =>
+    createEndpoint(`/order/send-package/${orderId}/status`),
 };
 
 export default apiEndPoints;

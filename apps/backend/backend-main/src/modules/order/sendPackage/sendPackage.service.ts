@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { Between, In } from "typeorm";
 
 import { DropLocation } from "../../../entity/DropLocation";
@@ -40,7 +40,7 @@ export class SendAPackageService {
   constructor(
     private readonly pricingService: PricingService,
     private readonly customerNotificationGateway: CustomerNotificationGateway,
-  ) {}
+  ) { }
   async create(data: TSendPackageOrder): Promise<SendPackageOrder> {
     logger.debug(
       "SendAPackageService.create: Creating a new send package order",
@@ -374,6 +374,46 @@ export class SendAPackageService {
     return updatedOrder;
   }
 
+  async updateItemVerifiedPhoto(
+    orderId: number,
+    agentId: number,
+    photoUrl: string,
+  ): Promise<SendPackageOrder> {
+    logger.debug(
+      `SendAPackageService.updateItemVerifiedPhoto: Agent ID ${agentId} updating photo for order ID ${orderId}`,
+    );
+
+    if (!photoUrl) {
+      throw new SendPackageNotFoundError(`An Error occured while uploading the image`);
+
+    }
+    const order = await dbReadRepo(SendPackageOrder).findOne({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
+    }
+
+    order.itemVerifiedPhoto = photoUrl;
+
+    try {
+      const updatedOrder = await dbRepo(SendPackageOrder).save(order);
+      logger.debug(
+        `SendAPackageService.updateItemVerifiedPhoto: Order ID ${orderId} updated with itemVerifiedPhoto`,
+      );
+      return updatedOrder;
+    } catch (error) {
+      logger.error(
+        `SendAPackageService.updateItemVerifiedPhoto: Failed to update order ID ${orderId} - ${error.message}`,
+        { stack: error.stack },
+      );
+      throw new InternalServerErrorException(
+        "Failed to update item verification photo",
+      );
+    }
+  }
+
   async startOrder(
     orderId: number,
     agentId: number,
@@ -513,6 +553,8 @@ export class SendAPackageService {
     return savedReport;
   }
 
+
+
   // ====== Admin Service Methods ======
 
   async getAllOrders(query: any): Promise<SendPackageOrder[]> {
@@ -553,6 +595,64 @@ export class SendAPackageService {
       `SendAPackageService.getAllOrders: Retrieved ${orders.length} orders`,
     );
     return orders;
+  }
+
+  // ====== Common APIs ======
+  async updateOrderStatus(orderId: number, status: OrderStatusEnum): Promise<SendPackageOrder> {
+    logger.debug(`SendAPackageService.updateOrderStatus: Updating status for order ID ${orderId} to ${status}`);
+
+    const order = await dbReadRepo(SendPackageOrder).findOne({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
+    }
+
+    // Define valid status transitions
+    const validTransitions: Record<OrderStatusEnum, OrderStatusEnum[]> = {
+      [OrderStatusEnum.PENDING]: [OrderStatusEnum.ACCEPTED, OrderStatusEnum.CANCELED],
+      [OrderStatusEnum.ACCEPTED]: [OrderStatusEnum.IN_PROGRESS, OrderStatusEnum.CANCELED],
+      [OrderStatusEnum.IN_PROGRESS]: [OrderStatusEnum.COMPLETED, OrderStatusEnum.CANCELED],
+      [OrderStatusEnum.COMPLETED]: [],
+      [OrderStatusEnum.CANCELED]: [],
+      [OrderStatusEnum.PICKEDUP_ORDER]: [OrderStatusEnum.COMPLETED],
+    };
+
+    // if (!validTransitions[order.status].includes(status)) {
+    //   throw new BadRequestException(
+    //     `Cannot change status from ${order.status} to ${status}`,
+    //   );
+    // }
+
+    order.status = status;
+
+    // Additional logic based on status
+    switch (status) {
+      case OrderStatusEnum.ACCEPTED:
+        order.acceptedAt = new Date();
+        await this.notifyCustomerOrderAccepted(order);
+        break;
+      case OrderStatusEnum.IN_PROGRESS:
+        order.startedAt = new Date();
+        break;
+      case OrderStatusEnum.COMPLETED:
+        order.completedAt = new Date();
+        break;
+      case OrderStatusEnum.CANCELED:
+        break;
+      default:
+        break;
+    }
+
+    try {
+      const updatedOrder = await dbRepo(SendPackageOrder).save(order);
+      logger.debug(`SendAPackageService.updateOrderStatus: Order ID ${orderId} status updated to ${status}`);
+      return updatedOrder;
+    } catch (error) {
+      logger.error(`SendAPackageService.updateOrderStatus: Failed to update order ID ${orderId} - ${error.message}`, { stack: error.stack });
+      throw new InternalServerErrorException("Failed to update order status");
+    }
   }
 
   // private methods

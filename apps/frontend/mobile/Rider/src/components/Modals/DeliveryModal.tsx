@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,20 @@ import {
   Image,
   TextStyle,
 } from 'react-native';
-import {colors} from '../../theme/colors';
-import {formStyles} from '../../theme/form';
-import {typography} from '../../theme/typography';
-import {images} from '../../assets/images/images';
+import { colors } from '../../theme/colors';
+import { formStyles } from '../../theme/form';
+import { typography } from '../../theme/typography';
+import { images } from '../../assets/images/images';
+import { SendPackageOrder } from '../../redux/slices/types/sendAPackage';
 
 interface DeliveryModalProps {
   isVisible: boolean;
   onClose: () => void;
   driverName: string;
   deliveryAddress: string;
-  deliveryInstructions: string[];
+  deliveryInstructions: string;
   itemsToDeliver: string[];
+  order: SendPackageOrder;
 }
 
 const DeliveryModal: React.FC<DeliveryModalProps> = ({
@@ -29,31 +31,37 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
   deliveryAddress,
   deliveryInstructions,
   itemsToDeliver,
+  order,
 }) => {
   const [isTakingPhoto, setIsTakingPhoto] = useState(false);
+  const [photoTaken, setPhotoTaken] = useState(false);
 
   const handleTakePhoto = () => {
     setIsTakingPhoto(true);
-    console.log('Take Photo button clicked', isTakingPhoto); // Replace this with your camera logic
+    setTimeout(() => {
+      setIsTakingPhoto(false);
+      setPhotoTaken(true);
+    }, 1000);
+    console.log('Take Photo button clicked');
   };
 
   const handleOrderDelivered = () => {
-    console.log('Order Delivered button clicked');
-    onClose(); // Close the modal when delivered
+    if (photoTaken) {
+      console.log('Order Delivered button clicked');
+      onClose();
+    }
   };
 
   return (
-    <Modal
-      visible={isVisible}
-      animationType="slide"
-      onRequestClose={onClose}
-      transparent>
+    <Modal visible={isVisible} animationType="slide" onRequestClose={onClose} transparent>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           {/* Header Section */}
           <View style={styles.header}>
-            <Text style={styles.driverName}>{driverName}</Text>
-            <Text style={styles.deliveryAddress}>{deliveryAddress}</Text>
+            <View>
+              <Text style={styles.driverName}>{order.customer?.firstName}</Text>
+              <Text style={styles.deliveryAddress}>{order.dropLocation?.addressLine1}</Text>
+            </View>
             <View style={styles.headerIcons}>
               <TouchableOpacity>
                 <Image source={images.phone} style={styles.icon} />
@@ -68,19 +76,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Delivery Instructions</Text>
             <View style={styles.instructionsContainer}>
-              {deliveryInstructions.map((instruction, index) => (
-                <View key={index} style={styles.instructionRow}>
-                  <Image
-                    source={
-                      instruction === 'Do not ring the bell'
-                        ? images.doNotRing
-                        : images.doorDropOff
-                    }
-                    style={styles.instructionIcon}
-                  />
-                  <Text style={styles.instructionText}>{instruction}</Text>
-                </View>
-              ))}
+              <Text style={styles.instructionText}>{deliveryInstructions}</Text>
             </View>
           </View>
 
@@ -97,25 +93,28 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
           {/* Proof of Delivery */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Proof of Delivery</Text>
-            <Text style={styles.proofText}>
-              Take a photo to confirm delivery
-            </Text>
+            <Text style={styles.proofText}>Take a photo to confirm delivery</Text>
             <TouchableOpacity
               style={[formStyles.button, formStyles.buttonEnabled]}
               onPress={handleTakePhoto}>
               <Image source={images.camera} style={styles.cameraIcon} />
-              <Text
-                style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
-                Take Photo
+              <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
+                {photoTaken ? 'Photo Taken' : 'Take Photo'}
               </Text>
             </TouchableOpacity>
           </View>
 
-          {/* Order Delivered Button */}
+          {/* Order Delivered Button - Slightly Grayed Out When Disabled */}
           <TouchableOpacity
-            style={[formStyles.button, formStyles.buttonSuccess]}
-            onPress={handleOrderDelivered}>
-            <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
+            style={[
+              formStyles.button,
+              formStyles.buttonSuccess,
+              { opacity: photoTaken ? 1 : 0.5 }, // Grayed out effect
+            ]}
+            onPress={handleOrderDelivered}
+            disabled={!photoTaken} // Disable if no photo taken
+          >
+            <Text style={formStyles.buttonText}>
               Order Delivered
             </Text>
           </TouchableOpacity>
@@ -138,13 +137,20 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
   },
   header: {
     marginBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+    backgroundColor: '#F6F6F6',
+    borderRadius: 12,
   },
   driverName: {
     fontSize: typography.fontSize.large,
@@ -179,15 +185,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 15,
   },
-  instructionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  instructionIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
-  },
   instructionText: {
     fontSize: typography.fontSize.medium,
     color: colors.text.primaryGrey,
@@ -207,6 +204,7 @@ const styles = StyleSheet.create({
     height: 20,
     tintColor: colors.white,
     marginRight: 10,
+    objectFit: 'contain',
   },
 });
 

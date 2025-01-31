@@ -31,13 +31,15 @@ import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { AgentService } from "./agent.service";
 import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
+import { SendPackageOrder } from "../../entity/SendPackageOrder";
+import { logger } from "../../logger";
 
 @Controller("agent")
 export class AgentController {
   constructor(
     private readonly agentService: AgentService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @Post("signup")
   @UseGuards(OnboardingGuard)
@@ -73,6 +75,30 @@ export class AgentController {
       success: true,
       message: "Agent created successfully.",
       data: { agent: createdAgent, accessToken },
+    };
+  }
+  @Get("ongoingorder")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.AGENT)
+  async getOngoingOrder(
+    @Req() request: any
+  ): Promise<IApiResponse<SendPackageOrder | null>> {
+    const agentId = request.user.agent?.id;
+
+    const ongoingOrder = await this.agentService.getOngoingOrder(agentId);
+
+    if (!ongoingOrder) {
+      return {
+        success: true,
+        message: "No ongoing order found.",
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      message: "Ongoing order retrieved successfully.",
+      data: ongoingOrder,
     };
   }
 

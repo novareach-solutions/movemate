@@ -39,6 +39,7 @@ import SignupNumberScreen from '../Screens/SignupNumberScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import ChatScreen from '../Screens/ChatScreen';
 import {navigationRef} from './NavigationService';
+import OrderDetailsScreen from '../Screens/OrderDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -106,6 +107,11 @@ const App = () => {
         <Stack.Screen
           name={DeliverAPackage.Home}
           component={HomeScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={DeliverAPackage.OrderDetails}
+          component={OrderDetailsScreen}
           options={{headerShown: false}}
         />
 

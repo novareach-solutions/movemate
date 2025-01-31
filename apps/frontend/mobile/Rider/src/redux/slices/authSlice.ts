@@ -1,13 +1,13 @@
 // src/redux/slices/authSlice.ts
 
-import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiClient from '../../api/apiClient';
 import apiEndPoints from '../../api/apiEndPoints';
 import axios from 'axios';
-import {saveToken} from '../../utils/manageToken';
-import {SimpleToast} from '../../utils/helpers';
-import {Alert} from 'react-native'; // Import Alert
+import { saveToken } from '../../utils/manageToken';
+import { SimpleToast } from '../../utils/helpers';
+import { Alert } from 'react-native'; // Import Alert
 
 const dummyImageApi = 'https://api.escuelajs.co/api/v1/files/upload';
 
@@ -53,7 +53,7 @@ interface AgentDoc {
 // Request OTP
 export const requestOtp = createAsyncThunk(
   'auth/requestOtp',
-  async ({phone}: {phone: string}, {rejectWithValue}) => {
+  async ({ phone }: { phone: string }, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(apiEndPoints.requestOtp, {
         phoneNumber: phone,
@@ -83,7 +83,7 @@ export const requestOtp = createAsyncThunk(
 // Upload Media
 export const uploadMedia = createAsyncThunk(
   'auth/uploadMedia',
-  async (formData: FormData, {rejectWithValue}) => {
+  async (formData: FormData, { rejectWithValue }) => {
     try {
       const headers = {
         'Content-Type': 'multipart/form-data',
@@ -109,7 +109,7 @@ export const uploadMedia = createAsyncThunk(
 // Verify OTP
 export const verifyOtp = createAsyncThunk(
   'auth/verifyOtp',
-  async ({phone, otp}: {phone: string; otp: string}, {rejectWithValue}) => {
+  async ({ phone, otp }: { phone: string; otp: string }, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(apiEndPoints.verifyOtp, {
         phoneNumber: phone,
@@ -141,11 +141,11 @@ export const verifyOtp = createAsyncThunk(
 // Login
 export const login = createAsyncThunk(
   'auth/login',
-  async ({phone, otp}: {phone: string; otp: string}, {rejectWithValue}) => {
+  async ({ phone, otp }: { phone: string; otp: string }, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(
         apiEndPoints.login,
-        {phoneNumber: phone, otp},
+        { phoneNumber: phone, otp },
         {
           headers: {
             role: 'AGENT',
@@ -154,7 +154,7 @@ export const login = createAsyncThunk(
       );
 
       // Assuming the response contains tokens
-      const {accessToken, agentId, userId} = response.data.data;
+      const { accessToken, agentId, userId } = response.data.data;
       if (accessToken) {
         console.log(
           'saving access token',
@@ -189,7 +189,7 @@ export const login = createAsyncThunk(
 // Agent Signup
 export const agentSignup = createAsyncThunk(
   'auth/agentSignup',
-  async (payload: AgentSignupPayload, {rejectWithValue}) => {
+  async (payload: AgentSignupPayload, { rejectWithValue }) => {
     console.log('🚀 Initiating Agent Signup...');
     console.log('📤 Request Payload:', JSON.stringify(payload, null, 2)); // Log the request body
 
@@ -200,8 +200,8 @@ export const agentSignup = createAsyncThunk(
 
       // Correctly access the accessToken in the nested response
       const accessToken = response.data?.data?.accessToken;
-      const agentId = response.data?.data?.agent.id;
-      const userId = response.data?.data?.userId;
+      const agentId = response.data?.data?.agent.id.toString();
+      const userId = response.data?.data?.agent.userId.toString();
 
       if (accessToken) {
         console.log('🔑 Access Token Received:', accessToken);
@@ -237,7 +237,7 @@ export const agentSignup = createAsyncThunk(
 // Upload Agent Document
 export const uploadAgentDoc = createAsyncThunk(
   'auth/uploadAgentDoc',
-  async (payload: AgentDoc, {rejectWithValue}) => {
+  async (payload: AgentDoc, { rejectWithValue }) => {
     console.log('payload', payload);
     try {
       const response = await apiClient.post(apiEndPoints.agentDoc, payload);
@@ -269,7 +269,7 @@ const authSlice = createSlice({
       action: PayloadAction<Partial<AgentSignupPayload>>,
     ) => {
       if (state.signupData) {
-        state.signupData = {...state.signupData, ...action.payload};
+        state.signupData = { ...state.signupData, ...action.payload };
       } else {
         state.signupData = action.payload as AgentSignupPayload;
       }
@@ -380,5 +380,5 @@ const authSlice = createSlice({
 });
 
 // Export the actions and reducer
-export const {logout, setSignupData} = authSlice.actions;
+export const { logout, setSignupData } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,3 +1,5 @@
+// src/components/ConfirmPhotoModal.tsx
+
 import React from 'react';
 import {
   View,
@@ -8,16 +10,17 @@ import {
   Image,
   TextStyle,
 } from 'react-native';
-import {colors} from '../../theme/colors';
-import {typography} from '../../theme/typography';
-import {formStyles} from '../../theme/form';
-import {images} from '../../assets/images/images';
+import { colors } from '../../theme/colors';
+import { typography } from '../../theme/typography';
+import { formStyles } from '../../theme/form';
+import { ImageSourcePropType } from 'react-native';
 
 interface ConfirmPhotoModalProps {
   isVisible: boolean;
   onClose: () => void;
   onRetry: () => void;
   onDone: () => void;
+  image: string | null; // URI of the selected image
 }
 
 const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
@@ -25,6 +28,7 @@ const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
   onClose,
   onRetry,
   onDone,
+  image,
 }) => {
   return (
     <Modal
@@ -35,9 +39,13 @@ const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
       <View style={styles.container}>
         <Text style={styles.title}>Confirm Photo</Text>
 
-        {/* Placeholder Image */}
+        {/* Display Selected Image */}
         <View style={styles.imageContainer}>
-          <Image source={images.introImage1} style={styles.image} />
+          {image ? (
+            <Image source={{ uri: image }} style={styles.image} />
+          ) : (
+            <Text style={styles.noImageText}>No Image Selected</Text>
+          )}
         </View>
 
         {/* Buttons */}
@@ -85,15 +93,18 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 40,
     backgroundColor: colors.lightButtonBackground,
-    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
   image: {
-    width: '87%',
-    height: '87%',
+    width: '100%',
+    height: '100%',
     resizeMode: 'cover',
     borderRadius: 10,
+  },
+  noImageText: {
+    fontSize: typography.fontSize.medium,
+    color: colors.text.secondary,
   },
   buttonContainer: {
     flexDirection: 'column',
@@ -105,6 +116,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingVertical: 12,
     borderRadius: 8,
+    marginBottom: 10,
   },
   retryText: {
     color: colors.purple,

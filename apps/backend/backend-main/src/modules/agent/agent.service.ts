@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { DeleteResult, QueryRunner, UpdateResult } from "typeorm";
+import { DeleteResult, In, QueryRunner, UpdateResult } from "typeorm";
 
 import { Agent } from "../../entity/Agent";
 import { AgentDocument } from "../../entity/AgentDocument";
@@ -11,6 +11,7 @@ import {
   AgentStatusEnum,
   AgentTypeEnum,
   ApprovalStatusEnum,
+  OrderStatusEnum,
 } from "../../shared/enums";
 import { SendPackageAgentAcceptError } from "../../shared/errors/sendAPackage";
 import {
@@ -124,7 +125,16 @@ export class AgentService {
       await queryRunner.release();
     }
   }
-
+  
+  async getOngoingOrder(agentId: number): Promise<SendPackageOrder | null> {
+    return await dbReadRepo(SendPackageOrder).findOne({
+      where: {
+        agentId,
+        status: In([OrderStatusEnum.ACCEPTED, OrderStatusEnum.IN_PROGRESS,OrderStatusEnum.PICKEDUP_ORDER]),
+      },
+      relations: ["pickupLocation", "dropLocation", "customer"],
+    });
+  }  
   async getAgentById(agentId: number): Promise<Agent> {
     logger.debug(
       `AgentService.getAgentById: Fetching agent with ID ${agentId}.`,

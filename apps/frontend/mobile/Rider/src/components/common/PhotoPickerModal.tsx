@@ -1,16 +1,19 @@
+// src/components/PhotoPickerModal.tsx
+
 import React from 'react';
-import {Modal, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import {colors} from '../../theme/colors';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, TextStyle } from 'react-native';
+import { colors } from '../../theme/colors';
+import { typography } from '../../theme/typography';
 
 interface PhotoPickerModalProps {
-  visible: boolean;
+  isVisible: boolean;
   onClose: () => void;
   onTakePhoto: () => void;
   onChooseFromGallery: () => void;
 }
 
 const PhotoPickerModal: React.FC<PhotoPickerModalProps> = ({
-  visible,
+  isVisible,
   onClose,
   onTakePhoto,
   onChooseFromGallery,
@@ -18,7 +21,7 @@ const PhotoPickerModal: React.FC<PhotoPickerModalProps> = ({
   return (
     <Modal
       transparent
-      visible={visible}
+      visible={isVisible}
       animationType="slide"
       onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
@@ -44,41 +47,42 @@ const PhotoPickerModal: React.FC<PhotoPickerModalProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end', // Align modal at the bottom
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
   },
   modalContainer: {
-    width: '80%',
+    width: '100%',
     backgroundColor: colors.white,
-    borderRadius: 8,
-    padding: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontSize: typography.fontSize.large,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    marginBottom: 20,
+    color: colors.text.primary,
   },
   modalButton: {
     width: '100%',
-    padding: 12,
+    padding: 15,
     backgroundColor: colors.purple,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   modalButtonText: {
     color: colors.white,
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: typography.fontSize.medium,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
   },
   modalCancelButton: {
-    marginTop: 8,
+    marginTop: 10,
   },
   modalCancelText: {
     color: colors.black,
-    fontSize: 16,
+    fontSize: typography.fontSize.medium,
   },
 });
 

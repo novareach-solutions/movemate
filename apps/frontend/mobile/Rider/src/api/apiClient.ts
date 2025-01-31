@@ -9,7 +9,7 @@ import {navigate} from '../navigation/NavigationService';
 import {AuthScreens} from '../navigation/ScreenNames';
 import {generateCurlCommand} from '../utils/generateCurl';
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: apiEndPoints.baseURL,
   timeout: 30000,
   withCredentials: true,

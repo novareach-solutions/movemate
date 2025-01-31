@@ -1,4 +1,6 @@
-import React, {useEffect, useState} from 'react';
+// src/components/Modals/OrderModal.tsx
+
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,9 +9,15 @@ import {
   Animated,
   Image,
   Modal,
+  Alert,
 } from 'react-native';
-import {colors} from '../../../theme/colors';
-import {images} from '../../../assets/images/images';
+import { useDispatch } from 'react-redux';
+import { hideOrderModal } from '../../../redux/slices/orderSlice';
+import { colors } from '../../../theme/colors';
+import { images } from '../../../assets/images/images';
+import apiClient from '../../../api/apiClient';
+import apiEndPoints from '../../../api/apiEndPoints';
+import { SendPackageOrder } from '../../../redux/slices/types/sendAPackage'; // Ensure correct import
 
 interface ModalComponentProps {
   isVisible: boolean;
@@ -20,25 +28,9 @@ interface ModalComponentProps {
   distance: string;
   pickupAddress: string;
   dropoffAddress: string;
+  orderId: string;
+  onAcceptOrderSuccess: (order: SendPackageOrder) => void; // New Callback Prop
 }
-
-interface InfoRowProps {
-  iconSource: any;
-  text: string;
-}
-
-const InfoRow: React.FC<InfoRowProps> = ({iconSource, text}) => (
-  <View style={styles.infoRow}>
-    <Image source={iconSource} style={styles.infoIcon} />
-    <Text style={styles.infoText}>{text}</Text>
-  </View>
-);
-
-const TipBadge: React.FC<{tip: string}> = ({tip}) => (
-  <View style={styles.tipBadge}>
-    <Text style={styles.tipBadgeText}>Tip: {tip}</Text>
-  </View>
-);
 
 const OrderModal: React.FC<ModalComponentProps> = ({
   isVisible,
@@ -49,13 +41,15 @@ const OrderModal: React.FC<ModalComponentProps> = ({
   distance,
   pickupAddress,
   dropoffAddress,
+  orderId,
+  onAcceptOrderSuccess, // Destructure the new prop
 }) => {
+  const dispatch = useDispatch();
   const [progress] = useState(new Animated.Value(0));
-  const timerDuration = 20000; // 20 seconds
+  const timerDuration = 40000; // 40 seconds
 
   useEffect(() => {
     if (isVisible) {
-      // Start the timer animation
       Animated.timing(progress, {
         toValue: 1,
         duration: timerDuration,
@@ -64,15 +58,38 @@ const OrderModal: React.FC<ModalComponentProps> = ({
         onClose(); // Close modal when the timer ends
       });
     } else {
-      // Reset the progress bar when the modal is closed
       progress.setValue(0);
     }
-  }, [isVisible]);
+  }, [isVisible, progress, timerDuration, onClose]);
 
   const widthInterpolation = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: ['100%', '0%'], // Moves background from right to left
+    outputRange: ['100%', '0%'],
   });
+
+  const handleAcceptOrder = async () => {
+    if (!orderId) {
+      Alert.alert('Error', 'Order ID is missing.');
+      return;
+    }
+
+    try {
+      const response = await apiClient.post(apiEndPoints.acceptOrder(orderId));
+
+      if (response.status === 200 && response.data.success) {
+        Alert.alert('Success', 'Order accepted successfully.');
+        dispatch(hideOrderModal());
+
+        const acceptedOrder: SendPackageOrder = response.data.data;
+        onAcceptOrderSuccess(acceptedOrder);
+      } else {
+        Alert.alert('Error', response.data.message || 'Failed to accept order.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+      console.error('Accept Order Error:', error);
+    }
+  };
 
   return (
     <Modal
@@ -82,38 +99,45 @@ const OrderModal: React.FC<ModalComponentProps> = ({
       onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          {/* Tip Badge */}
           <Text style={styles.totalEarningsLabel}>Total Earning</Text>
           <View style={styles.earning}>
             <Text style={styles.totalEarnings}>{earnings}</Text>
-            <TipBadge tip={tip} />
+            <View style={styles.tipBadge}>
+              <Text style={styles.tipBadgeText}>Tip: {tip}</Text>
+            </View>
           </View>
 
           <View style={styles.infoContainer}>
-            <InfoRow
-              iconSource={images.distanceIcon}
-              text={`${time} to deliver`}
-            />
-            <InfoRow iconSource={images.towing} text={`${distance}`} />
+            <View style={styles.infoRow}>
+              <Image source={images.distanceIcon} style={styles.infoIcon} />
+              <Text style={styles.infoText}>{`${time} time to deliver`}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Image source={images.towing} style={styles.infoIcon} />
+              <Text style={styles.infoText}>{`${distance} kms`}</Text>
+            </View>
           </View>
 
           <View style={styles.addressContainer}>
-            <InfoRow iconSource={images.greenCircle} text={pickupAddress} />
-            <InfoRow iconSource={images.greenCircle} text={dropoffAddress} />
+            <View style={styles.infoRow}>
+              <Image source={images.greenCircle} style={styles.infoIcon} />
+              <Text style={styles.infoText}>{pickupAddress}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Image source={images.greenCircle} style={styles.infoIcon} />
+              <Text style={styles.infoText}>{dropoffAddress}</Text>
+            </View>
           </View>
 
-          {/* Button at the Bottom */}
+          {/* Accept Order Button */}
           <View style={styles.timerButtonContainer}>
             <View style={styles.darkBackground} />
             <Animated.View
-              style={[
-                styles.timerButtonBackground,
-                {width: widthInterpolation},
-              ]}
+              style={[styles.timerButtonBackground, { width: widthInterpolation }]}
             />
             <TouchableOpacity
               style={styles.acceptOrderButton}
-              onPress={onClose}>
+              onPress={handleAcceptOrder}>
               <Text style={styles.acceptOrderText}>Accept Order</Text>
             </TouchableOpacity>
           </View>
@@ -135,9 +159,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     borderWidth: 3,
     borderColor: colors.purple,
-    borderBottomWidth: 0,
     padding: 20,
-    justifyContent: 'space-between',
   },
   tipBadge: {
     backgroundColor: colors.lightPurple,
@@ -165,7 +187,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   infoContainer: {
-    flexDirection: 'column',
     marginVertical: 10,
   },
   infoRow: {
@@ -194,28 +215,28 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 8,
     overflow: 'hidden',
+    marginTop: 20,
   },
   darkBackground: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     backgroundColor: colors.darkGreen,
     borderRadius: 8,
+    width: '100%',
+    height: '100%',
   },
   timerButtonBackground: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
     backgroundColor: colors.green,
     borderRadius: 8,
+    width: '100%',
+    height: '100%',
   },
   acceptOrderButton: {
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute', 
+    width: '100%',
   },
   acceptOrderText: {
     color: colors.white,

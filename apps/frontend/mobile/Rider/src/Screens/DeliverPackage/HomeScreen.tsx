@@ -1,4 +1,6 @@
-import React, {useEffect, useState} from 'react';
+// src/screens/HomeScreen.tsx
+
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,26 +13,27 @@ import {
   Alert,
 } from 'react-native';
 import StatCard from '../../components/StatCard';
-import Geolocation from 'react-native-geolocation-service';
-import {images} from '../../assets/images/images';
-import {colors} from '../../theme/colors';
+import { images } from '../../assets/images/images';
+import { colors } from '../../theme/colors';
 import HelpButton from '../../components/HelpButton';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AppScreens, AppScreensParamList, DeliverAPackage } from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
-import {useSelector, useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import store, {RootState} from '../../redux/store';
 import {
   AgentStatusEnum,
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
-import {OrderData, showOrderModal} from '../../redux/slices/orderSlice'; // Updated import
+import { showOrderModal, fetchOngoingOrder } from '../../redux/slices/orderSlice';
 import OrderExpandedModal from '../../components/Modals/ExpandedModal';
-import {io} from 'socket.io-client';
+import { io } from 'socket.io-client';
 import apiClient from '../../api/apiClient';
 import apiEndPoints from '../../api/apiEndPoints';
 import GetLocation from 'react-native-get-location';
+import { RootState } from '../../redux/store';
+
+const SOCKET_SERVER_URL = 'http://192.168.29.63:3001';
 
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
@@ -43,7 +46,14 @@ const HomeScreen: React.FC = () => {
     (state: RootState) => state.auth.isAuthenticated,
   );
 
-  const SOCKET_SERVER_URL = 'http://192.168.29.63:3001';
+  // Select ongoing order from Redux store
+  const ongoingOrder = useSelector(
+    (state: RootState) => state.order.ongoingOrder,
+  );
+
+
+  // Track if navigation has already occurred to prevent multiple navigations
+  const [hasNavigated, setHasNavigated] = useState(false);
 
   const updateLocationAPI = async (latitude: number, longitude: number) => {
     try {
@@ -66,6 +76,7 @@ const HomeScreen: React.FC = () => {
     if (isOnline) {
       // Start updating location every 15 seconds
       locationInterval = setInterval(() => {
+        // Replace these static coordinates with dynamic ones if needed
         updateLocationAPI(40.712579, -74.218993);
       }, 15000);
     } else if (locationInterval) {
@@ -123,7 +134,6 @@ const HomeScreen: React.FC = () => {
         useNativeDriver: false,
       }).start();
       console.error('❌ Failed to update status:', error);
-      Alert.alert('Error', 'Failed to update status. Please try again.');
     } finally {
       setIsLoading(false); // Stop loading
     }
@@ -140,7 +150,9 @@ const HomeScreen: React.FC = () => {
     };
 
     fetchAgentId();
+  }, []);
 
+  useEffect(() => {
     // Skip WebSocket initialization if no agentId is present
     if (!agentId) return;
 
@@ -155,7 +167,7 @@ const HomeScreen: React.FC = () => {
 
     socket.on('connect', () => {
       console.log('Connected to WebSocket server');
-      socket.emit('joinRoom', {agentId: numericAgentId}); // Use the numeric agentId
+      socket.emit('joinRoom', { agentId: numericAgentId }); // Use the numeric agentId
       console.log(`Joined room for agentId: ${numericAgentId}`);
     });
 
@@ -166,15 +178,15 @@ const HomeScreen: React.FC = () => {
     socket.on('newRequest', (data: any) => {
       console.log('Received newRequest:', data);
       // Dispatch the order modal with the received data
-      store.dispatch(
+      dispatch(
         showOrderModal({
           orderId: data.orderId,
-          earnings: data.earnings,
-          tip: data.tip,
-          time: data.time,
-          distance: data.distance,
+          earnings: `${data.earnings}$`,
+          tip: `${data.tip}$`,
+          time: data.estimatedTime,
+          distance: data.estimatedDistance,
           pickupAddress: data.pickupAddress,
-          dropoffAddress: data.dropoffAddress,
+          dropoffAddress: data.dropAddress,
         }),
       );
     });
@@ -182,7 +194,24 @@ const HomeScreen: React.FC = () => {
     return () => {
       socket.disconnect();
     };
-  }, [agentId]);
+  }, [agentId, dispatch]);
+
+  // Fetch ongoing order when HomeScreen mounts or when agentId changes
+  useEffect(() => {
+    if (agentId) {
+      dispatch(fetchOngoingOrder());
+    }
+  }, [agentId, dispatch]);
+
+  // **New useEffect for Redirecting to OrderDetails**
+  useEffect(() => {
+
+    console.log("Ongoingon order value",ongoingOrder)
+    if (ongoingOrder && !hasNavigated) {
+      setHasNavigated(true); // Prevent further navigations
+      navigation.navigate(DeliverAPackage.OrderDetails, { order: ongoingOrder });
+    }
+  }, [ongoingOrder, hasNavigated, navigation]);
 
   const handleTakePhoto = () => {
     console.log('Taking a photo for proof...');
@@ -238,7 +267,7 @@ const HomeScreen: React.FC = () => {
       </View>
 
       {/* Sliding Drawer */}
-      <Animated.View style={[styles.drawer, {height: drawerHeight}]}>
+      <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
         <View style={styles.statsContainer}>
           <StatCard icon={images.money} value="$50" label="EARNINGS" />
           <StatCard icon={images.cart} value="7" label="ORDERS" />
@@ -257,33 +286,6 @@ const HomeScreen: React.FC = () => {
           }}
         />
       </View>
-
-      {/* Remove the local OrderModal */}
-      {/*
-      <OrderModal
-        isVisible={isOrderModalVisible}
-        onClose={handleAcceptOrder} // Trigger handleAcceptOrder on close
-        earnings="$21.89"
-        tip="$11.89"
-        time="15 mins"
-        distance="7.6 Km"
-        pickupAddress="Yocha (Tom Roberts Parade)"
-        dropoffAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
-      />
-      */}
-
-      {/* Earnings Modal */}
-      {/* ... existing modals ... */}
-
-      {/* Order Expanded Modal */}
-      <OrderExpandedModal
-        isVisible={isExpandedModalVisible}
-        onClose={() => setIsExpandedModalVisible(false)} // Close ExpandedModal
-        driverName="Alexander V."
-        pickupAddress="Yocha (Tom Roberts Parade)"
-        pickupNotes="Deliver to the back door, main gate is locked."
-        items={['Documents', 'Laptop', 'Bag']}
-      />
     </SafeAreaView>
   );
 };
@@ -350,7 +352,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    shadowOffset: {width: 0, height: -2},
+    shadowOffset: { width: 0, height: -2 },
     paddingHorizontal: 20,
     paddingTop: 10,
   },
@@ -363,6 +365,7 @@ const styles = StyleSheet.create({
     top: 12,
     right: 12,
   },
+  // Add other styles as needed
 });
 
 export default HomeScreen;

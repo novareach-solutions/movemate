@@ -3,6 +3,10 @@ import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../../../redux/store';
 import {hideOrderModal} from '../../../redux/slices/orderSlice';
 import OrderModal from './OrderModal';
+import { useNavigation } from '@react-navigation/native';
+import { DeliverAPackage } from '../../../navigation/ScreenNames';
+import { SendPackageOrder } from '../../../redux/slices/types/sendAPackage';
+import { navigate } from '../../../navigation/NavigationService';
 
 const GlobalOrderModal: React.FC = () => {
   const dispatch = useDispatch();
@@ -14,6 +18,9 @@ const GlobalOrderModal: React.FC = () => {
     dispatch(hideOrderModal());
   };
 
+  const handleAcceptOrderSuccess = (order: SendPackageOrder) => {
+    navigate(DeliverAPackage.OrderDetails, { order });  };
+
   return (
     <OrderModal
       isVisible={isModalVisible}
@@ -24,6 +31,8 @@ const GlobalOrderModal: React.FC = () => {
       distance={selectedOrder?.distance || ''}
       pickupAddress={selectedOrder?.pickupAddress || ''}
       dropoffAddress={selectedOrder?.dropoffAddress || ''}
+      orderId={selectedOrder?.orderId || ''}
+      onAcceptOrderSuccess={handleAcceptOrderSuccess}
     />
   );
 };
