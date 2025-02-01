@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import { images } from '../../assets/images/images';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface DetailsModalProps {
   isVisible: boolean;
@@ -59,6 +60,7 @@ const SenderReceiverModal: React.FC<DetailsModalProps> = ({
     type === 'sender' ? 'Add Sender Details' : 'Add Receiver Details';
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <Modal
       visible={isVisible}
       transparent
@@ -112,6 +114,7 @@ const SenderReceiverModal: React.FC<DetailsModalProps> = ({
         </View>
       </TouchableWithoutFeedback>
     </Modal>
+    </SafeAreaView>
   );
 };
 

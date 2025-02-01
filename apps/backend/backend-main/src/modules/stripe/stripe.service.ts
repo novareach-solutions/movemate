@@ -22,7 +22,7 @@ export class StripeService {
       throw new MissingStripeApiKeyException();
     }
     this.stripe = new Stripe(apiKey, {
-      apiVersion: "2024-12-18.acacia",
+      apiVersion: "2025-01-27.acacia",
     });
   }
 

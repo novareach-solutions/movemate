@@ -32,7 +32,16 @@ import cart from "./Cart.png";
 import map from "./Map.png";
 import paymentSuccess from "./paymentSuccess.png";
 import deliveryMan from "./delivery-man.png";
-import success from "./success.png"
+import success from "./success.png";
+import profileInbox from "./ProfileInbox.png";
+import profileEarnings from "./ProfileEarnings.png";
+import profileReferFriend from "./ProfileReferFriend.png";
+import profileWallet from "./ProfileWallet.png";
+import profileEarningMode from "./ProfileEarningMode.png";
+import profileRewards from "./ProfileRewards.png";
+import profileLogout from "./ProfileLogout.png";
+import phoneWhite from "./PhoneWhite.png";
+import messageWhite from "./MessageWhite.png";
 
 
 export const images = {
@@ -59,5 +68,5 @@ export const images = {
   masterCard,
   applePay,
   paypal,
-  profileAccount,arrow,doNotRing,doorDropOff,pickUpNotesIcon,phone,visaIcon,cart,map,paymentSuccess,deliveryMan,success
+  profileAccount, arrow, doNotRing, doorDropOff, pickUpNotesIcon, phone, visaIcon, cart, map, paymentSuccess, deliveryMan, success, profileInbox, profileEarnings, profileReferFriend, profileWallet, profileEarningMode, profileRewards, profileLogout,phoneWhite,messageWhite,
 };

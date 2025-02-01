@@ -33,7 +33,7 @@ const SAPDetailsScreen = () => {
     );
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={styles.safeArea}>
             {/* Header Section */}
             <View style={styles.header}>
                 <View style={styles.rowButton}>
@@ -85,6 +85,10 @@ const SAPDetailsScreen = () => {
 };
 
 const styles = StyleSheet.create({
+    safeArea:{
+        flex:1,
+        backgroundColor: colors.white,
+    },
     container: {
         flex: 1,
         backgroundColor: colors.white,

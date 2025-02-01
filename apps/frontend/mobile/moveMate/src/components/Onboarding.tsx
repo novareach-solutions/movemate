@@ -16,7 +16,7 @@ import {typography} from '../theme/typography';
 import {colors} from '../theme/colors';
 import {images} from '../assets/images/images';
 import { useNavigation } from '@react-navigation/native';
-import { AuthScreens, CustomerScreens } from '../navigation/ScreenNames';
+import { AuthScreens, CustomerScreens, ProfileScreens } from '../navigation/ScreenNames';
 import { useAppDispatch } from '../redux/hook';
 import { setIsLogin } from '../redux/slices/authSlice';
 const {width, height} = Dimensions.get('window');
@@ -83,7 +83,7 @@ const Onboarding: React.FC = () => {
     dispatch(setIsLogin(true))
     navigation.navigate(AuthScreens.LoginScreen);
     // navigation.navigate(CustomerScreens.EnterLocationDetailsScreen);
-    // navigation.navigate(AuthScreens.CompleteProfileScreen);
+    // navigation.navigate(ProfileScreens.ProfileScreen);
   };
   const Footer = () => (
     <View style={styles.footer}>

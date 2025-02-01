@@ -6,12 +6,16 @@ import Header from '../../../components/Header';
 import SuccessMessage from '../../../components/Modals/SuccessMessage';
 import { useNavigation } from '@react-navigation/native';
 import { CustomerScreens } from '../../../navigation/ScreenNames';
+import { cancelOrder } from '../../../redux/slices/deliverAPackageSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 
 const CancelOrderScreen: React.FC = () => {
   const [selectedReason, setSelectedReason] = useState<string>('');
+  const orderId = useAppSelector(state => state.deliverAPackage.id);
   const [otherReason, setOtherReason] = useState<string>('');
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
-const navigation=useNavigation()
+const navigation=useNavigation();
+const dispatch = useAppDispatch();
   const reasons = [
     'No longer needed',
     'Found another option',
@@ -20,10 +24,18 @@ const navigation=useNavigation()
     'Others, please specify',
   ];
 
-  const handleCancel = (selectedReason:string, otherReason:string)=>{
-    console.log('caancel order',selectedReason,otherReason)
-    setIsSuccess(true);
-     navigation.navigate(CustomerScreens.CancelSuccessScreen)
+  const handleCancel = async(selectedReason:string, otherReason:string)=>{
+    console.log('cancel order',selectedReason,otherReason)
+    try {
+    //   await dispatch(cancelOrder({
+    //     reason:otherReason ? otherReason : selectedReason,orderId:orderId ?? ""
+    //  }));
+setIsSuccess(true);
+navigation.navigate(CustomerScreens.CancelSuccessScreen)  
+            } catch (error) {
+                console.log('Error cancelling order:', error);
+            }
+    
   }
 
   return (

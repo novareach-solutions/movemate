@@ -1,7 +1,7 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {AuthScreens, AppScreens, CustomerScreens} from './ScreenNames';
+import {AuthScreens, AppScreens, CustomerScreens, ProfileScreens} from './ScreenNames';
 import Onboarding from '../components/Onboarding';
 import Login from '../Screens/LoginScreen';
 import OtpScreen from '../Screens/OtpScreen';
@@ -22,6 +22,11 @@ import PaymentSuccessScreen from '../Screens/Customer/SendAPackage/PaymentSucces
 import DeliveryScreen from '../Screens/Customer/SendAPackage/DeliveryScreen';
 import CancelOrderScreen from '../Screens/Customer/SendAPackage/CancelOrderScreen';
 import CancelSuccessScreen from '../Screens/Customer/SendAPackage/CancelSuccessScreen';
+import ProfileScreen from '../Screens/Profile/ProfileScreen';
+import SavedAddressesScreen from '../Screens/Profile/SavedAddressScreen';
+import LegalAboutScreen from '../Screens/Profile/LegalAndAbout';
+import FeedbackScreen from '../Screens/Profile/FeedbackScreen';
+import ReferFriendsScreen from '../Screens/Profile/ReferFriendScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -129,6 +134,33 @@ const AppNavigator = () => {
           component={CancelSuccessScreen}
           options={{ headerShown: false }}
         />
+
+<Stack.Screen
+          name={ProfileScreens.ProfileScreen}
+          component={ProfileScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={ProfileScreens.SavedAddressesScreen}
+          component={SavedAddressesScreen}
+          options={{ headerShown: true }}
+        />
+        <Stack.Screen
+          name={ProfileScreens.LegalAboutScreen}
+          component={LegalAboutScreen}
+          options={{ headerShown: true }}
+        />
+        <Stack.Screen
+          name={ProfileScreens.FeedbackScreen}
+          component={FeedbackScreen}
+          options={{ headerShown: true }}
+        />
+        <Stack.Screen
+          name={ProfileScreens.ReferFriendsScreen}
+          component={ReferFriendsScreen}
+          options={{ headerShown: true }}
+        />
+
 
         <Stack.Screen name={CustomerScreens.AppLayoutScreen} component={AppLayoutScreen} options={{ headerShown: false }} />
         </Stack.Navigator>

@@ -1,3 +1,4 @@
+import ProfileScreen from '../Screens/AccountScreen';
 import CancelSuccessScreen from '../Screens/Customer/SendAPackage/CancelSuccessScreen';
 import DeliveryScreen from '../Screens/Customer/SendAPackage/DeliveryScreen';
 import PaymentSuccessScreen from '../Screens/Customer/SendAPackage/PaymentSuccessScreen';
@@ -52,4 +53,12 @@ export const CustomerScreens = {
   DeliveryScreen:'DeliveryScreen',
   CancelOrderScreen:'CancelOrderScreen',
   CancelSuccessScreen:'CancelSuccessScreen'
+}
+
+export const ProfileScreens = {
+  ProfileScreen:'Profile',
+  LegalAboutScreen:'Legal About',
+  SavedAddressesScreen:'Saved Addresses',
+  FeedbackScreen:'Feedback',
+  ReferFriendsScreen:'Refer Friends'
 }

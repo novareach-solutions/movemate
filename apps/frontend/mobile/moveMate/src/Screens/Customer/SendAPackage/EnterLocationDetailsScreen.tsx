@@ -163,11 +163,11 @@ const EnterLocationDetailsScreen = () => {
     
 
         try {
-          const response = await dispatch(createOrder(payload)).unwrap();
-          if(response){
+          // const response = await dispatch(createOrder(payload)).unwrap();
+          // if(response){
 
-            dispatch(updatePkgId(response?.data?.id))
-          }
+          //   dispatch(updatePkgId(response?.data?.id))
+          // }
           Alert.alert("Success", "Order confirmed!");
 
           navigation.navigate(CustomerScreens.CheckoutScreen);
@@ -196,7 +196,7 @@ const EnterLocationDetailsScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
-      <Header isBack logo />
+      {/* <Header isBack logo /> */}
       <ScrollView contentContainerStyle={styles.container}>
         {/* Header */}
         <View style={styles.headerContainer}>
@@ -421,7 +421,7 @@ const EnterLocationDetailsScreen = () => {
       paddingVertical: 16,
       alignItems: "center",
       justifyContent: "center",
-      margin: 16,
+      marginVertical: 16,
     },
     confirmButtonText: {
       color: "#FFFFFF",

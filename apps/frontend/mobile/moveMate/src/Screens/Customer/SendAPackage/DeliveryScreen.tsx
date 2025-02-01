@@ -29,11 +29,11 @@ const dispatch = useAppDispatch();
         }
     
         try {
-            await dispatch(assignOrder({
-                pickupLatitude: pickupLocation.pickupLattitude ?? 0,
-                pickupLongitude: pickupLocation.pickupLongitude ?? 0, 
-                orderId:orderId ?? ""
-            }));
+            // await dispatch(assignOrder({
+            //     pickupLatitude: pickupLocation.pickupLattitude ?? 0,
+            //     pickupLongitude: pickupLocation.pickupLongitude ?? 0, 
+            //     orderId:orderId ?? ""
+            // }));
             Alert.alert("We've Assigned a Delivery Agent for your order.")
         } catch (error) {
             console.log('Error assigning rider:', error);
