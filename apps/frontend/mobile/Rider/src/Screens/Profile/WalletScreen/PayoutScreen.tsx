@@ -6,10 +6,12 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
 import {images} from '../../../assets/images/images';
+import Header from '../../../components/Header';
 
 const PayoutOption: React.FC<{
   title: string;
@@ -51,7 +53,8 @@ const PayoutScreen: React.FC = () => {
   >(null);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <Header title='Payout' isBack />
       <ScrollView contentContainerStyle={styles.content}>
         {/* Amount Section */}
         <View style={styles.sectionContainer}>
@@ -124,7 +127,7 @@ const PayoutScreen: React.FC = () => {
           <Text style={styles.confirmButtonText}>Confirm</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

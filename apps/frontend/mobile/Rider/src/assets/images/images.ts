@@ -52,4 +52,6 @@ export const images = {
   benefitCheck: require('../images/BenefitCheck.png'),
   trophy: require('../images/Trophy.png'),
   car: require('../images/Car.png'),
+  earningSuccess: require('../images/EarningSuccess.png'),
+  subscriptionBanner: require('../images/SubscriptionBanner.png'),
 };

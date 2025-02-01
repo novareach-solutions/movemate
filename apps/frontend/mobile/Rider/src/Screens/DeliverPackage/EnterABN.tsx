@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TextInput,
@@ -6,26 +6,45 @@ import {
   StyleSheet,
   SafeAreaView,
   Text,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
 import TitleDescription from '../../components/TitleDescription';
-import {formStyles} from '../../theme/form';
-import {colors} from '../../theme/colors';
+import { formStyles } from '../../theme/form';
+import { colors } from '../../theme/colors';
 import StepIndicator from '../../components/StepIndicator';
-import {useNavigation} from '@react-navigation/native';
-import {DeliverAPackage} from '../../navigation/ScreenNames';
-import {useAppDispatch, useAppSelector} from '../../redux/hook';
-import {setSignupData} from '../../redux/slices/authSlice';
+import { useNavigation } from '@react-navigation/native';
+import { DeliverAPackage } from '../../navigation/ScreenNames';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import { setSignupData } from '../../redux/slices/authSlice';
 import Header from '../../components/Header';
 
 const EnterABNScreen: React.FC = () => {
   const [abn, setAbn] = useState('');
+  const [error, setError] = useState('');
   const dispatch = useAppDispatch();
   const signupData = useAppSelector(state => state.auth.signupData);
   console.log('signupData>>>>', signupData);
   const navigation = useNavigation();
 
+  const validateABN = () => {
+    if (!abn) {
+      setError('ABN is required');
+      return false;
+    } else if (!/^\d{11}$/.test(abn)) {
+      setError('ABN must be exactly 11 digits');
+      return false;
+    }
+    setError('');
+    return true;
+  };
+
   const handleContinue = async () => {
-    console.log({abn});
+    if (!validateABN()) return;
+
+    Keyboard.dismiss(); // Dismiss keyboard on submit
+
     const abnDetails = {
       abnNumber: abn,
     };
@@ -38,46 +57,63 @@ const EnterABNScreen: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       <Header logo isBack />
 
-      <View style={styles.container}>
-        <StepIndicator current={3} total={5} />
-        <View style={styles.content}>
-          <TitleDescription
-            title="Enter your ABN details"
-            description="Add your ABN to get started"
-          />
-          <View style={formStyles.inputWrapper}>
-            <Text style={formStyles.inputLabel}>ABN</Text>
-            <TextInput
-              style={formStyles.input}
-              placeholder="Enter your ABN"
-              keyboardType="numeric"
-              value={abn}
-              onChangeText={setAbn}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <StepIndicator current={3} total={5} />
+          <View style={styles.content}>
+            <TitleDescription
+              title="Enter your ABN details"
+              description="Add your ABN to get started"
             />
+            <View style={formStyles.inputWrapper}>
+              <Text style={formStyles.inputLabel}>ABN</Text>
+              <TextInput
+                style={[
+                  formStyles.input,
+                  error ? formStyles.errorInput : null,
+                ]}
+                placeholder="Enter your ABN"
+                placeholderTextColor={colors.text.subText} 
+                keyboardType="numeric"
+                value={abn}
+                onChangeText={text => {
+                  setAbn(text);
+                  setError(''); // Clear error on change
+                }}
+                returnKeyType="done"
+                onSubmitEditing={Keyboard.dismiss}
+                blurOnSubmit={Platform.OS === 'ios'}
+                maxLength={11} // ✅ Ensure ABN is 11 digits max
+              />
+              {error ? <Text style={formStyles.errorText}>{error}</Text> : null}
+            </View>
+          </View>
+
+          {/* Footer */}
+          <View style={styles.footer}>
+            <TouchableOpacity
+              style={[
+                formStyles.button,
+                abn && !error ? formStyles.buttonEnabled : formStyles.buttonDisabled,
+              ]}
+              onPress={handleContinue}
+              disabled={!abn || !!error}>
+              <Text
+                style={[
+                  formStyles.buttonText,
+                  abn && !error ? formStyles.buttonTextEnabled : formStyles.buttonTextDisabled,
+                ]}>
+                Continue
+              </Text>
+            </TouchableOpacity>
+            <Text style={formStyles.footerText}>
+              By continuing you accept our{' '}
+              <Text style={formStyles.link}>Terms of Service</Text> and{' '}
+              <Text style={formStyles.link}>Privacy Policy</Text>
+            </Text>
           </View>
         </View>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={[formStyles.button, abn ? formStyles.buttonEnabled : null]}
-            onPress={handleContinue}
-            disabled={!abn}>
-            <Text
-              style={[
-                formStyles.buttonText,
-                abn ? formStyles.buttonTextEnabled : null,
-              ]}>
-              Continue
-            </Text>
-          </TouchableOpacity>
-          <Text style={formStyles.footerText}>
-            By continuing you accept our{' '}
-            <Text style={formStyles.link}>Terms of Service</Text> and{' '}
-            <Text style={formStyles.link}>Privacy Policy</Text>
-          </Text>
-        </View>
-      </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };

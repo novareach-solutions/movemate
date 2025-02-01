@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   TextStyle,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
@@ -14,6 +15,7 @@ import {images} from '../../../assets/images/images';
 import ProfileScreen from '..';
 import {ProfileScreens} from '../../../navigation/ScreenNames';
 import {useNavigation} from '@react-navigation/native';
+import Header from '../../../components/Header';
 
 const historyData = [
   {
@@ -56,7 +58,7 @@ const WalletScreen: React.FC = () => {
             marginTop: 30,
           }}>
           <Text style={styles.viewDetails}>View details</Text>
-          <Image source={images.arrow} />
+          <Image style={styles.viewicon} source={images.arrow} />
         </View>
       </View>
       <View style={styles.historyRightContainer}>
@@ -70,7 +72,9 @@ const WalletScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+
+      <Header title='Wallet' isBack />
       {/* Tabs */}
       <View style={styles.tabsContainer}>
         <TouchableOpacity
@@ -147,7 +151,7 @@ const WalletScreen: React.FC = () => {
           </Text>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -331,6 +335,11 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primaryGrey,
   },
+  viewicon:{
+    width:12,
+    height:12,
+    objectFit:"contain"
+  }
 });
 
 export default WalletScreen;

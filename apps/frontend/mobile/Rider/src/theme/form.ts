@@ -1,6 +1,6 @@
-import {StyleSheet, TextStyle} from 'react-native';
-import {colors} from './colors';
-import {typography} from './typography';
+import { StyleSheet, TextStyle } from 'react-native';
+import { colors } from './colors';
+import { typography } from './typography';
 
 export const formStyles = StyleSheet.create({
   inputLabel: {
@@ -55,6 +55,14 @@ export const formStyles = StyleSheet.create({
   },
   buttonTextEnabled: {
     color: colors.white,
+  },
+  buttonTextDisabled: {
+    color: colors.purple, 
+  },
+  buttonDisabled: {
+    backgroundColor: 'transparent', 
+    borderColor: colors.purple,
+    borderWidth:1
   },
   footer: {
     marginTop: 20,

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,10 @@ import {
   Image,
   TextStyle,
 } from 'react-native';
-import {colors} from '../../theme/colors';
-import {formStyles} from '../../theme/form';
-import {typography} from '../../theme/typography';
-import {images} from '../../assets/images/images';
+import { colors } from '../../theme/colors';
+import { formStyles } from '../../theme/form';
+import { typography } from '../../theme/typography';
+import { images } from '../../assets/images/images';
 
 interface DeliveryModalProps {
   isVisible: boolean;
@@ -52,8 +52,12 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
         <View style={styles.modalContainer}>
           {/* Header Section */}
           <View style={styles.header}>
-            <Text style={styles.driverName}>{driverName}</Text>
+            <View style={{
+              width:"70%"
+            }}>
+              <Text style={styles.driverName}>{driverName}</Text>
             <Text style={styles.deliveryAddress}>{deliveryAddress}</Text>
+            </View>
             <View style={styles.headerIcons}>
               <TouchableOpacity>
                 <Image source={images.phone} style={styles.icon} />
@@ -101,7 +105,11 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
               Take a photo to confirm delivery
             </Text>
             <TouchableOpacity
-              style={[formStyles.button, formStyles.buttonEnabled]}
+              style={[formStyles.button, formStyles.buttonEnabled,{
+                flexDirection:"row",
+                alignItems:"center",
+                justifyContent:"center"
+              }]}
               onPress={handleTakePhoto}>
               <Image source={images.camera} style={styles.cameraIcon} />
               <Text
@@ -138,13 +146,20 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
   },
   header: {
     marginBottom: 20,
+    flexDirection:"row",
+    justifyContent:"space-between",
+    alignItems:"center",
+    paddingHorizontal:10,
+    paddingVertical:20,
+    backgroundColor:"#F6F6F6",
+    borderRadius:12
   },
   driverName: {
     fontSize: typography.fontSize.large,
@@ -154,16 +169,14 @@ const styles = StyleSheet.create({
   deliveryAddress: {
     fontSize: typography.fontSize.medium,
     color: colors.text.primaryGrey,
-    marginBottom: 10,
   },
   headerIcons: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     gap: 20,
   },
   icon: {
-    width: 20,
-    height: 20,
+    width: 23,
+    height: 23,
     tintColor: colors.text.primary,
   },
   section: {
@@ -186,6 +199,7 @@ const styles = StyleSheet.create({
   instructionIcon: {
     width: 20,
     height: 20,
+    objectFit: "contain",
     marginRight: 10,
   },
   instructionText: {
@@ -204,7 +218,7 @@ const styles = StyleSheet.create({
   },
   cameraIcon: {
     width: 20,
-    height: 20,
+    height: 20, objectFit: "contain",
     tintColor: colors.white,
     marginRight: 10,
   },

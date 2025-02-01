@@ -66,19 +66,15 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
     try {
       if (isLogin) {
         // Dispatch login thunk
-        const response = await dispatch(
-          login({phone: phoneNumber, otp: enteredOtp}),
-        ).unwrap();
-        console.log('Login Successful!', response);
+        // const response = await dispatch(
+        //   login({phone: phoneNumber, otp: enteredOtp}),
+        // ).unwrap();
+        // console.log('Login Successful!', response);
         // Navigate to the main app screen or dashboard
         navigation.navigate(DeliverAPackage.Home);
       } else {
         // Dispatch verifyOtp thunk
-        await dispatch(
-          verifyOtp({phone: phoneNumber, otp: enteredOtp}),
-        ).unwrap();
-        console.log('OTP Verified Successfully!');
-        // Navigate to the next screen after OTP verification
+      123
         navigation.navigate(AuthScreens.SelectService);
       }
     } catch (err: any) {

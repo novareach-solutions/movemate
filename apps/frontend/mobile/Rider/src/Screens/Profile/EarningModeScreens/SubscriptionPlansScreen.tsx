@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   Image,
   TextStyle,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
 import {images} from '../../../assets/images/images';
+import Header from '../../../components/Header';
 
-const BenefitItem = ({title, description}) => {
+export const BenefitItem = ({title, description}) => {
   return (
     <View style={styles.benifitContainer}>
       <Image source={images.benefitCheck} />
@@ -85,6 +87,10 @@ const SubscriptionPlansScreen: React.FC = () => {
   const activePlan = plansData[activeTab];
 
   return (
+    <SafeAreaView style={{
+      flex:1
+    }}>
+      <Header isBack earningScreen />
     <View style={styles.container}>
       <Text style={styles.title}>Boost Earnings with</Text>
       <Text style={styles.subtitle}>0% Commission!</Text>
@@ -139,7 +145,7 @@ const SubscriptionPlansScreen: React.FC = () => {
           <Text style={styles.getStartedText}>Get Started</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </View></SafeAreaView>
   );
 };
 
@@ -199,6 +205,8 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
     width: '100%',
+    borderWidth:1,
+    borderColor:"#FC9BE5"
   },
   cardTitle: {
     fontSize: typography.fontSize.large,

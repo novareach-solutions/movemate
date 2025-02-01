@@ -1,19 +1,22 @@
 // Header.tsx
 
 import React from 'react';
-import {View, TouchableOpacity, StyleSheet, Image} from 'react-native';
-import {useNavigation, NavigationProp} from '@react-navigation/native';
-import {colors} from '../theme/colors';
-import {images} from '../assets/images/images';
-import {AppScreens, AuthScreensParamList} from '../navigation/ScreenNames';
+import { View, TouchableOpacity, StyleSheet, Image, Text, TextStyle } from 'react-native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { colors } from '../theme/colors';
+import { images } from '../assets/images/images';
+import { AppScreens, AuthScreensParamList } from '../navigation/ScreenNames';
+import { typography } from '../theme/typography';
 
 interface HeaderProps {
   isBack?: boolean;
   logo?: boolean;
   home?: boolean;
+  title?: string;
+  earningScreen?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({isBack, logo, home}) => {
+const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScreen }) => {
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
 
   const handleHomePress = () => {
@@ -21,7 +24,15 @@ const Header: React.FC<HeaderProps> = ({isBack, logo, home}) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={!earningScreen ? styles.container : {
+      backgroundColor: '#2a1d3d',
+      height: 60,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      borderBottomWidth: 1,
+      position: 'relative',
+    }}>
       {/* Back Button */}
       {isBack && (
         <TouchableOpacity
@@ -44,6 +55,10 @@ const Header: React.FC<HeaderProps> = ({isBack, logo, home}) => {
           <Image source={images.profileAccount} style={styles.profileIcon} />
         </TouchableOpacity>
       )}
+
+      {title && (
+        <Text style={styles.title}>{title}</Text>
+      )}
     </View>
   );
 };
@@ -64,7 +79,7 @@ const styles = StyleSheet.create({
     left: 20,
   },
   arrow: {
-    transform: [{rotate: '180deg'}],
+    transform: [{ rotate: '180deg' }],
     resizeMode: 'contain',
   },
   logoContainer: {
@@ -89,6 +104,12 @@ const styles = StyleSheet.create({
   profileIcon: {
     resizeMode: 'contain',
   },
+  title: {
+    fontSize: typography.fontSize.semiMedium,
+    marginLeft: 30,
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
+    color: colors.black
+  }
 });
 
 export default Header;

@@ -1,10 +1,11 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
-import {colors} from '../../../theme/colors';
-import {typography} from '../../../theme/typography';
-import {images} from '../../../assets/images/images';
-import {useNavigation} from '@react-navigation/native';
-import {AppScreens, ProfileScreens} from '../../../navigation/ScreenNames';
+import { View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView } from 'react-native';
+import { colors } from '../../../theme/colors';
+import { typography } from '../../../theme/typography';
+import { images } from '../../../assets/images/images';
+import { useNavigation } from '@react-navigation/native';
+import { AppScreens, ProfileScreens } from '../../../navigation/ScreenNames';
+import Header from '../../../components/Header';
 
 const AccountScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -56,10 +57,13 @@ const AccountScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Account</Text>
-      <View style={styles.menuContainer}>{menuItems.map(renderMenuItem)}</View>
-    </View>
+    <SafeAreaView style={{
+      flex: 1
+    }}>
+      <Header isBack title='Account' />
+      <View style={styles.container}>
+        <View style={styles.menuContainer}>{menuItems.map(renderMenuItem)}</View>
+      </View></SafeAreaView>
   );
 };
 
@@ -67,7 +71,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.lightButtonBackground,
-    padding: 20,
+    paddingHorizontal: 20,
   },
   header: {
     fontSize: typography.fontSize.large,

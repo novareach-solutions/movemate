@@ -40,7 +40,7 @@ const EarningsModal: React.FC<EarningsModalProps> = ({
         <View style={styles.modalContainer}>
           {/* Header Section */}
           <View style={styles.headerContainer}>
-            <Image source={images.greenCircle} style={styles.successIcon} />
+            <Image source={images.earningSuccess} style={styles.successIcon} />
             <Text style={styles.headerText}>You earned</Text>
             <Text style={styles.earningsText}>${totalEarnings}</Text>
           </View>
@@ -99,8 +99,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   successIcon: {
-    width: 50,
-    height: 50,
+    width: 60,
+    height: 60,
     marginBottom: 10,
   },
   separator: {
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   earningsText: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
     color: colors.purple,
   },
@@ -123,6 +123,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightButtonBackground,
     padding: 20,
     borderRadius: 30,
+    borderWidth:1,
+    borderColor:colors.border.lightGray
   },
   doneButton: {
     backgroundColor: colors.purple,

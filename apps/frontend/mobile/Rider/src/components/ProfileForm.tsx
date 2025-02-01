@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,13 @@ import {
   TouchableOpacity,
   ScrollView,
   KeyboardTypeOptions,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
-import {formStyles} from '../theme/form';
+import { formStyles } from '../theme/form';
 import TitleDescription from './TitleDescription';
+import { colors } from '../theme/colors';
 
 type FormFields = {
   firstName: string;
@@ -67,13 +71,14 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 
   const handleSubmit = () => {
     if (validateForm()) {
+      Keyboard.dismiss(); // Dismiss keyboard on submit
       onSubmit(form);
     }
   };
 
   const handleInputChange = (field: keyof FormFields, value: string) => {
-    setForm(prev => ({...prev, [field]: value}));
-    setErrors(prev => ({...prev, [field]: ''})); // Clear error for this field
+    setForm(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: '' })); // Clear error for this field
   };
 
   const inputFields: {
@@ -81,66 +86,75 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     field: keyof FormFields;
     keyboardType?: KeyboardTypeOptions;
   }[] = [
-    {label: 'First Name', field: 'firstName'},
-    {label: 'Last Name', field: 'lastName'},
-    {label: 'Email Address', field: 'email', keyboardType: 'email-address'},
-    {label: 'Street Address', field: 'address'},
-    {label: 'Suburb', field: 'suburb'},
-    {label: 'State', field: 'state'},
-    {label: 'Postal Code', field: 'postalCode', keyboardType: 'numeric'},
-  ];
+      { label: 'First Name', field: 'firstName' },
+      { label: 'Last Name', field: 'lastName' },
+      { label: 'Email Address', field: 'email', keyboardType: 'email-address' },
+      { label: 'Street Address', field: 'address' },
+      { label: 'Suburb', field: 'suburb' },
+      { label: 'State', field: 'state' },
+      { label: 'Postal Code', field: 'postalCode', keyboardType: 'numeric' },
+    ];
 
   return (
-    <ScrollView>
-      <TitleDescription title={title} description={description} />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <ScrollView keyboardShouldPersistTaps="handled">
+        <TitleDescription title={title} description={description} />
 
-      {inputFields.map((input, index) => (
-        <View key={index} style={formStyles.inputWrapper}>
-          <Text style={formStyles.inputLabel}>{input.label}</Text>
-          <TextInput
-            placeholder={`Enter your ${input.label.toLowerCase()}`}
-            style={[
-              formStyles.input,
-              focusedField === input.field && formStyles.focusedInput,
-              errors[input.field] && formStyles.errorInput,
-            ]}
-            onFocus={() => setFocusedField(input.field)}
-            onBlur={() => setFocusedField(null)}
-            keyboardType={input.keyboardType || 'default'}
-            value={form[input.field]}
-            onChangeText={text => handleInputChange(input.field, text)}
-          />
-          {errors[input.field] && (
-            <Text style={formStyles.errorText}>{errors[input.field]}</Text>
-          )}
-        </View>
-      ))}
+        {inputFields.map((input, index) => (
+          <View key={index} style={formStyles.inputWrapper}>
+            <Text style={formStyles.inputLabel}>{input.label}</Text>
+            <TextInput
+              placeholderTextColor={colors.text.subText}
+              placeholder={`Enter your ${input.label.toLowerCase()}`}
+              style={[
+                formStyles.input,
+                focusedField === input.field && formStyles.focusedInput,
+                errors[input.field] && formStyles.errorInput,
+              ]}
+              onFocus={() => setFocusedField(input.field)}
+              onBlur={() => setFocusedField(null)}
+              keyboardType={input.keyboardType || 'default'}
+              value={form[input.field]}
+              onChangeText={text => handleInputChange(input.field, text)}
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss} // Dismiss keyboard when return is pressed
+              blurOnSubmit={Platform.OS === 'ios'}
+            />
+            {errors[input.field] && (
+              <Text style={formStyles.errorText}>{errors[input.field]}</Text>
+            )}
+          </View>
+        ))}
 
-      <TouchableOpacity
-        style={[
-          formStyles.button,
-          Object.values(form).every(value => value) && formStyles.buttonEnabled,
-        ]}
-        onPress={handleSubmit}
-        disabled={!Object.values(form).every(value => value)}>
-        <Text
+        <TouchableOpacity
           style={[
-            formStyles.buttonText,
-            Object.values(form).every(value => value) &&
-              formStyles.buttonTextEnabled,
-          ]}>
-          Continue
-        </Text>
-      </TouchableOpacity>
+            formStyles.button,
+            Object.values(form).every(value => value)
+              ? formStyles.buttonEnabled
+              : formStyles.buttonDisabled, // Apply disabled styling
+          ]}
+          onPress={handleSubmit}
+          disabled={!Object.values(form).every(value => value)}>
+          <Text
+            style={[
+              formStyles.buttonText,
+              Object.values(form).every(value => value)
+                ? formStyles.buttonTextEnabled
+                : formStyles.buttonTextDisabled, // Change text color when disabled
+            ]}>
+            Continue
+          </Text>
+        </TouchableOpacity>
 
-      <View style={formStyles.footer}>
-        <Text style={formStyles.footerText}>
-          By continuing you accept our{' '}
-          <Text style={formStyles.link}>Terms of Service</Text> and{' '}
-          <Text style={formStyles.link}>Privacy Policy</Text>
-        </Text>
-      </View>
-    </ScrollView>
+        <View style={formStyles.footer}>
+          <Text style={formStyles.footerText}>
+            By continuing you accept our{' '}
+            <Text style={formStyles.link}>Terms of Service</Text> and{' '}
+            <Text style={formStyles.link}>Privacy Policy</Text>
+          </Text>
+        </View>
+      </ScrollView>
+    </TouchableWithoutFeedback>
   );
 };
 

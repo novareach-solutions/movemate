@@ -195,6 +195,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                 {/* Button at the Bottom */}
                 <View style={styles.footer}>
                   <TouchableOpacity
+                  onPress={onClose}
                     style={[formStyles.button, formStyles.buttonSuccess]}>
                     <Text
                       style={[

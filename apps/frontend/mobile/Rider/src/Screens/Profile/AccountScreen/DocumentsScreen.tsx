@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,12 @@ import {
   TouchableOpacity,
   Image,
   TextStyle,
+  SafeAreaView,
 } from 'react-native';
-import {colors} from '../../../theme/colors';
-import {typography} from '../../../theme/typography';
-import {images} from '../../../assets/images/images';
+import { colors } from '../../../theme/colors';
+import { typography } from '../../../theme/typography';
+import { images } from '../../../assets/images/images';
+import Header from '../../../components/Header';
 
 const DocumentsScreen: React.FC = () => {
   const [expandedDocument, setExpandedDocument] = useState<number | null>(null);
@@ -83,7 +85,7 @@ const DocumentsScreen: React.FC = () => {
           <Text
             style={[
               styles.documentStatus,
-              {color: getStatusColor(document.status)},
+              { color: getStatusColor(document.status) },
             ]}>
             {document.status}
           </Text>
@@ -99,11 +101,15 @@ const DocumentsScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.documentList}>
-        {documentsWithIcons.map(renderDocumentItem)}
-      </View>
-    </View>
+    <SafeAreaView style={{
+      flex: 1
+    }}>
+      <Header isBack title='Documents' />
+      <View style={styles.container}>
+        <View style={styles.documentList}>
+          {documentsWithIcons.map(renderDocumentItem)}
+        </View>
+      </View></SafeAreaView>
   );
 };
 
@@ -127,6 +133,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
+    borderWidth:1,
+    borderColor:colors.border.lightGray
   },
   documentContent: {
     flexDirection: 'row',
@@ -139,7 +147,7 @@ const styles = StyleSheet.create({
   documentIconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   documentIcon: {
     width: 40,
@@ -150,7 +158,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.medium as TextStyle['fontWeight'],
     color: colors.text.primary,
     textAlign: 'center',
-    marginVertical: 15,
+    marginTop: 15,
   },
   rightContainer: {
     justifyContent: 'flex-start',
@@ -162,11 +170,11 @@ const styles = StyleSheet.create({
   },
   reUploadButton: {
     flexDirection: 'row',
-    marginTop: 10,
     alignItems: 'center',
     borderTopWidth: 1,
-    paddingTop: 10,
+    paddingTop: 15,
     borderColor: colors.border.lightGray,
+    marginTop:15
   },
   reUploadIcon: {
     tintColor: colors.primary,

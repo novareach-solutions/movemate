@@ -25,6 +25,8 @@ const HomeScreen: React.FC = () => {
   const [drawerHeight] = useState(new Animated.Value(0));
   const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
   const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
+  const [isDeliveryModal, setIsDeliveryModal] = useState(false);
+  const [isEarningsModal, setIsEarningsModal] = useState(false);
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
 
   const toggleStatus = () => {
@@ -52,7 +54,17 @@ const HomeScreen: React.FC = () => {
 
   const handleOrderDelivered = () => {
     console.log('Order marked as delivered.');
-    setIsOrderModalVisible(false);
+    setIsDeliveryModal(false);
+    setTimeout(() => {
+      setIsEarningsModal(true);
+    }, 300);
+  };
+  const handleOrderStarted = () => {
+    console.log('Order marked as delivered.');
+    setIsExpandedModalVisible(false);
+    setTimeout(() => {
+      setIsDeliveryModal(true);
+    }, 300);
   };
 
   // Handle "Accept Order" button press
@@ -117,7 +129,7 @@ const HomeScreen: React.FC = () => {
       {/* Order Modal */}
       <OrderModal
         isVisible={isOrderModalVisible}
-        onClose={handleAcceptOrder} // Trigger handleAcceptOrder on close
+        onClose={handleAcceptOrder} 
         earnings="$21.89"
         tip="$11.89"
         time="15 mins"
@@ -127,30 +139,30 @@ const HomeScreen: React.FC = () => {
       />
 
       {/* Earnings Modal */}
-      {/* <EarningsModal
-        isVisible={isOrderModalVisible}
-        onClose={() => setIsOrderModalVisible(false)}
+      <EarningsModal
+        isVisible={isEarningsModal}
+        onClose={() => setIsEarningsModal(false)}
         tripTime="26 mins"
         tripDistance="5.2 km"
         tripPay={55}
         tip={5}
         totalEarnings={60}
-      /> */}
+      />
 
       {/* Delivery Modal */}
-      {/* <DeliveryModal
-        isVisible={isOrderModalVisible}
-        onClose={() => setIsOrderModalVisible(false)}
+      <DeliveryModal
+        isVisible={isDeliveryModal}
+        onClose={handleOrderDelivered}
         driverName="Alexander V."
         deliveryAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
         deliveryInstructions={['Do not ring the bell', 'Drop-off at the door']}
         itemsToDeliver={['Documents']}
-      /> */}
+      />
 
       {/*Order Expanded Modal */}
       <ExpandedModal
         isVisible={isExpandedModalVisible}
-        onClose={() => setIsExpandedModalVisible(false)} // Close ExpandedModal
+        onClose={handleOrderStarted}
         driverName="Alexander V."
         pickupAddress="Yocha (Tom Roberts Parade)"
         pickupNotes="Deliver to the back door, main gate is locked."

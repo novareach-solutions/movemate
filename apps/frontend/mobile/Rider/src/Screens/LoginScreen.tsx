@@ -39,7 +39,7 @@ const LoginScreen: React.FC = () => {
 
   const handleSendCode = async () => {
     try {
-      await dispatch(requestOtp({phone: phoneNumber})).unwrap();
+      // await dispatch(requestOtp({phone: phoneNumber})).unwrap();
       navigation.navigate(AuthScreens.Otp, {phoneNumber, login: true});
     } catch {
       console.log('Request Otp failed');

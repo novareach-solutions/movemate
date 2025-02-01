@@ -22,7 +22,7 @@ import Header from '../../components/Header';
 const profileData = [
   {
     id: '1',
-    title: 'Inbox',
+    title: 'Notifications',
     icon: images.profileInbox,
     screen: ProfileScreens.Inbox,
     notificationCount: 3,
@@ -93,7 +93,7 @@ const ProfileScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header logo isBack />
 
       {/* Profile Header */}
@@ -130,7 +130,7 @@ const ProfileScreen: React.FC = () => {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContainer}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -138,6 +138,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.lightButtonBackground,
+    paddingBottom:30
   },
   header: {
     flexDirection: 'row',
@@ -175,10 +176,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     borderRadius: 12,
     marginTop: 10,
+    borderWidth:1,
+    borderColor:colors.border.lightGray
   },
   subscriptionText: {
     fontSize: typography.fontSize.medium,
-    color: colors.text.primary,
+    color: colors.purple,
     fontWeight: 'bold',
   },
   subscriptionBadge: {

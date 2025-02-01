@@ -131,8 +131,7 @@ const AddProfilePhotoScreen: React.FC = () => {
   const handleContinue = async () => {
     if (signupData) {
       try {
-        console.log('signup initiated');
-        await dispatch(agentSignup(signupData)).unwrap();
+        // await dispatch(agentSignup(signupData)).unwrap();
         // Navigate to DeliverPackage.home on success
         navigation.navigate(DeliverAPackage.UploadDocuments);
       } catch {

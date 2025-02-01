@@ -119,52 +119,52 @@ const App = () => {
         <Stack.Screen
           name={ProfileScreens.Inbox}
           component={InboxScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.ReferFriends}
           component={ReferFriendsScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Wallet}
           component={WalletScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Payout}
           component={PayoutScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Account}
           component={AccountScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Documents}
           component={DocumentsScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.ManageAccount}
           component={ManageAccountScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.EarningMode}
           component={EarningsModeScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.SubscriptionPlans}
           component={SubscriptionPlansScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.ReplaceVehicle}
           component={ReplaceVehicleScreen}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
 
         {/* App */}
@@ -196,7 +196,7 @@ const App = () => {
         <Stack.Screen
           name={AppScreens.ComingSoon}
           component={ComingSoonScreen}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
