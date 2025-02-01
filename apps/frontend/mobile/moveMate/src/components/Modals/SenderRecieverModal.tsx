@@ -11,6 +11,8 @@ import {
   Modal,
   Dimensions,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import { images } from '../../assets/images/images';
@@ -67,6 +69,10 @@ const SenderReceiverModal: React.FC<DetailsModalProps> = ({
       animationType="slide"
       onRequestClose={() => onClose()}
     >
+      <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+              style={styles.keyboardAvoid}
+            >
       {/* Overlay to detect taps outside the modal content */}
       <TouchableWithoutFeedback onPress={() => onClose()}>
         <View style={styles.overlay}>
@@ -112,7 +118,7 @@ const SenderReceiverModal: React.FC<DetailsModalProps> = ({
             </View>
           </TouchableWithoutFeedback>
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback></KeyboardAvoidingView>
     </Modal>
     </SafeAreaView>
   );
@@ -123,6 +129,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end', // Align modal at the bottom
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  keyboardAvoid: {
+    flex: 1,
+    backgroundColor: '#F8F8F8',
   },
   modalContainer: {
     height: height * 0.35, // 35% of screen height, adjust as needed

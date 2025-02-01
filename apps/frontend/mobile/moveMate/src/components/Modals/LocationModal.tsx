@@ -125,7 +125,6 @@ const LocationModal: React.FC<LocationModalProps> = ({
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
     <Modal visible={isVisible} transparent animationType="slide">
       <SafeAreaView style={styles.container}>
         {/* Header */}
@@ -323,7 +322,6 @@ const LocationModal: React.FC<LocationModalProps> = ({
         )}
       </SafeAreaView>
     </Modal>
-    </SafeAreaView>
   );
 };
 
@@ -331,7 +329,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    marginTop:10
   },
   header: {
     flexDirection: "row",
