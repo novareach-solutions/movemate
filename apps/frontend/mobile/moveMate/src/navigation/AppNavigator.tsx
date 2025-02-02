@@ -27,6 +27,8 @@ import SavedAddressesScreen from '../Screens/Profile/SavedAddressScreen';
 import LegalAboutScreen from '../Screens/Profile/LegalAndAbout';
 import FeedbackScreen from '../Screens/Profile/FeedbackScreen';
 import ReferFriendsScreen from '../Screens/Profile/ReferFriendScreen';
+import InboxScreen from '../Screens/Profile/InboxScreen';
+import OrderDetails from '../Screens/Customer/SendAPackage/OrderDetails';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -115,6 +117,11 @@ const AppNavigator = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name={CustomerScreens.OrderDetails}
+          component={OrderDetails}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name={CustomerScreens.PaymentSuccessScreen}
           component={PaymentSuccessScreen}
           options={{ headerShown: false }}
@@ -143,22 +150,27 @@ const AppNavigator = () => {
         <Stack.Screen
           name={ProfileScreens.SavedAddressesScreen}
           component={SavedAddressesScreen}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.LegalAboutScreen}
           component={LegalAboutScreen}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.FeedbackScreen}
           component={FeedbackScreen}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.ReferFriendsScreen}
           component={ReferFriendsScreen}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={ProfileScreens.Inbox}
+          component={InboxScreen}
+          options={{ headerShown: false }}
         />
 
 

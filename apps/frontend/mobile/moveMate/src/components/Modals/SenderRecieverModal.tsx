@@ -96,6 +96,7 @@ const SenderReceiverModal: React.FC<DetailsModalProps> = ({
                   style={styles.input}
                   placeholder="Name"
                   value={name}
+                  placeholderTextColor={colors.grey}
                   onChangeText={setName}
                   autoCapitalize="words"
                 />
@@ -103,6 +104,7 @@ const SenderReceiverModal: React.FC<DetailsModalProps> = ({
                   style={styles.input}
                   placeholder="Phone Number"
                   value={phoneNumber}
+                  placeholderTextColor={colors.grey}
                   onChangeText={setPhoneNumber}
                   keyboardType="phone-pad"
                 />

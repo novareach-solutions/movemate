@@ -12,10 +12,13 @@ import { images } from "../../../assets/images/images";
 import { colors } from "../../../theme/colors";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { assignOrder } from "../../../redux/slices/deliverAPackageSlice";
+import { useNavigation } from "@react-navigation/native";
+import { CustomerScreens } from "../../../navigation/ScreenNames";
 
 const DeliveryTrackingScreen = () => {
      const orderId = useAppSelector(state => state.deliverAPackage.id);
      const pickupLocation = useAppSelector(state => state.deliverAPackage.pickupLocation);
+     const navigation=useNavigation()
 const dispatch = useAppDispatch();
     useEffect(()=>{
         if(orderId){
@@ -39,6 +42,14 @@ const dispatch = useAppDispatch();
             console.log('Error assigning rider:', error);
         }
     };
+
+    const CancelOrder = ()=>{
+      navigation.navigate(CustomerScreens.CancelOrderScreen);
+    }
+
+    const viewDetails = ()=>{
+      navigation.navigate(CustomerScreens.OrderDetails);
+    }
     
   return (
     <SafeAreaView style={styles.container}>
@@ -67,7 +78,7 @@ const dispatch = useAppDispatch();
               <Text style={styles.addressTitle}>88 Zurab Gorgiladze St</Text>
               <Text style={styles.addressSubtitle}>Georgia, Batumi</Text>
             </View>
-            <TouchableOpacity style={styles.detailButton}>
+            <TouchableOpacity style={styles.detailButton} onPress={viewDetails}>
               <Text style={styles.detailText}>View details</Text>
             </TouchableOpacity>
           </View>
@@ -87,7 +98,7 @@ const dispatch = useAppDispatch();
         <Text style={styles.amountText}>$36</Text>
         <Text style={styles.paymentInfo}>Paid via card ending in 8930</Text>
       </View>
-      <TouchableOpacity style={styles.cancelButton}>
+      <TouchableOpacity style={styles.cancelButton} onPress={CancelOrder}>
         <Text style={styles.cancelText}>Cancel</Text>
       </TouchableOpacity>
         </View>

@@ -9,6 +9,8 @@ import {
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { images } from '../../assets/images/images';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Header from '../../components/Header';
 
 
 const privacyPolicy = `MoveMate is your reliable, all-in-one solution for deliveries, towing, and moving services.Whether it's sending a package, buying from a store, or arranging home or vehicle transport,MoveMate ensures fast, secure, and hassle-free service. MoveMate is designed to make your life`
@@ -23,6 +25,8 @@ const LegalAboutScreen: React.FC = () => {
     };
 
     return (
+        <SafeAreaView style={{flex:1, backgroundColor:colors.lightGrey}}>
+             <Header isBack title='Legal & About' bgColor={colors.lightGrey} />
         <View style={styles.container}>
             {/* About App Section */}
             <View style={styles.section}>
@@ -44,13 +48,9 @@ const LegalAboutScreen: React.FC = () => {
                     onPress={() => toggleSection('Privacy Policy')}
                 >
                     <Text style={styles.accordionTitle}>Privacy Policy</Text>
-                    <Image
-                        source={images.arrow}
-                        style={[
-                            styles.accordionIndicator,
-                            expandedSection === 'Privacy Policy' && styles.accordionIndicatorRotated,
-                        ]}
-                    />
+                    <View style={[styles.accordionIndicator,expandedSection === 'Privacy Policy' && styles.accordionIndicatorRotated]}>
+                        <images.BackArrow width={15} height={15} />
+                    </View>
                 </TouchableOpacity>
                 {expandedSection === 'Privacy Policy' && (
                     <View style={styles.accordionContent}>
@@ -66,13 +66,9 @@ const LegalAboutScreen: React.FC = () => {
                     onPress={() => toggleSection('Terms of Service')}
                 >
                     <Text style={styles.accordionTitle}>Terms Of Service</Text>
-                    <Image
-                        source={images.arrow}
-                        style={[
-                            styles.accordionIndicator,
-                            expandedSection === 'Privacy Policy' && styles.accordionIndicatorRotated,
-                        ]}
-                    />
+                    <View style={[styles.accordionIndicator,expandedSection === 'Terms of Service' && styles.accordionIndicatorRotated]}>
+                        <images.BackArrow width={15} height={15} />
+                    </View>
                 </TouchableOpacity>
                 {expandedSection === 'Terms of Service' && (
                     <View style={styles.accordionContent}>
@@ -81,13 +77,14 @@ const LegalAboutScreen: React.FC = () => {
                 )}
             </View>
         </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.lightButtonBackground,
+        backgroundColor: colors.lightGrey,
         padding: 20,
     },
     section: {

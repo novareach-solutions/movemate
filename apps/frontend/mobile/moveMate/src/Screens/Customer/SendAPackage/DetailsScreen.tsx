@@ -11,7 +11,7 @@ import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { images } from '../../../assets/images/images';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CustomerScreens } from '../../../navigation/ScreenNames';
+import { CustomerScreens, ProfileScreens } from '../../../navigation/ScreenNames';
 import { useNavigation } from '@react-navigation/native';
 
 const SAPDetailsScreen = () => {
@@ -38,14 +38,13 @@ const SAPDetailsScreen = () => {
             <View style={styles.header}>
                 <View style={styles.rowButton}>
                     <TouchableOpacity style={styles.rowButton}>
-                        <Image style={styles.icon} source={images.location} />
+                        <images.Location width={20} height={20} />
                         <Text style={styles.homeText}>Home</Text>
                         <Text style={styles.icon}>⬇</Text>
                     </TouchableOpacity>
-                    <Image
-                        source={images.account}
-                        style={{ marginLeft: '60%', height: 30, width: 30 }}
-                    />
+                       <TouchableOpacity  style={{ marginLeft: "60%",}} onPress={()=>{navigation.navigate(ProfileScreens.ProfileScreen)}}>
+                                          <images.Account width={30} height={30} />
+                                          </TouchableOpacity>
                 </View>
                 <Text style={styles.address}>{address}</Text>
             </View>

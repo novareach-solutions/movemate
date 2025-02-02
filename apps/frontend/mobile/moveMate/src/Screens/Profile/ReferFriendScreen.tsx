@@ -5,18 +5,42 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  ScrollView,
+  ScrollView,Share
 } from 'react-native';
 import {colors} from '../../theme/colors';
 import {typography} from '../../theme/typography';
 import {images} from '../../assets/images/images';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Header from '../../components/Header';
 
 const ReferFriendsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Invite Friend' | 'Status'>(
     'Invite Friend',
   );
 
+  const shareInvite = async () => {
+    try {
+      const result = await Share.share({
+        message: 'Hey! Check this out: https://www.google.com',
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log('Shared with activity type: ', result.activityType);
+        } else {
+          console.log('Shared successfully!');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log('Share dismissed');
+      }
+    } catch (error) {
+      console.error('Error sharing invite: ', error);
+    }
+  };
+
   return (
+    <SafeAreaView style={{flex:1,backgroundColor:colors.lightGrey}}>
+      <Header isBack title='Refer Friends' bgColor={colors.lightGrey} />
     <View style={styles.container}>
       {/* Tabs */}
       <View style={styles.tabsContainer}>
@@ -31,7 +55,7 @@ const ReferFriendsScreen: React.FC = () => {
               styles.tabText,
               activeTab === 'Invite Friend' && styles.activeTabText,
             ]}>
-            Invite Friend
+            Refer Friend
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -51,10 +75,7 @@ const ReferFriendsScreen: React.FC = () => {
         <View style={styles.content}>
           {/* Friends Circle */}
           <View style={styles.circleImageContainer}>
-            <Image
-              source={images.referPlaceholder}
-              style={styles.circleImage}
-            />
+            <images.ReferFriendImage />
           </View>
 
           <View
@@ -71,8 +92,8 @@ const ReferFriendsScreen: React.FC = () => {
 
             {/* Footer Invite Button */}
             <View style={styles.footer}>
-              <TouchableOpacity style={styles.inviteButton}>
-                <Text style={styles.inviteButtonText}>Invite Friends</Text>
+              <TouchableOpacity style={styles.inviteButton} onPress={shareInvite}>
+                <Text style={styles.inviteButtonText}>Refer Friends</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -145,13 +166,14 @@ const ReferFriendsScreen: React.FC = () => {
         </View>
       )}
     </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.lightButtonBackground,
+    backgroundColor: colors.lightGrey,
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -184,7 +206,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   circleImageContainer: {
-    marginVertical: 40,
+    flex:1,
+    alignItems:'center',
+    justifyContent:'center'
+    // marginVertical: 40,
   },
   circleImage: {
     width: 300,

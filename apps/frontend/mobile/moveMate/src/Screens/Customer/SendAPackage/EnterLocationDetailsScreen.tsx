@@ -10,6 +10,8 @@ import {
   ScrollView,
   Alert,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../../../assets/images/images";
@@ -60,9 +62,17 @@ const EnterLocationDetailsScreen = () => {
   const [receiverDetails, setReceiverDetails] = useState<{ name: string; phoneNumber: string } | null>(null);
 
     const dispatch = useAppDispatch();
+  console.log("       ")
+    console.log("**********Modal************")
+    console.log("       ")
+    console.log('isSenderModalVisible', isSenderModalVisible);
+    console.log('isReceiverModalVisible', isReceiverModalVisible);
+    console.log('isLocationModalVisible', isLocationModalVisible);
+    
 
   // States for Package Type Modal
   const [isPackageTypeModalVisible, setIsPackageTypeModalVisible] = useState(false);
+  console.log('isPackageTypeModalVisible', isPackageTypeModalVisible)
   const [packageType, setPackageType] = useState<string | null>(null);
 
   const navigation=useNavigation()
@@ -196,7 +206,11 @@ const EnterLocationDetailsScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
-      {/* <Header isBack logo /> */}
+      <Header isBack bgColor="#F8F8F8" />
+      <KeyboardAvoidingView
+                            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+                            style={{flex:1}}
+                          >
       <ScrollView contentContainerStyle={styles.container}>
         {/* Header */}
         <View style={styles.headerContainer}>
@@ -206,11 +220,7 @@ const EnterLocationDetailsScreen = () => {
 
         {/* Location Steps */}
         <View style={styles.stepsContainer}>
-          {/* Step Image */}
-          <Image
-            source={images.locaionSteps} // Replace with your actual image path
-            style={styles.stepsImage}
-          />
+               <images.LocaionSteps width={20} style={styles.stepsImage} />
 
           {/* Step Content */}
           <View style={styles.fieldsContainer}>
@@ -288,6 +298,7 @@ const EnterLocationDetailsScreen = () => {
             style={styles.notesInput}
             placeholder="Add any special pickup instructions (e.g., handle with care)"
             multiline
+            numberOfLines={5}
             value={pickupNotes}
             onChangeText={(text) => setPickupNotes(text)}
           />
@@ -299,13 +310,17 @@ const EnterLocationDetailsScreen = () => {
         </TouchableOpacity>
 
         {/* Location Modal */}
-        <LocationModal
+        {
+          isLocationModalVisible &&
+          <LocationModal
           isVisible={isLocationModalVisible}
           onClose={closeLocationModal}
           title={modalTitle}
           placeholder={modalPlaceholder}
           type={currentType}
         />
+        }
+        
 
         {/* Sender Details Modal */}
         <SenderReceiverModal
@@ -326,7 +341,7 @@ const EnterLocationDetailsScreen = () => {
           isVisible={isPackageTypeModalVisible}
           onClose={closePackageTypeModal}
         />
-      </ScrollView>
+      </ScrollView></KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -341,7 +356,7 @@ const EnterLocationDetailsScreen = () => {
     headerTitle: {
       fontSize: 20,
       fontWeight: "bold",
-      color: "#6C2DBE", // Purple color
+      color: "#8123AD", // Purple color
       textAlign: "left",
       marginBottom: 4,
     },
@@ -356,8 +371,8 @@ const EnterLocationDetailsScreen = () => {
       marginBottom: 20,
     },
     stepsImage: {
-      width: 20,
-      height: "100%", // Adjust height based on your image
+      marginTop:28,
+      height: "100%",
       marginRight: 16,
     },
     fieldsContainer: {
@@ -368,7 +383,7 @@ const EnterLocationDetailsScreen = () => {
       borderWidth: 1,
       borderColor: "#E0E0E0",
       borderRadius: 8,
-      marginBottom: 12,
+      marginBottom: 20,
       overflow: "hidden",
     },
     fieldButton: {
@@ -412,7 +427,7 @@ const EnterLocationDetailsScreen = () => {
       borderColor: "#E0E0E0",
       borderRadius: 8,
       padding: 12,
-      minHeight: 80,
+      minHeight: 120,
       textAlignVertical: "top",
     },
     confirmButton: {

@@ -8,7 +8,8 @@ import {
   Image,
   Keyboard,
   TouchableWithoutFeedback,
-  TextStyle,ActivityIndicator
+  TextStyle,ActivityIndicator,
+  SafeAreaView
 } from 'react-native';
 import PhoneInput from 'react-native-phone-number-input';
 import {colors} from '../theme/colors';
@@ -53,9 +54,11 @@ const Login: React.FC = () => {
   };
 
   return (
+    <SafeAreaView style={{flex:1,backgroundColor:colors.white}}>
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <View style={styles.container}>
-        <Image source={images.logo} style={styles.logo} />
+        {/* <Image source={images.logo} style={styles.logo} /> */}
+         <images.Logo width={width * 0.3} height={width * 0.3} style={styles.logo} />
         <Text style={styles.heading}>Enter phone number for verification</Text>
         <Text style={styles.subheading}>
           We'll send you a verification code
@@ -76,6 +79,7 @@ const Login: React.FC = () => {
           textInputProps={{
             onFocus: () => setIsFocused(true),
             onBlur: () => setIsFocused(false),
+            placeholderTextColor: 'gray',
           }}
         />
 
@@ -101,7 +105,7 @@ const Login: React.FC = () => {
         )}
       </TouchableOpacity>
       </View>
-    </TouchableWithoutFeedback>
+    </TouchableWithoutFeedback></SafeAreaView>
   );
 };
 
@@ -113,9 +117,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   logo: {
-    width: width * 0.3,
-    height: width * 0.3,
-    resizeMode: 'contain',
     marginBottom: 30,
     alignSelf: 'center',
   },

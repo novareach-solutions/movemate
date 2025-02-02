@@ -52,7 +52,8 @@ export const CustomerScreens = {
   AddCardScreen: 'AddCardScreen',
   DeliveryScreen:'DeliveryScreen',
   CancelOrderScreen:'CancelOrderScreen',
-  CancelSuccessScreen:'CancelSuccessScreen'
+  CancelSuccessScreen:'CancelSuccessScreen',
+  OrderDetails:'OrderDetails'
 }
 
 export const ProfileScreens = {
@@ -60,5 +61,6 @@ export const ProfileScreens = {
   LegalAboutScreen:'Legal About',
   SavedAddressesScreen:'Saved Addresses',
   FeedbackScreen:'Feedback',
-  ReferFriendsScreen:'Refer Friends'
+  ReferFriendsScreen:'Refer Friends',
+  Inbox:'Inbox'
 }

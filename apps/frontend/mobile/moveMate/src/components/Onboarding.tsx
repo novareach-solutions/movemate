@@ -19,8 +19,9 @@ import { useNavigation } from '@react-navigation/native';
 import { AuthScreens, CustomerScreens, ProfileScreens } from '../navigation/ScreenNames';
 import { useAppDispatch } from '../redux/hook';
 import { setIsLogin } from '../redux/slices/authSlice';
+import { SvgProps } from 'react-native-svg';
+type SvgComponent = React.FC<SvgProps>;
 const {width, height} = Dimensions.get('window');
-
 interface Slide {
   id: number;
   title: string;
@@ -34,7 +35,7 @@ const slides: Slide[] = [
     id: 0,
     title: 'Send a',
     subtitle: 'Package',
-    image: images.introImage1,
+    image: images.PackageArrived,
     description:
       'Quickly send packages with ease. Choose pickup and delivery, and we handle the rest',
   },
@@ -42,7 +43,7 @@ const slides: Slide[] = [
     id: 1,
     title: 'Buy from a',
     subtitle: 'Store',
-    image: images.introImage2,
+    image: images.Trolley,
     description:
       'Shop from your favorite stores effortlessly. Select, pay, and have it delivered right to your door.',
   },
@@ -50,7 +51,7 @@ const slides: Slide[] = [
     id: 2,
     title: 'Car',
     subtitle: 'Towing',
-    image: images.introImage3,
+    image: images.CarTowing,
     description:
       'Shop from your favorite stores effortlessly. Select, pay, and have it delivered right to your door.',
   },
@@ -58,7 +59,7 @@ const slides: Slide[] = [
     id: 3,
     title: 'Home',
     subtitle: 'Moving',
-    image: images.introImage4,
+    image: images.HouseMoving,
     description:
       'Quickly send packages with ease. Choose pickup and delivery, and we handle the rest',
   },
@@ -129,15 +130,21 @@ const Onboarding: React.FC = () => {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={updateSlidePosition}
-        renderItem={({item}) => (
-          <View style={styles.slide}>
-            <Image source={item.image} style={styles.image} />
+        renderItem={({item}) => {
+          const SvgImage: SvgComponent = item.image;
+          return(
+            <View style={styles.slide}>
+              <SvgImage width={width * 0.7} height={height * 0.6}/>
+            {/* <Image source={item.image} style={styles.image} /> */}
             <Text style={styles.title}>
               {item.title} <Text style={styles.subtitle}>{item.subtitle}</Text>
             </Text>
             <Text style={styles.description}>{item.description}</Text>
           </View>
-        )}
+          )
+        }
+        
+        }
       />
       <Footer />
     </View>
@@ -147,7 +154,7 @@ const Onboarding: React.FC = () => {
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: colors.white},
   slide: {width, alignItems: 'center', justifyContent: 'center'},
-  image: {height: height * 0.5, width: width * 0.8, resizeMode: 'contain'},
+  // image: {height: height * 0.5, width: width * 0.8, resizeMode: 'contain'},
   title: {
     fontSize: typography.fontSize.large,
     fontFamily: typography.fontFamily.regular,
@@ -165,11 +172,12 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.medium as TextStyle['fontWeight'],
   },
   footer: {
-    height: height * 0.21,
+    height: height * 0.25,
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical:20
   },
-  indicatorContainer: {flexDirection: 'row', marginTop: 20},
+  indicatorContainer: {flexDirection: 'row', marginTop: 10},
   indicator: {
     height: 10,
     width: 10,

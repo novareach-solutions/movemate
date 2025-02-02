@@ -7,9 +7,11 @@ import {
     TouchableOpacity,
     Linking,
     Alert,
+    SafeAreaView,
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
+import Header from '../../components/Header';
 
 const FeedbackScreen: React.FC = () => {
     const [feedback, setFeedback] = useState('');
@@ -27,6 +29,9 @@ const FeedbackScreen: React.FC = () => {
     };
 
     return (
+        <SafeAreaView style={{flex: 1,
+            backgroundColor: colors.lightGrey}}>
+                <Header isBack title='Give a Feedback' bgColor={colors.lightGrey} />
         <View style={styles.container}>
             <Text style={styles.infoText}>
                 We welcome your feedback on what works and how we can improve.
@@ -48,14 +53,17 @@ const FeedbackScreen: React.FC = () => {
                 <Text style={styles.submitText}>Submit</Text>
             </TouchableOpacity>
         </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.lightButtonBackground,
-        padding: 20,
+        padding:20,
+        backgroundColor:colors.lightGrey
+        // backgroundColor: colors.lightButtonBackground,
+        // padding: 20,borderColor:'red',borderWidth:2
     },
     infoText: {
         fontSize: typography.fontSize.medium,

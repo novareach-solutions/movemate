@@ -6,10 +6,14 @@ import {
     TouchableOpacity,
     FlatList,
     Image,
+    SafeAreaView,
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { images } from '../../assets/images/images';
+import Header from '../../components/Header';
+import { SvgProps } from 'react-native-svg';
+type SvgComponent = React.FC<SvgProps>;
 
 const SavedAddressesScreen: React.FC = () => {
     const savedAddresses = [
@@ -17,21 +21,23 @@ const SavedAddressesScreen: React.FC = () => {
             id: 1,
             title: 'Home',
             address: '120 Waldeck Street, Arlington, Texas, 75760',
-            icon: images.profileAccount,
+            icon: images.HomeIcon,
         },
         {
             id: 2,
             title: 'Office',
             address: '120 Waldeck Street, Arlington, Texas, 75760',
-            icon: images.profileAccount,
+            icon: images.OfficeIcon,
         },
     ];
 
-    const renderAddressItem = ({ item }: { item: typeof savedAddresses[0] }) => (
+    const renderAddressItem = ({ item }: { item: typeof savedAddresses[0] }) => {
+        const SvgImage: SvgComponent = item.icon;
+        return(
         <View style={styles.addressCard}>
             <View style={styles.addressContent}>
                 <View style={styles.iconContainer}>
-                    <Image source={item.icon} style={styles.icon} />
+                <SvgImage width={30} height={30} style={styles.icon}/>
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={styles.title}>{item.title}</Text>
@@ -47,9 +53,11 @@ const SavedAddressesScreen: React.FC = () => {
                 </TouchableOpacity>
             </View>
         </View>
-    );
+        )};
 
     return (
+        <SafeAreaView style={{flex:1,backgroundColor:'#F6F6F6'}}>
+            <Header isBack title='Manage Addresses' bgColor='#F6F6F6' />
         <View style={styles.container}>
             <Text style={styles.header}>Saved Address</Text>
             <FlatList
@@ -61,18 +69,18 @@ const SavedAddressesScreen: React.FC = () => {
             <TouchableOpacity style={styles.addButton}>
                 <Text style={styles.addButtonText}>Add New Address</Text>
             </TouchableOpacity>
-        </View>
+        </View></SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.lightButtonBackground,
+        backgroundColor: '#F6F6F6',
         padding: 20,
     },
     header: {
-        fontSize: typography.fontSize.large,
+        fontSize: typography.fontSize.medium,
         fontWeight: 'bold',
         color: colors.text.primary,
         marginBottom: 20,
@@ -81,7 +89,7 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     addressCard: {
-        backgroundColor: '#F6F6F6',
+        backgroundColor: colors.white,
         borderRadius: 10,
         paddingTop: 15,
         paddingHorizontal: 15,

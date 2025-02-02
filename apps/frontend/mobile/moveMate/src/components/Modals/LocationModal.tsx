@@ -1,6 +1,6 @@
 // LocationModal.tsx
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,12 +11,17 @@ import {
   Modal,
   Image,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
+import CheckBox from "@react-native-community/checkbox";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../../assets/images/images";
 import Header from "../Header";
 import { colors } from "../../theme/colors";
 import { fetchPlaceSuggestions } from "../../api/mapboxAPI";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Path } from "react-native-svg";
 
 export type ILocation = {
   addressLine1: string;
@@ -52,10 +57,16 @@ const LocationModal: React.FC<LocationModalProps> = ({
   type,
 }) => {
   const [query, setQuery] = useState("");
+  const insets = useSafeAreaInsets();
   const [results, setResults] = useState<LocationItem[]>([]);
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
+  console.log('isMapModalVisible', isMapModalVisible);
+  console.log('isVisible', isVisible)
   const [selectedLocation, setSelectedLocation] = useState<LocationItem | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [isAddressDetailsVisible, setIsAddressDetailsVisible] = useState(false);
+  console.log('isAddressDetailsVisible', isAddressDetailsVisible)
   const [addressDetails, setAddressDetails] = useState({
     addressLine1: "",
     addressLine2: "",
@@ -66,6 +77,18 @@ const LocationModal: React.FC<LocationModalProps> = ({
 
   // Example saved locations array
   const savedLocations: LocationItem[] = [
+    {
+      name: 'Fed Square',
+      address: '120 Waldeck Street, Arlington, Texas..',
+      latitude: 19.0760,
+      longitude: 72.8777,
+    },
+    {
+      name: 'Fed Square',
+      address: '120 Waldeck Street, Arlington, Texas..',
+      latitude: 19.0760,
+      longitude: 72.8777,
+    },
   ];
 
   const handleSearch = async (text: string) => {
@@ -89,15 +112,15 @@ const LocationModal: React.FC<LocationModalProps> = ({
   };
 
   const onConfirmAddress = () => {
-    if (!addressDetails.addressLine1) {
-      alert("Please fill in the required fields.");
-      return;
-    }
+    // if (!addressDetails.addressLine1) {
+    //   alert("Please fill in the required fields.");
+    //   return;
+    // }
 
-    if (!selectedLocation) {
-      alert("No location selected.");
-      return;
-    }
+    // if (!selectedLocation) {
+    //   alert("No location selected.");
+    //   return;
+    // }
 
     const completeLocationData: ILocation = {
       addressLine1: addressDetails.addressLine1,
@@ -124,17 +147,19 @@ const LocationModal: React.FC<LocationModalProps> = ({
     });
   };
 
+
   return (
     <Modal visible={isVisible} transparent animationType="slide">
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         {/* Header */}
-        <Header isBack onPress={() => onClose()} title={title} />
+        <Header isBack onClickButton={() => onClose()} title={title} />
 
         {/* Search Bar */}
         <View style={styles.header}>
           <TextInput
             style={styles.searchBar}
             placeholder={placeholder}
+            placeholderTextColor={colors.grey}
             value={query}
             onChangeText={handleSearch}
           />
@@ -179,6 +204,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
         />
 
         {/* Confirm Button */}
+        <View style={styles.footer}>
         <TouchableOpacity
           style={styles.confirmButton}
           onPress={() => {
@@ -193,8 +219,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
         >
           <Text style={styles.confirmButtonText}>Confirm Location</Text>
         </TouchableOpacity>
+        </View>
 
-        {/* Map Modal */}
+        {/* Map Modal for location confirm */}
         {selectedLocation && (
           <Modal
             visible={isMapModalVisible}
@@ -202,10 +229,10 @@ const LocationModal: React.FC<LocationModalProps> = ({
             animationType="slide"
             onRequestClose={() => setIsMapModalVisible(false)}
           >
-            <SafeAreaView style={styles.mapModalContainer}>
+            <View style={[styles.mapModalContainer, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
               <Header
                 isBack
-                onPress={() => setIsMapModalVisible(false)}
+                onClickButton={() => setIsMapModalVisible(false)}
                 title="Add Location"
               />
               <View style={styles.mapContainer}>
@@ -214,12 +241,42 @@ const LocationModal: React.FC<LocationModalProps> = ({
                   style={styles.mapImage}
                 />
                 <View style={styles.addressContainer}>
+                  {/* Address Section */}
+                  <View style={styles.addressRow}>
+                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="purple">
+                      <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
+                    </Svg>
+                    <Text style={styles.addressTitle}>18-8-224/5</Text>
+                    <TouchableOpacity>
+                      <Text style={styles.editText1}>Edit</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.addressSubtitle}>
+                    Plenty Rd, Bundoora VIC 30, Melbourne
+                  </Text>
+
+                  <View style={styles.addLocContainer}>
+                  {/* Confirm Button */}
+                  <TouchableOpacity
+                    style={styles.confirmButton}
+                    onPress={() => {
+                      setIsMapModalVisible(false);
+                      setIsAddressDetailsVisible(true); // Navigate to address details
+                    }}
+                  >
+                    <Text style={styles.confirmButtonText}>Confirm</Text>
+                  </TouchableOpacity></View>
+                </View>
+                {/* <View style={styles.addressContainer}>
+                  <View>
                   <Text style={styles.addressDetails}>
                     {selectedLocation.address}
                   </Text>
                   <TouchableOpacity>
                     <Text style={styles.editButtonText}>Edit</Text>
                   </TouchableOpacity>
+                  </View>
+                 
                 </View>
                 <TouchableOpacity
                   style={styles.confirmButton}
@@ -229,9 +286,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
                   }}
                 >
                   <Text style={styles.confirmButtonText}>Confirm</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
-            </SafeAreaView>
+            </View>
           </Modal>
         )}
 
@@ -243,20 +300,38 @@ const LocationModal: React.FC<LocationModalProps> = ({
             animationType="slide"
             onRequestClose={() => setIsAddressDetailsVisible(false)}
           >
-            <SafeAreaView style={styles.addressDetailsContainer}>
+            <View style={[styles.addressDetailsContainer, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+              <KeyboardAvoidingView 
+                      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+                      style={{flex:1}}
+                    >
               <Header
                 isBack
-                onPress={() => setIsAddressDetailsVisible(false)}
+                onClickButton={() => setIsAddressDetailsVisible(false)}
                 title="Add Address Details"
               />
 
               <ScrollView contentContainerStyle={styles.addressForm}>
-                <Image source={images.map} style={styles.mapImage} />
-
+                <Image source={images.map} style={styles.detailAddressMapImage} />
+                <View style={styles.addessInMap}>
+                  <View style={styles.addressRow}>
+                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="purple">
+                      <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
+                    </Svg>
+                    <Text style={styles.addressTitle}>18-8-224/5</Text>
+                    <TouchableOpacity>
+                      <Text style={styles.editText1}>Edit</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.addressSubtitle}>
+                    Plenty Rd, Bundoora VIC 30, Melbourne
+                  </Text></View>
+                <Text style={styles.label}>Street Address</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Street Address"
                   value={addressDetails.addressLine1}
+                  placeholderTextColor={colors.grey}
                   onChangeText={(text) =>
                     setAddressDetails({
                       ...addressDetails,
@@ -264,10 +339,13 @@ const LocationModal: React.FC<LocationModalProps> = ({
                     })
                   }
                 />
+
+                <Text style={styles.label}>Address Line 2<Text style={styles.optional}>(optional)</Text></Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Address Line 2 (Optional)"
                   value={addressDetails.addressLine2}
+                  placeholderTextColor={colors.grey}
                   onChangeText={(text) =>
                     setAddressDetails({
                       ...addressDetails,
@@ -275,10 +353,14 @@ const LocationModal: React.FC<LocationModalProps> = ({
                     })
                   }
                 />
+
+                <Text style={styles.label}>Suburb</Text>
+
                 <TextInput
                   style={styles.input}
                   placeholder="Suburb"
                   value={addressDetails.suburb}
+                  placeholderTextColor={colors.grey}
                   onChangeText={(text) =>
                     setAddressDetails({
                       ...addressDetails,
@@ -286,10 +368,12 @@ const LocationModal: React.FC<LocationModalProps> = ({
                     })
                   }
                 />
+                <Text style={styles.label}>Postal Code</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Postal Code"
                   keyboardType="numeric"
+                  placeholderTextColor={colors.grey}
                   value={addressDetails.postalCode}
                   onChangeText={(text) =>
                     setAddressDetails({
@@ -298,9 +382,13 @@ const LocationModal: React.FC<LocationModalProps> = ({
                     })
                   }
                 />
+                <Text style={styles.label}>
+                  Landmark <Text style={styles.optional}>(optional)</Text>
+                </Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Landmark (Optional)"
+                  placeholderTextColor={colors.grey}
                   value={addressDetails.landmark}
                   onChangeText={(text) =>
                     setAddressDetails({
@@ -310,17 +398,52 @@ const LocationModal: React.FC<LocationModalProps> = ({
                   }
                 />
 
-                <TouchableOpacity
-                  style={styles.confirmButton}
-                  onPress={onConfirmAddress}
-                >
-                  <Text style={styles.confirmButtonText}>Confirm Address</Text>
-                </TouchableOpacity>
+                {/* Save Address Checkbox */}
+                <View style={styles.checkboxRow}>
+                  <CheckBox
+                    value={isSaved}
+                    onValueChange={setIsSaved}
+                    tintColors={{ true: "#6200EE", false: "#8A8A8A" }} // Purple when checked, gray when unchecked
+                    boxType="square" // Ensures it's a square checkbox (iOS only)
+                    style={styles.checkbox}
+                  />
+                  <Text style={styles.checkboxText}>Add to saved addresses</Text>
+                </View>
+                {/* Address Tags */}
+                <View style={styles.tagsContainer}>
+                  {["Home", "Work", "Other"].map((tag) => (
+                    <TouchableOpacity
+                      key={tag}
+                      style={[
+                        styles.tag,
+                        selectedTag === tag && styles.selectedTag,
+                      ]}
+                      onPress={() => setSelectedTag(tag)}
+                    >
+                      <Text
+                        style={[
+                          styles.tagText,
+                          selectedTag === tag && styles.selectedTagText,
+                        ]}
+                      >
+                        {tag}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <View style={styles.cnfAddress}>
+                  <TouchableOpacity
+                    style={styles.confirmButton}
+                    onPress={onConfirmAddress}
+                  >
+                    <Text style={styles.confirmButtonText}>Confirm Address</Text>
+                  </TouchableOpacity></View>
               </ScrollView>
-            </SafeAreaView>
+              </KeyboardAvoidingView>
+            </View>
           </Modal>
         )}
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 };
@@ -408,7 +531,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
-    margin: 16,
+    // margin: 16,
   },
   confirmButtonText: {
     color: "#FFFFFF",
@@ -421,22 +544,36 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    // justifyContent: "center",
+    // alignItems: "center",
   },
   mapImage: {
     width: "100%",
-    height: "60%",
-    marginBottom: 20,
+    height: "70%",
+    // marginBottom: 20,
+  },
+  detailAddressMapImage: {
+    width: "100%",
+    height: 200,
+    marginBottom: 10,
+    borderRadius: 12,
+    elevation: 6,
+    borderColor: colors.grey,
+    borderWidth: 0.25
+    // height: "50%",
+    // marginBottom: 20,
   },
   addressContainer: {
     padding: 16,
+    // borderWidth:2,
+    // borderColor:'red',
     backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    position: "absolute",
-    bottom: 100,
-    width: "90%",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+
+    // position: "absolute",
+    bottom: 10,
+    width: "100%",
     alignSelf: "center",
     elevation: 10,
   },
@@ -457,6 +594,18 @@ const styles = StyleSheet.create({
   addressForm: {
     padding: 16,
   },
+  addessInMap: {
+    position: 'absolute',
+    flex: 1,
+    top: 100,
+    left: 35,
+    backgroundColor: colors.white,
+    padding: 10,
+    borderWidth: 0.25,
+    borderColor: colors.grey,
+    width: '90%',
+    borderRadius: 12
+  },
   input: {
     borderWidth: 1,
     borderColor: "#E0E0E0",
@@ -465,6 +614,96 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: "#F8F8F8",
   },
+  addressRow: {
+    paddingTop: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  addressTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginLeft: 8,
+    flex: 1,
+  },
+  editText1: {
+    color: "purple",
+    fontWeight: "bold",
+  },
+  addressSubtitle: {
+    fontSize: 14,
+    color: "gray",
+    marginTop: 8,
+  },
+  // confirmButton1: {
+  //   backgroundColor: "purple",
+  //   // paddingVertical: 14,
+  //   borderRadius: 10,
+  //   alignItems: "center",
+  //   marginTop: 20,
+  // },
+  confirmText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  footer: {
+    padding:10,
+    backgroundColor: colors.white,
+    justifyContent: 'flex-end',
+},
+cnfAddress: {
+    paddingVertical:20,
+    backgroundColor: colors.white,
+    justifyContent: 'flex-end',
+},
+addLocContainer: {
+  marginTop:20,
+    paddingVertical:10,
+    backgroundColor: colors.white,
+    justifyContent: 'flex-end',
+},
+  label: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginVertical: 5,
+  },
+  optional: {
+    color: colors.grey,
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 15,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+  },
+  checkboxText: {
+    fontSize: 14,
+    marginLeft: 8,
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    marginTop: 10,
+  },
+  tag: {
+    padding: 10,
+    backgroundColor: "#ddd",
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  selectedTag: {
+    backgroundColor: colors.purple,
+  },
+  tagText: {
+    color: "black",
+  },
+  selectedTagText: {
+    color: "white",
+  },
 });
 
 export default LocationModal;
+

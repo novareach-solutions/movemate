@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { CustomerScreens } from '../../../navigation/ScreenNames';
 import { cancelOrder } from '../../../redux/slices/deliverAPackageSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
+import { colors } from '../../../theme/colors';
 
 const CancelOrderScreen: React.FC = () => {
   const [selectedReason, setSelectedReason] = useState<string>('');
@@ -67,6 +68,7 @@ navigation.navigate(CustomerScreens.CancelSuccessScreen)
               value={otherReason}
               onChangeText={setOtherReason}
               multiline
+              placeholderTextColor={colors.grey}
               numberOfLines={5}
               textAlignVertical="top"
             />

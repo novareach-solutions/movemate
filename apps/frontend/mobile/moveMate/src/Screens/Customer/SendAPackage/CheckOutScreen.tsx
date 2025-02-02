@@ -12,6 +12,7 @@ import Header from "../../../components/Header";
 import { images } from "../../../assets/images/images";
 import { CustomerScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
+import { colors } from "../../../theme/colors";
 
 const CheckoutScreen = () => {
   const [tip, setTip] = useState(null);
@@ -27,7 +28,7 @@ const CheckoutScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header isBack />
+      <Header isBack title="Checkout" bgColor={colors.lightGrey} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {/* From and To Section */}
         <View style={styles.addressContainer}>

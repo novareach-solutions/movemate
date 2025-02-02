@@ -11,7 +11,9 @@ import {
   KeyboardTypeOptions,
   SafeAreaView,
   TextStyle,
-  ActivityIndicator,Alert
+  ActivityIndicator,Alert,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import Header from '../components/Header';
 import {colors} from '../theme/colors';
@@ -81,7 +83,7 @@ const [loading, setLoading] = useState(false);
     }
      setLoading(true); 
         try {
-          await dispatch(userSignup(payload)).unwrap();
+          // await dispatch(userSignup(payload)).unwrap();
           navigation.navigate(CustomerScreens.CustomerHomeScreen);
           // Alert.alert('Session Expired', 'Please log in again.');
         } catch {
@@ -112,10 +114,14 @@ const [loading, setLoading] = useState(false);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+      <KeyboardAvoidingView 
+                  behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+                  style={styles.keyboardAvoid}
+                >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <Header showLogo={true} />
-
+          <Header logo />
+          
           <ScrollView contentContainerStyle={styles.formContainer}>
             <Text style={styles.title}>Complete your Profile</Text>
             <Text style={styles.subTitle}>Add your details to get started</Text>
@@ -132,6 +138,7 @@ const [loading, setLoading] = useState(false);
                     },
                     errors[input.field] && {borderColor: colors.error},
                   ]}
+                  placeholderTextColor={colors.grey}
                   onFocus={() => setFocusedField(input.field)}
                   onBlur={() => setFocusedField(null)}
                   keyboardType={input.keyboardType || 'default'}
@@ -182,8 +189,9 @@ const [loading, setLoading] = useState(false);
               </Text>
             </View>
           </ScrollView>
+     
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback></KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -192,6 +200,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
+  },
+  keyboardAvoid: {
+    flex: 1,
+    backgroundColor: '#F8F8F8',
   },
   formContainer: {
     padding: 20,

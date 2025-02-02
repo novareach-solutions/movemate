@@ -9,6 +9,7 @@ import {
     SafeAreaView,
 } from "react-native";
 import Header from "../../../components/Header";
+import { colors } from "../../../theme/colors";
 
 const AddCardScreen = () => {
     const [cardNumber, setCardNumber] = useState("");
@@ -33,6 +34,7 @@ const AddCardScreen = () => {
                         style={styles.input}
                         placeholder="1234 XXXX XXXX 5678"
                         keyboardType="numeric"
+                        placeholderTextColor={colors.grey}
                         value={cardNumber}
                         onChangeText={setCardNumber}
                     />
@@ -42,6 +44,7 @@ const AddCardScreen = () => {
                         style={styles.input}
                         placeholder="John Doe"
                         value={cardHolderName}
+                        placeholderTextColor={colors.grey}
                         onChangeText={setCardHolderName}
                     />
 
@@ -51,6 +54,7 @@ const AddCardScreen = () => {
                             <TextInput
                                 style={styles.input}
                                 placeholder="MM/YY"
+                                placeholderTextColor={colors.grey}
                                 keyboardType="numeric"
                                 value={expiry}
                                 onChangeText={setExpiry}
@@ -62,6 +66,7 @@ const AddCardScreen = () => {
                                 style={styles.input}
                                 placeholder="XXX"
                                 keyboardType="numeric"
+                                placeholderTextColor={colors.grey}
                                 secureTextEntry
                                 value={cvv}
                                 onChangeText={setCvv}
@@ -123,6 +128,7 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: "row",
         justifyContent: "space-between",
+        gap:10
     },
     column: {
         flex: 1,

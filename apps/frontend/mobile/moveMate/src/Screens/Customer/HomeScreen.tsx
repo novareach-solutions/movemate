@@ -11,24 +11,28 @@ import {
 import { images } from '../../assets/images/images';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
-import { CustomerScreens } from '../../navigation/ScreenNames';
+import { CustomerScreens, ProfileScreens } from '../../navigation/ScreenNames';
+import LocationIcon from "../../assets/images/Location.svg";
+import AccountIcon from "../../assets/images/Account.svg";
 import { useNavigation } from '@react-navigation/native';
+import { SvgProps } from 'react-native-svg';
 // Mock Data
 const address = '123 Main Street, Springfield, USA';
+type SvgComponent = React.FC<SvgProps>;
 const gridButtons = [
     {
         id: 1,
         title: 'SEND A PACKAGE',
         subTitle: 'Hassle-Free',
-        image: images.package,
+        image: images.PackageImg,
     },
-    { id: 2, title: 'BUY FROM STORE', subTitle: 'Easy Shop', image: images.store },
-    { id: 3, title: 'CAR TOWING', subTitle: 'Fast Tow', image: images.towTruck },
+    { id: 2, title: 'BUY FROM STORE', subTitle: 'Easy Shop', image: images.Store },
+    { id: 3, title: 'CAR TOWING', subTitle: 'Fast Tow', image: images.TowTruck },
     {
         id: 4,
         title: 'HOME MOVING',
         subTitle: 'Swift Shifting',
-        image: images.shoppingCart,
+        image: images.ShoppingCart,
     },
 ];
 
@@ -40,14 +44,18 @@ const navigation=useNavigation()
             <View style={styles.header}>
                 <View style={styles.rowButton}>
                     <TouchableOpacity style={styles.rowButton}>
-                        <Image style={styles.icon} source={images.location} />
+                        {/* <Image style={styles.icon} source={images.location} /> */}
+                        <images.Location width={20} height={20} />
                         <Text style={styles.homeText}>Home</Text>
                         <Text style={styles.icon}>⬇</Text>
                     </TouchableOpacity>
-                    <Image
+                    <TouchableOpacity  style={{ marginLeft: "60%",}} onPress={()=>{navigation.navigate(ProfileScreens.ProfileScreen)}}>
+                    <images.Account width={30} height={30} />
+                    </TouchableOpacity>
+                    {/* <Image
                         source={images.account}
                         style={{ marginLeft: "60%", height: 30, width: 30 }}
-                    />
+                    /> */}
                 </View>
 
                 <Text style={styles.address}>{address}</Text>
@@ -64,20 +72,30 @@ const navigation=useNavigation()
                 </TouchableOpacity> */}
             </View>
 
+            <View style={styles.gridContainer}>
             <FlatList
                 data={gridButtons}
                 keyExtractor={item => item.id.toString()}
                 numColumns={2}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={()=>{
-                        navigation.navigate(CustomerScreens.SAPDetailsScreen)
-                    }} style={styles.gridButton}>
-                        <Text style={styles.gridButtonText}>{item.title}</Text>
-                        <Text style={styles.gridButtonSubText}>{item.subTitle}</Text>
-                        <Image source={item.image} style={styles.gridButtonImage} />
-                    </TouchableOpacity>
-                )}
+                renderItem={({ item }) => {
+                    const SvgImage: SvgComponent = item.image;
+                    return (
+                        <TouchableOpacity 
+                            onPress={() => {
+                                navigation.navigate(CustomerScreens.SAPDetailsScreen);
+                            }} 
+                            style={styles.gridButton}
+                        >
+                            <Text style={styles.gridButtonText}>{item.title}</Text>
+                            <Text style={styles.gridButtonSubText}>{item.subTitle}</Text>
+                            <SvgImage width={91} height={91} style={styles.gridButtonImage} /> 
+                        </TouchableOpacity>
+                    );
+                }}
             />
+            </View>
+
+           
             {/* <View style={styles.bannerContainer}>
                 <Image
                     source={images.banner2} // Replace with a static banner image
@@ -130,6 +148,9 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         overflow: 'hidden',
     },
+    gridContainer: {
+        marginHorizontal: 10,
+    },
     banner: {
         width: '100%',
         height: 150,
@@ -160,7 +181,7 @@ const styles = StyleSheet.create({
     gridButtonImage: {
         width: 91,
         height: 91,
-        marginBottom: 8,
+        marginTop: 8,
         alignSelf: 'flex-end',
     },
     gridButtonText: {

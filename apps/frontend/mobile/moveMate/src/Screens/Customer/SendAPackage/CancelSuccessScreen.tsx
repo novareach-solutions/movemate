@@ -8,7 +8,7 @@ const CancelSuccessScreen = () => {
       <ScrollView contentContainerStyle={styles.container}>
         {/* Success Icon */}
         <View style={styles.iconContainer}>
-          <Image source={images.success} width={200} height={200}/>
+          <images.SuccessGreen width={200} height={200} />
         </View>
 
         {/* Title */}

@@ -10,9 +10,12 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
-import { ProfileScreens } from '../../navigation/ScreenNames';
+import { AuthScreens, ProfileScreens } from '../../navigation/ScreenNames';
 import { images } from '../../assets/images/images';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { SvgProps } from 'react-native-svg';
+import Header from '../../components/Header';
+type SvgComponent = React.FC<SvgProps>;
 // import { images } from '../../assets/images/images';
 
 const profileData = [
@@ -26,25 +29,25 @@ const profileData = [
     {
         id: '2',
         title: 'Manage Addresses',
-        icon: images.profileEarnings,
+        icon: images.ManageAddress,
         screen: ProfileScreens.SavedAddressesScreen,
     },
     {
         id: '3',
         title: 'Refer Friends',
-        icon: images.profileReferFriend,
+        icon: images.InviteFriends,
         screen: ProfileScreens.ReferFriendsScreen,
     },
     {
         id: '4',
         title: 'Legal & About',
-        icon: images.profileWallet,
+        icon: images.LegalNAbout,
         screen: ProfileScreens.LegalAboutScreen,
     },
     {
         id: '5',
         title: 'Give A Feedback',
-        icon: images.profileEarningMode,
+        icon: images.HelpNSupport,
         screen: ProfileScreens.FeedbackScreen,
     },
     // {
@@ -53,37 +56,46 @@ const profileData = [
     //     icon: images.profileRewards,
     //     screen: ProfileScreens.Rewards,
     // },
-    // {
-    //     id: '7',
-    //     title: 'Log Out',
-    //     icon: images.profileLogout,
-    //     screen: ProfileScreens.Logout,
-    //     isLogout: true,
-    // },
+    {
+        id: '7',
+        title: 'Log Out',
+        icon: images.Logout,
+        screen: AuthScreens.LoginScreen,
+        isLogout: true,
+    },
 ];
 
 const ProfileScreen: React.FC = () => {
     const navigation = useNavigation();
 
-    const renderItem = ({ item }: { item: (typeof profileData)[0] }) => (
-        <TouchableOpacity
+    const renderItem = ({ item }: { item: (typeof profileData)[0] }) => {
+        const SvgImage: SvgComponent = item.icon;
+        return(
+<TouchableOpacity
             style={[styles.listItem]}
             onPress={() => navigation.navigate(item.screen as never)}>
-            <Image source={item.icon} />
-            <Text style={[styles.itemText]}>{item.title}</Text>
+            {/* <Image source={item.icon} /> */}
+            <SvgImage />
+            <Text style={item.title === "Log Out" ? styles.LogoutText : styles.itemText}>{item.title}</Text>
             {/* {item.notificationCount && (
                 <View style={styles.notificationBadge}>
                     <Text style={styles.notificationText}>{item.notificationCount}</Text>
                 </View>
             )} */}
-            <View>
-                <Image source={images.arrow} />
-            </View>
+            {
+               item.title !== "Log Out" && <View>
+               <images.ForwardArrow />
+           </View>
+            }
+            
         </TouchableOpacity>
-    );
+        )
+    }
+
 
     return (
          <SafeAreaView style={styles.container}>
+            <Header isBack title='Profile' bgColor='#F6F6F6' />
         <View>
             {/* Profile Header */}
             <View style={styles.header}>
@@ -95,12 +107,14 @@ const ProfileScreen: React.FC = () => {
                         justifyContent: 'space-between',
                         marginVertical: 10
                     }}><View style={styles.contactItem}>
-                            <Image source={images.phoneWhite} />
+                        <images.PhoneIcon />
+                            {/* <Image source={images.phoneWhite} /> */}
                             <Text style={styles.contactText}>+61-123456789</Text>
                         </View>
                         <View style={styles.divider} />
                         <View style={styles.contactItem}>
-                            <Image source={images.messageWhite} />
+                        <images.EmailIcon />
+                            {/* <Image source={images.messageWhite} /> */}
                             <Text style={styles.contactText}>syedmustafa@gmail.com</Text>
                         </View></View>
                     <TouchableOpacity onPress={() => {
@@ -127,14 +141,14 @@ const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.lightButtonBackground,
+        backgroundColor: colors.lightGrey,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border.primary,
+        // borderBottomWidth: 1,
+        // borderBottomColor: colors.border.primary,
     },
     profileImage: {
         width: 60,
@@ -189,12 +203,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 20,
+        padding: 20,
         borderWidth: 1.2,
         borderColor: colors.border.lightGray,
-        paddingHorizontal: 10,
+        // paddingHorizontal: 10,
         backgroundColor: colors.white,
-        marginVertical: 10,
+        marginVertical: 7,
         borderRadius: 12,
     },
 
@@ -207,6 +221,13 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         fontSize: typography.fontSize.medium,
         color: colors.text.primary,
+        fontFamily: typography.fontWeight.semiBold,
+    },
+    LogoutText: {
+        flex: 1,
+        marginLeft: 15,
+        fontSize: typography.fontSize.medium,
+        color: colors.red,
         fontFamily: typography.fontWeight.semiBold,
     },
     notificationBadge: {
@@ -244,8 +265,7 @@ const styles = StyleSheet.create({
     },
     editProfileText: {
         fontSize: typography.fontSize.medium,
-        color: colors.white, // Adjust this to match your button text color
-        textDecorationLine: 'underline',
+        color: colors.white,
     },
     contactItem: {
         flexDirection: 'row',

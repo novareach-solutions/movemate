@@ -12,6 +12,7 @@ import { images } from "../../../assets/images/images";
 import Header from "../../../components/Header";
 import { CustomerScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
+import { colors } from "../../../theme/colors";
 
 const PaymentSelectionScreen = () => {
   const [selectedMethod, setSelectedMethod] = useState(null);
@@ -45,7 +46,7 @@ const PaymentSelectionScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-        <Header isBack />
+        <Header isBack title="Make payment" bgColor={colors.lightGrey} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {/* Credit/Debit Card Section */}
         <View style={styles.sectionContainer}>
@@ -97,6 +98,8 @@ const PaymentSelectionScreen = () => {
           ))}
         </View>
 
+        <View style={styles.footer}>
+
         {/* Terms and Conditions */}
         <Text style={styles.termsText}>
           By confirming, I agree that this order does not include illegal or restricted items.{" "}
@@ -107,6 +110,7 @@ const PaymentSelectionScreen = () => {
         <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
           <Text style={styles.payButtonText}>Proceed To Pay</Text>
         </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -117,11 +121,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F8F8F8",
   },
+  footer:{
+    flex:1,
+    paddingVertical:10,
+    justifyContent: 'flex-end',
+  },
   contentContainer: {
+    flex:1,
     // padding: 16,
   },
   sectionContainer: {
-    backgroundColor: "#FFFFFF",
+    // backgroundColor: "#FFFFFF",
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
@@ -137,6 +147,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     borderWidth: 1,
+    backgroundColor:colors.white,
     borderColor: "#DDD",
     borderRadius: 8,
     marginBottom: 12,
@@ -146,6 +157,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     borderWidth: 1,
+    backgroundColor:colors.white,
     borderColor: "#DDD",
     borderRadius: 8,
     marginBottom: 12,
