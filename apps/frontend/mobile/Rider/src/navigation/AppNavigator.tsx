@@ -39,6 +39,9 @@ import SignupNumberScreen from '../Screens/SignupNumberScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import ChatScreen from '../Screens/ChatScreen';
 import EarningsScreen from '../Screens/Profile/EarningsScreen';
+import RatingsScreen from '../Screens/Profile/RatingScreen';
+import OrderDetailsScreen from '../Screens/Profile/OrderDetailsScreen';
+import HelpAndSupportScreen from '../Screens/Profile/HelpAndSupportScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -178,6 +181,21 @@ const App = () => {
         <Stack.Screen
           name={ProfileScreens.Earnings}
           component={EarningsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={ProfileScreens.Ratings}
+          component={RatingsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={ProfileScreens.OrderDetails}
+          component={OrderDetailsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={ProfileScreens.HelpAndSupport}
+          component={HelpAndSupportScreen}
           options={{headerShown: false}}
         />
 

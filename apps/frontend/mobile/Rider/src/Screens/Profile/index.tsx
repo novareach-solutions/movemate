@@ -9,15 +9,15 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {colors} from '../../theme/colors';
-import {typography} from '../../theme/typography';
+import { useNavigation } from '@react-navigation/native';
+import { colors } from '../../theme/colors';
+import { typography } from '../../theme/typography';
 import {
   AppScreens,
   AuthScreens,
   ProfileScreens,
 } from '../../navigation/ScreenNames';
-import {images} from '../../assets/images/images';
+import { images } from '../../assets/images/images';
 import Header from '../../components/Header';
 
 const profileData = [
@@ -54,15 +54,15 @@ const profileData = [
   {
     id: '6',
     title: 'Ratings',
-    icon: images.profileInbox, 
-    screen: ProfileScreens.Ratings, 
-    notificationCount: 3, 
+    icon: images.profileInbox,
+    screen: ProfileScreens.Ratings,
+    notificationCount: 3,
   },
   {
     id: '7',
     title: 'Help & Support',
     icon: images.profileInbox,
-    screen: ProfileScreens.HelpSupport,
+    screen: ProfileScreens.HelpAndSupport,
     notificationCount: 2,
   },
   {
@@ -84,7 +84,7 @@ const profileData = [
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation();
 
-  const renderItem = ({item}: {item: (typeof profileData)[0]}) => (
+  const renderItem = ({ item }: { item: (typeof profileData)[0] }) => (
     <TouchableOpacity
       style={[styles.listItem]}
       onPress={() => navigation.navigate(item.screen as never)}>
@@ -102,50 +102,50 @@ const ProfileScreen: React.FC = () => {
   );
 
   return (
-<SafeAreaView style={styles.container}>
-  <Header logo isBack />
+    <SafeAreaView style={styles.container}>
+      <Header logo isBack />
 
-  {/* Fixed Profile Header */}
-  <View style={styles.header}>
-    <Image
-      source={{ uri: 'https://i.pravatar.cc/100' }}
-      style={styles.profileImage}
-    />
-    <View>
-      <Text style={styles.profileName}>John Doe</Text>
-      <Text style={styles.profileDetails}>+61 6783940545</Text>
-      <Text style={styles.membership}>
-        Membership valid till 23rd February
-      </Text>
-    </View>
-  </View>
-
-  {/* Scrollable Area */}
-  <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
-    {/* Weekly Subscription Plan (Now Scrollable) */}
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate(ProfileScreens.EarningMode);
-      }}
-      style={styles.subscriptionPlan}>
-      <Text style={styles.subscriptionText}>Weekly subscription plan</Text>
-      <View style={styles.subscriptionBadge}>
-        <Text style={styles.subscriptionBadgeText}>ACTIVE</Text>
+      {/* Fixed Profile Header */}
+      <View style={styles.header}>
+        <Image
+          source={{ uri: 'https://i.pravatar.cc/100' }}
+          style={styles.profileImage}
+        />
+        <View>
+          <Text style={styles.profileName}>John Doe</Text>
+          <Text style={styles.profileDetails}>+61 6783940545</Text>
+          <Text style={styles.membership}>
+            Membership valid till 23rd February
+          </Text>
+        </View>
       </View>
-    </TouchableOpacity>
 
-    {/* Scrollable Menu List */}
-    <FlatList
-      data={profileData}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.listContainer}
-      scrollEnabled={false} // FlatList should not have its own scrolling
-    />
-  </ScrollView>
-</SafeAreaView>
+      {/* Scrollable Area */}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Weekly Subscription Plan (Now Scrollable) */}
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(ProfileScreens.EarningMode);
+          }}
+          style={styles.subscriptionPlan}>
+          <Text style={styles.subscriptionText}>Weekly subscription plan</Text>
+          <View style={styles.subscriptionBadge}>
+            <Text style={styles.subscriptionBadgeText}>ACTIVE</Text>
+          </View>
+        </TouchableOpacity>
 
-  
+        {/* Scrollable Menu List */}
+        <FlatList
+          data={profileData}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContainer}
+          scrollEnabled={false} // FlatList should not have its own scrolling
+        />
+      </ScrollView>
+    </SafeAreaView>
+
+
   );
 };
 
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.lightButtonBackground,
-    paddingBottom:30
+    paddingBottom: 30
   },
   header: {
     flexDirection: 'row',
@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     borderRadius: 12,
     marginTop: 10,
-    borderWidth:1,
-    borderColor:colors.border.lightGray
+    borderWidth: 1,
+    borderColor: colors.border.lightGray
   },
   subscriptionText: {
     fontSize: typography.fontSize.medium,

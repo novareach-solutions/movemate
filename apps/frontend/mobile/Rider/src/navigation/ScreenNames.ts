@@ -96,4 +96,7 @@ export const ProfileScreens = {
   AppSettings: 'AppSettingsScreen',
   SubscriptionPlans: 'SubscriptionPlansScreen',
   ReplaceVehicle: 'ReplaceVehicleScreen',
+  Ratings: 'RatingsScreen',
+  OrderDetails: 'OrderDetailsScreen',
+  HelpAndSupport: 'HelpAndSupportScreen',
 } as const;

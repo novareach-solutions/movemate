@@ -54,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScree
       {/* Home/Profile Button */}
       {home && (
         <TouchableOpacity style={styles.homeButton} onPress={handleHomePress}>
-          <Image source={images.profileAccount} style={styles.profileIcon} />
+      <Image source={images.profileAccount} style={styles.profileIcon} /> 
         </TouchableOpacity>
       )}
 
