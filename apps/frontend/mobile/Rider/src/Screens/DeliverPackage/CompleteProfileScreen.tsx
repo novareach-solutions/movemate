@@ -46,7 +46,7 @@ const DAPCompleteProfileScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+    <SafeAreaView style={{flex: 1}}>
       <Header logo />
       <View style={styles.container}>
         <StepIndicator current={1} total={5} />

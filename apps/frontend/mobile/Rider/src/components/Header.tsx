@@ -7,6 +7,7 @@ import { colors } from '../theme/colors';
 import { images } from '../assets/images/images';
 import { AppScreens, AuthScreensParamList } from '../navigation/ScreenNames';
 import { typography } from '../theme/typography';
+import HelpButton from './HelpButton';
 
 interface HeaderProps {
   isBack?: boolean;
@@ -14,9 +15,10 @@ interface HeaderProps {
   home?: boolean;
   title?: string;
   earningScreen?: boolean;
+  help?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScreen }) => {
+const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScreen, help }) => {
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
 
   const handleHomePress = () => {
@@ -56,8 +58,22 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScree
         </TouchableOpacity>
       )}
 
+      {/* Title */}
       {title && (
         <Text style={styles.title}>{title}</Text>
+      )}
+
+
+      {/* Help/FAQ */}
+      {help && (
+        <View style={styles.helpBtnContainer}>
+          <HelpButton
+            onPress={() => {
+              navigation.navigate(AppScreens.FAQScreen);
+            }}
+          />
+        </View>
+
       )}
     </View>
   );
@@ -109,6 +125,10 @@ const styles = StyleSheet.create({
     marginLeft: 30,
     fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     color: colors.black
+  },
+  helpBtnContainer: {
+    position: "absolute",
+    right: 10
   }
 });
 

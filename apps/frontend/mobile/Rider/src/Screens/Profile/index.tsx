@@ -7,6 +7,7 @@ import {
   FlatList,
   Image,
   SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {colors} from '../../theme/colors';
@@ -22,55 +23,63 @@ import Header from '../../components/Header';
 const profileData = [
   {
     id: '1',
-    title: 'Notifications',
-    icon: images.profileInbox,
-    screen: ProfileScreens.Inbox,
-    notificationCount: 3,
+    title: 'Earnings',
+    icon: images.profileEarnings,
+    screen: ProfileScreens.Earnings,
   },
   {
     id: '2',
-    title: 'Earnings',
-    icon: images.profileEarnings,
-    screen: AppScreens.ComingSoon,
-  },
-  {
-    id: '3',
     title: 'Wallet',
     icon: images.profileWallet,
     screen: ProfileScreens.Wallet,
   },
   {
-    id: '4',
+    id: '3',
     title: 'Earning Mode',
     icon: images.profileEarningMode,
     screen: ProfileScreens.EarningMode,
   },
   {
-    id: '5',
-    title: 'Refer Friends',
+    id: '4',
+    title: 'Refer & Earn',
     icon: images.profileReferFriend,
     screen: ProfileScreens.ReferFriends,
   },
   {
+    id: '5',
+    title: 'Notifications',
+    icon: images.profileInbox,
+    screen: ProfileScreens.Inbox,
+  },
+  {
     id: '6',
-    title: 'Rewards',
-    icon: images.profileRewards,
-    screen: AppScreens.ComingSoon,
+    title: 'Ratings',
+    icon: images.profileInbox, 
+    screen: ProfileScreens.Ratings, 
+    notificationCount: 3, 
   },
   {
     id: '7',
+    title: 'Help & Support',
+    icon: images.profileInbox,
+    screen: ProfileScreens.HelpSupport,
+    notificationCount: 2,
+  },
+  {
+    id: '8',
     title: 'Account',
     icon: images.profileAccount,
     screen: ProfileScreens.Account,
   },
   {
-    id: '8',
+    id: '9',
     title: 'Log Out',
     icon: images.profileLogout,
     screen: AuthScreens.Onboarding,
     isLogout: true,
   },
 ];
+
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -93,44 +102,50 @@ const ProfileScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Header logo isBack />
+<SafeAreaView style={styles.container}>
+  <Header logo isBack />
 
-      {/* Profile Header */}
-      <View style={styles.header}>
-        <Image
-          source={{uri: 'https://i.pravatar.cc/100'}}
-          style={styles.profileImage}
-        />
-        <View>
-          <Text style={styles.profileName}>John Doe</Text>
-          <Text style={styles.profileDetails}>+61 6783940545</Text>
-          <Text style={styles.membership}>
-            Membership valid till 23rd February
-          </Text>
-        </View>
+  {/* Fixed Profile Header */}
+  <View style={styles.header}>
+    <Image
+      source={{ uri: 'https://i.pravatar.cc/100' }}
+      style={styles.profileImage}
+    />
+    <View>
+      <Text style={styles.profileName}>John Doe</Text>
+      <Text style={styles.profileDetails}>+61 6783940545</Text>
+      <Text style={styles.membership}>
+        Membership valid till 23rd February
+      </Text>
+    </View>
+  </View>
+
+  {/* Scrollable Area */}
+  <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+    {/* Weekly Subscription Plan (Now Scrollable) */}
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate(ProfileScreens.EarningMode);
+      }}
+      style={styles.subscriptionPlan}>
+      <Text style={styles.subscriptionText}>Weekly subscription plan</Text>
+      <View style={styles.subscriptionBadge}>
+        <Text style={styles.subscriptionBadgeText}>ACTIVE</Text>
       </View>
+    </TouchableOpacity>
 
-      {/* Subscription Plan */}
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate(ProfileScreens.EarningMode);
-        }}
-        style={styles.subscriptionPlan}>
-        <Text style={styles.subscriptionText}>Weekly subscription plan</Text>
-        <View style={styles.subscriptionBadge}>
-          <Text style={styles.subscriptionBadgeText}>ACTIVE</Text>
-        </View>
-      </TouchableOpacity>
+    {/* Scrollable Menu List */}
+    <FlatList
+      data={profileData}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.listContainer}
+      scrollEnabled={false} // FlatList should not have its own scrolling
+    />
+  </ScrollView>
+</SafeAreaView>
 
-      {/* Menu List */}
-      <FlatList
-        data={profileData}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContainer}
-      />
-    </SafeAreaView>
+  
   );
 };
 

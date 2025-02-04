@@ -77,7 +77,7 @@ const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Header logo home />
+      <Header logo home help />
 
       {/* Map Image */}
       <View style={styles.mapContainer}>
@@ -118,14 +118,7 @@ const HomeScreen: React.FC = () => {
         </View>
       </Animated.View>
 
-      <View style={styles.helpButtonContainer}>
-        <HelpButton
-          onPress={() => {
-            navigation.navigate(AppScreens.FAQScreen);
-          }}
-        />
-      </View>
-
+ 
       {/* Order Modal */}
       <OrderModal
         isVisible={isOrderModalVisible}

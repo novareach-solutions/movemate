@@ -45,7 +45,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         </Text>
       </TouchableOpacity>
 
-      {/* Expandable Dropdown Options (No Modal) */}
+      {/* Overlapping Dropdown Options */}
       {isOpen && (
         <View style={styles.dropdown}>
           <FlatList
@@ -68,6 +68,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 const styles = StyleSheet.create({
   wrapper: {
     marginBottom: 15,
+    position: 'relative',
   },
   label: {
     fontSize: typography.fontSize.medium,
@@ -84,12 +85,18 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   dropdown: {
+    position: 'absolute',
+    top: '100%', 
+    left: 0,
+    right: 0,
     borderWidth: 1,
     borderColor: colors.border.primary,
     borderRadius: 8,
     marginTop: 5,
     backgroundColor: colors.white,
-    maxHeight: 150, // Keeps dropdown from overflowing too much
+    maxHeight: 250, 
+    zIndex: 999,
+    elevation: 5, 
   },
   option: {
     padding: 12,

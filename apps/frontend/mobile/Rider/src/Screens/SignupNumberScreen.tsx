@@ -34,7 +34,7 @@ const SignupNumberScreen: React.FC = () => {
   const handlePhoneNumberChange = (number: string) => {
     setIsFocused(true);
     setPhoneNumber(number);
-    setIsFilled(number.length > 0);
+    setIsFilled(number.length === 13);
   };
 
   const handleSendCode = async () => {

@@ -54,8 +54,6 @@ const InboxScreen: React.FC = () => {
     },
   ];
 
-  const filteredNotifications = notifications.filter(item => !item.resolved);
-  const resolvedNotifications = notifications.filter(item => item.resolved);
 
   const renderNotification = ({ item }: { item: (typeof notifications)[0] }) => (
     <View style={styles.notificationItem}>
@@ -63,7 +61,7 @@ const InboxScreen: React.FC = () => {
         <Text style={styles.notificationMessage}>{item.message}</Text>
         <Text style={styles.notificationDate}>{item.date}</Text>
       </View>
-      <View style={styles.notificationDot} />
+      {!item.resolved && <View style={styles.notificationDot} />}
     </View>
   );
 
@@ -77,18 +75,12 @@ const InboxScreen: React.FC = () => {
    
           <View>
             <FlatList
-              data={filteredNotifications}
+              data={notifications}
               renderItem={renderNotification}
               keyExtractor={item => item.id}
               contentContainerStyle={styles.notificationList}
             />
-            <Text style={styles.resolvedText}>Resolved</Text>
-            <FlatList
-              data={resolvedNotifications}
-              renderItem={renderNotification}
-              keyExtractor={item => item.id}
-              contentContainerStyle={styles.notificationList}
-            />
+           
        
       </View>
 

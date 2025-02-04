@@ -1,5 +1,5 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   AppScreens,
@@ -38,12 +38,21 @@ import ReplaceVehicleScreen from '../Screens/Profile/AccountScreen/ReplaceVehicl
 import SignupNumberScreen from '../Screens/SignupNumberScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import ChatScreen from '../Screens/ChatScreen';
+import EarningsScreen from '../Screens/Profile/EarningsScreen';
 
 const Stack = createNativeStackNavigator();
 
+const RiderTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#2a1d3d', 
+  },
+};
+
 const App = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={RiderTheme}>
       <Stack.Navigator initialRouteName={AuthScreens.Onboarding}>
         <Stack.Screen
           name={AuthScreens.Onboarding}
@@ -164,6 +173,11 @@ const App = () => {
         <Stack.Screen
           name={ProfileScreens.ReplaceVehicle}
           component={ReplaceVehicleScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={ProfileScreens.Earnings}
+          component={EarningsScreen}
           options={{headerShown: false}}
         />
 

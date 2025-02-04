@@ -57,12 +57,12 @@ export const formStyles = StyleSheet.create({
     color: colors.white,
   },
   buttonTextDisabled: {
-    color: colors.purple, 
+    color: colors.purple,
   },
   buttonDisabled: {
-    backgroundColor: 'transparent', 
+    backgroundColor: 'transparent',
     borderColor: colors.purple,
-    borderWidth:1
+    borderWidth: 1
   },
   footer: {
     marginTop: 20,
@@ -80,5 +80,31 @@ export const formStyles = StyleSheet.create({
   link: {
     color: colors.purple,
     textDecorationLine: 'underline',
+  },
+  suggestionBox: {
+    position: "absolute",
+    top: 50,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    maxHeight: 200,
+    zIndex: 1000,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  suggestionItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  suggestionText: {
+    fontSize: 16,
+    color: "#333",
   },
 });

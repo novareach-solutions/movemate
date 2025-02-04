@@ -54,4 +54,5 @@ export const images = {
   car: require('../images/Car.png'),
   earningSuccess: require('../images/EarningSuccess.png'),
   subscriptionBanner: require('../images/SubscriptionBanner.png'),
+  hamburger: require('../images/Hamburger.svg'),
 };
