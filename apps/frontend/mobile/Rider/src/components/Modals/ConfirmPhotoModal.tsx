@@ -11,7 +11,7 @@ import {
 import {colors} from '../../theme/colors';
 import {typography} from '../../theme/typography';
 import {formStyles} from '../../theme/form';
-import {images} from '../../assets/images/images';
+import PlaceHolderProfile from "../../assets/icons/placeHolderProfile.svg"
 
 interface ConfirmPhotoModalProps {
   isVisible: boolean;
@@ -37,7 +37,7 @@ const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
 
         {/* Placeholder Image */}
         <View style={styles.imageContainer}>
-          <Image source={images.introImage1} style={styles.image} />
+          <PlaceHolderProfile style={styles.image} />
         </View>
 
         {/* Buttons */}

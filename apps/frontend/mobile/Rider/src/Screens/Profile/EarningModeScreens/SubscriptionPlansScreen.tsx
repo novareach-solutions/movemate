@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
-import { images } from '../../../assets/images/images';
+import PurpleCheck from "../../../assets/icons/purpleCheck.svg"
 import Header from '../../../components/Header';
 
 export const BenefitItem = ({ title, description }) => {
   return (
     <View style={styles.benifitContainer}>
-      <Image source={images.benefitCheck} />
+      <PurpleCheck />
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>

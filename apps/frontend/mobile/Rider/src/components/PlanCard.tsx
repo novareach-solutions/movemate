@@ -2,7 +2,6 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
 
 const PlanCard = ({
   planTitle,
@@ -33,10 +32,6 @@ const PlanCard = ({
       <View style={styles.benefitsContainer}>
         {benefits.map((benefit, index) => (
           <View key={index} style={styles.benefitItem}>
-            <Image
-              source={images.checkIcon} // Replace with your check icon
-              style={styles.benefitIcon}
-            />
             <Text style={styles.benefitText}>
               <Text style={styles.benefitTitle}>{benefit.title}: </Text>
               {benefit.description}

@@ -8,6 +8,7 @@ import HelpButton from './HelpButton';
 import BlackArrow from "../assets/icons/blackArrow.svg"
 import Logo from "../assets/icons/logo.svg"
 import Hamburger from "../assets/icons/hamburger.svg"
+import WhiteArrow from "../assets/icons/whiteArrow.svg"
 
 interface HeaderProps {
   isBack?: boolean;
@@ -40,14 +41,16 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScree
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}>
-            <BlackArrow />
+          {earningScreen ? <WhiteArrow style={{
+            transform: [{ rotate: '180deg' }]
+          }} /> : <BlackArrow />}
         </TouchableOpacity>
       )}
 
       {/* Logo */}
       {logo && (
         <View style={styles.logoContainer}>
-          <Logo style={styles.logo}/>
+          <Logo style={styles.logo} />
         </View>
       )}
 

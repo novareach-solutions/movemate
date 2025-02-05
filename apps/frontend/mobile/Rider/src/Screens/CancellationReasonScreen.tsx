@@ -12,8 +12,8 @@ import {
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {formStyles} from '../theme/form';
-import {images} from '../assets/images/images';
 import Header from '../components/Header';
+import Camera from "../assets/icons/camera.svg"
 
 const CancellationReasonScreen: React.FC = () => {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
@@ -60,7 +60,7 @@ const CancellationReasonScreen: React.FC = () => {
                     Upload photo for proof
                   </Text>
                   <TouchableOpacity style={styles.photoUploadButton}>
-                    <Image source={images.camera} style={styles.cameraIcon} />
+                    <Camera style={styles.cameraIcon} />
                     <Text style={styles.photoUploadButtonText}>Take Photo</Text>
                   </TouchableOpacity>
                 </View>

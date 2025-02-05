@@ -10,8 +10,9 @@ import {
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
-import { images } from '../../assets/images/images';
 import Header from '../../components/Header';
+import ReferalBG from "../../assets/images/referalBG.svg"
+import GoldCoin from "../../assets/icons/goldCoin.svg"
 
 const ReferFriendsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Invite Friend' | 'Status'>(
@@ -57,8 +58,7 @@ const ReferFriendsScreen: React.FC = () => {
           <View style={styles.content}>
             {/* Friends Circle */}
             <View style={styles.circleImageContainer}>
-              <Image
-                source={images.referPlaceholder}
+              <ReferalBG
                 style={styles.circleImage}
               />
             </View>
@@ -69,7 +69,7 @@ const ReferFriendsScreen: React.FC = () => {
               }}>
               {/* Referral Card */}
               <View style={styles.referralCard}>
-                <Image source={images.currencyCoin} style={styles.icon} />
+                <GoldCoin style={styles.icon} />
                 <Text style={styles.referralText}>
                   Refer your friends and earn $30 for every successful referral!
                 </Text>
@@ -89,7 +89,7 @@ const ReferFriendsScreen: React.FC = () => {
           <View style={{ flex: 1, paddingHorizontal: 20 }}>
             {/* Summary Card */}
             <View style={styles.summaryCard}>
-              <Image source={images.rewardCoin} style={styles.icon} />
+              <GoldCoin style={styles.icon} />
               <View>
                 <Text style={styles.summaryText}>
                   ₹2,000 earned from 4 referrals

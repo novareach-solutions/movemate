@@ -10,14 +10,14 @@ import {
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import Header from '../../components/Header';
-import Svg, { Circle } from 'react-native-svg';
 import { ProfileScreens } from '../../navigation/ScreenNames';
 import { useNavigation } from '@react-navigation/native';
+import PieChart from "../../assets/icons/piechart.svg"
 
 // Sample ratings data
 const ratingsData = {
-    score: 3.6, // Rating out of 5
-    total: 5, // Total rating scale
+    score: 3.6, 
+    total: 5, 
     history: [
         { id: '#135432', rating: 5, date: 'Dec 20, 2024, 2:15 PM' },
         { id: '#135433', rating: 5, date: 'Dec 20, 2024, 2:15 PM' },
@@ -34,7 +34,7 @@ const filterOptions = [
 
 const RatingsScreen = () => {
     const [selectedFilter, setSelectedFilter] = useState('5');
-    const navigation=useNavigation()
+    const navigation = useNavigation()
 
     return (
         <SafeAreaView style={{
@@ -46,26 +46,7 @@ const RatingsScreen = () => {
 
                     {/* Ratings Graph */}
                     <View style={styles.graphContainer}>
-                        <Svg width={180} height={90} viewBox="0 0 180 90">
-                            <Circle
-                                cx="90"
-                                cy="90"
-                                r="70"
-                                stroke={colors.border.lightGray}
-                                strokeWidth="20"
-                                fill="none"
-                            />
-                            <Circle
-                                cx="90"
-                                cy="90"
-                                r="70"
-                                stroke={colors.purple}
-                                strokeWidth="20"
-                                fill="none"
-                                strokeDasharray={`${(ratingsData.score / ratingsData.total) * 440} 440`}
-                                strokeLinecap="round"
-                            />
-                        </Svg>
+                        <PieChart />
                         <Text style={styles.ratingText}>{ratingsData.score.toFixed(1)}</Text>
                     </View>
                     <Text>History</Text>
@@ -108,7 +89,7 @@ const RatingsScreen = () => {
                                 </View>
                                 <View style={styles.orderRight}>
                                     <Text style={styles.rating}>⭐ {item.rating}</Text>
-                                    <TouchableOpacity onPress={()=>{
+                                    <TouchableOpacity onPress={() => {
                                         navigation.navigate(ProfileScreens.OrderDetails)
                                     }}>
                                         <Text style={styles.viewDetails}>View details &gt;</Text>
@@ -133,19 +114,21 @@ const styles = StyleSheet.create({
         backgroundColor: colors.white,
         padding: 20,
         borderRadius: 12,
+        borderWidth: 1,
+        borderColor: colors.border.lightGray
     },
     ratingText: {
         position: 'absolute',
         top: 30,
-        fontSize: 32,
+        fontSize: 40,
         fontWeight: 'bold',
         color: colors.purple,
-        marginTop: 40,
+        marginTop: 70,
     },
     filterScrollContainer: {
         flexDirection: 'row',
         paddingVertical: 4,
-        gap:5
+        gap: 5
     },
     filterTab: {
         paddingVertical: 6,

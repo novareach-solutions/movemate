@@ -2,10 +2,15 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
-import { images } from '../../../assets/images/images';
 import { useNavigation } from '@react-navigation/native';
 import { AppScreens, ProfileScreens } from '../../../navigation/ScreenNames';
 import Header from '../../../components/Header';
+import Vehicle from "../../../assets/icons/vehicle.svg"
+import Documents from "../../../assets/icons/documents.svg"
+import Bank from "../../../assets/icons/bank.svg"
+import AccountAndProfile from "../../../assets/icons/accountAndProfile.svg"
+import Settings from "../../../assets/icons/settings.svg"
+import BlackArrow from "../../../assets/icons/blackArrow.svg"
 
 const AccountScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -14,31 +19,31 @@ const AccountScreen: React.FC = () => {
     {
       id: 1,
       title: 'Vehicles',
-      icon: images.vehicleIcon,
+      icon: Vehicle,
       screen: ProfileScreens.ReplaceVehicle,
     },
     {
       id: 2,
       title: 'Documents',
-      icon: images.documentIcon,
+      icon: Documents,
       screen: ProfileScreens.Documents,
     },
     {
       id: 3,
       title: 'Bank Details',
-      icon: images.bankIcon,
+      icon: Bank,
       screen: AppScreens.ComingSoon,
     },
     {
       id: 4,
       title: 'Manage Account',
-      icon: images.profileAccount,
+      icon: AccountAndProfile,
       screen: ProfileScreens.ManageAccount,
     },
     {
       id: 5,
       title: 'App Settings',
-      icon: images.settingsIcon,
+      icon: Settings,
       screen: AppScreens.ComingSoon,
     },
   ];
@@ -49,10 +54,12 @@ const AccountScreen: React.FC = () => {
       style={styles.menuItem}
       onPress={() => navigation.navigate(item.screen)}>
       <View style={styles.iconContainer}>
-        <Image source={item.icon} style={styles.icon} />
+        <item.icon />
       </View>
       <Text style={styles.menuTitle}>{item.title}</Text>
-      <Image source={images.blackArrow} style={styles.arrowIcon} />
+      <BlackArrow style={{
+        transform: [{ rotate: '180deg' }]
+      }} />
     </TouchableOpacity>
   );
 

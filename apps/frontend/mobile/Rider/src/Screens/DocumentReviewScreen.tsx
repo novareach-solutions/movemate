@@ -15,7 +15,6 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { useNavigation } from '@react-navigation/native';
 import { DeliverAPackage } from '../navigation/ScreenNames';
 import Header from '../components/Header';
-import { images } from '../assets/images/images';
 
 interface DocumentReviewProps {
   route: {
@@ -87,7 +86,7 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({ route }) => {
         />
         <View style={styles.imageContainer}>
           <Image
-            source={image ? { uri: image } : images.placeholderprofile}
+            source={image ? { uri: image } : require("../assets/icons/placeHolderProfile.svg")}
             style={styles.image}
           />
         </View>

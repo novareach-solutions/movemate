@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { formStyles } from '../../../theme/form';
 import { colors } from '../../../theme/colors';
-import { images } from '../../../assets/images/images';
 import Header from '../../../components/Header';
+import FilledCar from "../../../assets/icons/filledCar.svg"
 
 const ReplaceVehicleScreen: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -34,11 +34,10 @@ const ReplaceVehicleScreen: React.FC = () => {
       <View style={styles.container}>
         <View style={styles.card}>
           <View>
-            <Image
+            <FilledCar
               style={{
                 marginTop: 10,
               }}
-              source={images.car}
             />
           </View>
           <View>

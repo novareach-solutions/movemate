@@ -13,11 +13,11 @@ import {
 import PhoneInput from 'react-native-phone-number-input';
 import {colors} from '../../theme/colors';
 import {typography} from '../../theme/typography';
-import {images} from '../../assets/images/images';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, AuthScreensParamList} from '../../navigation/ScreenNames';
 import {useAppDispatch} from '../../redux/hook';
 import {requestOtp} from '../../redux/slices/authSlice';
+import Logo from "../../assets/icons/logo.svg"
 
 const {width} = Dimensions.get('window');
 
@@ -53,7 +53,7 @@ const Register: React.FC = () => {
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <View style={styles.container}>
-        <Image source={images.logo} style={styles.logo} />
+        <Logo style={styles.logo} />
         <Text style={styles.heading}>Create an Account</Text>
         <Text style={styles.subheading}>
           Enter phone number and we’ll send you a verification code
