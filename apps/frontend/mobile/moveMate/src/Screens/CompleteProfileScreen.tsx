@@ -13,7 +13,8 @@ import {
   TextStyle,
   ActivityIndicator,Alert,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  FlatList
 } from 'react-native';
 import Header from '../components/Header';
 import {colors} from '../theme/colors';
@@ -22,69 +23,89 @@ import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch } from '../redux/hook';
 import { userSignup } from '../redux/slices/authSlice';
 import { CustomerScreens } from '../navigation/ScreenNames';
-type FormFields = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  address: string;
-  suburb: string;
-  state: string;
-  postalCode: string;
-};
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { formSchema } from '../utils/zod/signupValidation';
+// import { fetchPlaceSuggestions } from '../api/mapboxAPI';
+import { formStyles } from '../theme/form';
+import { fetchPlaceSuggestions } from '../utils/fetchPlaceSuggestions';
 
-type Errors = Partial<Record<keyof FormFields, string>>;
+
+type FormFields = z.infer<typeof formSchema>;
 
 const CompleteProfileScreen = () => {
   const navigation = useNavigation();
-const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 const [loading, setLoading] = useState(false); 
-  const [form, setForm] = useState<FormFields>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    address: '',
-    suburb: '',
-    state: '',
-    postalCode: '',
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<FormFields>({
+    resolver: zodResolver(formSchema),
+    mode: "onChange",
   });
 
-  const [errors, setErrors] = useState<Errors>({});
-  const [focusedField, setFocusedField] = useState<keyof FormFields | null>(
-    null,
-  );
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // const validateForm = () => {
-  //   const newErrors: Errors = {};
-  //   if (!form.firstName) newErrors.firstName = 'First Name is required';
-  //   if (!form.lastName) newErrors.lastName = 'Last Name is required';
-  //   if (!form.email) newErrors.email = 'Email is required';
-  //   if (!form.address) newErrors.address = 'Street Address is required';
-  //   if (!form.suburb) newErrors.suburb = 'Suburb is required';
-  //   if (!form.state) newErrors.state = 'State is required';
-  //   if (!form.postalCode) {
-  //     newErrors.postalCode = 'Postal Code is required';
-  //   } else if (!/^\d+$/.test(form.postalCode)) {
-  //     newErrors.postalCode = 'Postal Code must be numeric';
-  //   }
-  //   setErrors(newErrors);
-  //   return Object.keys(newErrors).length === 0;
-  // };
+  const address = watch("address");
+  const suburb = watch("suburb");
+  const state = watch("state");
+  const postalCode = watch("postalCode");
 
-  const handleSubmit = async() => {
+  const handleAddressChange = async (text: string) => {
+    setValue("address", text, { shouldValidate: true });
+
+    if (text.length > 0) {
+      const places = await fetchPlaceSuggestions(text);
+      setSuggestions(places);
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSelectAddress = (place: any) => {
+    setValue("address", place.address, { shouldValidate: true });
+    setValue("suburb", place.suburb, { shouldValidate: true });
+    setValue("state", place.state, { shouldValidate: true });
+    setValue("postalCode", place.postalCode, { shouldValidate: true });
+
+    setShowSuggestions(false);
+  };
+
+  const onSubmit = async() => {
 
     const payload = {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      email: form.email,
-      street: form.address,
-      suburb: form.suburb,
-      state: form.state,
-      postalCode: Number(form.postalCode)
-    }
+      firstName: watch("firstName"),
+      lastName: watch("lastName"),
+      email: watch("email"),
+      street: watch("address"),
+      suburb: watch("suburb"),
+      state: watch("state"),
+      postalCode: Number(watch("postalCode")),
+    };
+
+    console.log('payload', payload)
+
      setLoading(true); 
         try {
           // await dispatch(userSignup(payload)).unwrap();
-          navigation.navigate(CustomerScreens.CustomerHomeScreen);
+          // navigation.navigate(CustomerScreens.CustomerHomeScreen);
+            // navigation.reset(({
+            //         index: 0,
+            //         routes: [{ name: CustomerScreens.CustomerHomeScreen }],
+            //       }));
+                  Alert.alert("Success", "Your account has been created!", [
+                    { text: "OK", onPress: () =>  navigation.reset(({
+                      index: 0,
+                      routes: [{ name: CustomerScreens.CustomerHomeScreen }],
+                    }))}
+                  ]);
+                  
           // Alert.alert('Session Expired', 'Please log in again.');
         } catch {
           console.log('Request OTP failed');
@@ -93,105 +114,142 @@ const [loading, setLoading] = useState(false);
         }
   };
 
-  const handleInputChange = (field: keyof FormFields, value: string) => {
-    setForm(prev => ({...prev, [field]: value}));
-    setErrors(prev => ({...prev, [field]: ''})); // Clear error for this field
-  };
-
-  const inputFields: {
-    label: string;
-    field: keyof FormFields;
-    keyboardType?: KeyboardTypeOptions;
-  }[] = [
-    {label: 'First Name', field: 'firstName'},
-    {label: 'Last Name', field: 'lastName'},
-    {label: 'Email Address', field: 'email', keyboardType: 'email-address'},
-    {label: 'Street Address', field: 'address'},
-    {label: 'Suburb', field: 'suburb'},
-    {label: 'State', field: 'state'},
-    {label: 'Postal Code', field: 'postalCode', keyboardType: 'numeric'},
-  ];
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
-      <KeyboardAvoidingView 
-                  behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-                  style={styles.keyboardAvoid}
-                >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <Header logo />
-          
-          <ScrollView contentContainerStyle={styles.formContainer}>
-            <Text style={styles.title}>Complete your Profile</Text>
-            <Text style={styles.subTitle}>Add your details to get started</Text>
-
-            {inputFields.map((input, index) => (
-              <View key={index} style={styles.inputWrapper}>
-                <Text style={styles.inputLabel}>{input.label}</Text>
-                <TextInput
-                  placeholder={`Enter your ${input.label.toLowerCase()}`}
-                  style={[
-                    styles.input,
-                    focusedField === input.field && {
-                      borderColor: colors.purple,
-                    },
-                    errors[input.field] && {borderColor: colors.error},
-                  ]}
-                  placeholderTextColor={colors.grey}
-                  onFocus={() => setFocusedField(input.field)}
-                  onBlur={() => setFocusedField(null)}
-                  keyboardType={input.keyboardType || 'default'}
-                  value={form[input.field]}
-                  onChangeText={text => handleInputChange(input.field, text)}
-                />
-                {errors[input.field] && (
-                  <Text style={styles.errorText}>{errors[input.field]}</Text>
-                )}
-              </View>
-            ))}
-
-<TouchableOpacity
-  style={[
-    styles.button,
-    Object.values(form).every(value => value) &&
-      styles.buttonEnabled,
-  ]}
-  onPress={handleSubmit}
-  disabled={!Object.values(form).every(value => value) || loading}>
-  {loading ? (
-    <ActivityIndicator color={colors.white} /> 
-  ) : (
-    <Text
-      style={[
-        styles.buttonText,
-        Object.values(form).every(value => value) &&
-          styles.buttonTextEnabled,
-      ]}>
-      Sign Up
-    </Text>
-  )}
-</TouchableOpacity>
-
-
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>
-                By continuing you accept our{' '}
-                <Text style={styles.link}>Terms of Service</Text> and{' '}
-                <Text
-                  style={styles.link}
-                  onPress={() =>
-                    navigation.navigate(AuthScreens.PrivacyPolicyScreen)
-                  }
-                >
-                  Privacy Policy
-                </Text>
-              </Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={{ flex: 1, padding: 16 }}>
+            <Header logo/>
+            <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+              <Text style={styles.title}>Complete your Profile</Text>
+              <Text style={styles.subTitle}>Add your details to get started</Text>
+              <View style={formStyles.inputWrapper}>
+              <Text style={formStyles.inputLabel}>First Name</Text>
+              <TextInput
+                placeholder="Enter your first name"
+                placeholderTextColor={colors.text.subText}
+                style={[formStyles.input, errors.firstName && formStyles.errorInput]}
+                onChangeText={(text) => setValue("firstName", text, { shouldValidate: true })}
+              />
+              {errors.firstName && <Text style={formStyles.errorText}>{errors.firstName.message}</Text>}
             </View>
-          </ScrollView>
-     
-        </View>
-      </TouchableWithoutFeedback></KeyboardAvoidingView>
+
+            {/* Last Name */}
+            <View style={formStyles.inputWrapper}>
+              <Text style={formStyles.inputLabel}>Last Name</Text>
+              <TextInput
+                placeholder="Enter your last name"
+                placeholderTextColor={colors.text.subText}
+                style={[formStyles.input, errors.lastName && formStyles.errorInput]}
+                onChangeText={(text) => setValue("lastName", text, { shouldValidate: true })}
+              />
+              {errors.lastName && <Text style={formStyles.errorText}>{errors.lastName.message}</Text>}
+            </View>
+
+            {/* Email Address */}
+            <View style={formStyles.inputWrapper}>
+              <Text style={formStyles.inputLabel}>Email Address</Text>
+              <TextInput
+                placeholder="Enter your email"
+                placeholderTextColor={colors.text.subText}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                style={[formStyles.input, errors.email && formStyles.errorInput]}
+                onChangeText={(text) => {
+                  setValue("email", text, { shouldValidate: true })}}
+              />
+              {errors.email && <Text style={formStyles.errorText}>{errors.email.message}</Text>}
+            </View>
+
+            {/* Address Input */}
+            <View style={formStyles.inputWrapper}>
+              <Text style={formStyles.inputLabel}>Street Address</Text>
+              <TextInput
+                placeholder="Enter your address"
+                placeholderTextColor={colors.text.subText}
+                style={[formStyles.input, errors.address && formStyles.errorInput]}
+                onChangeText={handleAddressChange}
+                value={address}
+              />
+              {errors.address && <Text style={formStyles.errorText}>{errors.address.message}</Text>}
+
+              {/* Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <View style={formStyles.suggestionBox}>
+                  <FlatList
+                    data={suggestions}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={formStyles.suggestionItem}
+                        onPress={() => handleSelectAddress(item)}
+                      >
+                        <Text style={formStyles.suggestionText}>{item.address}</Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                </View>
+              )}
+            </View>
+
+            {/* Auto-fill Inputs */}
+            <View style={formStyles.inputWrapper}>
+              <Text style={formStyles.inputLabel}>Suburb</Text>
+              <TextInput
+                placeholder="Enter your suburb"
+                placeholderTextColor={colors.text.subText}
+                style={[formStyles.input, errors.suburb && formStyles.errorInput]}
+                value={suburb}
+                onChangeText={(text) => setValue("suburb", text, { shouldValidate: true })}
+              />
+            </View>
+
+            <View style={formStyles.inputWrapper}>
+              <Text style={formStyles.inputLabel}>State</Text>
+              <TextInput
+                placeholder="Enter your state"
+                placeholderTextColor={colors.text.subText}
+                style={[formStyles.input, errors.state && formStyles.errorInput]}
+                value={state}
+                onChangeText={(text) => setValue("state", text, { shouldValidate: true })}
+              />
+            </View>
+
+            <View style={formStyles.inputWrapper}>
+              <Text style={formStyles.inputLabel}>Postal Code</Text>
+              <TextInput
+                placeholder="Enter your postal code"
+                placeholderTextColor={colors.text.subText}
+                keyboardType="numeric"
+                style={[formStyles.input, errors.postalCode && formStyles.errorInput]}
+                value={postalCode}
+                onChangeText={(text) => setValue("postalCode", text, { shouldValidate: true })}
+              />
+            </View>
+          {/* </ScrollView> */}
+
+          {/* Fixed Footer & Button */}
+          <View style={formStyles.footerContainer}>
+            <TouchableOpacity
+              style={[formStyles.button, isValid ? formStyles.buttonEnabled : formStyles.buttonDisabled]}
+              onPress={handleSubmit(onSubmit)}
+              disabled={!isValid}
+            >
+              <Text style={[formStyles.buttonText, isValid ? formStyles.buttonTextEnabled : formStyles.buttonTextDisabled]}>
+                Continue
+              </Text>
+            </TouchableOpacity>
+
+            <Text style={formStyles.footerText}>
+              By continuing, you accept our <Text style={formStyles.link}>Terms of Service</Text> and <Text style={formStyles.link}>Privacy Policy</Text>
+            </Text>
+          </View>
+       
+            </ScrollView>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

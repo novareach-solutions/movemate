@@ -19,15 +19,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../../assets/images/images";
 import Header from "../Header";
 import { colors } from "../../theme/colors";
-import { fetchPlaceSuggestions } from "../../api/mapboxAPI";
+// import { fetchPlaceSuggestions } from "../../api/mapboxAPI";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from "react-native-svg";
 import Mapbox from '@rnmapbox/maps';
 import { getCurrentLocation, requestLocation } from "../../utils/helpers";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { updateDropLoaction, updatePickupLoaction } from "../../redux/slices/deliverAPackageSlice";
+import { fetchPlaceSuggestions } from "../../utils/fetchPlaceSuggestions";
+import { MAPBOX_ACCESS_TOKEN } from "../../constants";
 
-Mapbox.setAccessToken('pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw');
+Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 export type ILocation = {
   addressLine1: string;
@@ -282,7 +284,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
               />
               <View style={styles.mapContainer}>
                 <View>
-                  <Mapbox.MapView style={styles.mapImage}>
+                  <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
                     <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [0, 0]} />
 
                     {coordinates && (
@@ -349,7 +351,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
 
                 <ScrollView contentContainerStyle={styles.addressForm}>
                   <View style={styles.addMapContainer}>
-                    <Mapbox.MapView style={styles.detailAddressMapImage}>
+                    <Mapbox.MapView style={styles.detailAddressMapImage} styleURL="mapbox://styles/mapbox/light-v11">
                       <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [0, 0]} />
 
                       {coordinates && (

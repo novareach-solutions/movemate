@@ -45,7 +45,7 @@ navigation.navigate(CustomerScreens.CancelSuccessScreen)
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
         style={styles.keyboardAvoid}
       >
-        <Header isBack/>
+        <Header isBack bgColor={colors.lightGrey}/>
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
           <Text style={styles.header}>Cancellation Reason</Text>
           <Text style={styles.subHeader}>Why are you canceling this service?</Text>
@@ -73,6 +73,7 @@ navigation.navigate(CustomerScreens.CancelSuccessScreen)
               textAlignVertical="top"
             />
           )}
+          <View style={styles.footer}>
           <Button 
           mode="contained" 
           style={[styles.cancelButton, !selectedReason && styles.disabledButton]}
@@ -83,6 +84,8 @@ navigation.navigate(CustomerScreens.CancelSuccessScreen)
         >
           Cancel Service
         </Button>
+          </View>
+         
         </ScrollView>
 
         
@@ -94,7 +97,7 @@ navigation.navigate(CustomerScreens.CancelSuccessScreen)
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.lightGrey,
   },
   keyboardAvoid: {
     flex: 1,
@@ -153,8 +156,12 @@ const styles = StyleSheet.create({
     borderColor: '#CCC',
   },
   cancelButton: {
-    margin: 20,
     borderRadius: 10,
+  },
+  footer:{
+    flex:1,
+    justifyContent:'flex-end',
+    marginVertical: 10,
   },
   disabledButton: {
     backgroundColor: '#CCC',

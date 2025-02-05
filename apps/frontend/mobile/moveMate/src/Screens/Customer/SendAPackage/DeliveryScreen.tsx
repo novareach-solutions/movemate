@@ -15,6 +15,7 @@ import { assignOrder } from "../../../redux/slices/deliverAPackageSlice";
 import { useNavigation } from "@react-navigation/native";
 import { CustomerScreens } from "../../../navigation/ScreenNames";
 import Mapbox from '@rnmapbox/maps';
+import { MAPBOX_ACCESS_TOKEN, MAPBOX_DRIVING_URL } from "../../../constants";
 Mapbox.setAccessToken('pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw');
 
 
@@ -50,7 +51,7 @@ useEffect(() => {
   const fetchRoute = async () => {
     try {
       const response = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${pickupLocation[0]},${pickupLocation[1]};${dropLocation[0]},${dropLocation[1]}?geometries=geojson&access_token=pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw`
+        `${MAPBOX_DRIVING_URL}${pickupLocation[0]},${pickupLocation[1]};${dropLocation[0]},${dropLocation[1]}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`
       );
       const data = await response.json();
       if (data.routes.length) {
@@ -61,9 +62,12 @@ useEffect(() => {
     }
   };
   useEffect(() => {
-    if (pickupLocationData?.latitude && pickupLocationData?.longitude && dropLocationData?.latitude && dropLocationData?.longitude) {
-      fetchRoute();
-    }
+    setTimeout(() => {
+      if (pickupLocationData?.latitude && pickupLocationData?.longitude && dropLocationData?.latitude && dropLocationData?.longitude) {
+        fetchRoute();
+      }
+    }, 4000);
+    
   }, [pickupLocation,dropLocation]);
 
 
@@ -103,20 +107,20 @@ useEffect(() => {
       {/* Map Section */}
       <View style={styles.mapContainer}>
         <View>
-          <Mapbox.MapView style={styles.mapImage}>
-            <Mapbox.Camera zoomLevel={6} centerCoordinate={pickupLocation} />
+          <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+            <Mapbox.Camera zoomLevel={12} centerCoordinate={pickupLocation} />
 
             {/* Pickup Marker */}
             <Mapbox.PointAnnotation id="pickup" coordinate={pickupLocation}>
               <View style={styles.markerContainer}>
-                <View style={[styles.marker, { backgroundColor: "green" }]} />
+                <View style={[styles.marker, { borderColor: "green" }]} />
               </View>
             </Mapbox.PointAnnotation>
 
             {/* Drop Marker */}
             <Mapbox.PointAnnotation id="drop" coordinate={dropLocation}>
               <View style={styles.markerContainer}>
-                <View style={[styles.marker, { backgroundColor: "red" }]} />
+                <View style={[styles.marker, { borderColor: "red" }]} />
               </View>
             </Mapbox.PointAnnotation>
 
@@ -130,7 +134,7 @@ useEffect(() => {
                     type: "LineString",
                     coordinates: routeCoords,
                   },
-                  properties: {}, // ✅ Add this to fix the error
+                  properties: {},
                 }}
               >
                 <Mapbox.LineLayer id="routeLayer" style={routeLineStyle} />
@@ -211,14 +215,15 @@ const styles = StyleSheet.create({
   detailsContainer: {
     flex: 2,
     backgroundColor: "#ffffff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
     padding: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: -2 },
-    elevation: 5,
+    bottom:25,
+    // shadowColor: "#000",
+    // shadowOpacity: 0.1,
+    // shadowRadius: 8,
+    // shadowOffset: { width: 0, height: -2 },
+    // elevation: 5,
   },
   deliveryBox: {
     flexDirection: 'row',
@@ -228,7 +233,7 @@ const styles = StyleSheet.create({
     padding: 20,
     // paddingHorizontal:10,
     borderRadius: 10,
-    marginBottom: 10
+    marginVertical: 10
   },
   deliveryImage: {
     width: 40,
@@ -281,10 +286,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 10,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
   textContainer: {
-    flex: 1,
+    // flex: 1,
   },
   amountText: {
     fontSize: 18,
@@ -320,7 +325,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   markerContainer: { alignItems: "center", justifyContent: "center" },
-  marker: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: "white" },
+  marker: { width: 20, height: 20, borderRadius: 10, borderWidth: 5, backgroundColor: colors.white },
   // routeLine: { lineColor: "blue", lineWidth: 3 },
 });
 
