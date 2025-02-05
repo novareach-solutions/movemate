@@ -1,85 +1,91 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Image,
   SafeAreaView,
   ScrollView,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
+  Image,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
 import {
-  AppScreens,
   AuthScreens,
   ProfileScreens,
-} from '../../navigation/ScreenNames';
-import { images } from '../../assets/images/images';
-import Header from '../../components/Header';
+} from "../../navigation/ScreenNames";
+import Header from "../../components/Header";
+import Crown from "../../assets/icons/crown.svg";
+import Wallet from "../../assets/icons/wallet.svg";
+import Earnings from "../../assets/icons/earnings.svg";
+import Inbox from "../../assets/icons/inbox.svg";
+import Help from "../../assets/icons/blackHelp.svg";
+import Logout from "../../assets/icons/logout.svg";
+import Account from "../../assets/icons/account.svg";
+import Refer from "../../assets/icons/refer.svg";
+import BlackArrow from "../../assets/icons/blackArrow.svg";
 
 const profileData = [
   {
-    id: '1',
-    title: 'Earnings',
-    icon: images.profileEarnings,
+    id: "1",
+    title: "Earnings",
+    icon: Earnings,
     screen: ProfileScreens.Earnings,
   },
   {
-    id: '2',
-    title: 'Wallet',
-    icon: images.profileWallet,
+    id: "2",
+    title: "Wallet",
+    icon: Wallet,
     screen: ProfileScreens.Wallet,
   },
   {
-    id: '3',
-    title: 'Earning Mode',
-    icon: images.profileEarningMode,
+    id: "3",
+    title: "Earning Mode",
+    icon: Crown,
     screen: ProfileScreens.EarningMode,
   },
   {
-    id: '4',
-    title: 'Refer & Earn',
-    icon: images.profileReferFriend,
+    id: "4",
+    title: "Refer & Earn",
+    icon: Refer,
     screen: ProfileScreens.ReferFriends,
   },
   {
-    id: '5',
-    title: 'Notifications',
-    icon: images.profileInbox,
+    id: "5",
+    title: "Notifications",
+    icon: Inbox,
     screen: ProfileScreens.Inbox,
   },
   {
-    id: '6',
-    title: 'Ratings',
-    icon: images.profileInbox,
+    id: "6",
+    title: "Ratings",
+    icon: Inbox,
     screen: ProfileScreens.Ratings,
     notificationCount: 3,
   },
   {
-    id: '7',
-    title: 'Help & Support',
-    icon: images.profileInbox,
+    id: "7",
+    title: "Help & Support",
+    icon: Help,
     screen: ProfileScreens.HelpAndSupport,
     notificationCount: 2,
   },
   {
-    id: '8',
-    title: 'Account',
-    icon: images.profileAccount,
+    id: "8",
+    title: "Account",
+    icon: Account,
     screen: ProfileScreens.Account,
   },
   {
-    id: '9',
-    title: 'Log Out',
-    icon: images.profileLogout,
+    id: "9",
+    title: "Log Out",
+    icon: Logout,
     screen: AuthScreens.Onboarding,
     isLogout: true,
   },
 ];
-
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -88,7 +94,7 @@ const ProfileScreen: React.FC = () => {
     <TouchableOpacity
       style={[styles.listItem]}
       onPress={() => navigation.navigate(item.screen as never)}>
-      <Image source={item.icon} />
+      <item.icon width={24} height={24} />
       <Text style={[styles.itemText]}>{item.title}</Text>
       {/* {item.notificationCount && (
                 <View style={styles.notificationBadge}>
@@ -96,7 +102,7 @@ const ProfileScreen: React.FC = () => {
                 </View>
             )} */}
       <View>
-        <Image source={images.arrow} />
+        <BlackArrow style={{ transform: [{ rotate: '180deg' }], }} />
       </View>
     </TouchableOpacity>
   );
@@ -104,7 +110,6 @@ const ProfileScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Header logo isBack />
-
       {/* Fixed Profile Header */}
       <View style={styles.header}>
         <Image

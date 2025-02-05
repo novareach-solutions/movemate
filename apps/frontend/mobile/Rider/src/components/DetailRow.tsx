@@ -2,21 +2,22 @@ import React from 'react';
 import {View, Text, Image, StyleSheet, TextStyle} from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
+import { SvgProps } from 'react-native-svg';
 
 interface DetailRowProps {
   label: string;
   value: string | number;
-  icon?: any;
+  icon?: React.FC<SvgProps>;
 }
 
-const DetailRow: React.FC<DetailRowProps> = ({icon, label, value}) => {
+const DetailRow: React.FC<DetailRowProps> = ({icon:Icon, label, value}) => {
   return (
     <View style={styles.detailRow}>
-      {icon && <Image source={icon} style={styles.icon} />}
+      {Icon && <Icon style={styles.icon} />}
       <Text
         style={[
           styles.detailText,
-          icon
+          Icon
             ? {
                 fontWeight: typography.fontWeight
                   .regular as TextStyle['fontWeight'],

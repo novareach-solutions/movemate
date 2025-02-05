@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -12,16 +12,16 @@ import {
   SafeAreaView,
 } from 'react-native';
 import PhoneInput from 'react-native-phone-number-input';
-import {colors} from '../theme/colors';
-import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
-import {requestOtp} from '../redux/slices/authSlice';
-import {useAppDispatch} from '../redux/hook';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
+import { images } from '../assets/images/images';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AuthScreens, AuthScreensParamList } from '../navigation/ScreenNames';
+import { requestOtp } from '../redux/slices/authSlice';
+import { useAppDispatch } from '../redux/hook';
 import Header from '../components/Header';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const LoginScreen: React.FC = () => {
   const phoneInput = useRef<PhoneInput>(null);
@@ -34,13 +34,13 @@ const LoginScreen: React.FC = () => {
   const handlePhoneNumberChange = (number: string) => {
     setIsFocused(true);
     setPhoneNumber(number);
-    setIsFilled(number.length > 0);
+    setIsFilled(number.length === 13);
   };
 
   const handleSendCode = async () => {
     try {
       // await dispatch(requestOtp({phone: phoneNumber})).unwrap();
-      navigation.navigate(AuthScreens.Otp, {phoneNumber, login: true});
+      navigation.navigate(AuthScreens.Otp, { phoneNumber, login: true });
     } catch {
       console.log('Request Otp failed');
     }
@@ -51,8 +51,8 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-  <SafeAreaView style={{
-      flex:1
+    <SafeAreaView style={{
+      flex: 1
     }}>
       <Header isBack />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -70,7 +70,7 @@ const LoginScreen: React.FC = () => {
             onChangeFormattedText={handlePhoneNumberChange}
             containerStyle={[
               styles.phoneContainer,
-              isFocused && {borderColor: colors.purple},
+              isFocused && { borderColor: colors.purple },
             ]}
             textContainerStyle={styles.textInput}
             textInputStyle={styles.textInputStyle}
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: typography.fontSize.large,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
-    color: colors.black,
+    color: colors.purple,
     textAlign: 'left',
     marginBottom: 10,
   },

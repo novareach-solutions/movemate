@@ -11,6 +11,8 @@ import {
 import { colors } from '../../theme/colors';
 import Header from '../../components/Header';
 import Svg, { Circle } from 'react-native-svg';
+import { ProfileScreens } from '../../navigation/ScreenNames';
+import { useNavigation } from '@react-navigation/native';
 
 // Sample ratings data
 const ratingsData = {
@@ -32,12 +34,13 @@ const filterOptions = [
 
 const RatingsScreen = () => {
     const [selectedFilter, setSelectedFilter] = useState('5');
+    const navigation=useNavigation()
 
     return (
         <SafeAreaView style={{
-            flex:1
+            flex: 1
         }}>
-                    <Header isBack title="Ratings" />
+            <Header isBack title="Ratings" />
             <View style={styles.container}>
                 <View style={{ paddingHorizontal: 16 }}>
 
@@ -65,7 +68,7 @@ const RatingsScreen = () => {
                         </Svg>
                         <Text style={styles.ratingText}>{ratingsData.score.toFixed(1)}</Text>
                     </View>
-
+                    <Text>History</Text>
                     {/* Filter Tabs - Now scrollable */}
                     <ScrollView
                         horizontal
@@ -105,7 +108,9 @@ const RatingsScreen = () => {
                                 </View>
                                 <View style={styles.orderRight}>
                                     <Text style={styles.rating}>⭐ {item.rating}</Text>
-                                    <TouchableOpacity>
+                                    <TouchableOpacity onPress={()=>{
+                                        navigation.navigate(ProfileScreens.OrderDetails)
+                                    }}>
                                         <Text style={styles.viewDetails}>View details &gt;</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -140,6 +145,7 @@ const styles = StyleSheet.create({
     filterScrollContainer: {
         flexDirection: 'row',
         paddingVertical: 4,
+        gap:5
     },
     filterTab: {
         paddingVertical: 6,
@@ -147,7 +153,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 1,
         borderColor: colors.border.lightGray,
-        marginHorizontal: 4,
+        // marginHorizontal: 4,
     },
     activeFilter: {
         backgroundColor: colors.purple,
@@ -167,7 +173,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.white,
         padding: 16,
         borderRadius: 12,
-        marginBottom: 10,
+        marginVertical: 10,
         borderWidth: 1,
         borderColor: colors.border.primary,
     },
@@ -175,6 +181,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: colors.black,
+        marginBottom: 5
     },
     orderDate: {
         fontSize: 14,

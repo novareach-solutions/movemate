@@ -175,11 +175,11 @@ const EnterVehicleDetailsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.white,
   },
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: colors.white,
   },
   title: {
     fontSize: 22,

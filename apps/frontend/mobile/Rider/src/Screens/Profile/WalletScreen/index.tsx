@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,12 +9,12 @@ import {
   TextStyle,
   SafeAreaView,
 } from 'react-native';
-import {colors} from '../../../theme/colors';
-import {typography} from '../../../theme/typography';
-import {images} from '../../../assets/images/images';
+import { colors } from '../../../theme/colors';
+import { typography } from '../../../theme/typography';
+import { images } from '../../../assets/images/images';
 import ProfileScreen from '..';
-import {ProfileScreens} from '../../../navigation/ScreenNames';
-import {useNavigation} from '@react-navigation/native';
+import { ProfileScreens } from '../../../navigation/ScreenNames';
+import { useNavigation } from '@react-navigation/native';
 import Header from '../../../components/Header';
 
 const historyData = [
@@ -50,7 +50,9 @@ const WalletScreen: React.FC = () => {
       <View style={styles.historyDetailsContainer}>
         <Text style={styles.historyAmount}>{item.amount}</Text>
         <Text style={styles.historyDetails}>{item.cardDetails}</Text>
-        <View
+        <TouchableOpacity onPress={()=>{
+          navigation.navigate(ProfileScreens.PayoutSummary)
+        }}><View
           style={{
             flexDirection: 'row',
             gap: 10,
@@ -59,7 +61,7 @@ const WalletScreen: React.FC = () => {
           }}>
           <Text style={styles.viewDetails}>View details</Text>
           <Image style={styles.viewicon} source={images.arrow} />
-        </View>
+        </View></TouchableOpacity>
       </View>
       <View style={styles.historyRightContainer}>
         <Text style={styles.historyDate}>{item.date}</Text>
@@ -335,10 +337,10 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primaryGrey,
   },
-  viewicon:{
-    width:12,
-    height:12,
-    objectFit:"contain"
+  viewicon: {
+    width: 12,
+    height: 12,
+    objectFit: "contain"
   }
 });
 

@@ -57,7 +57,7 @@ const Onboarding: React.FC = () => {
     // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
   const handleLogin = () => {
-    navigation.navigate(AuthScreens.Login);
+    navigation.navigate(DeliverAPackage.Home);
     // navigation.navigate(DeliverAPackage.CompleteProfile);
     // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
     // navigation.navigate(DeliverAPackage.EnterABN);

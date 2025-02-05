@@ -6,14 +6,15 @@ import {
   ScrollView,
   SafeAreaView,
   StyleSheet,
-  // Image, // Uncomment when adding tick/wrong icons
 } from 'react-native';
 import { colors } from '../../../theme/colors';
 import Header from '../../../components/Header';
 import { typography } from '../../../theme/typography';
 import { useNavigation } from '@react-navigation/native';
 import { ProfileScreens } from '../../../navigation/ScreenNames';
+import BlackArrow from '../../../assets/icons/blackArrow.svg';
 
+// Data for earnings and orders
 const earningsData = {
   daily: { amount: 45, orderEarnings: 40, tips: 5 },
   weekly: { amount: 317, orderEarnings: 300, tips: 17 },
@@ -22,7 +23,7 @@ const earningsData = {
 
 const orders = [
   {
-    id:0,
+    id: 0,
     type: 'Send a Package',
     status: 'Delivered',
     amount: 25,
@@ -30,7 +31,7 @@ const orders = [
     success: true,
   },
   {
-    id:1,
+    id: 1,
     type: 'Buy from a Store',
     status: 'Canceled',
     amount: 25,
@@ -39,18 +40,84 @@ const orders = [
   },
 ];
 
+// Helper functions to format dates
+const formatDaily = (date: Date) =>
+  date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+const formatWeekly = (start: Date) => {
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const endStr = end.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+  return `${startStr} - ${endStr}`;
+};
+
+const formatMonthly = (date: Date) =>
+  date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
 const EarningsScreen = () => {
+  const navigation = useNavigation();
+
+  // Active tab state: 'daily', 'weekly', or 'monthly'
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
-  const [dateRange, setDateRange] = useState('15 - 21 Dec');
-  const navigation=useNavigation()
+
+  // Date state for each tab:
+  const [dailyDate, setDailyDate] = useState(new Date());
+  // For weekly, initialize with December 15, 2024 (months are 0-indexed, so 11 = December)
+  const [weeklyStartDate, setWeeklyStartDate] = useState(new Date(2024, 11, 15));
+  // For monthly, initialize with the first day of the current month
+  const [monthlyDate, setMonthlyDate] = useState(
+    new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+  );
+
+  // Determine what date string to display based on active tab
+  let displayDate = '';
+  if (activeTab === 'daily') {
+    displayDate = formatDaily(dailyDate);
+  } else if (activeTab === 'weekly') {
+    displayDate = formatWeekly(weeklyStartDate);
+  } else if (activeTab === 'monthly') {
+    displayDate = formatMonthly(monthlyDate);
+  }
+
+  // Handler for left arrow press (go to previous period)
+  const handleLeftArrow = () => {
+    if (activeTab === 'daily') {
+      const newDate = new Date(dailyDate);
+      newDate.setDate(newDate.getDate() - 1);
+      setDailyDate(newDate);
+    } else if (activeTab === 'weekly') {
+      const newStart = new Date(weeklyStartDate);
+      newStart.setDate(newStart.getDate() - 7);
+      setWeeklyStartDate(newStart);
+    } else if (activeTab === 'monthly') {
+      const newMonth = new Date(monthlyDate);
+      newMonth.setMonth(newMonth.getMonth() - 1);
+      setMonthlyDate(newMonth);
+    }
+  };
+
+  // Handler for right arrow press (go to next period)
+  const handleRightArrow = () => {
+    if (activeTab === 'daily') {
+      const newDate = new Date(dailyDate);
+      newDate.setDate(newDate.getDate() + 1);
+      setDailyDate(newDate);
+    } else if (activeTab === 'weekly') {
+      const newStart = new Date(weeklyStartDate);
+      newStart.setDate(newStart.getDate() + 7);
+      setWeeklyStartDate(newStart);
+    } else if (activeTab === 'monthly') {
+      const newMonth = new Date(monthlyDate);
+      newMonth.setMonth(newMonth.getMonth() + 1);
+      setMonthlyDate(newMonth);
+    }
+  };
 
   return (
-    <SafeAreaView style={{
-      flex: 1
-    }}>
-      <Header isBack title='Earnings' />
+    <SafeAreaView style={{ flex: 1 }}>
+      <Header isBack title="Earnings" />
       <View style={styles.container}>
-
         {/* Tabs */}
         <View style={styles.tabsContainer}>
           {(['daily', 'weekly', 'monthly'] as const).map((tab) => (
@@ -67,22 +134,23 @@ const EarningsScreen = () => {
 
         {/* Earnings Summary Card */}
         <View style={styles.earningsCard}>
-          {/* Top Row: Arrows and Earnings Info */}
           <View style={styles.earningsTopRow}>
-            <TouchableOpacity>
-              <Text style={styles.arrow}>{'<'}</Text>
+            {/* Left Arrow */}
+            <TouchableOpacity onPress={handleLeftArrow}>
+              <BlackArrow width={30} height={30} />
             </TouchableOpacity>
             <View style={styles.earningsInfo}>
-              <Text style={styles.dateRange}>{dateRange}</Text>
+              <Text style={styles.dateRange}>{displayDate}</Text>
               <Text style={styles.earningsAmount}>${earningsData[activeTab].amount}</Text>
               <Text style={styles.earningsTime}>25hr 47 mins online</Text>
             </View>
-            <TouchableOpacity>
-              <Text style={styles.arrow}>{'>'}</Text>
+            {/* Right Arrow */}
+            <TouchableOpacity onPress={handleRightArrow}>
+              <BlackArrow width={30} height={30} style={styles.arrow} />
             </TouchableOpacity>
           </View>
 
-          {/* Bottom Section: Order Earnings and Tips */}
+          {/* Earnings Breakdown */}
           <View style={styles.earningsBottom}>
             <View style={styles.earningsBreakdown}>
               <Text style={styles.breakdownText}>Order Earnings</Text>
@@ -100,20 +168,26 @@ const EarningsScreen = () => {
           <Text style={styles.detailsButtonText}>See details</Text>
         </TouchableOpacity>
 
+        {/* Orders List */}
         <ScrollView style={styles.ordersContainer}>
           <Text style={styles.ordersHeader}>Today, Mon, Dec 20</Text>
           {orders.map((order) => (
             <TouchableOpacity
               key={order.id}
               style={styles.orderCard}
-              onPress={() => navigation.navigate(ProfileScreens.OrderDetails, { orderId: order.id })}
-            >
+              onPress={() =>
+                navigation.navigate(ProfileScreens.OrderDetails, { orderId: order.id })
+              }>
               <View style={styles.orderInfo}>
                 <Text style={styles.orderType}>{order.type}</Text>
                 <Text style={styles.orderDate}>{order.date}</Text>
               </View>
               <View style={styles.orderRight}>
-                <Text style={[styles.orderStatus, order.success ? styles.delivered : styles.canceled]}>
+                <Text
+                  style={[
+                    styles.orderStatus,
+                    order.success ? styles.delivered : styles.canceled,
+                  ]}>
                   {order.status}
                 </Text>
                 <Text style={styles.orderAmount}>+${order.amount}</Text>
@@ -139,6 +213,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderColor: colors.border.lightGray,
     borderBottomWidth: 1,
+    overflow: 'visible', // Allow children to overflow
   },
   tab: {
     paddingVertical: 8,
@@ -146,6 +221,8 @@ const styles = StyleSheet.create({
   activeTab: {
     borderBottomWidth: 3,
     borderBottomColor: colors.purple,
+    marginBottom: -11, // Adjust negative margin for proper overlap
+    zIndex: 1,
   },
   tabText: {
     fontSize: 16,
@@ -157,7 +234,7 @@ const styles = StyleSheet.create({
   },
   earningsCard: {
     backgroundColor: colors.white,
-    padding: 14,
+    padding: 10,
     borderRadius: 16,
     marginVertical: 20,
     borderWidth: 1,
@@ -186,8 +263,7 @@ const styles = StyleSheet.create({
     color: colors.text.subText,
   },
   arrow: {
-    fontSize: 26,
-    color: colors.purple,
+    transform: [{ rotate: '180deg' }],
   },
   earningsBottom: {
     marginTop: 35,
@@ -223,9 +299,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   ordersHeader: {
-    fontSize: 16, // Slightly smaller
+    fontSize: 16,
     fontWeight: 'bold',
-    color: colors.purple, // Purple text
+    color: colors.purple,
     marginBottom: 12,
   },
   orderCard: {
@@ -257,7 +333,6 @@ const styles = StyleSheet.create({
   orderStatus: {
     fontSize: 14,
     marginBottom: 4,
-    // Additional styling for the status text can be added here
   },
   delivered: {
     color: colors.green,
@@ -270,12 +345,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.black,
   },
-  // Uncomment and adjust the size when you add the status icons
-  // statusIcon: {
-  //   width: 16,
-  //   height: 16,
-  //   marginRight: 4,
-  // },
 });
 
 export default EarningsScreen;

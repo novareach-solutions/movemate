@@ -1,13 +1,13 @@
-// Header.tsx
-
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Image, Text, TextStyle } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { colors } from '../theme/colors';
-import { images } from '../assets/images/images';
 import { AppScreens, AuthScreensParamList } from '../navigation/ScreenNames';
 import { typography } from '../theme/typography';
 import HelpButton from './HelpButton';
+import BlackArrow from "../assets/icons/blackArrow.svg"
+import Logo from "../assets/icons/logo.svg"
+import Hamburger from "../assets/icons/hamburger.svg"
 
 interface HeaderProps {
   isBack?: boolean;
@@ -40,21 +40,21 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScree
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}>
-          <Image source={images.arrow} style={styles.arrow} />
+            <BlackArrow />
         </TouchableOpacity>
       )}
 
       {/* Logo */}
       {logo && (
         <View style={styles.logoContainer}>
-          <Image source={images.logo} style={styles.logo} />
+          <Logo style={styles.logo}/>
         </View>
       )}
 
       {/* Home/Profile Button */}
       {home && (
         <TouchableOpacity style={styles.homeButton} onPress={handleHomePress}>
-      <Image source={images.profileAccount} style={styles.profileIcon} /> 
+          <Hamburger />
         </TouchableOpacity>
       )}
 
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    left: 20,
+    left: 10,
   },
   arrow: {
     transform: [{ rotate: '180deg' }],

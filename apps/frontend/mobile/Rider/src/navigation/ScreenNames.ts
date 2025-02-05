@@ -99,4 +99,5 @@ export const ProfileScreens = {
   Ratings: 'RatingsScreen',
   OrderDetails: 'OrderDetailsScreen',
   HelpAndSupport: 'HelpAndSupportScreen',
+  PayoutSummary: 'PayoutSummaryScreen',
 } as const;

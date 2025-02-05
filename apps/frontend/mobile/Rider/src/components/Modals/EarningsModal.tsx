@@ -8,8 +8,12 @@ import {
   Image,
 } from 'react-native';
 import {colors} from '../../theme/colors';
-import {images} from '../../assets/images/images';
 import DetailRow from '../DetailRow';
+import SuccessGreenTick from "../../assets/icons/successGreenTick.svg"
+import PurpleTime from "../../assets/icons/purpleTime.svg"
+import PurpleDistance from "../../assets/icons/purpleDistance.svg"
+import PurpleCoin from "../../assets/icons/purpleCoin.svg"
+import PurpleTip from "../../assets/icons/purpleTip.svg"
 
 interface EarningsModalProps {
   isVisible: boolean;
@@ -40,7 +44,7 @@ const EarningsModal: React.FC<EarningsModalProps> = ({
         <View style={styles.modalContainer}>
           {/* Header Section */}
           <View style={styles.headerContainer}>
-            <Image source={images.earningSuccess} style={styles.successIcon} />
+            <SuccessGreenTick style={styles.successIcon} />
             <Text style={styles.headerText}>You earned</Text>
             <Text style={styles.earningsText}>${totalEarnings}</Text>
           </View>
@@ -48,12 +52,12 @@ const EarningsModal: React.FC<EarningsModalProps> = ({
           {/* Earnings Details Section */}
           <View style={styles.detailsContainer}>
             <DetailRow
-              icon={images.tripTime}
+              icon={PurpleTime}
               label="Trip time"
               value={tripTime}
             />
             <DetailRow
-              icon={images.tripDistance}
+              icon={PurpleDistance}
               label="Trip distance"
               value={`${tripDistance} km`}
             />
@@ -61,11 +65,11 @@ const EarningsModal: React.FC<EarningsModalProps> = ({
               <Text></Text>
             </View>
             <DetailRow
-              icon={images.tripPay}
+              icon={PurpleCoin}
               label="Trip pay"
               value={`$${tripPay}`}
             />
-            <DetailRow icon={images.tripTip} label="Tip" value={`$${tip}`} />
+            <DetailRow icon={PurpleTip} label="Tip" value={`$${tip}`} />
             <DetailRow label="Total earnings" value={`$${totalEarnings}`} />
           </View>
 

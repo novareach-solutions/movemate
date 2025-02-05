@@ -96,7 +96,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+    <SafeAreaView style={{flex: 1}}>
       <Header logo isBack />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: colors.white,
-    marginTop: 60,
+    paddingTop: 60,
   },
   otpContainer: {
     flexDirection: 'row',

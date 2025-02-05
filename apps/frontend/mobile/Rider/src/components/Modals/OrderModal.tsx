@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,12 @@ import {
   Image,
   Modal,
 } from 'react-native';
-import {colors} from '../../theme/colors';
-import {images} from '../../assets/images/images';
+import { colors } from '../../theme/colors';
+import Alarm from "../../assets/icons/alarm.svg"
+import Cycle from "../../assets/icons/cycle.svg"
+import RedCircle from "../../assets/icons/redCircle.svg"
+import GreenCircle from "../../assets/icons/greenCircle.svg"
+import { SvgProps } from 'react-native-svg';
 
 interface ModalComponentProps {
   isVisible: boolean;
@@ -23,18 +27,18 @@ interface ModalComponentProps {
 }
 
 interface InfoRowProps {
-  iconSource: any;
+  iconSource: React.FC<SvgProps>;
   text: string;
 }
 
-const InfoRow: React.FC<InfoRowProps> = ({iconSource, text}) => (
+export const InfoRow: React.FC<InfoRowProps> = ({ iconSource: Icon, text }) => (
   <View style={styles.infoRow}>
-    <Image source={iconSource} style={styles.infoIcon} />
+    <Icon width={15} height={15} style={styles.infoIcon} />
     <Text style={styles.infoText}>{text}</Text>
   </View>
 );
 
-const TipBadge: React.FC<{tip: string}> = ({tip}) => (
+const TipBadge: React.FC<{ tip: string }> = ({ tip }) => (
   <View style={styles.tipBadge}>
     <Text style={styles.tipBadgeText}>Tip: {tip}</Text>
   </View>
@@ -91,15 +95,15 @@ const OrderModal: React.FC<ModalComponentProps> = ({
 
           <View style={styles.infoContainer}>
             <InfoRow
-              iconSource={images.distanceIcon}
+              iconSource={Alarm}
               text={`${time} to deliver`}
             />
-            <InfoRow iconSource={images.towing} text={`${distance}`} />
+            <InfoRow iconSource={Cycle} text={`${distance}`} />
           </View>
 
           <View style={styles.addressContainer}>
-            <InfoRow iconSource={images.greenCircle} text={pickupAddress} />
-            <InfoRow iconSource={images.greenCircle} text={dropoffAddress} />
+            <InfoRow iconSource={RedCircle} text={pickupAddress} />
+            <InfoRow iconSource={GreenCircle} text={dropoffAddress} />
           </View>
 
           {/* Button at the Bottom */}
@@ -108,7 +112,7 @@ const OrderModal: React.FC<ModalComponentProps> = ({
             <Animated.View
               style={[
                 styles.timerButtonBackground,
-                {width: widthInterpolation},
+                { width: widthInterpolation },
               ]}
             />
             <TouchableOpacity

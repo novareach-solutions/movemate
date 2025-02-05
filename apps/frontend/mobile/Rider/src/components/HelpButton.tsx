@@ -9,13 +9,13 @@ import {
 } from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
+import Help from "../assets/icons/help.svg"
 
 const HelpButton: React.FC<{onPress: () => void}> = ({onPress}) => {
   return (
     <TouchableOpacity style={styles.helpButton} onPress={onPress}>
       <View style={styles.iconContainer}>
-        <Image source={images.helpIcon} style={styles.icon} />
+        <Help />
       </View>
       <Text style={styles.text}>Help</Text>
     </TouchableOpacity>

@@ -75,14 +75,16 @@ const EarningsModeScreen: React.FC = () => {
             <Text style={styles.buttonText}>Activate</Text>
           </TouchableOpacity>
           <View style={styles.benefitsContainer}>
-            <Text style={styles.benefit}>
-              <Text style={styles.bullet}>•</Text> Only 10% Commission: Pay a
-              small fee per ride; no subscription needed.
-            </Text>
-            <Text style={styles.benefit}>
-              <Text style={styles.bullet}>•</Text> No Commitment: Ideal for
-              part-time drivers or occasional deliveries.
-            </Text>
+          <BenefitItem
+              title={"Only 10% Commission"}
+              description={"Pay a small fee per ride; no subscription needed."}
+            />
+            <BenefitItem
+              title={"No Commitment"}
+              description={
+                "Ideal for part-time drivers or occasional deliveries."
+              }
+            />
           </View>
         </View>
       );
@@ -90,7 +92,7 @@ const EarningsModeScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1,backgroundColor:"#2a1d3d" }}>
       <Header isBack earningScreen />
       <ScrollView
         style={styles.container}
@@ -138,7 +140,7 @@ const EarningsModeScreen: React.FC = () => {
 
         {/* Dynamic Content */}
         {renderContent()}
-        <Image source={images.subscriptionBanner} />
+        {/* <Image source={images.subscriptionBanner} /> */}
       </ScrollView>
     </SafeAreaView>
   );
