@@ -27,7 +27,7 @@ const SAPDetailsScreen = () => {
 
     const renderPoint = ({ item }) => (
         <View style={styles.pointContainer}>
-            <Text style={styles.checkmark}>✔</Text>
+            <images.greenTick style={styles.checkmark} />
             <Text style={styles.pointText}>{item}</Text>
         </View>
     );
@@ -40,7 +40,7 @@ const SAPDetailsScreen = () => {
                     <TouchableOpacity style={styles.rowButton}>
                         <images.Location width={20} height={20} />
                         <Text style={styles.homeText}>Home</Text>
-                        <Text style={styles.icon}>⬇</Text>
+                        <images.BackArrow width={15} height={15} style={styles.arrowStyle} />
                     </TouchableOpacity>
                        <TouchableOpacity  style={{ marginLeft: "60%",}} onPress={()=>{navigation.navigate(ProfileScreens.ProfileScreen)}}>
                                           <images.Account width={30} height={30} />
@@ -48,6 +48,7 @@ const SAPDetailsScreen = () => {
                 </View>
                 <Text style={styles.address}>{address}</Text>
             </View>
+            <View style={styles.horizontalLine} />
 
             {/* Main Content */}
             <View style={styles.container}>
@@ -55,10 +56,11 @@ const SAPDetailsScreen = () => {
                 <Text style={styles.subHeader}>Quick, reliable, and safe parcel delivery</Text>
 
                 <View style={styles.availabilityContainer}>
+                    <images.Open />
                     <Text style={styles.availabilityText}>8:00 AM – 10:00 PM</Text>
                 </View>
 
-                <View style={styles.divider} />
+                <images.DashedLine style={styles.divider}/>
 
                 <View style={styles.sectionContainer}>
                     <Text style={styles.sectionTitle}>Before you send</Text>
@@ -76,7 +78,11 @@ const SAPDetailsScreen = () => {
                 <TouchableOpacity onPress={(()=>{
                     navigation.navigate(CustomerScreens.EnterLocationDetailsScreen)
                 })} style={styles.pickupButton}>
+                    <View style={{flexDirection:'row',justifyContent:'space-around'}}>
                     <Text style={styles.pickupButtonText}>Add pick up & drop location</Text>
+                    <images.ForwardWhiteArrow />
+                    </View>
+                  
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -133,16 +139,25 @@ const styles = StyleSheet.create({
     availabilityContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 20,
+        // marginBottom: 20,
     },
     availabilityText: {
         fontSize: typography.fontSize.medium,
         color: colors.green,
+        marginLeft:10
     },
     divider: {
+        marginVertical: 25,
+    },
+    arrowStyle:{
+        transform: [{ rotate: '270deg' }],
+        marginLeft:5
+    },
+    horizontalLine:{
         height: 1,
         backgroundColor: colors.border.primary,
-        marginVertical: 15,
+        marginVertical: 5,
+        marginHorizontal:23
     },
     sectionTitle: {
         fontSize: typography.fontSize.medium,
@@ -177,6 +192,7 @@ const styles = StyleSheet.create({
         color: colors.white,
         fontSize: typography.fontSize.medium,
         fontWeight: 'bold',
+        marginRight:10
     },
     sectionContainer: {
         borderWidth: 1, 

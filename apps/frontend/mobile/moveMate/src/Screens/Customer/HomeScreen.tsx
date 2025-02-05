@@ -45,9 +45,10 @@ const navigation=useNavigation()
                 <View style={styles.rowButton}>
                     <TouchableOpacity style={styles.rowButton}>
                         {/* <Image style={styles.icon} source={images.location} /> */}
-                        <images.Location width={20} height={20} />
+                        <images.Location width={25} height={25} />
                         <Text style={styles.homeText}>Home</Text>
-                        <Text style={styles.icon}>⬇</Text>
+                        <images.BackArrow width={15} height={15} style={styles.arrowStyle} />
+
                     </TouchableOpacity>
                     <TouchableOpacity  style={{ marginLeft: "60%",}} onPress={()=>{navigation.navigate(ProfileScreens.ProfileScreen)}}>
                     <images.Account width={30} height={30} />
@@ -202,6 +203,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    arrowStyle:{
+        transform: [{ rotate: '270deg' }],
+        marginLeft:5
     },
     loadingScreen: {
         flex: 1,

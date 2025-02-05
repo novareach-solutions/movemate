@@ -8,10 +8,14 @@ import { CustomerScreens } from '../../../navigation/ScreenNames';
 const PaymentSuccessScreen = () => {
     const navigation = useNavigation();
     useEffect(() => {
-        // Set a timeout to navigate after 5 seconds
+        // Set a timeout to navigate after 4 seconds
         const timer = setTimeout(() => {
-            navigation.navigate(CustomerScreens.DeliveryScreen);
-        }, 5000);
+            // navigation.navigate(CustomerScreens.DeliveryScreen);
+            navigation.reset(({
+                      index: 0,
+                      routes: [{ name: CustomerScreens.DeliveryScreen }],
+                    }));
+        }, 4000);
 
         return () => clearTimeout(timer);
     }, [navigation]);

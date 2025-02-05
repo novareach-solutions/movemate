@@ -57,7 +57,6 @@ const Login: React.FC = () => {
     <SafeAreaView style={{flex:1,backgroundColor:colors.white}}>
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <View style={styles.container}>
-        {/* <Image source={images.logo} style={styles.logo} /> */}
          <images.Logo width={width * 0.3} height={width * 0.3} style={styles.logo} />
         <Text style={styles.heading}>Enter phone number for verification</Text>
         <Text style={styles.subheading}>
@@ -66,12 +65,12 @@ const Login: React.FC = () => {
         <PhoneInput
           ref={phoneInput}
           defaultValue={phoneNumber}
-          defaultCode="AU" // Default country code: Australia (+61)
+          defaultCode="AU"
           layout="first"
           onChangeFormattedText={handlePhoneNumberChange}
           containerStyle={[
             styles.phoneContainer,
-            isFocused && {borderColor: colors.purple}, // Change border color on focus
+            isFocused && {borderColor: colors.purple},
           ]}
           textContainerStyle={styles.textInput}
           textInputStyle={styles.textInputStyle}
@@ -105,7 +104,8 @@ const Login: React.FC = () => {
         )}
       </TouchableOpacity>
       </View>
-    </TouchableWithoutFeedback></SafeAreaView>
+    </TouchableWithoutFeedback>
+    </SafeAreaView>
   );
 };
 

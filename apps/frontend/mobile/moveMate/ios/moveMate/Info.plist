@@ -24,6 +24,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>MBXAccessToken</key>
+	<string>pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -31,12 +33,22 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+ <string>Always Location access required to track your activity</string>
+ <key>NSLocationAlwaysUsageDescription</key>
+ <string>Always Location access required to track your activity</string>
+ <key>NSLocationWhenInUseUsageDescription</key>
+ <string>Always Location access required to track your activity</string>
+ <key>NSMotionUsageDescription</key>
+ <string>Always Location access required to track your activity</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Inter-Italic-VariableFont_opsz,wght.ttf</string>
 		<string>Inter-VariableFont_opsz,wght.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

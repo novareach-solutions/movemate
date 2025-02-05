@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text,Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native";
 import { images } from "../../../assets/images/images";
 
 const CancelSuccessScreen = () => {

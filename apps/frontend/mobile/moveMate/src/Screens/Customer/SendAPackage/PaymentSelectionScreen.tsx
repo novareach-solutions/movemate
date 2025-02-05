@@ -13,65 +13,48 @@ import Header from "../../../components/Header";
 import { CustomerScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../../theme/colors";
-
+import { SvgProps } from 'react-native-svg';
+import { cards, wallets } from "../../../constants/staticData";
+type SvgComponent = React.FC<SvgProps>;
 const PaymentSelectionScreen = () => {
   const [selectedMethod, setSelectedMethod] = useState(null);
-  const navigation=useNavigation()
-
-  const cards = [
-    {
-      id: 1,
-      type: "Visa",
-      bank: "Bank of Melbourne",
-      last4: "1234",
-      icon: images.visaIcon,
-    },
-    {
-      id: 2,
-      type: "MasterCard",
-      bank: "Bank of Melbourne",
-      last4: "1234",
-      icon: images.masterCard, 
-    },
-  ];
-
-  const wallets = [
-    { id: 1, name: "PayPal", icon: images.paypal },
-    { id: 2, name: "Apple Pay", icon: images.applePay },
-  ];
-
-  const handlePayment =()=>{
+  const navigation = useNavigation()
+  const handlePayment = () => {
     navigation.navigate(CustomerScreens.PaymentSuccessScreen);
   }
 
   return (
     <SafeAreaView style={styles.container}>
-        <Header isBack title="Make payment" bgColor={colors.lightGrey} />
+      <Header isBack title="Make payment" bgColor={colors.lightGrey} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {/* Credit/Debit Card Section */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Credit/debit card</Text>
-          {cards.map((card) => (
-            <TouchableOpacity
-              key={card.id}
-              style={[
-                styles.cardContainer,
-                selectedMethod === card.id && styles.selectedContainer,
-              ]}
-              onPress={() => setSelectedMethod(card.id)}
-            >
-              <Image source={card.icon} style={styles.icon} />
-              <View style={styles.cardDetails}>
-                <Text style={styles.cardText}>{card.bank}</Text>
-                <Text style={styles.cardText}>**** {card.last4}</Text>
-              </View>
-              <View style={styles.radioButton}>
-                {selectedMethod === card.id && <View style={styles.radioInner} />}
-              </View>
-            </TouchableOpacity>
-          ))}
-          <TouchableOpacity onPress={()=>{
-            navigation.navigate(CustomerScreens.AddCardScreen) 
+          {cards.map((card) => {
+            const SvgImage: SvgComponent = card.icon;
+            return (
+              <TouchableOpacity
+                key={card.id}
+                style={[
+                  styles.cardContainer,
+                  selectedMethod === card.id && styles.selectedContainer,
+                ]}
+                onPress={() => setSelectedMethod(card.id)}
+              >
+                <SvgImage style={styles.icon} />
+                {/* <Image source={card.icon} style={styles.icon} /> */}
+                <View style={styles.cardDetails}>
+                  <Text style={styles.cardText}>{card.bank}</Text>
+                  <Text style={styles.cardText}>**** {card.last4}</Text>
+                </View>
+                <View style={styles.radioButton}>
+                  {selectedMethod === card.id && <View style={styles.radioInner} />}
+                </View>
+              </TouchableOpacity>
+            )
+          })}
+          <TouchableOpacity onPress={() => {
+            navigation.navigate(CustomerScreens.AddCardScreen)
           }} style={styles.addNewCard}>
             <Text style={styles.addCardText}>+ Add new card</Text>
           </TouchableOpacity>
@@ -80,36 +63,39 @@ const PaymentSelectionScreen = () => {
         {/* Wallets Section */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Wallets</Text>
-          {wallets.map((wallet) => (
-            <TouchableOpacity
-              key={wallet.id}
-              style={[
-                styles.walletContainer,
-                selectedMethod === wallet.id && styles.selectedContainer,
-              ]}
-              onPress={() => setSelectedMethod(wallet.id)}
-            >
-              <Image source={wallet.icon} style={styles.icon} />
-              <Text style={styles.walletText}>{wallet.name}</Text>
-              <View style={styles.radioButton}>
-                {selectedMethod === wallet.id && <View style={styles.radioInner} />}
-              </View>
-            </TouchableOpacity>
-          ))}
+          {wallets.map((wallet) => {
+            const SvgImage: SvgComponent = wallet.icon;
+            return (
+              <TouchableOpacity
+                key={wallet.id}
+                style={[
+                  styles.walletContainer,
+                  selectedMethod === wallet.id && styles.selectedContainer,
+                ]}
+                onPress={() => setSelectedMethod(wallet.id)}
+              >
+                <SvgImage style={styles.icon} />
+                <Text style={styles.walletText}>{wallet.name}</Text>
+                <View style={styles.radioButton}>
+                  {selectedMethod === wallet.id && <View style={styles.radioInner} />}
+                </View>
+              </TouchableOpacity>
+            )
+          })}
         </View>
 
         <View style={styles.footer}>
 
-        {/* Terms and Conditions */}
-        <Text style={styles.termsText}>
-          By confirming, I agree that this order does not include illegal or restricted items.{" "}
-          <Text style={styles.termsLink}>View T&C</Text>
-        </Text>
+          {/* Terms and Conditions */}
+          <Text style={styles.termsText}>
+            By confirming, I agree that this order does not include illegal or restricted items.{" "}
+            <Text style={styles.termsLink}>View T&C</Text>
+          </Text>
 
-        {/* Proceed to Pay Button */}
-        <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
-          <Text style={styles.payButtonText}>Proceed To Pay</Text>
-        </TouchableOpacity>
+          {/* Proceed to Pay Button */}
+          <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
+            <Text style={styles.payButtonText}>Proceed To Pay</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -121,13 +107,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F8F8F8",
   },
-  footer:{
-    flex:1,
-    paddingVertical:10,
+  footer: {
+    flex: 1,
+    paddingVertical: 10,
     justifyContent: 'flex-end',
   },
   contentContainer: {
-    flex:1,
+    flex: 1,
     // padding: 16,
   },
   sectionContainer: {
@@ -147,7 +133,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     borderWidth: 1,
-    backgroundColor:colors.white,
+    backgroundColor: colors.white,
     borderColor: "#DDD",
     borderRadius: 8,
     marginBottom: 12,
@@ -157,7 +143,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     borderWidth: 1,
-    backgroundColor:colors.white,
+    backgroundColor: colors.white,
     borderColor: "#DDD",
     borderRadius: 8,
     marginBottom: 12,
@@ -168,7 +154,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 40,
     height: 40,
-    objectFit:"contain",
+    objectFit: "contain",
     marginRight: 12,
   },
   cardDetails: {
@@ -211,7 +197,7 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 16,
     textAlign: "center",
-    marginHorizontal:10
+    marginHorizontal: 10
   },
   termsLink: {
     color: "#007BFF",
@@ -224,7 +210,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 16,
-    marginHorizontal:10
+    marginHorizontal: 10
   },
   payButtonText: {
     color: "#FFF",

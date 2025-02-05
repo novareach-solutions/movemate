@@ -8,12 +8,14 @@ import { replaceOrderId, SimpleToast } from '../../utils/helpers';
 interface DeliverPkgState {
   id: number | null;
   pickupLocation: pickupLocation |null;
+  dropLocation: pickupLocation |null;
 }
 
 // Initial state
 const initialState: DeliverPkgState = {
   id: null,
-  pickupLocation:null
+  pickupLocation:null,
+  dropLocation:null
 };
 
 interface orderPayload {
@@ -40,8 +42,10 @@ interface orderPayload {
 }
 
 interface pickupLocation {
-  pickupLattitude:number | null,
-  pickupLongitude:number |null
+  latitude:number,
+  longitude:number,
+  name:string,
+  address:string
 }
 
 // create order
@@ -183,11 +187,14 @@ const deliverAPackage = createSlice({
     },
     updatePickupLoaction:(state,action)=>{
       state.pickupLocation = action.payload;
+    },
+    updateDropLoaction:(state,action)=>{
+      state.dropLocation = action.payload;
     }
     
   }
 });
 
 // Export the reducer
-export const { updatePkgId,updatePickupLoaction } = deliverAPackage.actions;
+export const { updatePkgId,updatePickupLoaction,updateDropLoaction } = deliverAPackage.actions;
 export default deliverAPackage.reducer;

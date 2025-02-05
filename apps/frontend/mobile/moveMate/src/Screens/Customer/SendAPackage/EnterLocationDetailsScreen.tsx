@@ -23,6 +23,7 @@ import { CustomerScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import { useAppDispatch } from "../../../redux/hook";
 import { createOrder, updatePickupLoaction, updatePkgId } from "../../../redux/slices/deliverAPackageSlice";
+import { colors } from "../../../theme/colors";
 
 const EnterLocationDetailsScreen = () => {
   interface orderPayload {
@@ -62,17 +63,10 @@ const EnterLocationDetailsScreen = () => {
   const [receiverDetails, setReceiverDetails] = useState<{ name: string; phoneNumber: string } | null>(null);
 
     const dispatch = useAppDispatch();
-  console.log("       ")
-    console.log("**********Modal************")
-    console.log("       ")
-    console.log('isSenderModalVisible', isSenderModalVisible);
-    console.log('isReceiverModalVisible', isReceiverModalVisible);
-    console.log('isLocationModalVisible', isLocationModalVisible);
     
 
   // States for Package Type Modal
   const [isPackageTypeModalVisible, setIsPackageTypeModalVisible] = useState(false);
-  console.log('isPackageTypeModalVisible', isPackageTypeModalVisible)
   const [packageType, setPackageType] = useState<string | null>(null);
 
   const navigation=useNavigation()
@@ -94,11 +88,11 @@ const EnterLocationDetailsScreen = () => {
     if (locationData) {
       if (currentType === "pickup") {
         const pickupLocation = {
-          pickupLattitude:locationData.latitude,
-          pickupLongitude:locationData.longitude
+          lattitude:locationData.latitude,
+          longitude:locationData.longitude
         }
         setPickupLocation(locationData);
-        dispatch(updatePickupLoaction(pickupLocation));
+        // dispatch(updatePickupLoaction(pickupLocation));
       } else {
         setDropLocation(locationData);
       }
@@ -138,7 +132,6 @@ const EnterLocationDetailsScreen = () => {
     }
   };
 
-  console.log('pickupLocation', pickupLocation)
 
   const confirmOrder = async() => {
     // Validate required fields
@@ -178,7 +171,7 @@ const EnterLocationDetailsScreen = () => {
 
           //   dispatch(updatePkgId(response?.data?.id))
           // }
-          Alert.alert("Success", "Order confirmed!");
+          // Alert.alert("Success", "Order confirmed!");
 
           navigation.navigate(CustomerScreens.CheckoutScreen);
               // Reset form (optional)
@@ -293,21 +286,29 @@ const EnterLocationDetailsScreen = () => {
 
         {/* Pickup Notes */}
         <View style={styles.notesContainer}>
-          <Text style={styles.notesLabel}>Pickup Notes (optional)</Text>
+          <View style={styles.pickupNotes}>
+          <images.PickupNotes width={20} height={20} />
+          <Text style={styles.notesLabel}>Pickup Notes <Text style={styles.optionalText}>(optional)
+            </Text></Text>
+          </View>
+          
           <TextInput
             style={styles.notesInput}
             placeholder="Add any special pickup instructions (e.g., handle with care)"
             multiline
             numberOfLines={5}
+            placeholderTextColor={colors.grey}
             value={pickupNotes}
             onChangeText={(text) => setPickupNotes(text)}
           />
         </View>
 
         {/* Confirm Button */}
+         <View style={styles.footer}>
         <TouchableOpacity style={styles.confirmButton} onPress={confirmOrder}>
           <Text style={styles.confirmButtonText}>Confirm Order</Text>
         </TouchableOpacity>
+        </View>
 
         {/* Location Modal */}
         {
@@ -406,7 +407,11 @@ const EnterLocationDetailsScreen = () => {
     },
     fieldText: {
       fontSize: 14,
-      color: "#9E9E9E",
+      color: colors.grey,
+    },
+    pickupNotes:{
+      flexDirection:'row',
+      marginBottom:8
     },
     locationText: {
       fontSize: 12,
@@ -417,9 +422,14 @@ const EnterLocationDetailsScreen = () => {
       marginBottom: 20,
     },
     notesLabel: {
-      fontSize: 14,
-      color: "#6C2DBE",
+      fontSize: 16,
+      fontWeight:'500',
+      color: colors.black,
       marginBottom: 8,
+      marginLeft:5,
+    },
+    optionalText:{
+      color:colors.grey
     },
     notesInput: {
       backgroundColor: "#FFFFFF",
@@ -431,7 +441,7 @@ const EnterLocationDetailsScreen = () => {
       textAlignVertical: "top",
     },
     confirmButton: {
-      backgroundColor: "#6C2DBE",
+      backgroundColor: colors.purple,
       borderRadius: 8,
       paddingVertical: 16,
       alignItems: "center",
@@ -443,6 +453,11 @@ const EnterLocationDetailsScreen = () => {
       fontSize: 16,
       fontWeight: "bold",
     },
+    footer: {
+      paddingVertical:10,
+      // backgroundColor: colors.white,
+      justifyContent: 'flex-end',
+  },
   });
 
   export default EnterLocationDetailsScreen;

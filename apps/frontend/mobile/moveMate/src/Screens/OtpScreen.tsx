@@ -64,7 +64,16 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
       if(isLogin){
         // await dispatch(Login({ phone: phoneNumber,otp:enteredOtp })).unwrap();
         // Navigate to the otp screen
-        navigation.navigate(CustomerScreens.CustomerHomeScreen);
+        // navigation.navigate(CustomerScreens.CustomerHomeScreen);
+        // navigation.reset(({
+        //   index: 0,
+        //   routes: [{ name: CustomerScreens.AppLayoutScreen }],
+        // }));
+        navigation.reset(({
+          index: 0,
+          routes: [{ name: CustomerScreens.CustomerHomeScreen }],
+        }));
+
       }else{
         // await dispatch(verifyOtp({ phone: phoneNumber,otp:enteredOtp }))
         // .unwrap();

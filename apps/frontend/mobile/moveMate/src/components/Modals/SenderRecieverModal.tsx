@@ -59,7 +59,7 @@ const SenderReceiverModal: React.FC<DetailsModalProps> = ({
   };
 
   const title =
-    type === 'sender' ? 'Add Sender Details' : 'Add Receiver Details';
+    type === 'sender' ? 'Add sender’s details' : 'Add receiver’s details';
 
   return (
     <SafeAreaView style={{flex:1}}>
@@ -115,7 +115,7 @@ const SenderReceiverModal: React.FC<DetailsModalProps> = ({
                 style={styles.confirmButton}
                 onPress={handleConfirm}
               >
-                <Text style={styles.confirmButtonText}>Confirm</Text>
+                <Text style={styles.confirmButtonText}>Add Details</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>
@@ -139,8 +139,8 @@ const styles = StyleSheet.create({
   modalContainer: {
     height: height * 0.35, // 35% of screen height, adjust as needed
     backgroundColor: colors.white,
-    borderTopLeftRadius: 12, // Top left radius
-    borderTopRightRadius: 12, // Top right radius
+    borderTopLeftRadius: 40, // Top left radius
+    borderTopRightRadius: 40, // Top right radius
     padding: 20,
     elevation: 10,
   },
@@ -160,7 +160,8 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: colors.purple,
+    color: colors.black,
+    paddingVertical:10
   },
   closeIcon: {
     width: 24,
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 15,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#fdfdfd',
   },
   confirmButton: {
     backgroundColor: colors.purple,

@@ -73,9 +73,7 @@ navigation.navigate(CustomerScreens.CancelSuccessScreen)
               textAlignVertical="top"
             />
           )}
-        </ScrollView>
-
-        <Button 
+          <Button 
           mode="contained" 
           style={[styles.cancelButton, !selectedReason && styles.disabledButton]}
           onPress={() => handleCancel(selectedReason, otherReason)}
@@ -85,6 +83,9 @@ navigation.navigate(CustomerScreens.CancelSuccessScreen)
         >
           Cancel Service
         </Button>
+        </ScrollView>
+
+        
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

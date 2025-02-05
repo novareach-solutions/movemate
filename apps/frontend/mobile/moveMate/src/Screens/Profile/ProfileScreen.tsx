@@ -13,57 +13,11 @@ import { typography } from '../../theme/typography';
 import { AuthScreens, ProfileScreens } from '../../navigation/ScreenNames';
 import { images } from '../../assets/images/images';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SvgProps } from 'react-native-svg';
+import { profileData } from '../../constants/staticData';
 import Header from '../../components/Header';
+import { SvgProps } from 'react-native-svg';
 type SvgComponent = React.FC<SvgProps>;
 // import { images } from '../../assets/images/images';
-
-const profileData = [
-    // {
-    //     id: '1',
-    //     title: 'Refunds',
-    //     icon: images.profileInbox,
-    //     screen: ProfileScreens.Inbox,
-    //     notificationCount: 3,
-    // },
-    {
-        id: '2',
-        title: 'Manage Addresses',
-        icon: images.ManageAddress,
-        screen: ProfileScreens.SavedAddressesScreen,
-    },
-    {
-        id: '3',
-        title: 'Refer Friends',
-        icon: images.InviteFriends,
-        screen: ProfileScreens.ReferFriendsScreen,
-    },
-    {
-        id: '4',
-        title: 'Legal & About',
-        icon: images.LegalNAbout,
-        screen: ProfileScreens.LegalAboutScreen,
-    },
-    {
-        id: '5',
-        title: 'Give A Feedback',
-        icon: images.HelpNSupport,
-        screen: ProfileScreens.FeedbackScreen,
-    },
-    // {
-    //     id: '6',
-    //     title: 'Invite Friends',
-    //     icon: images.profileRewards,
-    //     screen: ProfileScreens.Rewards,
-    // },
-    {
-        id: '7',
-        title: 'Log Out',
-        icon: images.Logout,
-        screen: AuthScreens.LoginScreen,
-        isLogout: true,
-    },
-];
 
 const ProfileScreen: React.FC = () => {
     const navigation = useNavigation();

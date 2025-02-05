@@ -70,7 +70,31 @@ import CarTowing from "./car-towing-truck-service 1.svg";
 import Trolley from "./package-boxes-with-trolley 1.svg";
 import Logout from "./Logout.svg";
 import SuccessGreen from "./successGreen.svg";
-import VisaIcon from "./VisaIcon.svg"
+import VisaIcon from "./VisaIcon.svg";
+import Open from "./openSign.svg";
+import greenTick from "./greentick.svg";
+import DashedLine from "./dashedLine.svg";
+import ForwardWhiteArrow from "./ForwardWhite.svg";
+import PickupNotes from "./notes.svg";
+import Marker from "./outlineMarker.svg";
+import Gps from "./gps.svg";
+import PaypalIcon from "./paypalIcon.svg";
+import AppleIcon from "./AppleIcon.svg";
+import MasterCardIcon from "./MasterCard.svg";
+//tab navigation
+import outlineHome from "./outlinehome.png";
+import outlineNotification from "./outlineNotification.png";
+import outlineOrder from "./outlineOrder.png";
+import outlineAccount from "./outlineAccount.png";
+
+// package type
+import laundryIcon from './packagetype/laundry.svg';
+import documentIcon from './packagetype/document.svg';
+import electricIcon from './packagetype/electricItem.svg';
+import foodIcon from './packagetype/food.svg';
+import otherIcon from './packagetype/other.svg';
+import repairIcon from './packagetype/repair.svg';
+import pkgWeightIcon from './packagetype/pkgWeight.svg';
 
 export const images = {
   introImage1,
@@ -101,5 +125,5 @@ export const images = {
   Account,
   Location,
   PackageImg,ShoppingCart,Store,TowTruck,LocaionSteps,BackArrow,Logo,
-  OfficeIcon,HomeIcon,ForwardArrow,EmailIcon,PhoneIcon,ReferFriend,Refund,HelpNSupport,LegalNAbout,InviteFriends,ManageAddress,ReferFriendImage,PackageArrived,CarTowing,HouseMoving,Trolley,Logout,SuccessGreen,VisaIcon
+  OfficeIcon,HomeIcon,ForwardArrow,EmailIcon,PhoneIcon,ReferFriend,Refund,HelpNSupport,LegalNAbout,InviteFriends,ManageAddress,ReferFriendImage,PackageArrived,CarTowing,HouseMoving,Trolley,Logout,SuccessGreen,VisaIcon,Open,greenTick,DashedLine,ForwardWhiteArrow,PickupNotes,Marker,Gps,outlineHome,outlineAccount,outlineNotification,outlineOrder,PaypalIcon,AppleIcon,MasterCardIcon,laundryIcon,repairIcon,otherIcon,documentIcon,foodIcon,electricIcon,pkgWeightIcon
 };

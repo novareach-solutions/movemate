@@ -1,12 +1,14 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {AppScreens} from '../navigation/ScreenNames';
-import HomeScreen from './HomeScreen';
 import OrderScreen from './OrderScreen';
-import NotificationScreen from './Offerscreen';
+// import NotificationScreen from './Offerscreen';
 import AccountScreen from './AccountScreen';
 import {Image, StyleSheet} from 'react-native';
 import {colors} from '../theme/colors';
 import {images} from '../assets/images/images';
+import HomeScreen from './Home/HomeScreen';
+import ProfileScreen from './Profile/ProfileScreen';
+import NotificationScreen from './Notification/NotificationScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -24,13 +26,13 @@ const AppLayoutScreen = () => {
           // Assigning icons based on the route name
           let icon;
           if (route.name === AppScreens.HomeScreen) {
-            icon = images.home;
+            icon = images.outlineHome;
           } else if (route.name === AppScreens.OrderScreen) {
             icon = images.orders;
           } else if (route.name === AppScreens.NotificationScreen) {
-            icon = images.notificatons;
+            icon = images.outlineNotification;
           } else if (route.name === AppScreens.AccountScreen) {
-            icon = images.account;
+            icon = images.outlineAccount;
           }
           return (
             <Image source={icon} style={[styles.icon, {tintColor: color}]} />
@@ -45,7 +47,7 @@ const AppLayoutScreen = () => {
       <Tab.Screen
         options={{tabBarLabel: 'Orders'}}
         name={AppScreens.OrderScreen}
-        component={OrderScreen}
+        component={NotificationScreen}
       />
       <Tab.Screen
         options={{tabBarLabel: 'Notifications'}}
@@ -55,7 +57,7 @@ const AppLayoutScreen = () => {
       <Tab.Screen
         options={{tabBarLabel: 'Account'}}
         name={AppScreens.AccountScreen}
-        component={AccountScreen}
+        component={ProfileScreen}
       />
     </Tab.Navigator>
   );

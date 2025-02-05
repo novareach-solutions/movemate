@@ -12,7 +12,10 @@ import {
   TextInput,
 } from 'react-native';
 import { colors } from '../../theme/colors';
-
+import { images } from '../../assets/images/images';
+import { SvgProps } from 'react-native-svg';
+import { packageOptions } from '../../constants/staticData';
+type SvgComponent = React.FC<SvgProps>;
 interface PackageTypeModalProps {
   isVisible: boolean;
   onClose: (selectedType?: string) => void;
@@ -25,14 +28,6 @@ const PackageTypeModal: React.FC<PackageTypeModalProps> = ({
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isOtherSelected, setIsOtherSelected] = useState(false);
   const [otherType, setOtherType] = useState('');
-
-  const packageOptions = [
-    'Documents',
-    'Food',
-    'Electric Item',
-    'Laundry',
-    'Others',
-  ];
 
   const handleSelect = (type: string) => {
     setSelectedType(type);
@@ -89,29 +84,44 @@ const PackageTypeModal: React.FC<PackageTypeModalProps> = ({
               </View>
 
               {/* Package Options */}
-              {packageOptions.map((item) => (
-                <TouchableOpacity
-                  key={item}
-                  style={styles.optionContainer}
-                  onPress={() => handleSelect(item)}
-                >
-                  <Text style={styles.optionText}>{item}</Text>
-                  <View style={styles.radioCircle}>
-                    {selectedType === item && <View style={styles.selectedRb} />}
-                  </View>
-                </TouchableOpacity>
-              ))}
+              {packageOptions.map((item) => {
+                const SvgImage: SvgComponent = item.icon;
+                return (
+                  <TouchableOpacity
+                    key={item.title}
+                    style={styles.optionContainer}
+                    onPress={() => handleSelect(item.title)}
+                  >
+                    <SvgImage style={styles.icon} />
+                    <Text style={styles.optionText}>{item.title}</Text>
+                    <View style={styles.radioCircle}>
+                      {selectedType === item.title && <View style={styles.selectedRb} />}
+                    </View>
+                  </TouchableOpacity>
+                )
+              }
+
+              )}
 
               {/* If "Others" is selected, show a TextInput */}
               {isOtherSelected && (
                 <View style={styles.otherInputContainer}>
                   <TextInput
                     style={styles.input}
-                    placeholder="Please specify"
+                    placeholderTextColor={colors.grey}
+                    placeholder="What's in your package?"
                     value={otherType}
+                    multiline
+                    numberOfLines={5}
                     onChangeText={setOtherType}
                   />
+                  <View style={styles.weightInfo}>
+                    <images.pkgWeightIcon style={styles.icon} />
+                    <Text >The package weight must be under 10 kg</Text>
+                  </View>
+
                 </View>
+
               )}
 
               {/* Done Button */}
@@ -131,16 +141,23 @@ const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: 'flex-end', // Align modal at the bottom
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  weightInfo: {
+    flexDirection: 'row',
+    paddingVertical: 10,
+    alignItems: 'center'
+  },
+  icon: {
+    marginRight: 10
   },
   modalContainer: {
     backgroundColor: colors.white,
-    borderTopLeftRadius: 12, // Top left radius
-    borderTopRightRadius: 12, // Top right radius
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
     padding: 20,
-    paddingBottom: 30, // Extra padding for the Done button
-    // Height is dynamic based on content, no fixed height
+    paddingBottom: 30,
   },
   dragHandle: {
     width: 40,
@@ -158,7 +175,8 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: colors.purple,
+    color: colors.black,
+    paddingVertical: 10
   },
   closeButton: {
     fontSize: 18,
@@ -196,10 +214,11 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#D4D4D4',
     borderRadius: 8,
     padding: 12,
-    backgroundColor: '#F8F8F8',
+    minHeight: 120,
+    backgroundColor: '#FFFFFF',
     fontSize: 16,
     width: '100%',
   },

@@ -9,22 +9,18 @@ import {
   Image,
 } from "react-native";
 import Header from "../../../components/Header";
-import { images } from "../../../assets/images/images";
 import { CustomerScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../../theme/colors";
+import { deliveryInstructions } from "../../../constants/staticData";
+import { useAppSelector } from "../../../redux/hook";
 
 const CheckoutScreen = () => {
+    const pickupLocationData = useAppSelector(state => state.deliverAPackage.pickupLocation);
+    const dropLocationData = useAppSelector(state => state.deliverAPackage.dropLocation);
   const [tip, setTip] = useState(null);
   const [selectedInstruction, setSelectedInstruction] = useState(null);
   const navigation=useNavigation()
-
-  const deliveryInstructions = [
-    { label: "OTP Verification", icon: images.pickUpNotesIcon },
-    { label: "Do not ring the bell", icon: images.doNotRing },
-    { label: "Drop-off at the door", icon: images.doorDropOff },
-    { label: "Avoid calling", icon: images.phone },
-  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -34,12 +30,12 @@ const CheckoutScreen = () => {
         <View style={styles.addressContainer}>
           <View style={styles.addressRow}>
             <Text style={styles.label}>From:</Text>
-            <Text style={styles.address}>120 Waldeck Street, 26301 (home)</Text>
+            <Text style={styles.address}>{pickupLocationData?.address}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.addressRow}>
             <Text style={styles.label}>To:</Text>
-            <Text style={styles.address}>120 Berkshire RG1, 2RI (work)</Text>
+            <Text style={styles.address}>{dropLocationData?.address}</Text>
           </View>
         </View>
 
