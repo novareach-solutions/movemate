@@ -1,9 +1,10 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { RedisModule } from "@nestjs-modules/ioredis";
 
+import { LiveTrackingGateway } from "../../../shared/gateways";
 import { OnboardingGuard } from "../../../shared/guards/onboarding.guard";
 import { AuthModule } from "../../auth/auth.module";
-import { RedisModule } from "../../redis/redis.module";
 import { LocationController } from "./location.controller";
 import { LocationService } from "./location.service";
 
@@ -13,10 +14,13 @@ import { LocationService } from "./location.service";
       isGlobal: true,
     }),
     AuthModule,
-    RedisModule,
+    RedisModule.forRoot({
+      type: "single",
+      url: "redis://localhost:6379",
+    }),
   ],
   controllers: [LocationController],
-  providers: [LocationService, OnboardingGuard],
+  providers: [LocationService, OnboardingGuard, LiveTrackingGateway],
   exports: [LocationService],
 })
 export class TrackingModule {}
