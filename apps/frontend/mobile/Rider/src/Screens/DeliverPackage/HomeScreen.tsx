@@ -20,7 +20,9 @@ import OrderModal from '../../components/Modals/OrderModal';
 import Money from "../../assets/icons/money.svg"
 import Order from "../../assets/icons/orders.svg"
 import Distance from "../../assets/icons/distance.svg"
-
+import Mapbox from '@rnmapbox/maps';
+import { MAPBOX_ACCESS_TOKEN } from '../../utils/constants';
+Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
@@ -81,8 +83,15 @@ const HomeScreen: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       <Header logo home help />
         {/* Map Image */}
-        <View style={styles.mapContainer}>
+        {/* <View style={styles.mapContainer}>
           <Image source={require('../../assets/images/Map.png')} style={styles.mapImage} />
+        </View> */}
+
+<View style={styles.mapContainer}>
+          <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+            <Mapbox.Camera zoomLevel={12} centerCoordinate={[80.2707, 13.0827]} />
+          </Mapbox.MapView>
+
         </View>
 
         {/* Status Button */}
@@ -121,7 +130,8 @@ const HomeScreen: React.FC = () => {
 
 
         {/* Order Modal */}
-        <OrderModal
+        {
+          isOrderModalVisible && <OrderModal
           isVisible={isOrderModalVisible}
           onClose={handleAcceptOrder}
           earnings="$21.89"
@@ -131,9 +141,12 @@ const HomeScreen: React.FC = () => {
           pickupAddress="Yocha (Tom Roberts Parade)"
           dropoffAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
         />
+        }
+        
 
         {/* Earnings Modal */}
-        <EarningsModal
+        {
+          isEarningsModal && <EarningsModal
           isVisible={isEarningsModal}
           onClose={() => setIsEarningsModal(false)}
           tripTime="26 mins"
@@ -142,9 +155,12 @@ const HomeScreen: React.FC = () => {
           tip={5}
           totalEarnings={60}
         />
+        }
+        
 
         {/* Delivery Modal */}
-        <DeliveryModal
+        {
+          isDeliveryModal &&  <DeliveryModal
           isVisible={isDeliveryModal}
           onClose={handleOrderDelivered}
           driverName="Alexander V."
@@ -152,9 +168,12 @@ const HomeScreen: React.FC = () => {
           deliveryInstructions={['Do not ring the bell', 'Drop-off at the door']}
           itemsToDeliver={['Documents']}
         />
+        }
+       
 
         {/*Order Expanded Modal */}
-        <ExpandedModal
+        {
+          isExpandedModalVisible &&  <ExpandedModal
           isVisible={isExpandedModalVisible}
           onClose={handleOrderStarted}
           driverName="Alexander V."
@@ -162,6 +181,8 @@ const HomeScreen: React.FC = () => {
           pickupNotes="Deliver to the back door, main gate is locked."
           items={['Documents', 'Laptop', 'Bag']}
         />
+        }
+       
     </SafeAreaView>
   );
 };
@@ -173,10 +194,10 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
     marginBottom: 20,
-    position: 'relative',
+    // position: 'relative',
   },
   mapImage: {
     width: '100%',
