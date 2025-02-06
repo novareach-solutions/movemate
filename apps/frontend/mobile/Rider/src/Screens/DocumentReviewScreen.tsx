@@ -12,8 +12,8 @@ import { formStyles } from '../theme/form';
 import TitleDescription from '../components/TitleDescription';
 import PhotoPickerModal from '../components/common/PhotoPickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
-import { useNavigation } from '@react-navigation/native';
-import { DeliverAPackage } from '../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { DeliverAPackage, DeliverAPackageParamList } from '../navigation/ScreenNames';
 import Header from '../components/Header';
 
 interface DocumentReviewProps {
@@ -29,7 +29,7 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({ route }) => {
   const { title, uploadedImage } = route.params;
   const [image, setImage] = useState(uploadedImage);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
 
   const handleSubmit = async () => {
     console.log('Document submitted:', image);

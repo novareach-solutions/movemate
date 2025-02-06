@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  Image,
   Keyboard,
   TouchableWithoutFeedback,
   TextStyle,
@@ -26,7 +25,7 @@ const Register: React.FC = () => {
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isFilled, setIsFilled] = useState(false);
-  const [isFocused, setIsFocused] = useState(false); // Track focus state
+  const [isFocused, setIsFocused] = useState(false); 
   const dispatch = useAppDispatch();
 
   const handlePhoneNumberChange = (number: string) => {

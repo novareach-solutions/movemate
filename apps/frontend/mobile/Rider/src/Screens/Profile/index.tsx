@@ -9,7 +9,7 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { colors } from "../../theme/colors";
 import { typography } from "../../theme/typography";
 import {
@@ -88,12 +88,12 @@ const profileData = [
 ];
 
 const ProfileScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const renderItem = ({ item }: { item: (typeof profileData)[0] }) => (
     <TouchableOpacity
       style={[styles.listItem]}
-      onPress={() => navigation.navigate(item.screen as never)}>
+      onPress={() => navigation.navigate(item.screen)}>
       <item.icon width={24} height={24} />
       <Text style={[styles.itemText]}>{item.title}</Text>
       {/* {item.notificationCount && (

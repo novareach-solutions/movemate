@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
-import { ProfileScreens } from '../../../navigation/ScreenNames';
-import { useNavigation } from '@react-navigation/native';
+import { ProfileScreens, ProfileScreensParamList } from '../../../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Header from '../../../components/Header';
 import Calender from "../../../assets/icons/calender.svg"
 import PurpleArrow from "../../../assets/icons/purpleArrow.svg"
@@ -45,7 +45,7 @@ const WalletScreen: React.FC = () => {
     'Wallet',
   );
   const [payoutFilter, setPayoutFilter] = useState('Week');
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const renderHistoryCard = (item: (typeof historyData)[0], index: number) => (
     <View key={index} style={styles.historyCard}>

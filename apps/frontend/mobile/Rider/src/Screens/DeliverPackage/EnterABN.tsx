@@ -16,8 +16,8 @@ import StepIndicator from '../../components/StepIndicator';
 import TitleDescription from '../../components/TitleDescription';
 import { formStyles } from '../../theme/form';
 import { colors } from '../../theme/colors';
-import { DeliverAPackage } from '../../navigation/ScreenNames';
-import { useNavigation } from '@react-navigation/native';
+import { DeliverAPackage, DeliverAPackageParamList } from '../../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../redux/hook';
 import { setSignupData } from '../../redux/slices/authSlice';
 import { z } from 'zod';
@@ -29,9 +29,7 @@ type FormFields = z.infer<typeof ZABNSchema>;
 
 const EnterABNScreen: React.FC = () => {
   const dispatch = useAppDispatch();
-  const signupData = useAppSelector((state) => state.auth.signupData);
-  console.log('signupData>>>>', signupData);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
 
   const {
     control,

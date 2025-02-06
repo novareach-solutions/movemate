@@ -6,12 +6,13 @@ import {
   ScrollView,
   SafeAreaView,
   StyleSheet,
+  TextStyle,
 } from 'react-native';
 import { colors } from '../../../theme/colors';
 import Header from '../../../components/Header';
 import { typography } from '../../../theme/typography';
-import { useNavigation } from '@react-navigation/native';
-import { ProfileScreens } from '../../../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { ProfileScreens, ProfileScreensParamList } from '../../../navigation/ScreenNames';
 import BlackArrow from '../../../assets/icons/blackArrow.svg';
 
 // Data for earnings and orders
@@ -56,21 +57,14 @@ const formatMonthly = (date: Date) =>
   date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
 const EarningsScreen = () => {
-  const navigation = useNavigation();
-
-  // Active tab state: 'daily', 'weekly', or 'monthly'
+  const navigation = useNavigation<NavigationProp<ProfileScreensParamList>>();
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
-
-  // Date state for each tab:
   const [dailyDate, setDailyDate] = useState(new Date());
-  // For weekly, initialize with December 15, 2024 (months are 0-indexed, so 11 = December)
   const [weeklyStartDate, setWeeklyStartDate] = useState(new Date(2024, 11, 15));
-  // For monthly, initialize with the first day of the current month
   const [monthlyDate, setMonthlyDate] = useState(
     new Date(new Date().getFullYear(), new Date().getMonth(), 1)
   );
 
-  // Determine what date string to display based on active tab
   let displayDate = '';
   if (activeTab === 'daily') {
     displayDate = formatDaily(dailyDate);
@@ -80,7 +74,6 @@ const EarningsScreen = () => {
     displayDate = formatMonthly(monthlyDate);
   }
 
-  // Handler for left arrow press (go to previous period)
   const handleLeftArrow = () => {
     if (activeTab === 'daily') {
       const newDate = new Date(dailyDate);
@@ -97,7 +90,6 @@ const EarningsScreen = () => {
     }
   };
 
-  // Handler for right arrow press (go to next period)
   const handleRightArrow = () => {
     if (activeTab === 'daily') {
       const newDate = new Date(dailyDate);
@@ -255,7 +247,7 @@ const styles = StyleSheet.create({
   },
   earningsAmount: {
     fontSize: 30,
-    fontWeight: typography.fontWeight.extraBold,
+    fontWeight: typography.fontWeight.extraBold as TextStyle["fontWeight"],
     color: colors.purple,
   },
   earningsTime: {

@@ -240,13 +240,13 @@ const styles = StyleSheet.create({
     orderDate: {
         fontFamily: typography.fontFamily.regular,
         fontSize: typography.fontSize.small,
-        color: colors.gray,
+        color: colors.text.primaryGrey,
         marginVertical: 4,
     },
     packageType: {
         fontFamily: typography.fontFamily.regular,
         fontSize: typography.fontSize.small,
-        color: colors.gray,
+        color: colors.text.primaryGrey,
     },
     orderStatusContainer: {
         // Align status badge to the top-right of the order row
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontFamily: typography.fontFamily.regular,
         fontSize: typography.fontSize.medium,
-        fontWeight: typography.fontWeight.bold,
+        fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
         color: colors.text.subText,
     },
     detailRow: {
@@ -315,12 +315,12 @@ const styles = StyleSheet.create({
     detailRowLabel: {
         fontFamily: typography.fontFamily.regular,
         fontSize: typography.fontSize.small,
-        color: colors.gray,
+        color: colors.text.primaryGrey,
     },
     detailRowValue: {
         fontFamily: typography.fontFamily.regular,
         fontSize: typography.fontSize.small,
-        fontWeight: typography.fontWeight.bold,
+        fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
         color: colors.black,
     },
     totalRow: {
@@ -368,12 +368,12 @@ const styles = StyleSheet.create({
     detailLabel: {
         fontFamily: typography.fontFamily.regular,
         fontSize: typography.fontSize.small,
-        color: colors.gray,
+        color: colors.text.primaryGrey,
     },
     detailValue: {
         fontFamily: typography.fontFamily.regular,
         fontSize: typography.fontSize.medium,
-        fontWeight: typography.fontWeight.bold,
+        fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     },
     ratingPrompt: {
         fontFamily: typography.fontFamily.regular,

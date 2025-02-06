@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AppScreens, ProfileScreens } from '../../../navigation/ScreenNames';
 import Header from '../../../components/Header';
 import Vehicle from "../../../assets/icons/vehicle.svg"
@@ -13,7 +13,7 @@ import Settings from "../../../assets/icons/settings.svg"
 import BlackArrow from "../../../assets/icons/blackArrow.svg"
 
 const AccountScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const menuItems = [
     {

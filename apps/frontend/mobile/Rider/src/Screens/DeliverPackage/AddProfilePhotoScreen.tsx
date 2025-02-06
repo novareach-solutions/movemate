@@ -14,29 +14,24 @@ import {colors} from '../../theme/colors';
 import {formStyles} from '../../theme/form';
 import {useAppDispatch, useAppSelector} from '../../redux/hook';
 import {
-  agentSignup,
   setSignupData,
   uploadMedia,
 } from '../../redux/slices/authSlice';
-// import {useNavigation} from '@react-navigation/native';
 import ImagePicker from 'react-native-image-crop-picker';
-import ConfirmPhotoModal from '../../components/Modals/ConfirmPhotoModal';
 import PhotoPickerModal from '../../components/common/PhotoPickerModal';
 import Header from '../../components/Header';
-import {useNavigation} from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {
-  AppScreens,
   AuthScreens,
   DeliverAPackage,
+  DeliverAPackageParamList,
 } from '../../navigation/ScreenNames';
 
 const AddProfilePhotoScreen: React.FC = () => {
-  // const navigation = useNavigation();
   const [image, setImage] = useState('');
-  const [imgToUpload, setImgToUpload] = useState('');
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const dispatch = useAppDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const signupData = useAppSelector(state => state.auth.signupData);
   const handleUpload = () => {
@@ -48,7 +43,6 @@ const AddProfilePhotoScreen: React.FC = () => {
     };
 
     dispatch(setSignupData(profilePhotoDetails));
-    // Logic for opening the file picker or camera
   };
 
   const handleTakePhoto = () => {
@@ -59,7 +53,6 @@ const AddProfilePhotoScreen: React.FC = () => {
       cropping: true,
     })
       .then(photo => {
-        // Construct FormData for upload
         const formData = new FormData();
         formData.append('file', {
           uri: photo.path,
@@ -67,7 +60,6 @@ const AddProfilePhotoScreen: React.FC = () => {
           name: photo.filename || `photo_${Date.now()}.jpg`,
         });
 
-        // Perform the upload via Redux or direct API call
         dispatch(uploadMedia(formData))
           .unwrap()
           .then(response => {
@@ -97,12 +89,11 @@ const AddProfilePhotoScreen: React.FC = () => {
       cropping: true,
     })
       .then(photo => {
-        // Construct FormData for upload
         const formData = new FormData();
         formData.append('file', {
-          uri: photo.path, // Use the file path
-          type: photo.mime, // File type (e.g., image/jpeg)
-          name: photo.filename || `photo_${Date.now()}.jpg`, // Use filename or fallback to a generated one
+          uri: photo.path, 
+          type: photo.mime, 
+          name: photo.filename || `photo_${Date.now()}.jpg`,
         });
 
         // Perform the upload via Redux or direct API call

@@ -183,7 +183,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ title, description, onSubmit 
           </ScrollView>
 
           {/* Fixed Footer & Button */}
-          <View style={formStyles.footerContainer}>
+          <View>
             <TouchableOpacity
               style={[formStyles.button, isValid ? formStyles.buttonEnabled : formStyles.buttonDisabled]}
               onPress={handleSubmit(onSubmit)}

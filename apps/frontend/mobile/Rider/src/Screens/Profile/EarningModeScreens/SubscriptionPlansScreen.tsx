@@ -13,7 +13,12 @@ import { typography } from '../../../theme/typography';
 import PurpleCheck from "../../../assets/icons/purpleCheck.svg"
 import Header from '../../../components/Header';
 
-export const BenefitItem = ({ title, description }) => {
+interface BenefitItemProps {
+  title: string;
+  description: string;
+}
+
+export const BenefitItem: React.FC<BenefitItemProps> = ({ title, description }) => {
   return (
     <View style={styles.benifitContainer}>
       <PurpleCheck />
@@ -255,11 +260,6 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-  },
-  title: {
-    fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
-    color: colors.white,
   },
   description: {
     fontSize: typography.fontSize.small,

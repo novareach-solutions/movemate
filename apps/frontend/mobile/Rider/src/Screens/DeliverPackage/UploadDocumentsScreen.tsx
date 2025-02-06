@@ -1,10 +1,10 @@
 import React from 'react';
 import DocumentList from '../../components/DocumentList';
-import {useNavigation} from '@react-navigation/native';
-import {DeliverAPackage} from '../../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {DeliverAPackage, DeliverAPackageParamList} from '../../navigation/ScreenNames';
 
 const DAPUploadDocumentsScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
 
   const documents = [
     {id: '1', title: 'Police Verification', value: 'POLICE_VERIFICATION'},

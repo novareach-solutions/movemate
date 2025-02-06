@@ -13,8 +13,8 @@ import TitleDescription from './TitleDescription';
 import { colors } from '../theme/colors';
 import { formStyles } from '../theme/form';
 import { typography } from '../theme/typography';
-import { DeliverAPackage } from '../navigation/ScreenNames';
-import { useNavigation } from '@react-navigation/native';
+import { DeliverAPackage, DeliverAPackageParamList } from '../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Header from './Header';
 import PurpleArrow from "../assets/icons/purpleArrow.svg"
 
@@ -38,7 +38,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
   documents,
   onCardPress,
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
   const renderItem = ({ item }: { item: Document }) => (
     <TouchableOpacity
       style={styles.card}

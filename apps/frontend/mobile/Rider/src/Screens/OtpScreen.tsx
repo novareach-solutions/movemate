@@ -37,7 +37,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
   const [timer, setTimer] = useState(60);
   const [error, setError] = useState(false);
   const inputs = useRef<TextInput[]>([]);
-  const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
+  const navigation = useNavigation<NavigationProp<any>>();
   const dispatch = useAppDispatch();
 
   useEffect(() => {

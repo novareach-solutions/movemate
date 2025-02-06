@@ -10,17 +10,16 @@ import {
 } from 'react-native';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
-import { ProfileScreens } from '../../../navigation/ScreenNames';
-import { useNavigation } from '@react-navigation/native';
+import { ProfileScreens, ProfileScreensParamList } from '../../../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Header from '../../../components/Header';
 import { BenefitItem } from './SubscriptionPlansScreen';
-import { images } from '../../../assets/images/images';
 
 const EarningsModeScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Subscription' | 'Commission'>(
     'Subscription',
   );
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<ProfileScreensParamList>>();
 
   const renderContent = () => {
     if (activeTab === 'Subscription') {
@@ -75,7 +74,7 @@ const EarningsModeScreen: React.FC = () => {
             <Text style={styles.buttonText}>Activate</Text>
           </TouchableOpacity>
           <View style={styles.benefitsContainer}>
-          <BenefitItem
+            <BenefitItem
               title={"Only 10% Commission"}
               description={"Pay a small fee per ride; no subscription needed."}
             />
@@ -92,7 +91,7 @@ const EarningsModeScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1,backgroundColor:"#2a1d3d" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#2a1d3d" }}>
       <Header isBack earningScreen />
       <ScrollView
         style={styles.container}

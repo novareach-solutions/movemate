@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Image, Text, TextStyle } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { colors } from '../theme/colors';
-import { AppScreens, AuthScreensParamList } from '../navigation/ScreenNames';
+import { AppScreens, AppScreensParamList, AuthScreensParamList } from '../navigation/ScreenNames';
 import { typography } from '../theme/typography';
 import HelpButton from './HelpButton';
 import BlackArrow from "../assets/icons/blackArrow.svg"
@@ -20,7 +20,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScreen, help }) => {
-  const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
+  const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
 
   const handleHomePress = () => {
     navigation.navigate(AppScreens.Profile);

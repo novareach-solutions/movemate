@@ -10,14 +10,14 @@ import {
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import Header from '../../components/Header';
-import { ProfileScreens } from '../../navigation/ScreenNames';
-import { useNavigation } from '@react-navigation/native';
+import { ProfileScreens, ProfileScreensParamList } from '../../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import PieChart from "../../assets/icons/piechart.svg"
 
 // Sample ratings data
 const ratingsData = {
-    score: 3.6, 
-    total: 5, 
+    score: 3.6,
+    total: 5,
     history: [
         { id: '#135432', rating: 5, date: 'Dec 20, 2024, 2:15 PM' },
         { id: '#135433', rating: 5, date: 'Dec 20, 2024, 2:15 PM' },
@@ -34,7 +34,7 @@ const filterOptions = [
 
 const RatingsScreen = () => {
     const [selectedFilter, setSelectedFilter] = useState('5');
-    const navigation = useNavigation()
+    const navigation = useNavigation<NavigationProp<ProfileScreensParamList>>();
 
     return (
         <SafeAreaView style={{
@@ -90,7 +90,9 @@ const RatingsScreen = () => {
                                 <View style={styles.orderRight}>
                                     <Text style={styles.rating}>⭐ {item.rating}</Text>
                                     <TouchableOpacity onPress={() => {
-                                        navigation.navigate(ProfileScreens.OrderDetails)
+                                        navigation.navigate(ProfileScreens.OrderDetails, {
+                                            orderId: 1
+                                        })
                                     }}>
                                         <Text style={styles.viewDetails}>View details &gt;</Text>
                                     </TouchableOpacity>

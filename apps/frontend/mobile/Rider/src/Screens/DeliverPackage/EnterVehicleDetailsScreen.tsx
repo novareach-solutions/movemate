@@ -16,8 +16,8 @@ import StepIndicator from '../../components/StepIndicator';
 import Dropdown from '../../components/Dropdown';
 import { colors } from '../../theme/colors';
 import { formStyles } from '../../theme/form';
-import { DeliverAPackage } from '../../navigation/ScreenNames';
-import { useNavigation } from '@react-navigation/native';
+import { DeliverAPackage, DeliverAPackageParamList } from '../../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useAppDispatch } from '../../redux/hook';
 import { setSignupData } from '../../redux/slices/authSlice';
 import { australianCarData } from '../../utils/australianCarData';
@@ -30,7 +30,7 @@ type FormFields = z.infer<typeof ZVehicleSchema>;
 
 const EnterVehicleDetailsScreen: React.FC = () => {
   const dispatch = useAppDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
 
   // Initialize react-hook-form
   const {

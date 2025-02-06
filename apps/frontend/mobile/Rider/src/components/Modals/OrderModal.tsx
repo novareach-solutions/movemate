@@ -7,6 +7,7 @@ import {
   Animated,
   Image,
   Modal,
+  TextStyle,
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import Alarm from "../../assets/icons/alarm.svg"
@@ -14,6 +15,7 @@ import Cycle from "../../assets/icons/cycle.svg"
 import RedCircle from "../../assets/icons/redCircle.svg"
 import GreenCircle from "../../assets/icons/greenCircle.svg"
 import { SvgProps } from 'react-native-svg';
+import { typography } from '../../theme/typography';
 
 interface ModalComponentProps {
   isVisible: boolean;
@@ -29,12 +31,15 @@ interface ModalComponentProps {
 interface InfoRowProps {
   iconSource: React.FC<SvgProps>;
   text: string;
+  bold?: boolean
 }
 
-export const InfoRow: React.FC<InfoRowProps> = ({ iconSource: Icon, text }) => (
+export const InfoRow: React.FC<InfoRowProps> = ({ iconSource: Icon, text, bold }) => (
   <View style={styles.infoRow}>
     <Icon width={15} height={15} style={styles.infoIcon} />
-    <Text style={styles.infoText}>{text}</Text>
+    <Text style={[styles.infoText, bold && {
+      fontWeight: typography.fontWeight.bold as TextStyle['fontWeight']
+    }]}>{text}</Text>
   </View>
 );
 

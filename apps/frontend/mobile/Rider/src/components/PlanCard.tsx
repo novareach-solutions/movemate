@@ -1,9 +1,24 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
-import {colors} from '../theme/colors';
-import {typography} from '../theme/typography';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
 
-const PlanCard = ({
+
+interface Benefit {
+  title: string;
+  description: string;
+}
+
+interface PlanCardProps {
+  planTitle: string;
+  price: number;
+  originalPrice?: number;
+  benefits: Benefit[];
+  isSelected: boolean;
+  onToggle: () => void;
+}
+
+const PlanCard: React.FC<PlanCardProps> = ({
   planTitle,
   price,
   originalPrice,
@@ -24,7 +39,7 @@ const PlanCard = ({
 
       <View style={styles.priceContainer}>
         <Text style={styles.price}>${price}</Text>
-        {originalPrice && (
+        {originalPrice !== undefined && (
           <Text style={styles.originalPrice}>${originalPrice}</Text>
         )}
       </View>
@@ -49,7 +64,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 5},
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
@@ -100,12 +115,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 10,
-  },
-  benefitIcon: {
-    width: 16,
-    height: 16,
-    tintColor: colors.purple,
-    marginRight: 10,
   },
   benefitText: {
     fontSize: typography.fontSize.small,

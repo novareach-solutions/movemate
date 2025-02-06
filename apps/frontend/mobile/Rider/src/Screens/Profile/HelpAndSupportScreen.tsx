@@ -21,6 +21,12 @@ import PromoCodes from "../../assets/icons/promoCodes.svg"
 import Warning from "../../assets/icons/warning.svg"
 import TrippleDots from "../../assets/icons/trippleDots.svg"
 import BlackArrow from "../../assets/icons/blackArrow.svg"
+import { SvgProps } from 'react-native-svg';
+
+interface MenuItem {
+    icon: React.FC<SvgProps>;
+    name: string;
+}
 
 // Support Categories Data
 const supportCategories = [
@@ -38,7 +44,7 @@ const supportCategories = [
 const HelpAndSupportScreen = () => {
     const [selectedTab, setSelectedTab] = useState('FAQ');
 
-    const renderMenuItem = ({ item, index }) => (
+    const renderMenuItem = ({ item, index }: { item: MenuItem; index: number }) => (
         <TouchableOpacity style={[styles.menuItem, index === 0 && styles.firstItem]}>
             <View style={styles.iconContainer}>
                 <item.icon style={styles.icon} />
@@ -111,7 +117,7 @@ const styles = StyleSheet.create({
     },
     tabText: {
         fontSize: 16,
-        color: colors.gray,
+        color: colors.text.primaryGrey,
         fontFamily: typography.fontFamily.regular,
     },
     activeTabText: {

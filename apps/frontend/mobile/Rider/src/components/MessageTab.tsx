@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     },
     dateText: {
         fontSize: typography.fontSize.small,
-        color: colors.gray,
+        color: colors.text.primaryGrey,
     },
     unreadIndicator: {
         width: 8,

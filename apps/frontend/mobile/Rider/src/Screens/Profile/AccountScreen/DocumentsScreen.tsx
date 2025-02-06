@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   reUploadText: {
     fontSize: typography.fontSize.medium,
     color: colors.primary,
-    fontWeight: typography.fontWeight.semiBold,
+    fontWeight: typography.fontWeight.semiBold as TextStyle["fontWeight"],
   },
 });
 

@@ -12,8 +12,8 @@ import { colors } from '../../theme/colors';
 import { formStyles } from '../../theme/form';
 import { typography } from '../../theme/typography';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
-import { useNavigation } from '@react-navigation/native';
-import { AppScreens } from '../../navigation/ScreenNames';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AppScreens, AppScreensParamList } from '../../navigation/ScreenNames';
 import PurplePhone from "../../assets/icons/purplePhone.svg"
 import PurpleMessage from "../../assets/icons/purpleMessage.svg"
 import PurpleDoNotRing from "../../assets/icons/purpleDoNotRing.svg"
@@ -38,16 +38,16 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
   itemsToDeliver,
 }) => {
   const [isTakingPhoto, setIsTakingPhoto] = useState(false);
-  const navigation = useNavigation()
+  const navigation = useNavigation<NavigationProp<AppScreensParamList>>()
 
   const handleTakePhoto = () => {
     setIsTakingPhoto(true);
-    console.log('Take Photo button clicked', isTakingPhoto); // Replace this with your camera logic
+    console.log('Take Photo button clicked', isTakingPhoto);
   };
 
   const handleOrderDelivered = () => {
     console.log('Order Delivered button clicked');
-    onClose(); // Close the modal when delivered
+    onClose(); 
   };
 
   return (
