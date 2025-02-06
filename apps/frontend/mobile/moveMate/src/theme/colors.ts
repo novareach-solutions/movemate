@@ -7,6 +7,7 @@ export const colors = {
   lightPurple: 'rgba(129, 35, 173, 0.22)',
   lightButtonBackground: 'rgba(129, 35, 173, 0.05)',
   green: 'rgba(34, 165, 110, 1)',
+  lightGreen:'#1CA672',
   darkGreen: 'rgb(1, 73, 43)',
   black: 'rgba(24, 24, 27, 1)',
   yellow: '#FFFCAA',
@@ -23,7 +24,9 @@ export const colors = {
     secondary: '#4563D6',
     light: '#D4D4D4',
     lightGray: '#D4D4D4',
+    greyD3:'#D3D3D3'
   },
   grey: '#636464',
   blue: '#18487F',
+  whiteFd:'#FDFDFD'
 };

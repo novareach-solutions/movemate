@@ -88,10 +88,10 @@ export const wallets = [
 ];
 
 export const deliveryInstructions = [
-    { label: "OTP Verification", icon: images.pickUpNotesIcon },
+    { label: "OTP Verification", icon: images.otpVerify },
     { label: "Do not ring the bell", icon: images.doNotRing },
     { label: "Drop-off at the door", icon: images.doorDropOff },
-    { label: "Avoid calling", icon: images.phone },
+    { label: "Avoid calling", icon: images.avoidCall },
 ];
 
 export const packageOptions = [

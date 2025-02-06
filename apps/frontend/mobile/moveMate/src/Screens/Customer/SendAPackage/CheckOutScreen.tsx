@@ -14,13 +14,17 @@ import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../../theme/colors";
 import { deliveryInstructions } from "../../../constants/staticData";
 import { useAppSelector } from "../../../redux/hook";
+import { formStyles } from "../../../theme/form";
+import { images } from "../../../assets/images/images";
+import CancellationPolicyModal from "../../../components/Modals/CancellationPolicyModal";
 
 const CheckoutScreen = () => {
-    const pickupLocationData = useAppSelector(state => state.deliverAPackage.pickupLocation);
-    const dropLocationData = useAppSelector(state => state.deliverAPackage.dropLocation);
+  const pickupLocationData = useAppSelector(state => state.deliverAPackage.pickupLocation);
+  const dropLocationData = useAppSelector(state => state.deliverAPackage.dropLocation);
   const [tip, setTip] = useState(null);
+  const [isCancelVisible,setIsCancelVisible] = useState(false);
   const [selectedInstruction, setSelectedInstruction] = useState(null);
-  const navigation=useNavigation()
+  const navigation = useNavigation()
 
   return (
     <SafeAreaView style={styles.container}>
@@ -38,50 +42,80 @@ const CheckoutScreen = () => {
             <Text style={styles.address}>{dropLocationData?.address}</Text>
           </View>
         </View>
-
+        <Text style={formStyles.inputLabel}>Delivery Details</Text>
         {/* Delivery Details Section */}
         <View style={styles.sectionContainer}>
-          <Text style={styles.greenText}>PICKUP IN 10 MINS</Text>
-          <Text style={styles.detailText}>25-30 mins delivery</Text>
-          <Text style={styles.detailText}>Total distance 5 kms</Text>
+
+          <View style={styles.pickupContainer}>
+
+            <Text style={styles.greenText}>PICKUP IN <Text style={styles.darkMin}>10 MINS</Text></Text>
+          </View>
+          <View style={styles.pickupWrapper}>
+            <images.clock style={styles.tipIcon} />
+            <Text style={styles.detailText}>25-30 mins delivery</Text>
+          </View>
+          <View style={styles.pickupWrapper}>
+            <images.distance style={styles.tipIcon} />
+            <Text style={styles.detailText}>Total distance 5 kms</Text>
+          </View>
+
         </View>
 
         {/* Delivery Instructions Section */}
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Delivery Instructions</Text>
-          <View style={styles.tagContainer}>
-            {deliveryInstructions.map((instruction, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.tag,
-                  selectedInstruction === instruction.label && styles.tagSelected,
-                ]}
-                onPress={() =>
-                  setSelectedInstruction(
-                    selectedInstruction === instruction.label ? null : instruction.label
-                  )
-                }
-              >
-                <Image source={instruction.icon} style={styles.icon} />
-                <Text
-                  style={
-                    selectedInstruction === instruction.label
-                      ? styles.tagTextSelected
-                      : styles.tagText
-                  }
-                >
-                  {instruction.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+          <View style={styles.tipTextContainer}>
+            <images.deliveryBoy style={styles.tipIcon} />
+            <View> <Text style={styles.sectionTitle}>Delivery Instructions</Text>
+              <Text>Add any special delivery notes</Text></View>
           </View>
+          <View style={styles.divider} />
+          <View style={styles.tagContainer}>
+          <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tagScrollView}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        snapToInterval={120} // Adjust card width
+      >
+        {deliveryInstructions.map((instruction, index) => {
+          const isSelected = selectedInstruction === instruction.label;
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[styles.tag, isSelected && styles.tagSelected]}
+              onPress={() =>
+                setSelectedInstruction(isSelected ? null : instruction.label)
+              }
+            >
+              <Image
+                source={instruction.icon}
+                style={[
+                  styles.icon,
+                  { tintColor: isSelected ? "#8123AD" : "#333" }, // Change color dynamically
+                ]}
+              />
+              <Text style={isSelected ? styles.tagTextSelected : styles.tagText}>
+                {instruction.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+      </View>
         </View>
 
         {/* Tip Section */}
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Thank your partner with a tip</Text>
-          <Text style={styles.tipSubText}>Tip goes directly to the driver</Text>
+          <View style={styles.tipTextContainer}>
+
+            <images.tipIcon style={styles.tipIcon} />
+            <View>
+              <Text style={styles.sectionTitle}>Thank your partner with a tip</Text>
+              <Text style={styles.tipSubText}>Tip goes directly to the driver</Text>
+            </View>
+          </View>
+
           <View style={styles.tipContainer}>
             {[2, 4, 6].map((amount) => (
               <TouchableOpacity
@@ -105,7 +139,7 @@ const CheckoutScreen = () => {
             ))}
           </View>
         </View>
-
+        <Text style={formStyles.inputLabel}>Bill Details</Text>
         {/* Bill Details Section */}
         <View style={styles.sectionContainer}>
           <Text style={styles.billText}>Handling Fee: $2</Text>
@@ -114,13 +148,25 @@ const CheckoutScreen = () => {
           <Text style={styles.totalText}>To Pay: $27</Text>
         </View>
 
+        <View style={[styles.sectionContainer,{backgroundColor:colors.lightGrey}]}>
+          <Text style={formStyles.inputLabel}>Review details to avoid cancellation</Text>
+          <Text>At Vamoose, we value the time and effort of our riders and believe in fair compensation for their work.</Text>
+          <TouchableOpacity style={styles.cancelPolicyBtn} onPress={() => {
+          setIsCancelVisible(true)
+        }}>
+          <Text style={styles.cancelPolicyBtnTxt}>READ CANCELATION POLICY</Text>
+        </TouchableOpacity>
+        </View>
+
         {/* Payment Button */}
-        <TouchableOpacity style={styles.paymentButton} onPress={()=>{
-            navigation.navigate(CustomerScreens.PaymentSelectionScreen)
+        <TouchableOpacity style={styles.paymentButton} onPress={() => {
+          navigation.navigate(CustomerScreens.PaymentSelectionScreen)
         }}>
           <Text style={styles.paymentButtonText}>Make Payment | $27</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <CancellationPolicyModal onClose={()=>{setIsCancelVisible(false)}} isVisible={isCancelVisible} />
     </SafeAreaView>
   );
 };
@@ -133,10 +179,22 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
   },
+  pickupContainer: {
+    backgroundColor: '#DDFBEF',
+    padding: 10,
+    width: 160
+  },
+  pickupWrapper: {
+    marginTop: 10,
+    flexDirection: 'row',
+    color: '#333'
+  },
   addressContainer: {
     backgroundColor: "#FFFFFF",
     padding: 16,
     borderRadius: 8,
+    borderColor: colors.border.greyD3,
+    borderWidth: 1,
     marginBottom: 16,
   },
   addressRow: {
@@ -147,6 +205,27 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: "bold",
     color: "#000",
+  },
+  tipTextContainer: {
+    flexDirection: 'row',
+    marginBottom: 10
+  },
+  tipIcon: {
+    marginRight: 10
+  },
+  cancelPolicyBtn:{
+    // padding:10,
+    paddingBottom:5,
+    // borderBottomColor:colors.purple,
+    // borderBottomWidth:1,
+    // borderStyle:'dashed'
+    // textDecorationLine:'line-through',
+
+  },
+  cancelPolicyBtnTxt:{
+    marginTop:10,
+    color:colors.purple,
+    // textDecorationLine:'underline',
   },
   address: {
     color: "#555",
@@ -161,66 +240,89 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#D4D4D4'
   },
   greenText: {
     color: "#28A745",
     fontWeight: "bold",
   },
+  darkMin: {
+    fontWeight: 900
+  },
   detailText: {
-    color: "#555",
+    color: "#232525",
     marginBottom: 4,
   },
   sectionTitle: {
     fontWeight: "bold",
     marginBottom: 8,
+    fontSize: 16,
     color: "#000",
   },
-  tagContainer: {
+  // tagContainer: {
+  //   flexDirection: "row",
+  //   flexWrap: "wrap",
+  // },
+  tagScrollView: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    paddingVertical: 8,
   },
   tag: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F0F0F0",
-    padding: 8,
-    borderRadius: 20,
-    marginRight: 8,
-    marginBottom: 8,
+    width: 88,
+    height:80,
+    flexDirection: "column",
+    // alignItems: "center",
+    justifyContent: "space-around",
+    borderWidth: 1,
+    borderColor: colors.border.greyD3,
+    padding: 10,
+    borderRadius: 12,
+    marginRight: 10,
+    backgroundColor: "#FFF",
   },
   tagSelected: {
-    backgroundColor: "#28A745",
-  },
-  tagText: {
-    color: "#555",
-    marginLeft: 8,
-  },
-  tagTextSelected: {
-    color: "#FFF",
+    borderColor: "#8123AD",
+    backgroundColor: "#FCF4FF",
   },
   icon: {
     width: 20,
     height: 20,
-    objectFit:"contain"
+    marginRight: 6,
+    resizeMode: "contain",
+  },
+  tagText: {
+    fontSize: 12,
+    color: "#333",
+  },
+  tagTextSelected: {
+    color: "#8123AD",
+    fontSize: 12,
+    // fontWeight: "bold",
   },
   tipContainer: {
     flexDirection: "row",
     marginTop: 8,
   },
   tipButton: {
-    backgroundColor: "#F0F0F0",
+    backgroundColor: colors.whiteFd,
+    borderWidth: 1,
+    borderColor: colors.border.greyD3,
+    color: '#232525',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginRight: 8,
   },
   tipButtonSelected: {
-    backgroundColor: "#28A745",
+    backgroundColor: "#FCF4FF",
+    borderWidth:1,
+    borderColor:'#8123AD'
   },
   tipText: {
     color: "#555",
   },
   tipTextSelected: {
-    color: "#FFF",
+    color: "#8123AD",
   },
   billText: {
     marginBottom: 4,
@@ -231,7 +333,7 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   paymentButton: {
-    backgroundColor: "#28A745",
+    backgroundColor: colors.lightGreen,
     padding: 16,
     borderRadius: 8,
     alignItems: "center",

@@ -37,6 +37,7 @@ type FormFields = z.infer<typeof formSchema>;
 const CompleteProfileScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 const [loading, setLoading] = useState(false); 
   const {
     handleSubmit,
@@ -116,11 +117,11 @@ const [loading, setLoading] = useState(false);
 
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.lightGrey }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={{ flex: 1, padding: 16 }}>
-            <Header logo/>
+            <Header logo bgColor={colors.lightGrey}/>
             <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
               <Text style={styles.title}>Complete your Profile</Text>
               <Text style={styles.subTitle}>Add your details to get started</Text>
@@ -129,7 +130,9 @@ const [loading, setLoading] = useState(false);
               <TextInput
                 placeholder="Enter your first name"
                 placeholderTextColor={colors.text.subText}
-                style={[formStyles.input, errors.firstName && formStyles.errorInput]}
+                style={[formStyles.input, errors.firstName && formStyles.errorInput,focusedField === "firstName" && { borderColor: colors.purple, borderWidth: 1 }]}
+                onFocus={() => setFocusedField("firstName")}
+                onBlur={() => setFocusedField(null)}
                 onChangeText={(text) => setValue("firstName", text, { shouldValidate: true })}
               />
               {errors.firstName && <Text style={formStyles.errorText}>{errors.firstName.message}</Text>}
@@ -141,7 +144,9 @@ const [loading, setLoading] = useState(false);
               <TextInput
                 placeholder="Enter your last name"
                 placeholderTextColor={colors.text.subText}
-                style={[formStyles.input, errors.lastName && formStyles.errorInput]}
+                style={[formStyles.input, errors.lastName && formStyles.errorInput,focusedField === "lastName" && { borderColor: colors.purple, borderWidth: 1 }]}
+                onFocus={() => setFocusedField("lastName")}
+                onBlur={() => setFocusedField(null)}
                 onChangeText={(text) => setValue("lastName", text, { shouldValidate: true })}
               />
               {errors.lastName && <Text style={formStyles.errorText}>{errors.lastName.message}</Text>}
@@ -155,7 +160,9 @@ const [loading, setLoading] = useState(false);
                 placeholderTextColor={colors.text.subText}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                style={[formStyles.input, errors.email && formStyles.errorInput]}
+                style={[formStyles.input, errors.email && formStyles.errorInput,focusedField === "email" && { borderColor: colors.purple, borderWidth: 1 }]}
+                onFocus={() => setFocusedField("email")}
+                onBlur={() => setFocusedField(null)}
                 onChangeText={(text) => {
                   setValue("email", text, { shouldValidate: true })}}
               />
@@ -168,7 +175,9 @@ const [loading, setLoading] = useState(false);
               <TextInput
                 placeholder="Enter your address"
                 placeholderTextColor={colors.text.subText}
-                style={[formStyles.input, errors.address && formStyles.errorInput]}
+                style={[formStyles.input, errors.address && formStyles.errorInput,focusedField === "address" && { borderColor: colors.purple, borderWidth: 1 }]}
+                onFocus={() => setFocusedField("address")}
+                onBlur={() => setFocusedField(null)}
                 onChangeText={handleAddressChange}
                 value={address}
               />
@@ -199,8 +208,10 @@ const [loading, setLoading] = useState(false);
               <TextInput
                 placeholder="Enter your suburb"
                 placeholderTextColor={colors.text.subText}
-                style={[formStyles.input, errors.suburb && formStyles.errorInput]}
+                style={[formStyles.input, errors.suburb && formStyles.errorInput,focusedField === "suburb" && { borderColor: colors.purple, borderWidth: 1 }]}
                 value={suburb}
+                onFocus={() => setFocusedField("suburb")}
+                onBlur={() => setFocusedField(null)}
                 onChangeText={(text) => setValue("suburb", text, { shouldValidate: true })}
               />
             </View>
@@ -210,7 +221,9 @@ const [loading, setLoading] = useState(false);
               <TextInput
                 placeholder="Enter your state"
                 placeholderTextColor={colors.text.subText}
-                style={[formStyles.input, errors.state && formStyles.errorInput]}
+                style={[formStyles.input, errors.state && formStyles.errorInput,focusedField === "state" && { borderColor: colors.purple, borderWidth: 1 }]}
+                onFocus={() => setFocusedField("state")}
+                onBlur={() => setFocusedField(null)}
                 value={state}
                 onChangeText={(text) => setValue("state", text, { shouldValidate: true })}
               />
@@ -222,8 +235,10 @@ const [loading, setLoading] = useState(false);
                 placeholder="Enter your postal code"
                 placeholderTextColor={colors.text.subText}
                 keyboardType="numeric"
-                style={[formStyles.input, errors.postalCode && formStyles.errorInput]}
+                style={[formStyles.input, errors.postalCode && formStyles.errorInput,focusedField === "postalCode" && { borderColor: colors.purple, borderWidth: 1 }]}
                 value={postalCode}
+                onFocus={() => setFocusedField("postalCode")}
+                onBlur={() => setFocusedField(null)}
                 onChangeText={(text) => setValue("postalCode", text, { shouldValidate: true })}
               />
             </View>
@@ -292,6 +307,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
+    backgroundColor:colors.white,
     borderColor: colors.border.light,
     borderRadius: 8,
     padding: 12,

@@ -22,17 +22,18 @@ interface DetailsModalProps {
   isVisible: boolean;
   onClose: (details?: { name: string; phoneNumber: string }) => void;
   type: 'sender' | 'receiver';
+  details:any
 }
 
 const { height } = Dimensions.get('window');
 
 const SenderReceiverModal: React.FC<DetailsModalProps> = ({
   isVisible,
-  onClose,
+  onClose,details,
   type,
 }) => {
-  const [name, setName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [name, setName] = useState(details?.name || '');
+  const [phoneNumber, setPhoneNumber] = useState(details?.phoneNumber || '');
 
   useEffect(() => {
     if (!isVisible) {
@@ -134,7 +135,6 @@ const styles = StyleSheet.create({
   },
   keyboardAvoid: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
   },
   modalContainer: {
     height: height * 0.35, // 35% of screen height, adjust as needed

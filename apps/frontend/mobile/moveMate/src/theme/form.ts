@@ -19,6 +19,7 @@ export const formStyles = StyleSheet.create({
     borderColor: colors.border.primary,
     borderRadius: 8,
     padding: 12,
+    backgroundColor:'#FDFDFD',
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
     color: colors.text.primary,

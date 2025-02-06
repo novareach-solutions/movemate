@@ -28,8 +28,15 @@ import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { updateDropLoaction, updatePickupLoaction } from "../../redux/slices/deliverAPackageSlice";
 import { fetchPlaceSuggestions } from "../../utils/fetchPlaceSuggestions";
 import { MAPBOX_ACCESS_TOKEN } from "../../constants";
+import { addressSchema } from "../../utils/zod/signupValidation";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { formStyles } from "../../theme/form";
 
 Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+
+type FormFields = z.infer<typeof addressSchema>;
 
 export type ILocation = {
   addressLine1: string;
@@ -43,7 +50,7 @@ export type ILocation = {
 
 interface LocationModalProps {
   isVisible: boolean;
-  onClose: (locationData?: ILocation) => void;
+  onClose: (locationData?: any) => void;
   title: string;
   placeholder: string;
   type: "pickup" | "drop"; // New prop
@@ -64,7 +71,17 @@ const LocationModal: React.FC<LocationModalProps> = ({
   placeholder,
   type,
 }) => {
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<FormFields>({
+    resolver: zodResolver(addressSchema),
+    mode: "onChange",
+  });
   const locationStatus = useAppSelector(state => state.common.locationStatus);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const insets = useSafeAreaInsets();
   const [results, setResults] = useState<LocationItem[]>([]);
@@ -96,7 +113,10 @@ const LocationModal: React.FC<LocationModalProps> = ({
     console.log('placenameData', placenameData)
   };
 
-
+  const addressLine1 = watch("addressLine1");
+  const suburb = watch("suburb");
+  const state = watch("state");
+  const postalCode = watch("postalCode");
 
   const requestLocationpermission = () => {
     // if (locationStatus) {
@@ -155,7 +175,11 @@ const LocationModal: React.FC<LocationModalProps> = ({
     }
   };
 
-  const handleSelectLocation = (location: LocationItem) => {
+  const handleSelectLocation = (location: any) => {
+    setValue("addressLine1", location.address, { shouldValidate: true });
+    setValue("suburb", location.suburb, { shouldValidate: true });
+    setValue("state", location.state, { shouldValidate: true });
+    setValue("postalCode", location.postalCode, { shouldValidate: true });
     setSelectedLocation(location);
     setCoordinates([location.longitude, location.latitude]);
     setIsMapModalVisible(true);
@@ -163,12 +187,12 @@ const LocationModal: React.FC<LocationModalProps> = ({
 
   const onConfirmAddress = () => {
 
-    const completeLocationData: ILocation = {
-      addressLine1: addressDetails.addressLine1,
-      addressLine2: addressDetails.addressLine2 || undefined,
-      suburb: addressDetails.suburb,         // Included
-      postalCode: addressDetails.postalCode, // Included
-      landmark: addressDetails.landmark || undefined,
+    const completeLocationData = {
+      addressLine1: watch("addressLine1"),
+      addressLine2: watch("addressLine2"),
+      suburb: watch("suburb"),         // Included
+      postalCode: watch("postalCode"), // Included
+      landmark: watch("landmark"),
       latitude: selectedLocation.latitude,
       longitude: selectedLocation.longitude,
     };
@@ -211,7 +235,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
           />
         </View>
 
-        {/* Current Location Section */}
+        {/* ######### Current Location Section ################# */}
         <View style={styles.currentLocation}>
           <Image source={images.gps} style={styles.locationIcon} />
           <View>
@@ -268,7 +292,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
           </TouchableOpacity>
         </View>
 
-        {/* Map Modal for location confirm */}
+        {/* ###### Map Modal for location confirm with map ########## */}
         {selectedLocation && (
           <Modal
             visible={isMapModalVisible}
@@ -304,7 +328,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
                       <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
                     </Svg>
                     <Text style={styles.addressTitle}>{selectedLocation?.name}</Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => setIsMapModalVisible(false)}>
                       <Text style={styles.editText1}>Edit</Text>
                     </TouchableOpacity>
                   </View>
@@ -329,7 +353,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
           </Modal>
         )}
 
-        {/* Address Details Modal */}
+        {/* ######### Address Details Form Modal ############## */}
         {isAddressDetailsVisible && (
           <Modal
             visible={isAddressDetailsVisible}
@@ -377,23 +401,25 @@ const LocationModal: React.FC<LocationModalProps> = ({
                     <Text style={styles.addressSubtitle}>
                       {selectedLocation?.address}
                     </Text></View>
-                  <Text style={styles.label}>Street Address</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Street Address"
-                    value={addressDetails.addressLine1}
-                    placeholderTextColor={colors.grey}
-                    onChangeText={(text) =>
-                      setAddressDetails({
-                        ...addressDetails,
-                        addressLine1: text,
-                      })
-                    }
-                  />
 
-                  <Text style={styles.label}>Address Line 2<Text style={styles.optional}>(optional)</Text></Text>
+                  <View style={formStyles.inputWrapper}>
+                    <Text style={formStyles.inputLabel}>Street Address</Text>
+                    <TextInput
+                      placeholder="Enter your address"
+                      placeholderTextColor={colors.text.subText}
+                      style={[formStyles.input, errors.addressLine1 && formStyles.errorInput, focusedField === "addressLine1" && { borderColor: colors.purple, borderWidth: 1 }]}
+                      onFocus={() => setFocusedField("addressLine1")}
+                      onBlur={() => setFocusedField(null)}
+                      onChangeText={(text) => setValue("addressLine1", text, { shouldValidate: true })}
+                      value={addressLine1}
+                    />
+                    {errors.addressLine1 && <Text style={formStyles.errorText}>{errors.addressLine1.message}</Text>}
+                  </View>
+
+                  <View style={formStyles.inputWrapper}>
+                  <Text style={formStyles.inputLabel}>Address Line 2<Text style={styles.optional}>(optional)</Text></Text>
                   <TextInput
-                    style={styles.input}
+                    style={formStyles.input}
                     placeholder="Address Line 2 (Optional)"
                     value={addressDetails.addressLine2}
                     placeholderTextColor={colors.grey}
@@ -404,40 +430,53 @@ const LocationModal: React.FC<LocationModalProps> = ({
                       })
                     }
                   />
+                  </View>
 
-                  <Text style={styles.label}>Suburb</Text>
+                  <View style={formStyles.inputWrapper}>
+                    <Text style={formStyles.inputLabel}>Suburb</Text>
+                    <TextInput
+                      placeholder="Enter your suburb"
+                      placeholderTextColor={colors.text.subText}
+                      style={[formStyles.input, errors.suburb && formStyles.errorInput, focusedField === "suburb" && { borderColor: colors.purple, borderWidth: 1 }]}
+                      value={suburb}
+                      onFocus={() => setFocusedField("suburb")}
+                      onBlur={() => setFocusedField(null)}
+                      onChangeText={(text) => setValue("suburb", text, { shouldValidate: true })}
+                    />
+                  </View>
 
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Suburb"
-                    value={addressDetails.suburb}
-                    placeholderTextColor={colors.grey}
-                    onChangeText={(text) =>
-                      setAddressDetails({
-                        ...addressDetails,
-                        suburb: text,
-                      })
-                    }
-                  />
-                  <Text style={styles.label}>Postal Code</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Postal Code"
-                    keyboardType="numeric"
-                    placeholderTextColor={colors.grey}
-                    value={addressDetails.postalCode}
-                    onChangeText={(text) =>
-                      setAddressDetails({
-                        ...addressDetails,
-                        postalCode: text,
-                      })
-                    }
-                  />
-                  <Text style={styles.label}>
+                  <View style={formStyles.inputWrapper}>
+                    <Text style={formStyles.inputLabel}>State</Text>
+                    <TextInput
+                      placeholder="Enter your state"
+                      placeholderTextColor={colors.text.subText}
+                      style={[formStyles.input, errors.state && formStyles.errorInput, focusedField === "state" && { borderColor: colors.purple, borderWidth: 1 }]}
+                      onFocus={() => setFocusedField("state")}
+                      onBlur={() => setFocusedField(null)}
+                      value={state}
+                      onChangeText={(text) => setValue("state", text, { shouldValidate: true })}
+                    />
+                  </View>
+
+                  <View style={formStyles.inputWrapper}>
+                    <Text style={formStyles.inputLabel}>Postal Code</Text>
+                    <TextInput
+                      placeholder="Enter your postal code"
+                      placeholderTextColor={colors.text.subText}
+                      keyboardType="numeric"
+                      style={[formStyles.input, errors.postalCode && formStyles.errorInput, focusedField === "postalCode" && { borderColor: colors.purple, borderWidth: 1 }]}
+                      value={postalCode}
+                      onFocus={() => setFocusedField("postalCode")}
+                      onBlur={() => setFocusedField(null)}
+                      onChangeText={(text) => setValue("postalCode", text, { shouldValidate: true })}
+                    />
+                  </View>
+
+                  <Text style={formStyles.inputLabel}>
                     Landmark <Text style={styles.optional}>(optional)</Text>
                   </Text>
                   <TextInput
-                    style={styles.input}
+                    style={formStyles.input}
                     placeholder="Landmark (Optional)"
                     placeholderTextColor={colors.grey}
                     value={addressDetails.landmark}
@@ -454,7 +493,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
                     <CheckBox
                       value={isSaved}
                       onValueChange={setIsSaved}
-                      tintColors={{ true: "#6200EE", false: "#8A8A8A" }} 
+                      tintColors={{ true: "#6200EE", false: "#8A8A8A" }}
                       boxType="square"
                       style={styles.checkbox}
                     />
@@ -604,8 +643,8 @@ const styles = StyleSheet.create({
     height: 550,
     // marginBottom: 20,
   },
-  addMapContainer:{
-    borderRadius:12
+  addMapContainer: {
+    borderRadius: 12
   },
   detailAddressMapImage: {
     width: "100%",
@@ -732,8 +771,8 @@ const styles = StyleSheet.create({
   tag: {
     padding: 10,
     backgroundColor: "#EAEAEA",
-    borderWidth:1,
-    borderColor:'#D3D3D3',
+    borderWidth: 1,
+    borderColor: '#D3D3D3',
     borderRadius: 12,
     marginRight: 10,
   },

@@ -30,8 +30,10 @@ import applePay from "./ApplePay.png";
 import paypal from "./Paypal.png";
 import profileAccount from "./ProfileAccount.png";
 import arrow from "./Arrow.png";
-import doNotRing from "./DoNotRing.png";
-import doorDropOff from "./DoorDropOff.png";
+import doNotRing from "./doNotringBell.png";
+import doorDropOff from "./doorDrop.png";
+import avoidCall from "./avoidCall.png";
+import otpVerify from "./otpVerification.png";
 import pickUpNotesIcon from "./PickUpNotesIcon.png";
 import phone from "./Phone.png";
 import visaIcon from "./VisaIcon.png";
@@ -96,6 +98,16 @@ import otherIcon from './packagetype/other.svg';
 import repairIcon from './packagetype/repair.svg';
 import pkgWeightIcon from './packagetype/pkgWeight.svg';
 
+import tipIcon from "./tip.svg";
+import deliveryBoy from "./delivery-boy.svg";
+import clock from "./clock.svg";
+import distance from "./distance.svg";
+
+import timeJar from "./timeJar.svg";
+import sad from "./formkit_sad.svg";
+import refundIcon from "./gridicons_refund.svg";
+import cancelGuide from "./cancelGuide.svg"
+
 export const images = {
   introImage1,
   introImage2,
@@ -125,5 +137,5 @@ export const images = {
   Account,
   Location,
   PackageImg,ShoppingCart,Store,TowTruck,LocaionSteps,BackArrow,Logo,
-  OfficeIcon,HomeIcon,ForwardArrow,EmailIcon,PhoneIcon,ReferFriend,Refund,HelpNSupport,LegalNAbout,InviteFriends,ManageAddress,ReferFriendImage,PackageArrived,CarTowing,HouseMoving,Trolley,Logout,SuccessGreen,VisaIcon,Open,greenTick,DashedLine,ForwardWhiteArrow,PickupNotes,Marker,Gps,outlineHome,outlineAccount,outlineNotification,outlineOrder,PaypalIcon,AppleIcon,MasterCardIcon,laundryIcon,repairIcon,otherIcon,documentIcon,foodIcon,electricIcon,pkgWeightIcon
+  OfficeIcon,HomeIcon,ForwardArrow,EmailIcon,PhoneIcon,ReferFriend,Refund,HelpNSupport,LegalNAbout,InviteFriends,ManageAddress,ReferFriendImage,PackageArrived,CarTowing,HouseMoving,Trolley,Logout,SuccessGreen,VisaIcon,Open,greenTick,DashedLine,ForwardWhiteArrow,PickupNotes,Marker,Gps,outlineHome,outlineAccount,outlineNotification,outlineOrder,PaypalIcon,AppleIcon,MasterCardIcon,laundryIcon,repairIcon,otherIcon,documentIcon,foodIcon,electricIcon,pkgWeightIcon,tipIcon,deliveryBoy,distance,clock,avoidCall,otpVerify,timeJar,sad,refundIcon,cancelGuide
 };

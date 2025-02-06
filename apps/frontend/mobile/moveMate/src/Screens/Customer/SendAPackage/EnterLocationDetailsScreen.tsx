@@ -324,18 +324,26 @@ const EnterLocationDetailsScreen = () => {
         
 
         {/* Sender Details Modal */}
-        <SenderReceiverModal
-          isVisible={isSenderModalVisible}
-          onClose={(details) => closeDetailsModal("sender", details)}
-          type="sender"
-        />
+        {
+          isSenderModalVisible &&  <SenderReceiverModal
+          details={senderDetails}
+            isVisible={isSenderModalVisible}
+            onClose={(details) => closeDetailsModal("sender", details)}
+            type="sender"
+          />
+        }
+       
 
         {/* Receiver Details Modal */}
-        <SenderReceiverModal
-          isVisible={isReceiverModalVisible}
-          onClose={(details) => closeDetailsModal("receiver", details)}
-          type="receiver"
-        />
+        {
+          isReceiverModalVisible && <SenderReceiverModal
+          details={receiverDetails}
+            isVisible={isReceiverModalVisible}
+            onClose={(details) => closeDetailsModal("receiver", details)}
+            type="receiver"
+          />
+        }
+        
 
         {/* Package Type Modal */}
         <PackageTypeModal
@@ -454,6 +462,7 @@ const EnterLocationDetailsScreen = () => {
       fontWeight: "bold",
     },
     footer: {
+      flex:1,
       paddingVertical:10,
       // backgroundColor: colors.white,
       justifyContent: 'flex-end',
