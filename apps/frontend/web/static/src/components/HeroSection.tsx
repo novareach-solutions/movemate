@@ -12,13 +12,6 @@ interface ServiceCardProps {
   height: number;
 }
 
-// Image container props type
-interface ImageContainerProps {
-  src: string;
-  alt: string;
-  label?: string;
-}
-
 // Service data
 const services: ServiceCardProps[] = [
   {
@@ -47,26 +40,14 @@ const services: ServiceCardProps[] = [
   },
 ];
 
-// Collage images data
-const collageImages: ImageContainerProps[] = [
-  { src: "/images/hero1.png", alt: "Car Towing" },
-  { src: "/images/hero1.png", alt: "Workers carrying boxes" },
-  { src: "/images/hero2.png", alt: "Person carrying a box" },
-  {
-    src: "/images/hero3.png",
-    alt: "Man loading boxes",
-    label: "Order Picked Up",
-  },
-];
-
 export default function HeroSection() {
   return (
-    <section className="relative py-12 px-4 bg-transparent">
-      <DottedPatternSvg className="absolute top-0 left-0 z-[1]" />
-      <DottedPatternSvg className="absolute bottom-0 right-0 z-[1] rotate-180" />
-      <PurpleCircleSvg className="absolute top-[-150px] right-[-200px] z-[1] w-[1000px] h-auto" />
+    <section className="relative  py-12 lg:px-[100px] px-4 bg-transparent">
+      <DottedPatternSvg className="absolute  top-0  hidden md:block left-0 z-[1]" />
+      <DottedPatternSvg className="absolute bottom-0  hidden md:block right-0 z-[1] rotate-180" />
+      <PurpleCircleSvg className="absolute top-[-150px] hidden md:block right-[-200px] z-[1] w-[1000px] h-auto" />
 
-      <div className="relative z-[2] mx-auto flex max-w-screen-xl flex-wrap items-center justify-between gap-8">
+      <div className="relative z-[2] mx-auto flex   flex-wrap items-center justify-between gap-8">
         {/* Left Content */}
         <div className="flex-1">
           <h1 className="mb-2 text-3xl md:text-4xl font-bold leading-snug">
@@ -77,7 +58,7 @@ export default function HeroSection() {
           </h1>
 
           <div className="border mt-[35px] border-[#8123AD45] border-opacity-[27%] rounded-[20px] max-w-[458px]">
-            <h2 className="flex items-center mt-[30px] mb-[30px] justify-center text-[20px] font-semibold">
+            <h2 className="flex items-center mt-[30px] mb-[30px] justify-center lg:text-[20px] font-semibold">
               What <span className="mx-1 text-[#8123AD]">service</span>
               are you looking for today?
             </h2>
@@ -89,11 +70,15 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Right Image Collage */}
-        <div className="relative grid flex-1 min-w-[300px] grid-cols-2 gap-4">
-          {collageImages.map((image, index) => (
-            <ImageContainer key={index} {...image} />
-          ))}
+        {/* Right Image - Hidden on mobile, visible on medium screens and above */}
+        <div className="hidden md:block relative  min-w-[300px]">
+          <Image
+            src="/images/herosection.png"
+            alt="Hero Section"
+            width={600} // Adjust width as needed
+            height={400} // Adjust height as needed
+            className="rounded-lg object-cover"
+          />
         </div>
       </div>
     </section>
@@ -108,20 +93,6 @@ function ServiceCard({ title, image, width, height }: ServiceCardProps) {
         <Image src={image} alt={title} width={width} height={height} />
       </div>
       <p className="mt-2 text-[18px] font-semibold">{title}</p>
-    </div>
-  );
-}
-
-// Image container component
-function ImageContainer({ src, alt, label }: ImageContainerProps) {
-  return (
-    <div className="relative w-full h-40">
-      <Image src={src} alt={alt} fill className="rounded-lg object-cover" />
-      {label && (
-        <div className="absolute bottom-[-1.25rem] left-5 rounded-md bg-white px-3 py-1 text-sm shadow-md">
-          {label}
-        </div>
-      )}
     </div>
   );
 }

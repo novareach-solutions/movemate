@@ -36,7 +36,9 @@ const WhyVamoose: React.FC<WhyVamooseProps> = ({
   secondRowFirstBg = "bg-gray-100",
 }) => {
   const SimpleCard = ({ icon, heading, description, bgColor }: SimpleCard) => (
-    <div className={`${bgColor} p-8 rounded-xl shadow-lg h-full flex flex-col`}>
+    <div
+      className={`${bgColor} p-8 rounded-xl shadow-lg shadow-purple-100 h-full flex flex-col`}
+    >
       <div className="flex flex-col items-start gap-4 flex-grow">
         <div className="p-4 rounded-lg bg-purple-100">{icon}</div>
         <h3 className="text-2xl font-bold">{heading}</h3>
@@ -49,7 +51,7 @@ const WhyVamoose: React.FC<WhyVamooseProps> = ({
     <section className="w-full">
       <div className="container mx-auto px-4 py-16">
         {/* Main Heading */}
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-left mb-12">
           {mainHeading} <span className="text-purple-600">{highlight}</span>
         </h2>
 
@@ -78,7 +80,7 @@ const WhyVamoose: React.FC<WhyVamooseProps> = ({
 
           {/* Second Row - Two Column Card */}
           <div
-            className={`md:col-span-2 ${secondRowCard.bgColor} p-8 rounded-xl shadow-lg h-full`}
+            className={`md:col-span-2 ${secondRowCard.bgColor} px-8 pt-8 rounded-xl shadow-lg shadow-purple-100 h-full`}
           >
             <div className="flex flex-col md:flex-row items-center gap-8 h-full">
               {/* Text Content */}
@@ -92,7 +94,7 @@ const WhyVamoose: React.FC<WhyVamooseProps> = ({
                   </p>
                 </div>
                 <button
-                  className="bg-purple-600 text-white px-6 py-2 rounded-lg 
+                  className="bg-purple-600 mb-2 text-white px-6 py-2 rounded-lg 
                   hover:bg-purple-700 transition-colors duration-300 mt-4"
                 >
                   {secondRowCard.buttonText}
@@ -100,7 +102,7 @@ const WhyVamoose: React.FC<WhyVamooseProps> = ({
               </div>
 
               {/* Image */}
-              <div className="md:w-1/2 relative h-64 md:h-full w-full">
+              <div className="md:w-[259px] relative h-64 md:h-[271px] overflow-hidden w-full">
                 <Image
                   src={secondRowCard.image}
                   alt="Feature image"
