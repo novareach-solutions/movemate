@@ -38,7 +38,9 @@ interface OrderState {
   errorUpdatingItemVerifiedPhoto: string | null;
   startingOrder: boolean;
   errorStartingOrder: string | null;
-  
+  acceptingOrder: boolean,
+  errorAcceptingOrder: string | null,
+
   // **New State Properties**
   updatingOrderStatus: boolean;
   errorUpdatingOrderStatus: string | null;
@@ -68,6 +70,8 @@ const initialState: OrderState = {
   errorUpdatingOrderStatus: null,
   isDeliveryModalVisible: false,
   deliveryDetails: null,
+  acceptingOrder: false,
+  errorAcceptingOrder: null,
 };
 
 
@@ -97,6 +101,32 @@ export const fetchOngoingOrder = createAsyncThunk<
       if (error.response && error.response.data && error.response.data.message) {
         errorMessage = error.response.data.message;
       }
+      Alert.alert('Error', errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const acceptOrder = createAsyncThunk<
+  SendPackageOrder,                   // Return type
+  { orderId: string },                // Argument type
+  { rejectValue: string }             // Rejected value type
+>(
+  'order/acceptOrder',
+  async ({ orderId }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post<{ success: boolean; message: string; data: SendPackageOrder }>(
+        apiEndPoints.acceptOrder(orderId)
+      );
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        Alert.alert('Error', response.data.message || 'Failed to accept order.');
+        return rejectWithValue(response.data.message || 'Failed to accept order.');
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to accept order.';
       Alert.alert('Error', errorMessage);
       return rejectWithValue(errorMessage);
     }
@@ -170,6 +200,41 @@ export const startOrder = createAsyncThunk<
   }
 );
 
+export const uploadProofOfDelivery = createAsyncThunk<
+  SendPackageOrder,                     // Return type
+  { orderId: number; url: string },     // Argument type
+  { rejectValue: string }               // Rejected value type
+>(
+  'order/uploadProofOfDelivery',
+  async ({ orderId, url }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.patch<{ success: boolean; message: string; data: SendPackageOrder }>(
+        apiEndPoints.proofOfDelivery(orderId),
+        { url },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        Alert.alert('Error', response.data.message || 'Failed to upload proof of delivery.');
+        return rejectWithValue(response.data.message || 'Failed to upload proof of delivery.');
+      }
+    } catch (error: any) {
+      let errorMessage = 'Failed to upload proof of delivery.';
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+      Alert.alert('Error', errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const updateOrderStatus = createAsyncThunk<
   SendPackageOrder,                   // Return type
   UpdateOrderStatusArgs,             // Argument type
@@ -196,6 +261,38 @@ export const updateOrderStatus = createAsyncThunk<
       }
     } catch (error: any) {
       let errorMessage = 'Failed to update order status.';
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+      Alert.alert('Error', errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const completeOrder = createAsyncThunk<
+  SendPackageOrder,                 // Return type
+  { orderId: number },              // Args type
+  { rejectValue: string }           // Rejected type
+>(
+  'order/completeOrder',
+  async ({ orderId }, { rejectWithValue }) => {
+    try {
+      // Make the POST request
+      const response = await apiClient.post<{
+        success: boolean;
+        message: string;
+        data: SendPackageOrder;
+      }>(apiEndPoints.completeOrder(orderId));
+
+      if (response.data.success) {
+        return response.data.data; // The updated SendPackageOrder
+      } else {
+        Alert.alert('Error', response.data.message || 'Failed to complete order.');
+        return rejectWithValue(response.data.message || 'Failed to complete order.');
+      }
+    } catch (error: any) {
+      let errorMessage = 'Failed to complete order.';
       if (error.response && error.response.data && error.response.data.message) {
         errorMessage = error.response.data.message;
       }
@@ -244,7 +341,6 @@ const orderSlice = createSlice({
       .addCase(updateItemVerifiedPhoto.fulfilled, (state, action: PayloadAction<SendPackageOrder>) => {
         state.updatingItemVerifiedPhoto = false;
         state.ongoingOrder = action.payload;
-        Alert.alert('Success', 'Item verification photo updated successfully.');
       })
       .addCase(updateItemVerifiedPhoto.rejected, (state, action) => {
         state.updatingItemVerifiedPhoto = false;
@@ -258,7 +354,6 @@ const orderSlice = createSlice({
       .addCase(startOrder.fulfilled, (state, action: PayloadAction<SendPackageOrder>) => {
         state.startingOrder = false;
         state.ongoingOrder = action.payload;
-        Alert.alert('Success', 'Order started successfully.');
       })
       .addCase(startOrder.rejected, (state, action) => {
         state.startingOrder = false;
@@ -272,7 +367,6 @@ const orderSlice = createSlice({
       .addCase(updateOrderStatus.fulfilled, (state, action: PayloadAction<SendPackageOrder>) => {
         state.updatingOrderStatus = false;
         state.ongoingOrder = action.payload;
-        Alert.alert('Success', 'Order status updated successfully.');
 
         // Check if the new status is PICKEDUP_ORDER to trigger DeliveryModal
         if (action.payload.status === OrderStatusEnum.PICKEDUP_ORDER) {
@@ -286,6 +380,42 @@ const orderSlice = createSlice({
       .addCase(updateOrderStatus.rejected, (state, action) => {
         state.updatingOrderStatus = false;
         state.errorUpdatingOrderStatus = action.payload || 'Failed to update order status.';
+      })
+      .addCase(uploadProofOfDelivery.pending, (state) => {
+        state.updatingOrderStatus = true;
+        state.errorUpdatingOrderStatus = null;
+      })
+      .addCase(uploadProofOfDelivery.fulfilled, (state, action: PayloadAction<SendPackageOrder>) => {
+        state.updatingOrderStatus = false;
+        state.ongoingOrder = action.payload;
+      })
+      .addCase(uploadProofOfDelivery.rejected, (state, action) => {
+        state.updatingOrderStatus = false;
+        state.errorUpdatingOrderStatus = action.payload || 'Failed to upload proof of delivery.';
+      }).addCase(completeOrder.pending, (state) => {
+        // optional: set a loading flag or something
+        state.updatingOrderStatus = true;
+        state.errorUpdatingOrderStatus = null;
+      })
+      .addCase(completeOrder.fulfilled, (state, action: PayloadAction<SendPackageOrder>) => {
+        state.updatingOrderStatus = false;
+        state.ongoingOrder = action.payload;
+        // The UI can now navigate to DeliverAPackage.EarningsDetails
+      })
+      .addCase(completeOrder.rejected, (state, action) => {
+        state.updatingOrderStatus = false;
+        state.errorUpdatingOrderStatus = action.payload || 'Failed to complete order.';
+      }).addCase(acceptOrder.pending, (state) => {
+        state.acceptingOrder = true;
+        state.errorAcceptingOrder = null;
+      })
+      .addCase(acceptOrder.fulfilled, (state, action: PayloadAction<SendPackageOrder>) => {
+        state.acceptingOrder = false;
+        state.ongoingOrder = action.payload;
+      })
+      .addCase(acceptOrder.rejected, (state, action) => {
+        state.acceptingOrder = false;
+        state.errorAcceptingOrder = action.payload || 'Failed to accept order.';
       });
 
   },

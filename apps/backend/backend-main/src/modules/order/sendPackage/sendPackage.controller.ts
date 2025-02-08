@@ -24,7 +24,7 @@ import { TSendPackageOrder } from "./sendPackage.types";
 import { logger } from "../../../logger";
 
 @Controller("order/send-package")
-// @UseGuards(AuthGuard, RoleGuard)
+@UseGuards(AuthGuard, RoleGuard)
 export class SendPackageController {
   constructor(private readonly sendPackageService: SendAPackageService) {}
 
@@ -34,6 +34,7 @@ export class SendPackageController {
     @Body() data: TSendPackageOrder,
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<SendPackageOrder>> {
+    console.log(request.user)
     const customerId = request.user.id;
     const createdOrder = await this.sendPackageService.create({
       ...data,
@@ -155,6 +156,27 @@ export class SendPackageController {
     };
   }
 
+  @Patch("agent/:orderId/proof-of-delivery")
+@Roles(UserRoleEnum.AGENT)
+async updateProofOfDelivery(
+  @Param("orderId", ParseIntPipe) orderId: number,
+  @Body("url") url: string,
+  @Req() request: ICustomRequest,
+): Promise<IApiResponse<SendPackageOrder>> {
+  const agentId = request.user.agent.id;
+
+  const updatedOrder = await this.sendPackageService.updateProofOfDelivery(
+    orderId,
+    agentId,
+    url,
+  );
+
+  return {
+    success: true,
+    message: "Proof of delivery photo updated successfully.",
+    data: updatedOrder,
+  };
+}
 
   @Post("agent/:orderId/start")
   @Roles(UserRoleEnum.AGENT)

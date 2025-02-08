@@ -10,6 +10,7 @@ import { navigate } from '../../../navigation/NavigationService';
 
 const GlobalOrderModal: React.FC = () => {
   const dispatch = useDispatch();
+  const navigation=useNavigation()
   const {isModalVisible, selectedOrder} = useSelector(
     (state: RootState) => state.order,
   );
@@ -19,7 +20,7 @@ const GlobalOrderModal: React.FC = () => {
   };
 
   const handleAcceptOrderSuccess = (order: SendPackageOrder) => {
-    navigate(DeliverAPackage.OrderDetails, { order });  };
+    navigation.navigate(DeliverAPackage.PickUpOrderDetails, { order });  };
 
   return (
     <OrderModal

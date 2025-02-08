@@ -2,7 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { IoAdapter } from "@nestjs/platform-socket.io";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { apiReference } from "@scalar/nestjs-api-reference";
-
+import cookieParser from 'cookie-parser';
 import { AppModule } from "./app.module";
 import configuration from "./config/configuration";
 import { CustomExceptionFilter } from "./errorFilter";
@@ -26,6 +26,7 @@ async function bootstrap(): Promise<void> {
       },
     }),
   );
+ 
 
   app.useGlobalFilters(new CustomExceptionFilter());
 
@@ -36,6 +37,7 @@ async function bootstrap(): Promise<void> {
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   });
+  app.use(cookieParser());
   // Configure WebSocket adapter
   app.useWebSocketAdapter(new IoAdapter(app));
 

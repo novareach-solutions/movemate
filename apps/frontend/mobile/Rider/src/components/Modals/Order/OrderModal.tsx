@@ -12,12 +12,14 @@ import {
   Alert,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { hideOrderModal } from '../../../redux/slices/orderSlice';
+import { acceptOrder, hideOrderModal } from '../../../redux/slices/orderSlice';
 import { colors } from '../../../theme/colors';
 import { images } from '../../../assets/images/images';
 import apiClient from '../../../api/apiClient';
 import apiEndPoints from '../../../api/apiEndPoints';
 import { SendPackageOrder } from '../../../redux/slices/types/sendAPackage'; // Ensure correct import
+import { useNavigation } from '@react-navigation/native';
+import { DeliverAPackage } from '../../../navigation/ScreenNames';
 
 interface ModalComponentProps {
   isVisible: boolean;
@@ -47,6 +49,7 @@ const OrderModal: React.FC<ModalComponentProps> = ({
   const dispatch = useDispatch();
   const [progress] = useState(new Animated.Value(0));
   const timerDuration = 40000; // 40 seconds
+  const navigation = useNavigation()
 
   useEffect(() => {
     if (isVisible) {
@@ -74,20 +77,13 @@ const OrderModal: React.FC<ModalComponentProps> = ({
     }
 
     try {
-      const response = await apiClient.post(apiEndPoints.acceptOrder(orderId));
-
-      if (response.status === 200 && response.data.success) {
-        Alert.alert('Success', 'Order accepted successfully.');
-        dispatch(hideOrderModal());
-
-        const acceptedOrder: SendPackageOrder = response.data.data;
-        onAcceptOrderSuccess(acceptedOrder);
-      } else {
-        Alert.alert('Error', response.data.message || 'Failed to accept order.');
-      }
+      const acceptedOrder = await dispatch(acceptOrder({ orderId })).unwrap();
+      onAcceptOrderSuccess(acceptedOrder);
+      navigation.navigate(DeliverAPackage.PickUpOrderDetails, { order: acceptedOrder });
+      dispatch(hideOrderModal());
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
       console.error('Accept Order Error:', error);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
     }
   };
 
@@ -101,9 +97,9 @@ const OrderModal: React.FC<ModalComponentProps> = ({
         <View style={styles.modalContainer}>
           <Text style={styles.totalEarningsLabel}>Total Earning</Text>
           <View style={styles.earning}>
-            <Text style={styles.totalEarnings}>{earnings}</Text>
+            <Text style={styles.totalEarnings}>24$</Text>
             <View style={styles.tipBadge}>
-              <Text style={styles.tipBadgeText}>Tip: {tip}</Text>
+              <Text style={styles.tipBadgeText}>Tip: 4$</Text>
             </View>
           </View>
 
@@ -235,7 +231,7 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute', 
+    position: 'absolute',
     width: '100%',
   },
   acceptOrderText: {

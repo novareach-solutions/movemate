@@ -48,7 +48,7 @@ export const formStyles = StyleSheet.create({
     backgroundColor: colors.green,
   },
   buttonText: {
-    color: colors.text.primaryGrey,
+    color: colors.white,
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
     fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],

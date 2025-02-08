@@ -277,6 +277,7 @@ export class AuthController {
     @Res() response: Response,
     @Req() request: Request,
   ): Promise<void> {
+    console.log(request.cookies)
     const refreshToken = request.cookies["refresh_token"];
     if (!refreshToken) {
       throw new ForbiddenException("Refresh token not found.");

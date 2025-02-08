@@ -58,7 +58,9 @@ export const DeliverAPackage = {
   EnterABN: 'EnterABNScreen',
   AddProfilePhoto: 'AddProfilePhotoScreen',
   Home: 'HomeScreen',
-  OrderDetails: 'OrderDetailsScreen',
+  PickUpOrderDetails: 'PickUpOrderDetailsScreen',
+  DropOffOrderDetails: 'DropOffOrderDetailsScreen',
+  EarningsDetails: 'EarningsDetailsScreen',
 } as const;
 
 export type BuyFromStoreParamList = {

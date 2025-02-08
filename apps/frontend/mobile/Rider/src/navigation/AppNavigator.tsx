@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
@@ -9,7 +9,6 @@ import {
   ProfileScreens,
 } from './ScreenNames';
 import Onboarding from '../components/Onboarding';
-import Login from '../Screens/SignupNumberScreen';
 import OtpScreen from '../Screens/OtpScreen';
 import SelectServiceScreen from '../Screens/SelectServiceScreen';
 import DAPCompleteProfileScreen from '../Screens/DeliverPackage/CompleteProfileScreen';
@@ -39,11 +38,17 @@ import SignupNumberScreen from '../Screens/SignupNumberScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import ChatScreen from '../Screens/ChatScreen';
 import {navigationRef} from './NavigationService';
-import OrderDetailsScreen from '../Screens/OrderDetailsScreen';
+import PickUpOrderDetailsScreen from '../Screens/PickUpOrderDetailsScreen';
+import DropOffOrderDetailsScreen from '../Screens/DropOffOrderDetailsScreen';
+import EarningsDetailsScreen from '../Screens/EarningDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
-const App = () => {
+interface AppNavigatorProps {
+  children?: ReactNode;
+}
+
+const App: React.FC<AppNavigatorProps> = ({ children }) => {
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator initialRouteName={AuthScreens.Onboarding}>
@@ -110,8 +115,18 @@ const App = () => {
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name={DeliverAPackage.OrderDetails}
-          component={OrderDetailsScreen}
+          name={DeliverAPackage.PickUpOrderDetails}
+          component={PickUpOrderDetailsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={DeliverAPackage.DropOffOrderDetails}
+          component={DropOffOrderDetailsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={DeliverAPackage.EarningsDetails}
+          component={EarningsDetailsScreen}
           options={{headerShown: false}}
         />
 
@@ -206,6 +221,7 @@ const App = () => {
           options={{headerShown: true}}
         />
       </Stack.Navigator>
+      {children}
     </NavigationContainer>
   );
 };

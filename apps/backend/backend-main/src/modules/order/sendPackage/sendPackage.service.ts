@@ -414,6 +414,38 @@ export class SendAPackageService {
     }
   }
 
+  async updateProofOfDelivery(
+    orderId: number,
+    agentId: number,
+    photoUrl: string,
+  ): Promise<SendPackageOrder> {
+    logger.debug(
+      `SendAPackageService.updateProofOfDelivery: Agent ID ${agentId} uploading proof of delivery for order ID ${orderId}`,
+    );
+  
+    if (!photoUrl) {
+      throw new SendPackageNotFoundError(`An error occurred while uploading the image`);
+    }
+  
+    const order = await dbReadRepo(SendPackageOrder).findOne({
+      where: { id: orderId },
+    });
+  
+    if (!order) {
+      throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
+    }
+  
+    order.completionPhoto = photoUrl;
+  
+  
+      const updatedOrder = await dbRepo(SendPackageOrder).save(order);
+      logger.debug(
+        `SendAPackageService.updateProofOfDelivery: Order ID ${orderId} updated with proof of delivery photo.`,
+      );
+      return updatedOrder;
+  }
+  
+
   async startOrder(
     orderId: number,
     agentId: number,
@@ -465,7 +497,7 @@ export class SendAPackageService {
       throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
     }
 
-    if (order.status !== OrderStatusEnum.IN_PROGRESS) {
+    if (order.status !== OrderStatusEnum.PICKEDUP_ORDER) {
       throw new SendPackageAgentCompleteError(
         `Order ID ${orderId} cannot be completed in its current status`,
       );

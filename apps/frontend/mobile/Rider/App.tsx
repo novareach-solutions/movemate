@@ -11,8 +11,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const App = () => (
   <Provider store={store}>
     <SafeAreaProvider>
-      <AppNavigator />
+      <AppNavigator>
       <GlobalOrderModal />
+      </AppNavigator>
     </SafeAreaProvider>
   </Provider>
 );

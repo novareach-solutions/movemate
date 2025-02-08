@@ -26,40 +26,34 @@ import {
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
 import { showOrderModal, fetchOngoingOrder } from '../../redux/slices/orderSlice';
-import OrderExpandedModal from '../../components/Modals/ExpandedModal';
 import { io } from 'socket.io-client';
 import apiClient from '../../api/apiClient';
 import apiEndPoints from '../../api/apiEndPoints';
 import GetLocation from 'react-native-get-location';
 import { RootState } from '../../redux/store';
+import { OrderStatusEnum } from '../../redux/slices/types/enums';
 
 const SOCKET_SERVER_URL = 'http://192.168.29.63:3001';
 
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
-  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated,
   );
-
-  // Select ongoing order from Redux store
   const ongoingOrder = useSelector(
     (state: RootState) => state.order.ongoingOrder,
   );
-
-
-  // Track if navigation has already occurred to prevent multiple navigations
   const [hasNavigated, setHasNavigated] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
 
   const updateLocationAPI = async (latitude: number, longitude: number) => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
       if (!accessToken) throw new Error('Access token not found.');
-
       const response = await apiClient.patch(apiEndPoints.updateLocation, {
         latitude,
         longitude,
@@ -72,61 +66,41 @@ const HomeScreen: React.FC = () => {
 
   useEffect(() => {
     let locationInterval: NodeJS.Timeout | null = null;
-
     if (isOnline) {
-      // Start updating location every 15 seconds
       locationInterval = setInterval(() => {
-        // Replace these static coordinates with dynamic ones if needed
         updateLocationAPI(40.712579, -74.218993);
       }, 15000);
     } else if (locationInterval) {
-      // Clear interval if the agent goes offline
       clearInterval(locationInterval);
     }
-
     return () => {
       if (locationInterval) clearInterval(locationInterval);
     };
   }, [isOnline]);
 
-  /**
-   * Toggles the agent's online/offline status.
-   */
   const toggleStatus = async () => {
     if (!isAuthenticated) {
       Alert.alert('Not Authenticated', 'Please log in to perform this action.');
       return;
     }
-
     const newStatus = !isOnline;
     setIsOnline(newStatus);
-    setIsLoading(true); // Start loading
-
-    // Animate the drawer
+    setIsLoading(true);
     Animated.timing(drawerHeight, {
-      toValue: newStatus ? 120 : 0, // If going online, show the drawer
+      toValue: newStatus ? 120 : 0,
       duration: 300,
       useNativeDriver: false,
     }).start();
-
-    // Optionally, log the current accessToken for verification
     const currentAccessToken = await AsyncStorage.getItem('accessToken');
-    console.log('🔍 Current Access Token:', currentAccessToken); // Minimal log
-
-    // Update status on the backend
+    console.log('🔍 Current Access Token:', currentAccessToken);
     try {
       const statusEnum = newStatus
         ? AgentStatusEnum.ONLINE
         : AgentStatusEnum.OFFLINE;
       await updateAgentStatus(statusEnum);
       console.log(`✅ Agent status set to ${statusEnum}`);
-      Alert.alert(
-        'Success',
-        `You are now ${newStatus ? 'Online' : 'Offline'}.`,
-      ); // **User Feedback**
     } catch (error) {
       console.log('Error', error);
-      // Revert the UI change if the API call fails
       setIsOnline(!newStatus);
       Animated.timing(drawerHeight, {
         toValue: !newStatus ? 120 : 0,
@@ -135,49 +109,36 @@ const HomeScreen: React.FC = () => {
       }).start();
       console.error('❌ Failed to update status:', error);
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
-  // Getting Order
-  const [agentId, setAgentId] = useState<string | null>(null);
-
   useEffect(() => {
-    // Fetch agentId from AsyncStorage
     const fetchAgentId = async () => {
       const storedAgentId = await AsyncStorage.getItem('agentId');
       setAgentId(storedAgentId);
     };
-
     fetchAgentId();
   }, []);
 
   useEffect(() => {
-    // Skip WebSocket initialization if no agentId is present
     if (!agentId) return;
-
-    const numericAgentId = parseInt(agentId, 10); // Convert agentId to a number
-
+    const numericAgentId = parseInt(agentId, 10);
     if (isNaN(numericAgentId)) {
       console.error('Invalid agentId: Unable to convert to number.');
       return;
     }
-
     const socket = io(SOCKET_SERVER_URL);
-
     socket.on('connect', () => {
       console.log('Connected to WebSocket server');
-      socket.emit('joinRoom', { agentId: numericAgentId }); // Use the numeric agentId
+      socket.emit('joinRoom', { agentId: numericAgentId });
       console.log(`Joined room for agentId: ${numericAgentId}`);
     });
-
     socket.on('disconnect', () => {
       console.log('Disconnected from WebSocket server');
     });
-
     socket.on('newRequest', (data: any) => {
       console.log('Received newRequest:', data);
-      // Dispatch the order modal with the received data
       dispatch(
         showOrderModal({
           orderId: data.orderId,
@@ -190,54 +151,49 @@ const HomeScreen: React.FC = () => {
         }),
       );
     });
-
     return () => {
       socket.disconnect();
     };
   }, [agentId, dispatch]);
 
-  // Fetch ongoing order when HomeScreen mounts or when agentId changes
   useEffect(() => {
     if (agentId) {
       dispatch(fetchOngoingOrder());
     }
   }, [agentId, dispatch]);
 
-  // **New useEffect for Redirecting to OrderDetails**
   useEffect(() => {
-
-    console.log("Ongoingon order value",ongoingOrder)
+    console.log("Ongoingon order value", ongoingOrder);
     if (ongoingOrder && !hasNavigated) {
-      setHasNavigated(true); // Prevent further navigations
-      navigation.navigate(DeliverAPackage.OrderDetails, { order: ongoingOrder });
+      setHasNavigated(true);
+      if (ongoingOrder.status===OrderStatusEnum.PICKEDUP_ORDER) {
+        navigation.navigate(DeliverAPackage.DropOffOrderDetails, { order: ongoingOrder });
+      }
+      if (ongoingOrder.status===OrderStatusEnum.ACCEPTED || ongoingOrder.status===OrderStatusEnum.PENDING)
+      {
+        navigation.navigate(DeliverAPackage.PickUpOrderDetails, { order: ongoingOrder });
+      }
     }
   }, [ongoingOrder, hasNavigated, navigation]);
 
   const handleTakePhoto = () => {
     console.log('Taking a photo for proof...');
-    // Add your camera logic here
   };
 
   const handleOrderDelivered = () => {
     console.log('Order marked as delivered.');
-    // No longer needed as modal is global
   };
 
-  // Handle "Accept Order" button press
   const handleAcceptOrder = () => {
-    // Any additional logic can be added here
+    // Additional logic can be added here
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <Header logo home />
-
-      {/* Map Image */}
       <View style={styles.mapContainer}>
         <Image source={images.map} style={styles.mapImage} />
       </View>
-
-      {/* Status Button */}
       <View style={styles.statusContainer}>
         <TouchableOpacity
           onPress={toggleStatus}
@@ -245,7 +201,7 @@ const HomeScreen: React.FC = () => {
             styles.statusButton,
             isOnline ? styles.stopButton : styles.goButton,
           ]}
-          disabled={isLoading} // **Disable Button While Loading**
+          disabled={isLoading}
         >
           {isLoading ? (
             <ActivityIndicator
@@ -256,7 +212,8 @@ const HomeScreen: React.FC = () => {
               style={[
                 styles.statusButtonText,
                 isOnline ? styles.stopText : styles.goText,
-              ]}>
+              ]}
+            >
               {isOnline ? 'Stop' : 'GO'}
             </Text>
           )}
@@ -265,8 +222,6 @@ const HomeScreen: React.FC = () => {
           {isOnline ? "You're Online" : "You're Offline"}
         </Text>
       </View>
-
-      {/* Sliding Drawer */}
       <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
         <View style={styles.statsContainer}>
           <StatCard icon={images.money} value="$50" label="EARNINGS" />
@@ -278,7 +233,6 @@ const HomeScreen: React.FC = () => {
           />
         </View>
       </Animated.View>
-
       <View style={styles.helpButtonContainer}>
         <HelpButton
           onPress={() => {
@@ -365,7 +319,6 @@ const styles = StyleSheet.create({
     top: 12,
     right: 12,
   },
-  // Add other styles as needed
 });
 
 export default HomeScreen;
