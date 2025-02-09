@@ -82,7 +82,7 @@ const ComparisonCards: React.FC = () => {
         </div>
 
         {/* Vamoose Highlight Card */}
-        <div className="w-[490px] h-[703px] bg-gradient-to-bl from-purple-400 to-purple-600 text-center rounded-[25px] px-[75px] py-[40px] transform -translate-y-12">
+        <div className="w-[490px] h-[703px] bg-gradient-to-bl from-purple-400 to-[#681F8B] text-center rounded-[25px] px-[75px] py-[40px] transform -translate-y-12">
           {/* Card Title */}
           <h3 className="text-[25px] font-bold font-gilroy text-white mb-[58px]">
             Vamoose

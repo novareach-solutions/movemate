@@ -107,8 +107,8 @@ const Navbar: React.FC = () => {
             </DropdownMenu>
 
             <Link href="/riders">For Riders</Link>
-            <Link href="/riders">Plans</Link>
-            <Link href="/riders">About us</Link>
+            <Link href="/pricing">Plans</Link>
+            <Link href="/about">About us</Link>
 
             <Link href="/contactus">Contact us</Link>
           </div>

@@ -21,13 +21,13 @@ const ServicesHerosection: React.FC<HeroSectionProps> = ({
       <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
         {/* Left Content */}
         <div className="lg:w-1/2 text-left">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-3">
             {headingPart1}{" "}
-            <span className="text-purple-600">{headingPart2}</span>
+            <span className="text-[#8123AD]">{headingPart2}</span>
           </h1>
           <p className="text-lg text-gray-600 mb-8">{description}</p>
           <button
-            className="bg-purple-600 text-white px-8 py-3 rounded-lg 
+            className="bg-[#8123AD] text-white px-8 py-3 rounded-lg 
             hover:bg-purple-700 transition-colors duration-300 text-lg font-semibold"
           >
             {buttonText}

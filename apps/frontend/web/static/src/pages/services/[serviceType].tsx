@@ -5,15 +5,10 @@ import ServicesHerosection from "@/components/ServicesHerosection";
 import ThreeStepsSection from "@/components/ThreeStepsSection";
 import WhyVamoose from "@/components/WhyVamoose";
 import { Truck, Clock, Shield, Package, Mail } from "lucide-react";
-import deliveryImage from "../../public/images/deliveryImage.png";
-
-// Import your images
-// import deliveryImage from "../../../public/images/deliveryImage.png";
-// import carTowingImage from "../../../public/images/carTowing.png";
-// import buyStoreImage from "../../../public/images/buyStore.png";
 import step1 from "../../../public/images/step1.png";
 import step2 from "../../../public/images/step2.png";
 import Dme from "../../../public/images/Dme.png";
+import service1 from "../../../public/images/service1.png";
 
 // Service type configuration
 interface ServiceConfig {
@@ -85,7 +80,7 @@ const EmailNotification: React.FC = () => {
 const serviceConfigs: Record<string, ServiceConfig> = {
   "on-demand-delivery": {
     hero: {
-      image: step1,
+      image: service1,
       headingPart1: "Fast, Reliable Delivery Right",
       headingPart2: "at Your Fingertips!",
       description:

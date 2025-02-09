@@ -3,40 +3,6 @@ import React from "react";
 // import Image from "next/image";
 
 const VamooseVsOthers: React.FC = () => {
-  //   const features = [
-  //     {
-  //       icon: percentage,
-  //       feature: "Hybrid Earning Model",
-  //     },
-  //     {
-  //       icon: percentage,
-  //       feature: "Transparent Policies",
-  //     },
-  //     {
-  //       icon: percentage,
-  //       feature: "Seamless Integration",
-  //     },
-  //     {
-  //       icon: percentage,
-  //       feature: "Seamless Integration",
-  //     },
-  //   ];
-
-  //   const vamoose = [
-  //     {
-  //       vamoose: "Keep 100% of earnings or a low-commission-per-ride model.",
-  //     },
-  //     {
-  //       vamoose: "Keep 100% of earnings or a low-commission-per-ride model.",
-  //     },
-  //     {
-  //       vamoose: "Keep 100% of earnings or a low-commission-per-ride model.",
-  //     },
-  //     {
-  //       vamoose: "Keep 100% of earnings or a low-commission-per-ride model.",
-  //     },
-  //   ];
-
   const featuresCard = [
     {
       feature: "Hybrid Earning Model",
@@ -74,38 +40,6 @@ const VamooseVsOthers: React.FC = () => {
           <span className="text-black"> What Sets Us Apart</span>
         </div>
 
-        {/* Features Section >md */}
-        {/* <div className="hidden  font-sans bg-[#F8F5FB] w-full rounded-[min(0.985vw,19px)] md:grid grid-cols-3 mt-[min(5.465vw,105px)] px-[min(3.125vw,60px)] pt-[min(1.305vw,25px)] pb-[min(3.905vw,75px)] relative">
-          
-          <div className="font-gilroy flex flex-col justify-start font-semibold text-[min(1.25vw,24px)] text-[#2D2D2D] pt-[min(3.905vw,75px)]">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="flex  justify-start items-center gap-[min(1.045vw,20px)]"
-              >
-                <Image
-                  src={feature.icon}
-                  alt="feature-icon"
-                  className="w-[min(1.875vw,36px)]"
-                />
-                <div>{feature.feature}</div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="justify-self-center  w-[90%] background-linear text-white  -top-[min(3.645vw,70px)] relative rounded-[min(1.305vw,25px)] pt-[min(2.085vw,40px)] pb-[min(4.685vw,90px)]">
-            VAMOOSE
-            <div className="flex w-[80%]  gap-6 justify-self-center flex-col ">
-              {vamoose.map((vamoose, index) => (
-                <div key={index}>{vamoose.vamoose}</div>
-              ))}
-            </div>
-          </div>
-
-          
-          <div className="flex justify-center">OTHERS</div>
-        </div> */}
-        {/* Features Section <md */}
         <div className="w-full flex flex-col gap-[min(4.095vw,16px)] md:hidden ">
           {featuresCard.map((item, index) => (
             <div
