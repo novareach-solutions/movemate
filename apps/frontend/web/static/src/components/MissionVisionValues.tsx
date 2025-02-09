@@ -27,9 +27,9 @@ export default function MissionVisionValues() {
   };
 
   return (
-    <section className="bg-purple-600 text-white py-16 px-4">
+    <section className="bg-[#8123AD] bg-opacity-[8%] text-black py-16 px-4">
       <div className="container mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-12">
+        <h2 className="text-[40px] font-bold font-gilroy text-center mb-12">
           Mission, Vision & Values
         </h2>
 
@@ -40,31 +40,34 @@ export default function MissionVisionValues() {
               <div key={index} className="border-b border-purple-400">
                 <button
                   onClick={() => toggleAccordion(index)}
-                  className="flex justify-between items-center w-full py-4"
+                  className="flex justify- gap-4 items-center w-full py-[40px]"
                 >
                   <h3
                     className={`text-xl font-semibold text-left ${
                       activeAccordion === index
-                        ? "text-purple-200"
-                        : "text-white"
+                        ? "text-[#8123AD] lg:text-[40px] font-gilroy font-bold"
+                        : "text-black lg:text-[40px] font-gilroy font-bold"
                     }`}
                   >
                     {item.title}
                   </h3>
-                  <ChevronDown
-                    className={`w-6 h-6 transform transition-transform ${
-                      activeAccordion === index
-                        ? "rotate-180 text-purple-200"
-                        : "text-white"
-                    }`}
-                  />
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 22 22"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16.5615 12.333H0.328125V9.66634H16.5615L9.09479 2.19967L10.9948 0.333008L21.6615 10.9997L10.9948 21.6663L9.09479 19.7997L16.5615 12.333Z"
+                      fill="#8123AD"
+                    />
+                  </svg>
                 </button>
 
                 {activeAccordion === index && (
                   <div className="pb-6">
-                    <p className="text-gray-100 leading-relaxed">
-                      {item.content}
-                    </p>
+                    <p className=" leading-relaxed">{item.content}</p>
                   </div>
                 )}
               </div>
@@ -73,9 +76,8 @@ export default function MissionVisionValues() {
 
           {/* Image Section */}
           <div className="hidden lg:block">
-            <div className="bg-gray-100 rounded-xl h-96 w-full flex items-center justify-center text-purple-600">
-              {/* Replace this div with your actual image */}
-              <span>Company Image/Illustration</span>
+            <div className="">
+              <img src="/images/msv.png" alt="Feature Icon" />{" "}
             </div>
           </div>
         </div>

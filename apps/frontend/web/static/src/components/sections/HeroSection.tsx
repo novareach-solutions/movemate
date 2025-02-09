@@ -13,24 +13,38 @@ export const HeroSection = ({
   formTitle,
   formDescription,
 }: HeroSectionProps) => (
-  <section className="relative min-h-screen flex flex- justify-center  items-center">
-    <div className="absolute inset-0 bg-gradient-to-r from-purple-900/80 to-blue-900/80">
-      <div className="absolute inset-0 bg-cover bg-center opacity-20" />
-    </div>
-
-    <div className="container relative grid md:grid-cols-2 items-center gap-[400px]">
-      <div className="text-white space-y-6">
-        <h1 className="text-5xl font-bold">{title}</h1>
-        <p className="text-xl">{description}</p>
-        <button className="bg-purple-600 text-white px-8 py-3 rounded-lg">
+  <section
+    className="relative min-h-screen flex justify-center items-center bg-cover bg-center"
+    style={{
+      backgroundImage: `url('/ridersBg.png')`, // Background image
+    }}
+  >
+    {/* Responsive Container */}
+    <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-[400px] px-4 md:px-8 lg:px-20">
+      {/* Left Content */}
+      <div className="text-black space-y-6 max-w-full md:max-w-[639px]">
+        <h1 className="text-3xl md:text-[45px] font-bold leading-snug md:leading-[65px]">
+          {title.split(" ").map((word, index) =>
+            index < 5 ? (
+              <span key={index} className="text-[#8123AD]">
+                {word}{" "}
+              </span>
+            ) : (
+              <span key={index}>{word} </span>
+            )
+          )}
+        </h1>
+        <p className="text-base md:text-xl">{description}</p>
+        <button className="bg-[#8123AD] text-white px-6 md:px-8 py-2 md:py-3 rounded-lg">
           {buttonText}
         </button>
       </div>
 
-      <div className="bg-white p-8 rounded-xl shadow-xl">
-        <h2 className="text-2xl font-bold mb-4">{formTitle}</h2>
-        <p className="text-gray-600 mb-6">{formDescription}</p>
-        <form className="space-y-4">
+      {/* Right Form Container */}
+      <div className="bg-[#F8F5FB] p-6 md:p-8 border border-[#8123AD] rounded-xl w-full max-w-md md:max-w-[535px] lg:h-[536px]">
+        <h2 className="text-2xl md:text-[28px] font-bold mb-4">{formTitle}</h2>
+        <p className="text-[#777777] mb-6 md:mb-[35px]">{formDescription}</p>
+        <form className="flex flex-col gap-4">
           <input
             type="text"
             placeholder="Full Name"
@@ -46,8 +60,8 @@ export const HeroSection = ({
             placeholder="Email Address"
             className="w-full p-3 border rounded-lg"
           />
-          <button className="w-full bg-purple-600 text-white py-3 rounded-lg">
-            Submit Application
+          <button className="w-full text-[#8123AD] text-lg font-semibold border border-[#8123AD] mt-6 md:mt-[35px] md:h-[60px] rounded-lg">
+            Submit
           </button>
         </form>
       </div>

@@ -143,7 +143,7 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
-      <FAQs {...faqData} />
+      {/* <FAQs {...faqData} /> */}
       <TryUsNow />
     </div>
   );

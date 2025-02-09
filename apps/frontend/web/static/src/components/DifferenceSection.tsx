@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { ShieldCheck, Wallet, Bell, Clock, Award, Bike } from "lucide-react";
+import { Tp } from "../../public/svgs/Tp";
+import { Frc } from "../../public/svgs/Frc";
+import { Cf } from "../../public/svgs/Cf";
 
 type ActiveTab = "customers" | "riders";
 
@@ -8,38 +11,39 @@ export default function DifferenceSection() {
 
   const customerCards = [
     {
-      icon: <ShieldCheck className="w-6 h-6" />,
-      title: "Safe Rides",
-      description: "Verified drivers and real-time tracking for your safety",
+      icon: <Tp />,
+      title: "Transparent Pricing",
+      description: "Pay only for what you order—no hidden costs or markups.",
     },
     {
-      icon: <Wallet className="w-6 h-6" />,
-      title: "Flexible Payments",
+      icon: <Frc />,
+      title: "Fast and Reliable Services",
+      description: "Quick deliveries and rides tailored to your schedule.",
+    },
+    {
+      icon: <Cf />,
+      title: "Community-Focused",
       description:
-        "Multiple payment options including cash and digital wallets",
-    },
-    {
-      icon: <Bell className="w-6 h-6" />,
-      title: "Instant Notifications",
-      description: "Real-time updates about your ride and driver",
+        "Proudly Australian, supporting local drivers and businesses.",
     },
   ];
 
   const riderCards = [
     {
-      icon: <Clock className="w-6 h-6" />,
-      title: "Flexible Hours",
-      description: "Work whenever you want with no fixed schedules",
+      icon: <Tp />,
+      title: "Transparent Pricing",
+      description: "Pay only for what you order—no hidden costs or markups.",
     },
     {
-      icon: <Award className="w-6 h-6" />,
-      title: "Earnings",
-      description: "Competitive rates and daily payout options",
+      icon: <Frc />,
+      title: "Fast and Reliable Services",
+      description: "Quick deliveries and rides tailored to your schedule.",
     },
     {
-      icon: <Bike className="w-6 h-6" />,
-      title: "Support",
-      description: "24/7 support team for riders",
+      icon: <Cf />,
+      title: "Community-Focused",
+      description:
+        "Proudly Australian, supporting local drivers and businesses.",
     },
   ];
 
@@ -79,11 +83,9 @@ export default function DifferenceSection() {
           (card, index) => (
             <div
               key={index}
-              className="flex flex-col items-center text-center p-6 shadow-lg rounded-xl"
+              className="flex flex-col items-center text-center p-6 "
             >
-              <div className="mb-4 p-4 bg-purple-100 rounded-full">
-                {card.icon}
-              </div>
+              <div className="mb-4 ">{card.icon}</div>
               <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
               <p className="text-gray-600">{card.description}</p>
             </div>

@@ -1,4 +1,3 @@
-// pages/services/[serviceType].tsx
 import { useRouter } from "next/router";
 import React from "react";
 import ServicesHerosection from "@/components/ServicesHerosection";
@@ -9,6 +8,10 @@ import step1 from "../../../public/images/step1.png";
 import step2 from "../../../public/images/step2.png";
 import Dme from "../../../public/images/Dme.png";
 import service1 from "../../../public/images/service1.png";
+import service2 from "../../../public/images/service2.png";
+import service32 from "../../../public/images/service32.png";
+
+import { StaticImageData } from "next/image";
 
 // Service type configuration
 interface ServiceConfig {
@@ -65,10 +68,7 @@ const EmailNotification: React.FC = () => {
           onChange={(e) => setEmail(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600"
         />
-        <button
-          className="bg-purple-600 text-white px-6 py-2 rounded-lg 
-          hover:bg-purple-700 transition-colors duration-300"
-        >
+        <button className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors duration-300">
           Get Notified
         </button>
       </div>
@@ -151,7 +151,7 @@ const serviceConfigs: Record<string, ServiceConfig> = {
   },
   "car-towing": {
     hero: {
-      image: step1,
+      image: service2,
       headingPart1: "24/7 Professional",
       headingPart2: "Car Towing Service",
       description:
@@ -198,7 +198,7 @@ const serviceConfigs: Record<string, ServiceConfig> = {
   },
   "buy-store": {
     hero: {
-      image: step1,
+      image: service32,
       headingPart1: "Shop & Ship",
       headingPart2: "with Confidence",
       description:

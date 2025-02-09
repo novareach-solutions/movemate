@@ -2,19 +2,21 @@ import Image, { StaticImageData } from "next/image";
 import React from "react";
 
 interface HeroSectionProps {
-  imageSrc: StaticImageData;
+  image: StaticImageData;
   headingPart1: string;
   headingPart2: string;
   description: string;
   buttonText: string;
+  children?: React.ReactNode;
 }
 
 const ServicesHerosection: React.FC<HeroSectionProps> = ({
-  imageSrc,
+  image,
   headingPart1 = "Fast, Reliable Delivery",
   headingPart2 = "at Your Fingertips!",
   description = "Make Vamoose your trusted choice for fast, reliable, and hassle-free delivery services tailored to meet your needs effortlessly!",
   buttonText = "Get Started",
+  children,
 }) => {
   return (
     <section className="container mx-auto px-4 py-12">
@@ -26,25 +28,16 @@ const ServicesHerosection: React.FC<HeroSectionProps> = ({
             <span className="text-[#8123AD]">{headingPart2}</span>
           </h1>
           <p className="text-lg text-gray-600 mb-8">{description}</p>
-          <button
-            className="bg-[#8123AD] text-white px-8 py-3 rounded-lg 
-            hover:bg-purple-700 transition-colors duration-300 text-lg font-semibold"
-          >
+          <button className="bg-[#8123AD] text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors duration-300 text-lg font-semibold">
             {buttonText}
           </button>
+          {children}
         </div>
 
         {/* Right Image */}
         <div className="lg:w-1/2 w-full">
-          <div className="relative h-96 lg:h-[500px] rounded-xl overflow-hidden">
-            <Image
-              src={imageSrc}
-              alt="Hero section image"
-              fill
-              className="object-cover object-center"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
+          <div className="">
+            <Image src={image} alt="Hero section image" />
           </div>
         </div>
       </div>
