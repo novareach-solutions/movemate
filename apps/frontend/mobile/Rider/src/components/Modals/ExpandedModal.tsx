@@ -32,8 +32,9 @@ import {
   updateOrderStatus,
 } from '../../redux/slices/orderSlice';
 import { RootState } from '../../redux/store';
-import { DeliverAPackage } from '../../navigation/ScreenNames';
+import { AppScreens, DeliverAPackage } from '../../navigation/ScreenNames';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -41,9 +42,11 @@ interface ExpandedModalProps {
   isVisible: boolean;
   onClose: () => void;
   order: SendPackageOrder;
+  /** When true, prevents the modal from closing/collapsing. */
+  disableClose?: boolean;
 }
 
-const InfoRow: React.FC<{ iconSource: any; text: string; bold?: boolean }> = ({
+export const InfoRow: React.FC<{ iconSource: any; text: string; bold?: boolean }> = ({
   iconSource,
   text,
   bold,
@@ -64,27 +67,33 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   isVisible,
   onClose,
   order,
+  disableClose = false,
 }) => {
   const [height] = useState(new Animated.Value(SCREEN_HEIGHT * 0.2));
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [isConfirmPhotoVisible, setIsConfirmPhotoVisible] = useState(false);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
-  const navigation = useNavigation()
-
-
+  const navigation = useNavigation();
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (order) {
-      // setCurrentOrder(order);
+      // Optionally set local state with order details if needed.
     }
   }, [order]);
 
   useEffect(() => {
-    isVisible ? handleExpand() : handleCollapse();
-  }, [isVisible]);
+    if (isVisible) {
+      // When the modal becomes visible, always expand it.
+      handleExpand();
+    } else {
+      if (!disableClose) {
+        handleCollapse();
+      }
+    }
+  }, [isVisible, disableClose]);
 
   const handleExpand = () => {
     setIsExpanded(true);
@@ -101,7 +110,11 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
       toValue: SCREEN_HEIGHT * 0.22,
       duration: 300,
       useNativeDriver: false,
-    }).start();
+    }).start(() => {
+      if (!disableClose) {
+        onClose();
+      }
+    });
   };
 
   const handleRetry = () => {
@@ -118,29 +131,26 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
     try {
       await dispatch(updateItemVerifiedPhoto({ orderId: currentOrder.id, url: uploadedImageUrl })).unwrap();
 
-      // ✅ Fetch updated order and update state
+      // Fetch updated order details.
       const fetchResponse = await dispatch(fetchOngoingOrder()).unwrap();
-      if (fetchResponse) {
-        // setCurrentOrder(fetchResponse); // ✅ Update local state with new order details
-      } else {
+      if (!fetchResponse) {
         Alert.alert('Warning', 'Photo updated, but order refresh failed.');
       }
     } catch (error: any) {
-      console.error('Failed to update itemVerifiedPhoto or refresh order:', error);
+      console.error('Failed to update photo or refresh order:', error);
       Alert.alert('Error', error.message || 'Failed to update photo or refresh order.');
     }
 
     setIsConfirmPhotoVisible(false);
   };
 
-
-  const currentOrder = useSelector((state: RootState) => state.order.ongoingOrder); // Sync with Redux store
+  const currentOrder = useSelector((state: RootState) => state.order.ongoingOrder);
 
   const handleOrderAction = async () => {
     if (currentOrder?.status === OrderStatusEnum.ACCEPTED) {
       try {
         await dispatch(startOrder({ orderId: currentOrder.id })).unwrap();
-        await dispatch(fetchOngoingOrder()).unwrap(); // Ensure we fetch updated data
+        await dispatch(fetchOngoingOrder()).unwrap();
       } catch (error: any) {
         console.error('Failed to start order:', error);
         Alert.alert('Error', error.message || 'Failed to start order.');
@@ -151,7 +161,9 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
       try {
         await dispatch(updateOrderStatus({ orderId: currentOrder.id, status: OrderStatusEnum.PICKEDUP_ORDER })).unwrap();
         await dispatch(fetchOngoingOrder()).unwrap();
-        onClose();
+        if (!disableClose) {
+          onClose();
+        }
         navigation.navigate(DeliverAPackage.DropOffOrderDetails, { order: currentOrder });
       } catch (error: any) {
         console.error('Failed to update order status:', error);
@@ -159,7 +171,6 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
       }
     }
   };
-
 
   const getButtonText = () => {
     return currentOrder?.status === OrderStatusEnum.ACCEPTED ? 'I Have Arrived' : 'Order Picked Up';
@@ -225,12 +236,31 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
     }
   };
 
+  const navigateChatScreen = async () => {
+    try {
+      // Retrieve the sender ID from AsyncStorage.
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) {
+        Alert.alert('Error', 'User not logged in.');
+        return;
+      }
+      // Navigate to the ChatScreen.
+      navigation.navigate(AppScreens.Chat, {
+        orderId: order.id,
+        senderId: userId,
+        headerTitle: order.customer?.firstName,
+      });
+    } catch (error) {
+      console.error('Error fetching user ID from AsyncStorage:', error);
+      Alert.alert('Error', 'Failed to retrieve user information.');
+    }
+  };
+
   const isVerifyItemsDisabled =
     currentOrder?.status === OrderStatusEnum.ACCEPTED ||
     (currentOrder?.status === OrderStatusEnum.PENDING && !currentOrder.itemVerifiedPhoto);
 
-    const isOrderPickedUpDisabled = !currentOrder?.itemVerifiedPhoto && currentOrder?.status!==OrderStatusEnum.ACCEPTED;
-
+  const isOrderPickedUpDisabled = !currentOrder?.itemVerifiedPhoto && currentOrder?.status !== OrderStatusEnum.ACCEPTED;
 
   return (
     <>
@@ -238,12 +268,12 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
         visible={isVisible}
         transparent
         animationType="none"
-        onRequestClose={handleCollapse}>
-        <TouchableWithoutFeedback onPress={handleCollapse}>
+        onRequestClose={disableClose ? () => {} : handleCollapse}>
+        <TouchableWithoutFeedback onPress={disableClose ? () => {} : handleCollapse}>
           <View style={styles.overlay}>
             <TouchableWithoutFeedback>
               <Animated.View style={[styles.modalContainer, { height }]}>
-                <TouchableOpacity onPress={isExpanded ? handleCollapse : handleExpand}>
+                <TouchableOpacity onPress={isExpanded ? (disableClose ? () => {} : handleCollapse) : handleExpand}>
                   <View style={styles.dragIndicator} />
                 </TouchableOpacity>
 
@@ -275,7 +305,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                           <TouchableOpacity onPress={() => Alert.alert('Call Driver')}>
                             <Image source={images.phone} style={styles.pickupIcon} />
                           </TouchableOpacity>
-                          <TouchableOpacity onPress={() => Alert.alert('Navigate to Chat')}>
+                          <TouchableOpacity onPress={navigateChatScreen}>
                             <Image source={images.message} style={styles.pickupIcon} />
                           </TouchableOpacity>
                         </View>
@@ -292,9 +322,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                     <View style={styles.sectionContainer}>
                       <InfoRow iconSource={images.cartItemsIcon} text="Items to Pickup" bold />
                       <View style={[styles.itemsContainer, styles.pickUpDetailsTextContainer]}>
-                        <Text style={styles.itemText}>
-                          • {order.packageType}
-                        </Text>
+                        <Text style={styles.itemText}>• {order.packageType}</Text>
                         <TouchableOpacity
                           style={[
                             currentOrder.itemVerifiedPhoto ? styles.viewImageButton : styles.verifyItemsButton,
@@ -502,14 +530,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#BDBDBD',
   },
-
   buttonTextDisabled: {
     color: '#9E9E9E',
     fontSize: typography.fontSize.medium,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
   },
-
-
 });
 
 export default OrderExpandedModal;

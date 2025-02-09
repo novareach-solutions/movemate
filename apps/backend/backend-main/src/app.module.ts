@@ -16,6 +16,7 @@ import { UserModule } from "./modules/user/user.module";
 import { AuthGuard } from "./shared/guards/auth.guard";
 import { OnboardingGuard } from "./shared/guards/onboarding.guard";
 import { RoleGuard } from "./shared/guards/roles.guard";
+import { OrderChatModule } from "./modules/orderChat/orderChat.module";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { RoleGuard } from "./shared/guards/roles.guard";
     UserModule,
     SendAPackageModule,
     MediaModule,
+    OrderChatModule
   ],
   providers: [RoleGuard, OnboardingGuard, AuthGuard, JwtService],
 })

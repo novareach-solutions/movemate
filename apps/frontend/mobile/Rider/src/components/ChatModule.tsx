@@ -18,7 +18,7 @@ import Header from './Header';
 
 interface Message {
   id: string;
-  text: string;
+  content: string;
   sender: 'user' | 'receiver';
   time: string;
   senderImage?: string;
@@ -63,7 +63,7 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
                 styles.messageText,
                 isUser ? styles.userText : styles.receiverText,
               ]}>
-              {item.text}
+              {item.content}
             </Text>
           </View>
         </View>

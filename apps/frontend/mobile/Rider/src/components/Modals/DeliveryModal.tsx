@@ -1,3 +1,5 @@
+// src/components/DeliveryModal.tsx
+
 import React, { useState } from 'react';
 import {
   View,
@@ -8,6 +10,8 @@ import {
   Image,
   TextStyle,
   Alert,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,14 +24,18 @@ import { uploadMedia } from '../../redux/slices/authSlice';
 import {
   completeOrder,
   fetchOngoingOrder,
-  updateItemVerifiedPhoto,
   uploadProofOfDelivery,
 } from '../../redux/slices/orderSlice';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
 import PhotoPickerModal from '../common/PhotoPickerModal';
 import { RootState } from '../../redux/store';
 import { useNavigation } from '@react-navigation/native';
-import { DeliverAPackage } from '../../navigation/ScreenNames';
+import { AppScreens, DeliverAPackage } from '../../navigation/ScreenNames';
+import { OrderStatusEnum } from '../../redux/slices/types/enums';
+import { InfoRow } from './ExpandedModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 interface DeliveryModalProps {
   isVisible: boolean;
@@ -35,33 +43,45 @@ interface DeliveryModalProps {
   order: SendPackageOrder;
 }
 
-const DeliveryModal: React.FC<DeliveryModalProps> = ({
-  isVisible,
-  onClose,
-  order,
-}) => {
+const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order }) => {
+  // Animated expand/collapse state.
+  const [height] = useState(new Animated.Value(SCREEN_HEIGHT * 0.5)); // collapsed height
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleExpand = () => {
+    setIsExpanded(true);
+    Animated.timing(height, {
+      toValue: SCREEN_HEIGHT * 0.73, // expanded height
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const handleCollapse = () => {
+    setIsExpanded(false);
+    Animated.timing(height, {
+      toValue: SCREEN_HEIGHT * 0.15, // collapsed height
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  // Photo-related state.
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [isConfirmPhotoVisible, setIsConfirmPhotoVisible] = useState(false);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const navigation=useNavigation()
-
-  const currentOrder = useSelector(
-    (state: RootState) => state.order.ongoingOrder
-  );
-
+  const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  // ------------------
-  // OPEN PHOTO PICKER
-  // ------------------
+  const currentOrder = useSelector((state: RootState) => state.order.ongoingOrder);
+
+  // ------------------ PHOTO HANDLING ------------------
+
   const openPhotoPickerModal = () => {
     setIsPhotoOptionVisible(true);
   };
 
-  // ------------------
-  // TAKE PHOTO
-  // ------------------
   const handleTakePhoto = () => {
     setIsPhotoOptionVisible(false);
     ImagePicker.openCamera({
@@ -78,9 +98,6 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
       });
   };
 
-  // ------------------
-  // CHOOSE FROM GALLERY
-  // ------------------
   const handleChooseFromGallery = () => {
     setIsPhotoOptionVisible(false);
     ImagePicker.openPicker({
@@ -97,9 +114,6 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
       });
   };
 
-  // -----------------------------------
-  // UPLOAD PHOTO => SHOW CONFIRM MODAL
-  // -----------------------------------
   const uploadAndSetPhoto = async (photo: any) => {
     const formData = new FormData();
     formData.append('file', {
@@ -123,29 +137,18 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
     }
   };
 
-  // ------------------
-  // RETRY
-  // ------------------
   const handleRetry = () => {
     setIsConfirmPhotoVisible(false);
     setIsPhotoOptionVisible(true);
   };
 
-  // ------------------
-  // DONE
-  // ------------------
   const handleDone = async () => {
     if (!uploadedImageUrl) {
       Alert.alert('Error', 'No image uploaded.');
       return;
     }
     try {
-      // Example: Here we call uploadProofOfDelivery. Adjust as needed:
-      await dispatch(
-        uploadProofOfDelivery({ orderId: order.id, url: uploadedImageUrl })
-      ).unwrap();
-
-      // Optionally refresh:
+      await dispatch(uploadProofOfDelivery({ orderId: order.id, url: uploadedImageUrl })).unwrap();
       await dispatch(fetchOngoingOrder()).unwrap();
     } catch (error) {
       console.error('Failed to upload proof of delivery:', error);
@@ -154,14 +157,8 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
     setIsConfirmPhotoVisible(false);
   };
 
-  // ------------------
-  // VIEW PHOTO
-  // ------------------
   const handleViewPhoto = () => {
-    // If there's a final "completionPhoto" from the order, use that
-    // or if you'd prefer the local "uploadedImageUrl"
     const finalPhotoUrl = currentOrder?.completionPhoto || uploadedImageUrl;
-
     if (!finalPhotoUrl) {
       Alert.alert('Error', 'No photo to view.');
       return;
@@ -170,23 +167,35 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
     setIsConfirmPhotoVisible(true);
   };
 
-  // -----------------------
-  // ORDER DELIVERED (OPT'L)
-  // -----------------------
   const handleOrderDelivered = async () => {
     try {
-      // Dispatch the completeOrder thunk
       await dispatch(completeOrder({ orderId: currentOrder.id })).unwrap();
-  
-      // On success, navigate to EarningsDetails
       navigation.navigate(DeliverAPackage.EarningsDetails);
     } catch (error) {
       console.error('Error completing order:', error);
-      // The slice already shows an alert on error, but you could do another if desired
     }
   };
 
-  // If there's a final photo on the server or local, show "View Photo"
+  const navigateChatScreen = async () => {
+    try {
+      // Retrieve the sender ID from AsyncStorage.
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) {
+        Alert.alert('Error', 'User not logged in.');
+        return;
+      }
+      // Navigate to the ChatScreen.
+      navigation.navigate(AppScreens.Chat, {
+        orderId: order.id,
+        senderId: userId,
+        headerTitle: order.customer?.firstName,
+      });
+    } catch (error) {
+      console.error('Error fetching user ID from AsyncStorage:', error);
+      Alert.alert('Error', 'Failed to retrieve user information.');
+    }
+  };
+
   const hasPhoto = !!currentOrder?.completionPhoto;
 
   return (
@@ -197,80 +206,97 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
       transparent
     >
       <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          {/* Header Section */}
-          <View style={styles.header}>
-            <View>
-              <Text style={styles.driverName}>
-                {order.customer?.firstName}
-              </Text>
-              <Text style={styles.deliveryAddress}>
-                {order.dropLocation?.addressLine1}
-              </Text>
-            </View>
-            <View style={styles.headerIcons}>
-              <TouchableOpacity>
-                <Image source={images.phone} style={styles.icon} />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Image source={images.message} style={styles.icon} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Delivery Instructions */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Delivery Instructions</Text>
-            <View style={styles.instructionsContainer}>
-              <Text style={styles.instructionText}>
-                {order.deliveryInstructions}
-              </Text>
-            </View>
-          </View>
-
-          {/* Items to Deliver */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Items to Deliver</Text>
-            <Text style={styles.itemText}>• {order.packageType}</Text>
-          </View>
-
-          {/* Proof of Delivery */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Proof of Delivery</Text>
-            <Text style={styles.proofText}>Take a photo to confirm delivery</Text>
-
-            {/* CHANGED LOGIC: show 'View Photo' or 'Take Photo' */}
-            <TouchableOpacity
-              style={hasPhoto ? styles.viewPhotoButton : [formStyles.button, formStyles.buttonEnabled]}
-              onPress={hasPhoto ? handleViewPhoto : openPhotoPickerModal}
-            >
-              {!hasPhoto &&  <Image source={images.camera} style={styles.cameraIcon} />}
-             
-              <Text
-                style={
-                  hasPhoto
-                    ? styles.viewPhotoText
-                    : [formStyles.buttonText, formStyles.buttonTextEnabled]
-                }
-              >
-                {hasPhoto ? 'View Photo' : 'Take Photo'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Order Delivered Button (Optional) */}
+        {/* Animated container with dynamic height */}
+        <Animated.View style={[styles.modalContainer, { height }]}>
+          {/* Drag Indicator */}
           <TouchableOpacity
-            style={[
-              formStyles.button,
-              formStyles.buttonSuccess,
-              { opacity: hasPhoto ? 1 : 0.5 },
-            ]}
-            onPress={handleOrderDelivered}
-            disabled={!hasPhoto}
+            onPress={isExpanded ? handleCollapse : handleExpand}
+            style={styles.dragIndicatorContainer}
           >
-            <Text style={formStyles.buttonText}>Order Delivered</Text>
+            <View style={styles.dragIndicator} />
           </TouchableOpacity>
-        </View>
+
+          <Text style={styles.title}>
+            {order.status === OrderStatusEnum.ACCEPTED ? 'Order Accepted' : 'Arriving in 10 mins'}
+          </Text>
+
+          {/* When collapsed, show only the location snippet.
+              When expanded, show the full content. */}
+          {!isExpanded ? (
+            <View style={styles.location}>
+              <InfoRow
+                iconSource={images.package}
+                text={`${order?.senderName} (${order.pickupLocation?.addressLine1})`}
+              />
+            </View>
+          ) : (
+            <>
+              {/* Expanded Content */}
+              <View style={styles.header}>
+                <View>
+                  <Text style={styles.driverName}>{order.customer?.firstName}</Text>
+                  <Text style={styles.deliveryAddress}>{order.dropLocation?.addressLine1}</Text>
+                </View>
+                <View style={styles.headerIcons}>
+                  <TouchableOpacity>
+                    <Image source={images.phone} style={styles.icon} />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={navigateChatScreen}>
+                    <Image source={images.message} style={styles.icon}/>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Delivery Instructions</Text>
+                <View style={styles.instructionsContainer}>
+                  <Text style={styles.instructionText}>{order.deliveryInstructions}</Text>
+                </View>
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Items to Deliver</Text>
+                <Text style={styles.itemText}>• {order.packageType}</Text>
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Proof of Delivery</Text>
+                <Text style={styles.proofText}>Take a photo to confirm delivery</Text>
+                <TouchableOpacity
+                  style={
+                    hasPhoto
+                      ? styles.viewPhotoButton
+                      : [formStyles.button, formStyles.buttonEnabled]
+                  }
+                  onPress={hasPhoto ? handleViewPhoto : openPhotoPickerModal}
+                >
+                  {!hasPhoto && <Image source={images.camera} style={styles.cameraIcon} />}
+                  <Text
+                    style={
+                      hasPhoto
+                        ? styles.viewPhotoText
+                        : [formStyles.buttonText, formStyles.buttonTextEnabled]
+                    }
+                  >
+                    {hasPhoto ? 'View Photo' : 'Take Photo'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity
+                style={[
+                  formStyles.button,
+                  formStyles.buttonSuccess,
+                  { opacity: hasPhoto ? 1 : 0.5 },
+                ]}
+                onPress={handleOrderDelivered}
+                disabled={!hasPhoto}
+              >
+                <Text style={formStyles.buttonText}>Order Delivered</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Animated.View>
       </View>
 
       {/* Confirm Photo Modal */}
@@ -310,6 +336,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
+  },
+  dragIndicatorContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  dragIndicator: {
+    width: 50,
+    height: 5,
+    backgroundColor: colors.text.subText,
+    borderRadius: 3,
+  },
+  title: {
+    fontSize: typography.fontSize.semiMedium,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    color: colors.text.primary,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  location: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 10,
   },
   header: {
     marginBottom: 20,
@@ -374,8 +422,6 @@ const styles = StyleSheet.create({
     tintColor: colors.white,
     marginRight: 10,
   },
-
-  /* Styles for the View Photo button */
   viewPhotoButton: {
     marginTop: 10,
     borderWidth: 1,

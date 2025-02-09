@@ -6,14 +6,20 @@ import {
   } from "@nestjs/websockets";
   import { Socket } from "socket.io";
 import { IOrderChatMessageInput, OrderChatService } from "../../modules/orderChat/orderChat.service";
+import { BaseSocketGateway } from "./base.socket";
+import { forwardRef, Inject } from "@nestjs/common";
   
   @WebSocketGateway({
     namespace: "order-chat",
     cors: { origin: "*" }, 
   })
-  export class OrderChatGateway {
-    constructor(private readonly orderChatService: OrderChatService) {}
-  
+  export class OrderChatGateway extends BaseSocketGateway {
+constructor(
+    @Inject(forwardRef(() => OrderChatService))
+    private readonly orderChatService: OrderChatService,
+  ) {
+    super();
+  }
     @SubscribeMessage("joinOrderRoom")
     async handleJoinOrderRoom(
       @MessageBody() data: { orderId: number },
