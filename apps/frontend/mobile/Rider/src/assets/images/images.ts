@@ -49,7 +49,7 @@ export const images = {
   blackArrow: require('../images/BlackArrow.png'),
   document1: require('../images/Document1.png'),
   reuploadIcon: require('../images/Reuploadicon.png'),
-  benefitCheck: require('../images/BenefitCheck.png'),
+  benefitCheck: require('../images/benefitCheck.png'),
   trophy: require('../images/Trophy.png'),
   car: require('../images/Car.png'),
 };
