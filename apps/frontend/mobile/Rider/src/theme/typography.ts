@@ -17,6 +17,7 @@ export const typography = {
   fontSize: {
     small: 12,
     medium: 16,
+    semiMedium: 18,
     large: 25,
   },
 };

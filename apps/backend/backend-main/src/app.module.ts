@@ -8,9 +8,11 @@ import { AgentModule } from "./modules/agent/agent.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { DatabaseModule } from "./modules/database/database.module";
 import { GatewayModule } from "./modules/gateway/gateway.module";
+import { MediaModule } from "./modules/media/media.module";
 import { SendAPackageModule } from "./modules/order/sendPackage/sendPackage.module";
 import { RedisModule } from "./modules/redis/redis.module";
 import { SupportModule } from "./modules/support/support.module";
+import { TrackingModule } from "./modules/tracking/location/tracking.module";
 import { UserModule } from "./modules/user/user.module";
 import { AuthGuard } from "./shared/guards/auth.guard";
 import { OnboardingGuard } from "./shared/guards/onboarding.guard";
@@ -31,6 +33,8 @@ import { RoleGuard } from "./shared/guards/roles.guard";
     GatewayModule,
     UserModule,
     SendAPackageModule,
+    MediaModule,
+    TrackingModule,
   ],
   providers: [RoleGuard, OnboardingGuard, AuthGuard, JwtService],
 })

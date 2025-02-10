@@ -4,18 +4,28 @@ import { DeleteResult, QueryRunner, UpdateResult } from "typeorm";
 import { Agent } from "../../entity/Agent";
 import { AgentDocument } from "../../entity/AgentDocument";
 import { RequiredDocument } from "../../entity/RequiredDocument";
+import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import { User } from "../../entity/User";
 import { logger } from "../../logger";
-import { AgentStatusEnum, ApprovalStatusEnum } from "../../shared/enums";
 import {
+  AgentStatusEnum,
+  AgentTypeEnum,
+  ApprovalStatusEnum,
+} from "../../shared/enums";
+import { SendPackageAgentAcceptError } from "../../shared/errors/sendAPackage";
+import {
+  UserAccessDeniedError,
   UserAlreadyExistsError,
   UserDocumentAlreadyExistsError,
+  UserExpiryDateRequiredError,
   UserInvalidDocumentError,
   UserNotFoundError,
 } from "../../shared/errors/user";
 import { AgentNotificationGateway } from "../../shared/gateways/agent.notification.gateway";
 import { filterEmptyValues } from "../../utils/filter";
+import { TokenService } from "../auth/utils/generateTokens";
 import { dbReadRepo, dbRepo } from "../database/database.service";
+import { MediaService } from "../media/media.service";
 import { RedisService } from "../redis/redis.service";
 import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
 import { radii } from "./agents.constants";
@@ -24,10 +34,14 @@ import { radii } from "./agents.constants";
 export class AgentService {
   constructor(
     private readonly redisService: RedisService,
-    private readonly notificationGateway: AgentNotificationGateway,
+    private readonly agentNotificationGateway: AgentNotificationGateway,
+    private readonly tokenService: TokenService,
+    private readonly mediaService: MediaService,
   ) {}
 
-  async createAgent(agent: TAgent): Promise<Agent> {
+  async createAgent(
+    agent: TAgent,
+  ): Promise<{ agent: Agent; accessToken: string; refreshToken: string }> {
     const { abnNumber, user } = agent;
     const queryRunner: QueryRunner =
       dbRepo(Agent).manager.connection.createQueryRunner();
@@ -87,12 +101,21 @@ export class AgentService {
       });
 
       const savedAgent = await queryRunner.manager.save(Agent, newAgent);
+
+      // Generate tokens
+      const accessToken = this.tokenService.generateAccessToken(
+        savedUser.id,
+        savedUser.phoneNumber,
+        savedUser.role,
+      );
+      const refreshToken = this.tokenService.generateRefreshToken(savedUser.id);
+
       logger.debug(
         `AgentService.createAgent: Agent with ID ${savedAgent.id} created successfully.`,
       );
       await queryRunner.commitTransaction();
 
-      return savedAgent;
+      return { agent: savedAgent, accessToken, refreshToken };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       logger.error(`AgentService.createAgent: Error occurred - ${error}`);
@@ -145,6 +168,13 @@ export class AgentService {
       throw new UserNotFoundError(`Agent with ID ${agentId} not found.`);
     }
 
+    if (!isAdmin && agent.approvalStatus !== ApprovalStatusEnum.APPROVED) {
+      logger.error(
+        `AgentService.setAgentStatus: Cannot update. Agent ID ${agentId} not approved.`,
+      );
+      throw new UserAccessDeniedError("Cannot update. Agent is not approved.");
+    }
+
     const filteredUpdateAgent = filterEmptyValues(updateAgent);
     if (!isAdmin) {
       delete filteredUpdateAgent.approvalStatus;
@@ -174,15 +204,22 @@ export class AgentService {
     const requiredDocs = await dbReadRepo(RequiredDocument).find({
       where: { agentType: agent.agentType },
     });
-    const requiredDocNames = requiredDocs.map((doc) => doc.name);
+    const requiredDoc = requiredDocs.find((doc) => doc.name === document.name);
 
-    if (!requiredDocNames.includes(document.name)) {
+    if (!requiredDoc) {
       logger.error(
         `AgentService.submitDocument: Invalid document ${document.name}.`,
       );
       throw new UserInvalidDocumentError(
         `${document.name} is not a valid document.`,
       );
+    }
+
+    if (requiredDoc.isExpiry && !document.expiry) {
+      logger.error(
+        `AgentService.submitDocument: Expiry date is required for document ${document.name}.`,
+      );
+      throw new UserExpiryDateRequiredError("Expiry date is required");
     }
 
     const existingDoc = await dbReadRepo(AgentDocument).findOne({
@@ -198,24 +235,33 @@ export class AgentService {
       );
     }
 
-    const newDocument = dbRepo(AgentDocument).create({
-      name: document.name,
-      description: document.description,
-      url: document.url,
-      agentId: agentId,
-    });
+    try {
+      const newDocument = dbRepo(AgentDocument).create({
+        name: document.name,
+        description: document.description,
+        url: document.url,
+        agentId: agentId,
+        expiry: document.expiry || null,
+      });
 
-    const savedDocument = await dbRepo(AgentDocument).save(newDocument);
-    logger.debug(
-      `AgentService.submitDocument: Document ${document.name} saved for agent ID ${agentId}.`,
-    );
+      const savedDocument = await dbRepo(AgentDocument).save(newDocument);
+      logger.debug(
+        `AgentService.submitDocument: Document ${document.name} saved for agent ID ${agentId}.`,
+      );
 
-    return {
-      name: savedDocument.name,
-      description: savedDocument.description,
-      url: savedDocument.url,
-      agentId: savedDocument.agentId,
-    };
+      return {
+        name: savedDocument.name,
+        description: savedDocument.description,
+        url: savedDocument.url,
+      };
+    } catch (error) {
+      // Delete the uploaded file on error
+      const key = this.extractKeyFromUrl(document.url);
+      if (key) {
+        await this.mediaService.deleteFile(key);
+      }
+      throw new InternalServerErrorException("An error Occured", error);
+    }
   }
 
   async removeDocument(agentId: number, documentId: number): Promise<void> {
@@ -268,7 +314,7 @@ export class AgentService {
       logger.error(
         `AgentService.setAgentStatus: Cannot set status. Agent ID ${agentId} not approved.`,
       );
-      throw new UserInvalidDocumentError(
+      throw new UserAccessDeniedError(
         "Cannot set status. Agent is not approved.",
       );
     }
@@ -284,29 +330,22 @@ export class AgentService {
     latitude: number,
     longitude: number,
   ): Promise<void> {
-    logger.debug(
-      `AgentService.updateAgentLocation: Updating location for agent ID ${agentId} to (${latitude}, ${longitude}).`,
-    );
+    logger.debug(`Updating location for agent ID ${agentId}`);
     const agent = await this.getAgentById(agentId);
-    if (agent.status !== AgentStatusEnum.ONLINE) {
+
+    if (agent.approvalStatus !== ApprovalStatusEnum.APPROVED) {
       logger.error(
-        `AgentService.updateAgentLocation: Cannot update location. Agent ID ${agentId} is not ONLINE.`,
+        `AgentService.setAgentStatus: Cannot update location. Agent ID ${agentId} not approved.`,
       );
-      throw new InternalServerErrorException(
-        "Cannot update location. Agent is not ONLINE.",
+      throw new UserAccessDeniedError(
+        "Cannot update location. Agent is not approved.",
       );
     }
 
     const member = `agent:${agentId}`;
-    logger.debug(
-      `AgentService.updateAgentLocation: Adding/updating location in Redis for member ${member}.`,
-    );
     await this.redisService
-      .getClient()
+      .getGeneralClient()
       .geoadd("agents:locations", longitude, latitude, member);
-    logger.debug(
-      `AgentService.updateAgentLocation: Setting agent status to ONLINE in Redis for agent ID ${agentId}.`,
-    );
     await this.redisService.set(
       `agent:${agentId}:status`,
       AgentStatusEnum.ONLINE,
@@ -325,7 +364,7 @@ export class AgentService {
     );
     const radiusMeters = radiusKm * 1000;
     const results = (await this.redisService
-      .getClient()
+      .getGeneralClient()
       .georadius(
         "agents:locations",
         longitude,
@@ -352,9 +391,48 @@ export class AgentService {
     logger.debug(
       `AgentService.assignRider: Assigning rider for order ID ${orderId} at location (${pickupLatitude}, ${pickupLongitude}).`,
     );
+
+    const orderIdNum = parseInt(orderId, 10);
+    if (isNaN(orderIdNum)) {
+      logger.error(`AgentService.assignRider: Invalid orderId ${orderId}.`);
+      throw new InternalServerErrorException("Invalid order ID provided.");
+    }
+
+    const order = await dbReadRepo(SendPackageOrder).findOne({
+      where: { id: orderIdNum },
+      relations: ["pickupLocation", "dropLocation"],
+    });
+
+    if (!order) {
+      logger.error(`AgentService.assignRider: Order ID ${orderId} not found.`);
+      throw new UserNotFoundError(`Order with ID ${orderId} not found.`);
+    }
+
+    if (order.agentId) {
+      throw new SendPackageAgentAcceptError(
+        `This Order cannot be assigned as it is already accepted`,
+      );
+    }
+
+    const pickupAddress = order.pickupLocation?.addressLine1 || "N/A";
+    const dropAddress = order.dropLocation?.addressLine1 || "N/A";
+    const estimatedDistance = order.estimatedDistance || 0;
+    const estimatedTime = order.estimatedTime || "00:00:00";
+
     const notifiedAgents = new Set<number>();
 
     for (const { km, limit } of radii) {
+      const currentOrder = await dbReadRepo(SendPackageOrder).findOne({
+        where: { id: orderIdNum },
+      });
+
+      if (currentOrder.agentId) {
+        logger.debug(
+          `AgentService.assignRider: Order ID ${orderId} has been accepted by Agent ID ${currentOrder.agentId}. Stopping assignment process.`,
+        );
+        return;
+      }
+
       logger.debug(
         `AgentService.assignRider: Searching within ${km} km with a limit of ${limit} agents.`,
       );
@@ -363,8 +441,9 @@ export class AgentService {
         pickupLongitude,
         km,
       );
+
       logger.debug(
-        `AgentService.assignRider: Found ${nearbyAgents.length} nearby agents within ${km} km.`,
+        `AgentService.assignRider: Nearby agents: ${JSON.stringify(nearbyAgents)}`,
       );
 
       const availableAgents = await Promise.all(
@@ -393,7 +472,9 @@ export class AgentService {
       ).then((results) => results.filter((agent) => agent !== null));
 
       logger.debug(
-        `AgentService.assignRider: ${availableAgents.length} agents available within ${km} km.`,
+        `AgentService.assignRider: Available agents within ${km} km: ${JSON.stringify(
+          availableAgents,
+        )}`,
       );
 
       const selectedAgents = availableAgents.slice(0, limit);
@@ -401,33 +482,39 @@ export class AgentService {
         `AgentService.assignRider: Selecting ${selectedAgents.length} agents to notify.`,
       );
 
-      if (selectedAgents.length === 0) {
+      if (selectedAgents.length > 0) {
+        selectedAgents.forEach((agent) => notifiedAgents.add(agent.agentId));
+
+        selectedAgents.forEach((agent) => {
+          logger.debug(
+            `AgentService.assignRider: Notifying agent ID ${agent.agentId} about order ID ${orderId}.`,
+          );
+          this.agentNotificationGateway.sendMessageToAgent(
+            agent.agentId,
+            "newRequest",
+            {
+              orderId,
+              pickupAddress,
+              dropAddress,
+              estimatedDistance,
+              estimatedTime,
+            },
+          );
+        });
+      } else {
         logger.debug(
-          `AgentService.assignRider: No agents to notify within ${km} km.`,
+          `AgentService.assignRider: No agents available to notify within ${km} km.`,
         );
-        continue;
       }
 
-      selectedAgents.forEach((agent) => notifiedAgents.add(agent.agentId));
+      logger.debug(
+        `AgentService.assignRider: Initiating wait for acceptance for order ID ${orderId} after processing ${km} km radius.`,
+      );
+      const assignedAgentId = await this.waitForAcceptance(orderId, 40000); // Wait for 40 seconds
+      logger.debug(
+        `AgentService.assignRider: waitForAcceptance completed for order ID ${orderId}.`,
+      );
 
-      selectedAgents.forEach((agent) => {
-        logger.debug(
-          `AgentService.assignRider: Notifying agent ID ${agent.agentId} about order ID ${orderId}.`,
-        );
-        this.notificationGateway.sendMessageToAgent(
-          agent.agentId,
-          "newRequest",
-          {
-            orderId,
-            pickupLocation: {
-              latitude: pickupLatitude,
-              longitude: pickupLongitude,
-            },
-          },
-        );
-      });
-
-      const assignedAgentId = await this.waitForAcceptance(orderId, 40000);
       if (assignedAgentId) {
         logger.debug(
           `AgentService.assignRider: Order ID ${orderId} accepted by agent ID ${assignedAgentId}.`,
@@ -435,7 +522,7 @@ export class AgentService {
         return assignedAgentId;
       } else {
         logger.debug(
-          `AgentService.assignRider: No agent accepted order ID ${orderId} within the timeout.`,
+          `AgentService.assignRider: No agent accepted order ID ${orderId} within the timeout of ${km} km.`,
         );
       }
     }
@@ -444,59 +531,6 @@ export class AgentService {
       `AgentService.assignRider: No agents accepted order ID ${orderId} after all radii.`,
     );
     return null;
-  }
-
-  private waitForAcceptance(
-    orderId: string,
-    timeoutMs: number,
-  ): Promise<number | null> {
-    logger.debug(
-      `AgentService.waitForAcceptance: Waiting for acceptance of order ID ${orderId} for ${timeoutMs} ms.`,
-    );
-    return new Promise((resolve) => {
-      const timeout = setTimeout(() => {
-        this.redisService.getClient().off(`acceptance:${orderId}`, listener);
-        logger.debug(
-          `AgentService.waitForAcceptance: Timeout reached for order ID ${orderId}.`,
-        );
-        resolve(null);
-      }, timeoutMs);
-      const listener = async (
-        _channel: string,
-        message: string,
-      ): Promise<any> => {
-        const data = JSON.parse(message);
-        if (data.orderId === orderId) {
-          clearTimeout(timeout);
-          await this.redisService
-            .getClient()
-            .unsubscribe(`acceptance:${orderId}`);
-          logger.debug(
-            `AgentService.waitForAcceptance: Order ID ${orderId} accepted by agent ID ${data.agentId}.`,
-          );
-          resolve(data.agentId);
-        }
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.redisService
-        .getClient()
-        .subscribe(`acceptance:${orderId}`, (err) => {
-          if (err) {
-            logger.error(
-              `AgentService.waitForAcceptance: Failed to subscribe to acceptance channel: ${err.message}`,
-            );
-            clearTimeout(timeout);
-            resolve(null);
-          } else {
-            logger.debug(
-              `AgentService.waitForAcceptance: Subscribed to acceptance channel for order ID ${orderId}.`,
-            );
-          }
-        });
-
-      this.redisService.getClient().on("message", listener);
-    });
   }
 
   async acceptOrder(orderId: string, agentId: number): Promise<void> {
@@ -510,13 +544,166 @@ export class AgentService {
       `AgentService.acceptOrder: Publishing acceptance data to Redis for order ID ${orderId}.`,
     );
     await this.redisService
-      .getClient()
+      .getGeneralClient()
       .publish(`acceptance:${orderId}`, JSON.stringify(acceptanceData));
 
-    // this is to notify the other agents that the order is taken, not necessary for now
+    // Optionally notify other agents that the order has been taken
     // logger.debug(
     //   `AgentService.acceptOrder: Notifying other agents that order ID ${orderId} is taken by agent ID ${agentId}.`,
     // );
-    // this.notificationGateway.sendMessageToRoom("agents", "ORDER_TAKEN", { orderId, agentId });
+    // this.agentNotificationGateway.sendMessageToRoom(
+    //   "agents",
+    //   "ORDER_TAKEN",
+    //   { orderId, agentId },
+    // );
+  }
+
+  async createRequiredDocument(createRequiredDocumentDto: {
+    name: string;
+    description?: string;
+    agentType: AgentTypeEnum;
+    isRequired: boolean;
+    isExpiry: boolean;
+  }): Promise<RequiredDocument> {
+    const { name, description, agentType, isRequired, isExpiry } =
+      createRequiredDocumentDto;
+
+    logger.debug(
+      `AgentService.createRequiredDocument: Checking if document with name ${name} already exists for agent type ${agentType}.`,
+    );
+
+    const existingDocument = await dbReadRepo(RequiredDocument).findOne({
+      where: { name, agentType },
+    });
+
+    if (existingDocument) {
+      logger.error(
+        `AgentService.createRequiredDocument: Document with name ${name} already exists for agent type ${agentType}.`,
+      );
+      throw new UserAlreadyExistsError(
+        `Document with name ${name} already exists for agent type ${agentType}.`,
+      );
+    }
+
+    logger.debug(
+      `AgentService.createRequiredDocument: Creating new required document.`,
+    );
+
+    const newDocument = dbRepo(RequiredDocument).create({
+      name,
+      description,
+      agentType,
+      isRequired,
+      isExpiry,
+    });
+
+    const savedDocument = await dbRepo(RequiredDocument).save(newDocument);
+
+    logger.debug(
+      `AgentService.createRequiredDocument: Required document with ID ${savedDocument.id} created successfully.`,
+    );
+    return savedDocument;
+  }
+
+  async updateDocumentApprovalStatus(
+    agentId: number,
+    documentId: number,
+    approvalStatus: ApprovalStatusEnum,
+  ): Promise<void> {
+    if (!["APPROVED", "REJECTED"].includes(approvalStatus)) {
+      throw new UserInvalidDocumentError("Invalid approval status provided.");
+    }
+
+    // Fetch the document
+    const document = await dbReadRepo(AgentDocument).findOne({
+      where: { id: documentId, agentId },
+    });
+
+    if (!document) {
+      throw new UserNotFoundError(
+        `Document with ID ${documentId} not found for agent ID ${agentId}.`,
+      );
+    }
+
+    // Update the document's approval status
+    document.approvalStatus = approvalStatus;
+
+    // Save the updated document to the database
+    await dbRepo(AgentDocument).save(document);
+  }
+
+  private extractKeyFromUrl(fileUrl: string): string {
+    const urlParts = fileUrl.split("/");
+    return urlParts[urlParts.length - 1]; // Extract the S3 object key
+  }
+
+  private waitForAcceptance(
+    orderId: string,
+    timeoutMs: number,
+  ): Promise<number | null> {
+    return new Promise((resolve) => {
+      const subscriber = this.redisService.getSubscriberClient();
+      const channel = `acceptance:${orderId}`;
+
+      const onMessage = (msgChannel: string, message: string): void => {
+        if (msgChannel !== channel) {
+          return;
+        }
+
+        try {
+          const data = JSON.parse(message);
+          if (data.orderId === orderId && typeof data.agentId === "number") {
+            logger.debug(
+              `waitForAcceptance: Received acceptance from agent ID ${data.agentId} for order ID ${orderId}.`,
+            );
+            clearTimeout(timeoutHandle); // Clear the timeout since acceptance is received
+            subscriber.removeListener("message", onMessage);
+            void subscriber.unsubscribe(channel).catch((err) => {
+              logger.error(
+                `waitForAcceptance: Failed to unsubscribe from ${channel}: ${err}`,
+              );
+            });
+            resolve(data.agentId);
+          }
+        } catch (err) {
+          logger.error(
+            `waitForAcceptance: Error parsing message on ${channel}: ${err}`,
+          );
+        }
+      };
+
+      subscriber.on("message", onMessage);
+
+      // Handle the Promise returned by subscribe
+      subscriber
+        .subscribe(channel)
+        .then(() => {
+          logger.debug(`waitForAcceptance: Subscribed to ${channel}.`);
+        })
+        .catch((err) => {
+          logger.error(
+            `waitForAcceptance: Failed to subscribe to ${channel}: ${err}`,
+          );
+          subscriber.removeListener("message", onMessage);
+          resolve(null);
+        });
+
+      logger.debug(
+        `waitForAcceptance: Waiting for acceptance for order ID ${orderId} with timeout of ${timeoutMs} ms.`,
+      );
+
+      const timeoutHandle = setTimeout(() => {
+        logger.debug(
+          `waitForAcceptance: Timeout reached for order ID ${orderId}.`,
+        );
+        subscriber.removeListener("message", onMessage);
+        void subscriber.unsubscribe(channel).catch((err) => {
+          logger.error(
+            `waitForAcceptance: Failed to unsubscribe from ${channel} after timeout: ${err}`,
+          );
+        });
+        resolve(null);
+      }, timeoutMs);
+    });
   }
 }

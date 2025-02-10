@@ -1,5 +1,3 @@
-// src/modules/support/support.controller.ts
-
 import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
 
 import { ChatMessage } from "../../entity/ChatMessage";
