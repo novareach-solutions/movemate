@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../../theme/colors';
 import {typography} from '../../theme/typography';
+import Header from '../../components/Header';
 
 const InboxScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Notifications' | 'Messages'>(
@@ -52,83 +54,38 @@ const InboxScreen: React.FC = () => {
     },
   ];
 
-  const filteredNotifications = notifications.filter(item => !item.resolved);
-  const resolvedNotifications = notifications.filter(item => item.resolved);
-
   const renderNotification = ({item}: {item: (typeof notifications)[0]}) => (
     <View style={styles.notificationItem}>
       <View style={styles.notificationContent}>
         <Text style={styles.notificationMessage}>{item.message}</Text>
         <Text style={styles.notificationDate}>{item.date}</Text>
       </View>
-      <View style={styles.notificationDot} />
+      {!item.resolved && <View style={styles.notificationDot} />}
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
-
+      <Header isBack title={'Notifications'} />
       {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'Notifications' && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab('Notifications')}>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'Notifications' && styles.activeTabText,
-            ]}>
-            Notifications
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'Messages' && styles.activeTab]}
-          onPress={() => setActiveTab('Messages')}>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'Messages' && styles.activeTabText,
-            ]}>
-            Messages
-          </Text>
-        </TouchableOpacity>
-      </View>
 
       {/* Content */}
+
       <View>
-        {activeTab === 'Notifications' && (
-          <View>
-            <FlatList
-              data={filteredNotifications}
-              renderItem={renderNotification}
-              keyExtractor={item => item.id}
-              contentContainerStyle={styles.notificationList}
-            />
-            <Text style={styles.resolvedText}>Resolved</Text>
-            <FlatList
-              data={resolvedNotifications}
-              renderItem={renderNotification}
-              keyExtractor={item => item.id}
-              contentContainerStyle={styles.notificationList}
-            />
-          </View>
-        )}
-        {activeTab === 'Messages' && (
-          <View style={styles.messagesContainer}>
-            <Text style={styles.emptyMessage}>No messages available.</Text>
-          </View>
-        )}
+        <FlatList
+          data={notifications}
+          renderItem={renderNotification}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.notificationList}
+        />
       </View>
 
       {/* Footer Note */}
       <Text style={styles.footerNote}>
         All notifications will be automatically deleted after 60 days.
       </Text>
-    </View>
+    </SafeAreaView>
   );
 };
 

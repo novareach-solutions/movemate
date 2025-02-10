@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { SendPackageOrder } from '../redux/slices/types/sendAPackage';
-import { colors } from '../theme/colors';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {useRoute} from '@react-navigation/native';
+import {SendPackageOrder} from '../redux/slices/types/sendAPackage';
+import {colors} from '../theme/colors';
 import OrderExpandedModal from '../components/Modals/ExpandedModal';
 
 const PickUpOrderDetailsScreen: React.FC = () => {
   const route = useRoute();
-  const { order } = route.params as { order: SendPackageOrder };
+  const {order} = route.params as {order: SendPackageOrder};
 
-  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState<boolean>(true);
-
+  const [isExpandedModalVisible, setIsExpandedModalVisible] =
+    useState<boolean>(true);
 
   if (!order) {
     return (
@@ -27,23 +27,23 @@ const PickUpOrderDetailsScreen: React.FC = () => {
   const handleCloseExpandedModal = () => {
     setIsExpandedModalVisible(false);
   };
-  
 
   return (
     <View style={styles.container}>
-        <>
-          <TouchableOpacity style={styles.openModalButton} onPress={handleOpenExpandedModal}>
-            <Text style={styles.openModalButtonText}>View Expanded Details</Text>
-          </TouchableOpacity>
+      <>
+        <TouchableOpacity
+          style={styles.openModalButton}
+          onPress={handleOpenExpandedModal}>
+          <Text style={styles.openModalButtonText}>View Expanded Details</Text>
+        </TouchableOpacity>
 
-          {/* Order Expanded Modal */}
-          <OrderExpandedModal
-            isVisible={isExpandedModalVisible}
-            onClose={handleCloseExpandedModal}
-            order={order}
-          />
-        </>
-  
+        {/* Order Expanded Modal */}
+        <OrderExpandedModal
+          isVisible={isExpandedModalVisible}
+          onClose={handleCloseExpandedModal}
+          order={order}
+        />
+      </>
     </View>
   );
 };

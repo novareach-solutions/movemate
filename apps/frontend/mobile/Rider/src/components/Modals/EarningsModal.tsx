@@ -8,8 +8,12 @@ import {
   Image,
 } from 'react-native';
 import {colors} from '../../theme/colors';
-import {images} from '../../assets/images/images';
 import DetailRow from '../DetailRow';
+import SuccessGreenTick from '../../assets/icons/successGreenTick.svg';
+import PurpleTime from '../../assets/icons/purpleTime.svg';
+import PurpleDistance from '../../assets/icons/purpleDistance.svg';
+import PurpleCoin from '../../assets/icons/purpleCoin.svg';
+import PurpleTip from '../../assets/icons/purpleTip.svg';
 
 interface EarningsModalProps {
   isVisible: boolean;
@@ -40,20 +44,16 @@ const EarningsModal: React.FC<EarningsModalProps> = ({
         <View style={styles.modalContainer}>
           {/* Header Section */}
           <View style={styles.headerContainer}>
-            <Image source={images.greenCircle} style={styles.successIcon} />
+            <SuccessGreenTick style={styles.successIcon} />
             <Text style={styles.headerText}>You earned</Text>
             <Text style={styles.earningsText}>${totalEarnings}</Text>
           </View>
 
           {/* Earnings Details Section */}
           <View style={styles.detailsContainer}>
+            <DetailRow icon={PurpleTime} label="Trip time" value={tripTime} />
             <DetailRow
-              icon={images.tripTime}
-              label="Trip time"
-              value={tripTime}
-            />
-            <DetailRow
-              icon={images.tripDistance}
+              icon={PurpleDistance}
               label="Trip distance"
               value={`${tripDistance} km`}
             />
@@ -61,11 +61,11 @@ const EarningsModal: React.FC<EarningsModalProps> = ({
               <Text></Text>
             </View>
             <DetailRow
-              icon={images.tripPay}
+              icon={PurpleCoin}
               label="Trip pay"
               value={`$${tripPay}`}
             />
-            <DetailRow icon={images.tripTip} label="Tip" value={`$${tip}`} />
+            <DetailRow icon={PurpleTip} label="Tip" value={`$${tip}`} />
             <DetailRow label="Total earnings" value={`$${totalEarnings}`} />
           </View>
 
@@ -99,8 +99,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   successIcon: {
-    width: 50,
-    height: 50,
+    width: 60,
+    height: 60,
     marginBottom: 10,
   },
   separator: {
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   earningsText: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
     color: colors.purple,
   },
@@ -123,6 +123,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightButtonBackground,
     padding: 20,
     borderRadius: 30,
+    borderWidth: 1,
+    borderColor: colors.border.lightGray,
   },
   doneButton: {
     backgroundColor: colors.purple,

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { Between, In } from "typeorm";
 
 import { DropLocation } from "../../../entity/DropLocation";
@@ -40,7 +40,7 @@ export class SendAPackageService {
   constructor(
     private readonly pricingService: PricingService,
     private readonly customerNotificationGateway: CustomerNotificationGateway,
-  ) { }
+  ) {}
   async create(data: TSendPackageOrder): Promise<SendPackageOrder> {
     logger.debug(
       "SendAPackageService.create: Creating a new send package order",
@@ -384,8 +384,9 @@ export class SendAPackageService {
     );
 
     if (!photoUrl) {
-      throw new SendPackageNotFoundError(`An Error occured while uploading the image`);
-
+      throw new SendPackageNotFoundError(
+        `An Error occured while uploading the image`,
+      );
     }
     const order = await dbReadRepo(SendPackageOrder).findOne({
       where: { id: orderId },
@@ -422,29 +423,29 @@ export class SendAPackageService {
     logger.debug(
       `SendAPackageService.updateProofOfDelivery: Agent ID ${agentId} uploading proof of delivery for order ID ${orderId}`,
     );
-  
+
     if (!photoUrl) {
-      throw new SendPackageNotFoundError(`An error occurred while uploading the image`);
+      throw new SendPackageNotFoundError(
+        `An error occurred while uploading the image`,
+      );
     }
-  
+
     const order = await dbReadRepo(SendPackageOrder).findOne({
       where: { id: orderId },
     });
-  
+
     if (!order) {
       throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
     }
-  
+
     order.completionPhoto = photoUrl;
-  
-  
-      const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-      logger.debug(
-        `SendAPackageService.updateProofOfDelivery: Order ID ${orderId} updated with proof of delivery photo.`,
-      );
-      return updatedOrder;
+
+    const updatedOrder = await dbRepo(SendPackageOrder).save(order);
+    logger.debug(
+      `SendAPackageService.updateProofOfDelivery: Order ID ${orderId} updated with proof of delivery photo.`,
+    );
+    return updatedOrder;
   }
-  
 
   async startOrder(
     orderId: number,
@@ -585,8 +586,6 @@ export class SendAPackageService {
     return savedReport;
   }
 
-
-
   // ====== Admin Service Methods ======
 
   async getAllOrders(query: any): Promise<SendPackageOrder[]> {
@@ -630,8 +629,13 @@ export class SendAPackageService {
   }
 
   // ====== Common APIs ======
-  async updateOrderStatus(orderId: number, status: OrderStatusEnum): Promise<SendPackageOrder> {
-    logger.debug(`SendAPackageService.updateOrderStatus: Updating status for order ID ${orderId} to ${status}`);
+  async updateOrderStatus(
+    orderId: number,
+    status: OrderStatusEnum,
+  ): Promise<SendPackageOrder> {
+    logger.debug(
+      `SendAPackageService.updateOrderStatus: Updating status for order ID ${orderId} to ${status}`,
+    );
 
     const order = await dbReadRepo(SendPackageOrder).findOne({
       where: { id: orderId },
@@ -642,14 +646,23 @@ export class SendAPackageService {
     }
 
     // Define valid status transitions
-    const validTransitions: Record<OrderStatusEnum, OrderStatusEnum[]> = {
-      [OrderStatusEnum.PENDING]: [OrderStatusEnum.ACCEPTED, OrderStatusEnum.CANCELED],
-      [OrderStatusEnum.ACCEPTED]: [OrderStatusEnum.IN_PROGRESS, OrderStatusEnum.CANCELED],
-      [OrderStatusEnum.IN_PROGRESS]: [OrderStatusEnum.COMPLETED, OrderStatusEnum.CANCELED],
-      [OrderStatusEnum.COMPLETED]: [],
-      [OrderStatusEnum.CANCELED]: [],
-      [OrderStatusEnum.PICKEDUP_ORDER]: [OrderStatusEnum.COMPLETED],
-    };
+    // const validTransitions: Record<OrderStatusEnum, OrderStatusEnum[]> = {
+    //   [OrderStatusEnum.PENDING]: [
+    //     OrderStatusEnum.ACCEPTED,
+    //     OrderStatusEnum.CANCELED,
+    //   ],
+    //   [OrderStatusEnum.ACCEPTED]: [
+    //     OrderStatusEnum.IN_PROGRESS,
+    //     OrderStatusEnum.CANCELED,
+    //   ],
+    //   [OrderStatusEnum.IN_PROGRESS]: [
+    //     OrderStatusEnum.COMPLETED,
+    //     OrderStatusEnum.CANCELED,
+    //   ],
+    //   [OrderStatusEnum.COMPLETED]: [],
+    //   [OrderStatusEnum.CANCELED]: [],
+    //   [OrderStatusEnum.PICKEDUP_ORDER]: [OrderStatusEnum.COMPLETED],
+    // };
 
     // if (!validTransitions[order.status].includes(status)) {
     //   throw new BadRequestException(
@@ -679,10 +692,15 @@ export class SendAPackageService {
 
     try {
       const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-      logger.debug(`SendAPackageService.updateOrderStatus: Order ID ${orderId} status updated to ${status}`);
+      logger.debug(
+        `SendAPackageService.updateOrderStatus: Order ID ${orderId} status updated to ${status}`,
+      );
       return updatedOrder;
     } catch (error) {
-      logger.error(`SendAPackageService.updateOrderStatus: Failed to update order ID ${orderId} - ${error.message}`, { stack: error.stack });
+      logger.error(
+        `SendAPackageService.updateOrderStatus: Failed to update order ID ${orderId} - ${error.message}`,
+        { stack: error.stack },
+      );
       throw new InternalServerErrorException("Failed to update order status");
     }
   }

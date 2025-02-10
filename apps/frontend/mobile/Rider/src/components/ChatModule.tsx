@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
 import Header from './Header';
+import SendIcon from '../assets/icons/sendIcon.svg';
 
 interface Message {
   id: string;
@@ -103,7 +103,7 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
             onChangeText={setInputText}
           />
           <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-            <Image source={images.sendIcon} style={styles.sendIcon} />
+            <SendIcon style={styles.sendIcon} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -191,15 +191,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
   },
-  sendButton: {
-    marginLeft: 10,
-    backgroundColor: colors.purple,
-    width: 45,
-    height: 45,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  sendButton: {},
   sendIcon: {
     width: 20,
     height: 20,

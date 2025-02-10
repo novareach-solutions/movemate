@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from "@nestjs/common";
 import { DeleteResult, In, QueryRunner, UpdateResult } from "typeorm";
 
 import { Agent } from "../../entity/Agent";
@@ -31,6 +35,8 @@ import { radii } from "./agents.constants";
 
 @Injectable()
 export class AgentService {
+  private readonly logger = new Logger(AgentService.name);
+
   constructor(
     private readonly redisService: RedisService,
     private readonly agentNotificationGateway: AgentNotificationGateway,
@@ -47,14 +53,14 @@ export class AgentService {
     await queryRunner.startTransaction();
 
     try {
-      logger.debug(
+      this.logger.debug(
         `AgentService.createAgent: Checking if agent with ABN ${abnNumber} exists.`,
       );
       const existingAgent = await queryRunner.manager.findOne(Agent, {
         where: { abnNumber },
       });
       if (existingAgent) {
-        logger.error(
+        this.logger.error(
           `AgentService.createAgent: Agent with ABN ${abnNumber} already exists.`,
         );
         throw new UserAlreadyExistsError(
@@ -62,7 +68,7 @@ export class AgentService {
         );
       }
 
-      logger.debug(
+      this.logger.debug(
         `AgentService.createAgent: Checking if user with phone ${user.phoneNumber} or email ${user.email} exists.`,
       );
       const existingUserByPhone = await queryRunner.manager.findOne(User, {
@@ -73,7 +79,7 @@ export class AgentService {
       });
 
       if (existingUserByPhone || existingUserByEmail) {
-        logger.error(
+        this.logger.error(
           `AgentService.createAgent: User with phone ${user.phoneNumber} or email ${user.email} already exists.`,
         );
         throw new UserAlreadyExistsError(
@@ -81,7 +87,7 @@ export class AgentService {
         );
       }
 
-      logger.debug(
+      this.logger.debug(
         `AgentService.createAgent: Creating user and agent records.`,
       );
       const newUser = queryRunner.manager.create(User, user);
@@ -109,7 +115,7 @@ export class AgentService {
       );
       const refreshToken = this.tokenService.generateRefreshToken(savedUser.id);
 
-      logger.debug(
+      this.logger.debug(
         `AgentService.createAgent: Agent with ID ${savedAgent.id} created successfully.`,
       );
       await queryRunner.commitTransaction();
@@ -117,7 +123,7 @@ export class AgentService {
       return { agent: savedAgent, accessToken, refreshToken };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      logger.error(`AgentService.createAgent: Error occurred - ${error}`);
+      this.logger.error(`AgentService.createAgent: Error occurred - ${error}`);
       throw new InternalServerErrorException(
         `Failed to create agent: ${error}`,
       );
@@ -125,18 +131,22 @@ export class AgentService {
       await queryRunner.release();
     }
   }
-  
+
   async getOngoingOrder(agentId: number): Promise<SendPackageOrder | null> {
     return await dbReadRepo(SendPackageOrder).findOne({
       where: {
         agentId,
-        status: In([OrderStatusEnum.ACCEPTED, OrderStatusEnum.IN_PROGRESS,OrderStatusEnum.PICKEDUP_ORDER]),
+        status: In([
+          OrderStatusEnum.ACCEPTED,
+          OrderStatusEnum.IN_PROGRESS,
+          OrderStatusEnum.PICKEDUP_ORDER,
+        ]),
       },
       relations: ["pickupLocation", "dropLocation", "customer"],
     });
-  }  
+  }
   async getAgentById(agentId: number): Promise<Agent> {
-    logger.debug(
+    this.logger.debug(
       `AgentService.getAgentById: Fetching agent with ID ${agentId}.`,
     );
     const agent = await dbReadRepo(Agent).findOne({
@@ -145,7 +155,7 @@ export class AgentService {
     });
 
     if (!agent) {
-      logger.error(
+      this.logger.error(
         `AgentService.getAgentById: Agent with ID ${agentId} not found.`,
       );
       throw new UserNotFoundError(`Agent not found for ID ${agentId}`);
@@ -155,7 +165,7 @@ export class AgentService {
   }
 
   async getAllAgents(): Promise<Agent[]> {
-    logger.debug(`AgentService.getAllAgents: Fetching all agents.`);
+    this.logger.debug(`AgentService.getAllAgents: Fetching all agents.`);
     return await dbReadRepo(Agent).find({ relations: ["user"] });
   }
 
@@ -164,13 +174,13 @@ export class AgentService {
     updateAgent: TAgentPartial,
     isAdmin: boolean = false,
   ): Promise<UpdateResult> {
-    logger.debug(
+    this.logger.debug(
       `AgentService.updateAgentProfile: Updating agent ID ${agentId}.`,
     );
     const agent = await dbReadRepo(Agent).findOne({ where: { id: agentId } });
 
     if (!agent) {
-      logger.error(
+      this.logger.error(
         `AgentService.updateAgentProfile: Agent with ID ${agentId} not found.`,
       );
       throw new UserNotFoundError(`Agent with ID ${agentId} not found.`);
@@ -188,14 +198,14 @@ export class AgentService {
       delete filteredUpdateAgent.approvalStatus;
     }
 
-    logger.debug(
+    this.logger.debug(
       `AgentService.updateAgentProfile: Update data - ${JSON.stringify(filteredUpdateAgent)}.`,
     );
     return await dbRepo(Agent).update(agentId, filteredUpdateAgent);
   }
 
   async deleteAgent(agentId: number): Promise<DeleteResult> {
-    logger.debug(
+    this.logger.debug(
       `AgentService.deleteAgent: Deleting agent with ID ${agentId}.`,
     );
     return await dbRepo(Agent).softDelete(agentId);
@@ -205,7 +215,7 @@ export class AgentService {
     agentId: number,
     document: TAgentDocument,
   ): Promise<TAgentDocument> {
-    logger.debug(
+    this.logger.debug(
       `AgentService.submitDocument: Submitting document for agent ID ${agentId}.`,
     );
 
@@ -289,7 +299,7 @@ export class AgentService {
   }
 
   async removeDocument(agentId: number, documentId: number): Promise<void> {
-    logger.debug(
+    this.logger.debug(
       `AgentService.removeDocument: Removing document ID ${documentId} for agent ID ${agentId}.`,
     );
     const document = await dbReadRepo(AgentDocument).findOne({
@@ -297,20 +307,20 @@ export class AgentService {
     });
 
     if (!document) {
-      logger.error(
+      this.logger.error(
         `AgentService.removeDocument: Document ID ${documentId} not found.`,
       );
       throw new UserNotFoundError(`Document with ID ${documentId} not found.`);
     }
 
     await dbRepo(AgentDocument).delete(documentId);
-    logger.debug(
+    this.logger.debug(
       `AgentService.removeDocument: Document ID ${documentId} removed for agent ID ${agentId}.`,
     );
   }
 
   async getAgentDocuments(agentId: number): Promise<TAgentDocument[]> {
-    logger.debug(
+    this.logger.debug(
       `AgentService.getAgentDocuments: Fetching documents for agent ID ${agentId}.`,
     );
     const documents = await dbReadRepo(AgentDocument).find({
@@ -329,13 +339,13 @@ export class AgentService {
     agentId: number,
     status: AgentStatusEnum,
   ): Promise<UpdateResult> {
-    logger.debug(
+    this.logger.debug(
       `AgentService.setAgentStatus: Setting status for agent ID ${agentId} to ${status}.`,
     );
     const agent = await this.getAgentById(agentId);
 
     if (agent.approvalStatus !== ApprovalStatusEnum.APPROVED) {
-      logger.error(
+      this.logger.error(
         `AgentService.setAgentStatus: Cannot set status. Agent ID ${agentId} not approved.`,
       );
       throw new UserAccessDeniedError(
@@ -343,7 +353,7 @@ export class AgentService {
       );
     }
 
-    logger.debug(
+    this.logger.debug(
       `AgentService.setAgentStatus: Updating status in database for agent ID ${agentId}.`,
     );
     return await dbRepo(Agent).update(agentId, { status });
@@ -392,7 +402,7 @@ export class AgentService {
     longitude: number,
     radiusKm: number,
   ): Promise<{ agentId: number; distance: number }[]> {
-    logger.debug(
+    this.logger.debug(
       `AgentService.getNearbyAgents: Fetching agents within ${radiusKm} km of (${latitude}, ${longitude}).`,
     );
     const radiusMeters = radiusKm * 1000;
@@ -407,7 +417,7 @@ export class AgentService {
         "WITHDIST",
         "ASC",
       )) as [string, string][];
-    logger.debug(
+    this.logger.debug(
       `AgentService.getNearbyAgents: Found ${results.length} agents within ${radiusKm} km.`,
     );
     return results.map((result) => ({
@@ -573,13 +583,13 @@ export class AgentService {
   }
 
   async acceptOrder(orderId: string, agentId: number): Promise<void> {
-    logger.debug(
+    this.logger.debug(
       `AgentService.acceptOrder: Agent ID ${agentId} is accepting order ID ${orderId}.`,
     );
     await this.setAgentStatus(agentId, AgentStatusEnum.BUSY);
 
     const acceptanceData = { orderId, agentId };
-    logger.debug(
+    this.logger.debug(
       `AgentService.acceptOrder: Publishing acceptance data to Redis for order ID ${orderId}.`,
     );
     await this.redisService

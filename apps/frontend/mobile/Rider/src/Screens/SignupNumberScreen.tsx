@@ -9,16 +9,16 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   TextStyle,
+  SafeAreaView,
 } from 'react-native';
 import PhoneInput from 'react-native-phone-number-input';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
-import {requestOtp} from '../redux/slices/authSlice';
 import {useAppDispatch} from '../redux/hook';
 import Header from '../components/Header';
+import Logo from '../assets/icons/logo.svg';
 
 const {width} = Dimensions.get('window');
 
@@ -33,12 +33,12 @@ const SignupNumberScreen: React.FC = () => {
   const handlePhoneNumberChange = (number: string) => {
     setIsFocused(true);
     setPhoneNumber(number);
-    setIsFilled(number.length > 0);
+    setIsFilled(number.length === 13);
   };
 
   const handleSendCode = async () => {
     try {
-      await dispatch(requestOtp({phone: phoneNumber})).unwrap();
+      // await dispatch(requestOtp({phone: phoneNumber})).unwrap();
       navigation.navigate(AuthScreens.Otp, {phoneNumber});
     } catch {
       console.log('Request Otp failed');
@@ -50,11 +50,14 @@ const SignupNumberScreen: React.FC = () => {
   };
 
   return (
-    <View>
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
       <Header isBack />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
-          <Image source={images.logo} style={styles.logo} />
+          <Logo style={styles.logo} />
           <Text style={styles.heading}>Create an Account</Text>
           <Text style={styles.subheading}>
             Enter phone number and we’ll send you a verification code
@@ -95,7 +98,7 @@ const SignupNumberScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
-    </View>
+    </SafeAreaView>
   );
 };
 

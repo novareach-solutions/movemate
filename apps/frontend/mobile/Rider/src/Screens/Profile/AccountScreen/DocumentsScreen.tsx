@@ -4,29 +4,26 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   TextStyle,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
-import {images} from '../../../assets/images/images';
+import Header from '../../../components/Header';
+import LicenseIcon from '../../../assets/icons/licenseIcon.svg';
+import Camera from '../../../assets/icons/camera.svg';
 
 const DocumentsScreen: React.FC = () => {
   const [expandedDocument, setExpandedDocument] = useState<number | null>(null);
 
   // Array for icons
-  const iconsArray = [
-    images.document1,
-    images.document1,
-    images.document1,
-    images.document1,
-  ];
+  const iconsArray = [LicenseIcon, LicenseIcon, LicenseIcon, LicenseIcon];
 
   // Array for documents
   const documents = [
     {
       id: 1,
-      title: "Driver's License",
+      title: 'Driver License',
       status: 'Approved',
       reUpload: true,
     },
@@ -75,7 +72,7 @@ const DocumentsScreen: React.FC = () => {
       <View style={styles.documentContent}>
         <View style={styles.leftContainer}>
           <View style={styles.documentIconContainer}>
-            <Image source={document.icon} style={styles.documentIcon} />
+            <document.icon style={styles.documentIcon} />
           </View>
           <Text style={styles.documentTitle}>{document.title}</Text>
         </View>
@@ -91,7 +88,7 @@ const DocumentsScreen: React.FC = () => {
       </View>
       {expandedDocument === document.id && document.reUpload && (
         <TouchableOpacity style={styles.reUploadButton}>
-          <Image source={images.reuploadIcon} style={styles.reUploadIcon} />
+          <Camera />
           <Text style={styles.reUploadText}>Re-Upload</Text>
         </TouchableOpacity>
       )}
@@ -99,11 +96,17 @@ const DocumentsScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.documentList}>
-        {documentsWithIcons.map(renderDocumentItem)}
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
+      <Header isBack title="Documents" />
+      <View style={styles.container}>
+        <View style={styles.documentList}>
+          {documentsWithIcons.map(renderDocumentItem)}
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -127,6 +130,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
+    borderWidth: 1,
+    borderColor: colors.border.lightGray,
   },
   documentContent: {
     flexDirection: 'row',
@@ -139,7 +144,7 @@ const styles = StyleSheet.create({
   documentIconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   documentIcon: {
     width: 40,
@@ -150,7 +155,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.medium as TextStyle['fontWeight'],
     color: colors.text.primary,
     textAlign: 'center',
-    marginVertical: 15,
+    marginTop: 15,
   },
   rightContainer: {
     justifyContent: 'flex-start',
@@ -162,11 +167,11 @@ const styles = StyleSheet.create({
   },
   reUploadButton: {
     flexDirection: 'row',
-    marginTop: 10,
     alignItems: 'center',
     borderTopWidth: 1,
-    paddingTop: 10,
+    paddingTop: 15,
     borderColor: colors.border.lightGray,
+    marginTop: 15,
   },
   reUploadIcon: {
     tintColor: colors.primary,
@@ -175,7 +180,7 @@ const styles = StyleSheet.create({
   reUploadText: {
     fontSize: typography.fontSize.medium,
     color: colors.primary,
-    fontWeight: typography.fontWeight.semiBold,
+    fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],
   },
 });
 

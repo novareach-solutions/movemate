@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
@@ -12,11 +13,19 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import { DeleteResult, UpdateResult } from "typeorm";
 
 import { User } from "../../entity/User";
 import { Roles } from "../../shared/decorators/roles.decorator";
+import {
+  UserDeleteProfileByIdSwagger,
+  UserGetByIdSwagger,
+  UserGetProfileByIdSwagger,
+  UserPatchProfileByIdSwagger,
+  UserPostSignUpSwagger,
+} from "../../shared/decorators/user/user.decorators";
 import { UserRoleEnum } from "../../shared/enums";
 import { UnauthorizedError } from "../../shared/errors/authErrors";
 import { AuthGuard } from "../../shared/guards/auth.guard";
@@ -26,8 +35,10 @@ import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { UserService } from "./user.service";
 import { TCreateUser, TGetUserProfile, TUpdateUser } from "./user.types";
 
+@ApiTags("User")
 @Controller("user")
 export class UserController {
+  private readonly logger = new Logger(UserController.name);
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
@@ -39,6 +50,7 @@ export class UserController {
    */
   @Post("signup")
   @UseGuards(OnboardingGuard)
+  @UserPostSignUpSwagger()
   async createUser(
     @Body() createUserDto: TCreateUser,
     @Req() request: ICustomRequest,
@@ -49,12 +61,21 @@ export class UserController {
       createUserDto.phoneNumber &&
       createUserDto.phoneNumber !== phoneNumberFromGuard
     ) {
+      this.logger.warn(
+        `UserController.createUser: The provided phone number ${createUserDto.phoneNumber} does not match the authenticated user's phone number ${phoneNumberFromGuard}.`,
+      );
       throw new UnauthorizedError(
         "The provided phone number does not match the authenticated user's phone number.",
       );
     }
     createUserDto.phoneNumber = phoneNumberFromGuard;
     createUserDto.role = UserRoleEnum.CUSTOMER;
+
+    this.logger.debug(
+      `UserController.createUser: Creating user with data: ${JSON.stringify(
+        createUserDto,
+      )}`,
+    );
 
     const { accessToken, refreshToken } =
       await this.userService.createUser(createUserDto);
@@ -80,12 +101,25 @@ export class UserController {
   @Get()
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.CUSTOMER)
+  @UserGetByIdSwagger()
   async getCurrentUser(
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<User>> {
     const userId = request.user.id;
 
+    this.logger.debug(
+      `UserController.getCurrentUser: Retrieving user profile for user ID: ${userId}`,
+    );
+
     const user = await this.userService.getUserById(userId);
+
+    if (!user) {
+      this.logger.error(
+        `UserController.getCurrentUser: User with ID ${userId} not found.`,
+      );
+      throw new UnauthorizedError(`User with ID ${userId} not found.`);
+    }
+
     return {
       success: true,
       message: "User profile retrieved successfully.",
@@ -100,10 +134,23 @@ export class UserController {
   @Get("profile/:id")
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
+  @UserGetProfileByIdSwagger()
   async getUserById(
     @Param("id", ParseIntPipe) id: number,
   ): Promise<IApiResponse<User>> {
+    this.logger.debug(
+      `UserController.getUserById: Retrieving user with ID ${id}`,
+    );
     const user = await this.userService.getUserById(id);
+    if (!user) {
+      this.logger.error(
+        `UserController.getUserById: User with ID ${id} not found.`,
+      );
+      throw new UnauthorizedError(`User with ID ${id} not found.`);
+    }
+    this.logger.log(
+      `UserController.getUserById: User with ID ${id} retrieved successfully.`,
+    );
     return {
       success: true,
       message: "User profile retrieved successfully.",
@@ -118,10 +165,27 @@ export class UserController {
   @Post("profile")
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
+  @UserGetProfileByIdSwagger()
   async getUserProfile(
     @Body() getUserProfileDto: TGetUserProfile,
   ): Promise<IApiResponse<User>> {
+    this.logger.debug(
+      `UserController.getUserProfile: Retrieving user profile with data: ${JSON.stringify(
+        getUserProfileDto,
+      )}`,
+    );
     const user = await this.userService.getUserProfile(getUserProfileDto);
+    if (!user) {
+      this.logger.error(
+        `UserController.getUserProfile: User with criteria ${JSON.stringify(
+          getUserProfileDto,
+        )} not found.`,
+      );
+      throw new UnauthorizedError(`User not found.`);
+    }
+    this.logger.log(
+      `UserController.getUserProfile: User profile retrieved successfully.`,
+    );
     return {
       success: true,
       message: "User profile retrieved successfully.",
@@ -137,7 +201,11 @@ export class UserController {
   // @UseGuards(AuthGuard, RoleGuard)
   // @Roles(UserRoleEnum.ADMIN)
   async getAllUsers(): Promise<IApiResponse<User[]>> {
+    this.logger.debug(`UserController.getAllUsers: Retrieving all users.`);
     const users = await this.userService.getAllUsers();
+    this.logger.log(
+      `UserController.getAllUsers: All users retrieved successfully.`,
+    );
     return {
       success: true,
       message: "All users retrieved successfully.",
@@ -152,11 +220,20 @@ export class UserController {
   @Patch("profile/:id")
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
+  @UserPatchProfileByIdSwagger()
   async updateUser(
     @Param("id", ParseIntPipe) id: number,
     @Body() updateUserDto: TUpdateUser,
   ): Promise<IApiResponse<UpdateResult>> {
+    this.logger.debug(
+      `UserController.updateUser: Updating user with ID ${id} with data: ${JSON.stringify(
+        updateUserDto,
+      )}`,
+    );
     const result = await this.userService.updateUser(id, updateUserDto);
+    this.logger.log(
+      `UserController.updateUser: User profile updated successfully for user ID ${id}.`,
+    );
     return {
       success: true,
       message: "User profile updated successfully.",
@@ -171,10 +248,15 @@ export class UserController {
   @Delete("profile/:id")
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
+  @UserDeleteProfileByIdSwagger()
   async deleteUser(
     @Param("id", ParseIntPipe) id: string,
   ): Promise<IApiResponse<DeleteResult>> {
+    this.logger.debug(`UserController.deleteUser: Deleting user with ID ${id}`);
     const result = await this.userService.deleteUser(id);
+    this.logger.log(
+      `UserController.deleteUser: User deleted successfully for user ID ${id}.`,
+    );
     return {
       success: true,
       message: "User deleted successfully.",

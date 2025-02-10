@@ -1,18 +1,19 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
+import {SvgProps} from 'react-native-svg';
 
 interface StatCardProps {
-  icon: any;
+  icon: React.FC<SvgProps>;
   value: string | number;
   label: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({icon, value, label}) => {
+const StatCard: React.FC<StatCardProps> = ({icon: Icon, value, label}) => {
   return (
     <View style={styles.container}>
-      <Image source={icon} style={styles.icon} />
+      <Icon width={40} height={50} />
       <Text style={styles.value}>{value}</Text>
       <Text style={styles.label}>{label}</Text>
     </View>
@@ -22,12 +23,6 @@ const StatCard: React.FC<StatCardProps> = ({icon, value, label}) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-  },
-  icon: {
-    width: 40,
-    height: 40,
-    marginBottom: 5,
-    objectFit: 'contain',
   },
   value: {
     fontSize: typography.fontSize.medium,

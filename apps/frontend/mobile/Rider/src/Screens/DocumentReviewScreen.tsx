@@ -9,17 +9,15 @@ import {
 } from 'react-native';
 import {colors} from '../theme/colors';
 import {formStyles} from '../theme/form';
-import StepIndicator from '../components/StepIndicator';
 import TitleDescription from '../components/TitleDescription';
 import PhotoPickerModal from '../components/common/PhotoPickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
-import {uploadAgentDoc, uploadMedia} from '../redux/slices/authSlice';
-import {useAppDispatch} from '../redux/hook';
-import Header from '../components/Header';
-import {images} from '../assets/images/images';
-import {SimpleToast} from '../utils/helpers';
 import {useNavigation} from '@react-navigation/native';
 import {DeliverAPackage} from '../navigation/ScreenNames';
+import Header from '../components/Header';
+import {SimpleToast} from '../utils/helpers';
+import {uploadAgentDoc} from '../redux/slices/authSlice';
+import {useAppDispatch} from '../redux/hook';
 interface DocumentReviewProps {
   route: {
     params: {
@@ -57,14 +55,16 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
       SimpleToast('Failed to upload the document. Please try again.', true);
       navigation.goBack();
     }
+    navigation.navigate(DeliverAPackage.UploadDocuments);
   };
 
   const handleRetry = () => {
     setIsPhotoOptionVisible(true);
-    console.log('Retry');
   };
 
-  const handleTakePhoto = () => {};
+  const handleTakePhoto = () => {
+    // Placeholder for taking a new photo
+  };
 
   const handleChooseFromGallery = () => {
     setIsPhotoOptionVisible(false);
@@ -74,25 +74,7 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
       cropping: true,
     })
       .then(photo => {
-        // Construct FormData for upload
-        const formData = new FormData();
-        formData.append('file', {
-          uri: photo.path, // Use the file path
-          type: photo.mime, // File type (e.g., image/jpeg)
-          name: photo.filename || `photo_${Date.now()}.jpg`, // Use filename or fallback to a generated one
-        });
-
-        // Perform the upload via Redux or direct API call
-        dispatch(uploadMedia(formData))
-          .unwrap()
-          .then(response => {
-            if (response) {
-              setImage(response?.location);
-            }
-          })
-          .catch(error => {
-            console.error('Upload failed:', error);
-          });
+        setImage(photo.path);
       })
       .catch(error => {
         console.log('Gallery error:', error);
@@ -110,14 +92,23 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
         <View style={styles.imageContainer}>
           <Image
             source={
-              image ? {uri: image} : images.placeholderprofile // Use a placeholder image for empty state
+              image
+                ? {uri: image}
+                : require('../assets/icons/placeHolderProfile.svg')
             }
             style={styles.image}
           />
         </View>
         <View style={styles.footer}>
           <TouchableOpacity
-            style={[formStyles.button, styles.halfButton]}
+            style={[
+              formStyles.button,
+              styles.halfButton,
+              {
+                borderWidth: 1,
+                borderColor: colors.purple,
+              },
+            ]}
             onPress={handleRetry}>
             <Text style={formStyles.buttonText}>Retry</Text>
           </TouchableOpacity>

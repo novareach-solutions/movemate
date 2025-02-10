@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
@@ -21,11 +22,12 @@ import { RoleGuard } from "../../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../../shared/interface";
 import { SendAPackageService } from "./sendPackage.service";
 import { TSendPackageOrder } from "./sendPackage.types";
-import { logger } from "../../../logger";
 
 @Controller("order/send-package")
 @UseGuards(AuthGuard, RoleGuard)
 export class SendPackageController {
+  private readonly logger = new Logger(SendPackageController.name);
+
   constructor(private readonly sendPackageService: SendAPackageService) {}
 
   @Post("create")
@@ -34,12 +36,17 @@ export class SendPackageController {
     @Body() data: TSendPackageOrder,
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<SendPackageOrder>> {
-    console.log(request.user)
     const customerId = request.user.id;
+    this.logger.debug(
+      `SendPackageController.createSendPackageOrder: Creating send package order for customer ID ${customerId}.`,
+    );
     const createdOrder = await this.sendPackageService.create({
       ...data,
       customerId,
     });
+    this.logger.log(
+      `SendPackageController.createSendPackageOrder: Send package order created successfully.`,
+    );
     return {
       success: true,
       message: "Send package order created successfully.",
@@ -47,15 +54,19 @@ export class SendPackageController {
     };
   }
 
-
-
   @Post(":orderId/cancel")
   @Roles(UserRoleEnum.CUSTOMER, UserRoleEnum.ADMIN)
   async cancelOrder(
     @Param("orderId", ParseIntPipe) orderId: number,
     @Body("reason") reason: string,
   ): Promise<IApiResponse<SendPackageOrder>> {
+    this.logger.debug(
+      `SendPackageController.cancelOrder: Canceling order ID ${orderId}.`,
+    );
     const data = await this.sendPackageService.cancelOrder(orderId, reason);
+    this.logger.log(
+      `SendPackageController.cancelOrder: Order canceled successfully.`,
+    );
     return {
       success: true,
       message: "Order canceled successfully.",
@@ -70,10 +81,16 @@ export class SendPackageController {
     @Body("reason") reason: string,
     @Body("details") details: string,
   ): Promise<IApiResponse<Report>> {
+    this.logger.debug(
+      `SendPackageController.reportAgent: Reporting agent for order ID ${orderId}.`,
+    );
     const data = await this.sendPackageService.reportAgent(
       orderId,
       reason,
       details,
+    );
+    this.logger.log(
+      `SendPackageController.reportAgent: Agent reported successfully.`,
     );
     return {
       success: true,
@@ -89,10 +106,16 @@ export class SendPackageController {
     @Body("rating") rating: number,
     @Body("comment") comment: string,
   ): Promise<IApiResponse<OrderReview>> {
+    this.logger.debug(
+      `SendPackageController.leaveReview: Leaving review for order ID ${orderId}.`,
+    );
     const data = await this.sendPackageService.leaveReview(
       orderId,
       rating,
       comment,
+    );
+    this.logger.log(
+      `SendPackageController.leaveReview: Review submitted successfully.`,
     );
     return {
       success: true,
@@ -106,7 +129,13 @@ export class SendPackageController {
   async getOrderDetails(
     @Param("orderId", ParseIntPipe) orderId: number,
   ): Promise<IApiResponse<SendPackageOrder>> {
+    this.logger.debug(
+      `SendPackageController.getOrderDetails: Retrieving order details for order ID ${orderId}.`,
+    );
     const data = await this.sendPackageService.getOrderDetails(orderId);
+    this.logger.log(
+      `SendPackageController.getOrderDetails: Order details retrieved successfully.`,
+    );
     return {
       success: true,
       message: "Order details retrieved successfully.",
@@ -116,7 +145,6 @@ export class SendPackageController {
 
   // ====== Agent APIs ======
 
-
   @Post("agent/:orderId/accept")
   @Roles(UserRoleEnum.AGENT)
   async acceptOrder(
@@ -124,7 +152,13 @@ export class SendPackageController {
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<SendPackageOrder>> {
     const agentId = request.user.agent.id;
+    this.logger.debug(
+      `SendPackageController.acceptOrder: Agent ID ${agentId} is accepting order ID ${orderId}.`,
+    );
     const data = await this.sendPackageService.acceptOrder(orderId, agentId);
+    this.logger.log(
+      `SendPackageController.acceptOrder: Order accepted successfully.`,
+    );
     return {
       success: true,
       message: "Order accepted successfully.",
@@ -139,8 +173,6 @@ export class SendPackageController {
     @Body("url") url: string,
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<SendPackageOrder>> {
-
-
     const agentId = request.user.agent.id;
 
     const updatedOrder = await this.sendPackageService.updateItemVerifiedPhoto(
@@ -157,26 +189,26 @@ export class SendPackageController {
   }
 
   @Patch("agent/:orderId/proof-of-delivery")
-@Roles(UserRoleEnum.AGENT)
-async updateProofOfDelivery(
-  @Param("orderId", ParseIntPipe) orderId: number,
-  @Body("url") url: string,
-  @Req() request: ICustomRequest,
-): Promise<IApiResponse<SendPackageOrder>> {
-  const agentId = request.user.agent.id;
+  @Roles(UserRoleEnum.AGENT)
+  async updateProofOfDelivery(
+    @Param("orderId", ParseIntPipe) orderId: number,
+    @Body("url") url: string,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<SendPackageOrder>> {
+    const agentId = request.user.agent.id;
 
-  const updatedOrder = await this.sendPackageService.updateProofOfDelivery(
-    orderId,
-    agentId,
-    url,
-  );
+    const updatedOrder = await this.sendPackageService.updateProofOfDelivery(
+      orderId,
+      agentId,
+      url,
+    );
 
-  return {
-    success: true,
-    message: "Proof of delivery photo updated successfully.",
-    data: updatedOrder,
-  };
-}
+    return {
+      success: true,
+      message: "Proof of delivery photo updated successfully.",
+      data: updatedOrder,
+    };
+  }
 
   @Post("agent/:orderId/start")
   @Roles(UserRoleEnum.AGENT)
@@ -185,7 +217,13 @@ async updateProofOfDelivery(
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<SendPackageOrder>> {
     const agentId = request.user.agent.id;
+    this.logger.debug(
+      `SendPackageController.startOrder: Agent ID ${agentId} is starting order ID ${orderId}.`,
+    );
     const data = await this.sendPackageService.startOrder(orderId, agentId);
+    this.logger.log(
+      `SendPackageController.startOrder: Order started successfully.`,
+    );
     return {
       success: true,
       message: "Order started successfully.",
@@ -198,7 +236,13 @@ async updateProofOfDelivery(
   async completeOrder(
     @Param("orderId", ParseIntPipe) orderId: number,
   ): Promise<IApiResponse<SendPackageOrder>> {
+    this.logger.debug(
+      `SendPackageController.completeOrder: Agent completing order ID ${orderId}.`,
+    );
     const data = await this.sendPackageService.completeOrder(orderId);
+    this.logger.log(
+      `SendPackageController.completeOrder: Order completed successfully.`,
+    );
     return {
       success: true,
       message: "Order completed successfully.",
@@ -212,9 +256,15 @@ async updateProofOfDelivery(
     @Param("orderId", ParseIntPipe) orderId: number,
     @Body("reason") reason: string,
   ): Promise<IApiResponse<SendPackageOrder>> {
+    this.logger.debug(
+      `SendPackageController.agentCancelOrder: Agent canceling order ID ${orderId}.`,
+    );
     const data = await this.sendPackageService.agentCancelOrder(
       orderId,
       reason,
+    );
+    this.logger.log(
+      `SendPackageController.agentCancelOrder: Order canceled successfully by agent.`,
     );
     return {
       success: true,
@@ -229,15 +279,19 @@ async updateProofOfDelivery(
     @Param("orderId", ParseIntPipe) orderId: number,
     @Body("issue") issue: string,
   ): Promise<IApiResponse<Report>> {
+    this.logger.debug(
+      `SendPackageController.reportIssue: Reporting issue for order ID ${orderId}.`,
+    );
     const data = await this.sendPackageService.reportIssue(orderId, issue);
+    this.logger.log(
+      `SendPackageController.reportIssue: Issue reported successfully.`,
+    );
     return {
       success: true,
       message: "Issue reported successfully.",
       data,
     };
   }
-
- 
 
   // ====== Admin APIs ======
 
@@ -246,7 +300,13 @@ async updateProofOfDelivery(
   async getAllOrders(
     @Query() query: any,
   ): Promise<IApiResponse<SendPackageOrder[]>> {
+    this.logger.debug(
+      `SendPackageController.getAllOrders: Retrieving all orders.`,
+    );
     const data = await this.sendPackageService.getAllOrders(query);
+    this.logger.log(
+      `SendPackageController.getAllOrders: All orders retrieved successfully.`,
+    );
     return {
       success: true,
       message: "All orders retrieved successfully.",
@@ -254,20 +314,21 @@ async updateProofOfDelivery(
     };
   }
 
-// ====== Common APIs ======
-@Patch(":orderId/status")
-@Roles(UserRoleEnum.ADMIN, UserRoleEnum.AGENT) // Adjust roles as necessary
-async updateOrderStatus(
-  @Param("orderId", ParseIntPipe) orderId: number,
-  @Body("status") status: OrderStatusEnum,
-): Promise<IApiResponse<SendPackageOrder>> {
-  const updatedOrder = await this.sendPackageService.updateOrderStatus(orderId, status);
-  return {
-    success: true,
-    message: "Order status updated successfully.",
-    data: updatedOrder,
-  };
-}
-
-
+  // ====== Common APIs ======
+  @Patch(":orderId/status")
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.AGENT) // Adjust roles as necessary
+  async updateOrderStatus(
+    @Param("orderId", ParseIntPipe) orderId: number,
+    @Body("status") status: OrderStatusEnum,
+  ): Promise<IApiResponse<SendPackageOrder>> {
+    const updatedOrder = await this.sendPackageService.updateOrderStatus(
+      orderId,
+      status,
+    );
+    return {
+      success: true,
+      message: "Order status updated successfully.",
+      data: updatedOrder,
+    };
+  }
 }

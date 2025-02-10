@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Modal,
   FlatList,
   TextStyle,
 } from 'react-native';
@@ -26,17 +25,19 @@ const Dropdown: React.FC<DropdownProps> = ({
   selectedValue,
   onValueChange,
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSelect = (value: string) => {
     onValueChange(value);
-    setIsVisible(false);
+    setIsOpen(false);
   };
 
   return (
     <View style={styles.wrapper}>
       <Text style={styles.label}>{label}</Text>
-      <TouchableOpacity style={styles.input} onPress={() => setIsVisible(true)}>
+
+      {/* Main Dropdown Selection */}
+      <TouchableOpacity style={styles.input} onPress={() => setIsOpen(!isOpen)}>
         <Text
           style={{
             color: selectedValue ? colors.text.primary : colors.text.subText,
@@ -44,8 +45,10 @@ const Dropdown: React.FC<DropdownProps> = ({
           {selectedValue || placeholder}
         </Text>
       </TouchableOpacity>
-      <Modal visible={isVisible} transparent animationType="slide">
-        <View style={styles.modal}>
+
+      {/* Overlapping Dropdown Options */}
+      {isOpen && (
+        <View style={styles.dropdown}>
           <FlatList
             data={options}
             keyExtractor={(item, index) => index.toString()}
@@ -57,13 +60,8 @@ const Dropdown: React.FC<DropdownProps> = ({
               </TouchableOpacity>
             )}
           />
-          <TouchableOpacity
-            style={styles.modalClose}
-            onPress={() => setIsVisible(false)}>
-            <Text style={styles.modalCloseText}>Close</Text>
-          </TouchableOpacity>
         </View>
-      </Modal>
+      )}
     </View>
   );
 };
@@ -71,6 +69,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 const styles = StyleSheet.create({
   wrapper: {
     marginBottom: 15,
+    position: 'relative',
   },
   label: {
     fontSize: typography.fontSize.medium,
@@ -86,32 +85,28 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
   },
-  modal: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    padding: 20,
+  dropdown: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    borderWidth: 1,
+    borderColor: colors.border.primary,
+    borderRadius: 8,
+    marginTop: 5,
+    backgroundColor: colors.white,
+    maxHeight: 250,
+    zIndex: 999,
+    elevation: 5,
   },
   option: {
-    backgroundColor: colors.white,
-    padding: 15,
+    padding: 12,
     borderBottomWidth: 1,
     borderColor: colors.border.primary,
   },
   optionText: {
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
-  },
-  modalClose: {
-    backgroundColor: colors.purple,
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  modalCloseText: {
-    color: colors.white,
-    fontSize: typography.fontSize.medium,
   },
 });
 

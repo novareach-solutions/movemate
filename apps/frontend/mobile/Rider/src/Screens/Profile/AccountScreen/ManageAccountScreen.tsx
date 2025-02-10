@@ -6,10 +6,12 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
-import {images} from '../../../assets/images/images';
+import Header from '../../../components/Header';
+import PlaceHolderProfile from '../../../assets/icons/placeHolderProfile.svg';
 
 const ManageAccountScreen: React.FC = () => {
   const [email, setEmail] = useState('johndoe@gmail.com');
@@ -25,46 +27,52 @@ const ManageAccountScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Profile Picture */}
-      <View style={styles.profileContainer}>
-        <Image source={images.placeholderprofile} style={styles.profileImage} />
-        <Text style={styles.editProfileText}>EDIT</Text>
-      </View>
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
+      <Header isBack title="Manage Account" />
+      <View style={styles.container}>
+        {/* Profile Picture */}
+        <View style={styles.profileContainer}>
+          <PlaceHolderProfile style={styles.profileImage} />
+          <Text style={styles.editProfileText}>EDIT</Text>
+        </View>
 
-      {/* Name */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Name</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.value}>John Doe</Text>
-          <TouchableOpacity>
-            <Text style={styles.editText}>EDIT</Text>
-          </TouchableOpacity>
+        {/* Name */}
+        <View style={styles.infoContainer}>
+          <Text style={styles.label}>Name</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.value}>John Doe</Text>
+            <TouchableOpacity>
+              <Text style={styles.editText}>EDIT</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Phone Number */}
+        <View style={styles.infoContainer}>
+          <Text style={styles.label}>Phone Number</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.value}>123456789</Text>
+            <TouchableOpacity>
+              <Text style={styles.editText}>EDIT</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Email Address */}
+        <View style={styles.infoContainer}>
+          <Text style={styles.label}>Email Address</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.value}>ahad@gmail.com</Text>
+            <TouchableOpacity>
+              <Text style={styles.editText}>EDIT</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-
-      {/* Phone Number */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Phone Number</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.value}>123456789</Text>
-          <TouchableOpacity>
-            <Text style={styles.editText}>EDIT</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Email Address */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Email Address</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.value}>ahad@gmail.com</Text>
-          <TouchableOpacity>
-            <Text style={styles.editText}>EDIT</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

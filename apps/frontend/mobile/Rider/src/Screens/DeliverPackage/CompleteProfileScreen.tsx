@@ -13,7 +13,7 @@ import {setSignupData} from '../../redux/slices/authSlice';
 import Header from '../../components/Header';
 
 type FormFields = {
-  role: 'AGENT';
+  role: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -46,8 +46,8 @@ const DAPCompleteProfileScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
-      <Header logo />
+    <SafeAreaView style={{flex: 1}}>
+      <Header logo isBack />
       <View style={styles.container}>
         <StepIndicator current={1} total={5} />
         <ProfileForm

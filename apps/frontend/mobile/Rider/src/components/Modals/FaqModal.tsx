@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import {colors} from '../../theme/colors';
 import {typography} from '../../theme/typography';
-import {images} from '../../assets/images/images';
+import PurplePhone from '../../assets/icons/purplePhone.svg';
+import PurpleMessage from '../../assets/icons/purpleMessage.svg';
 
 interface FAQModalProps {
   isVisible: boolean;
@@ -38,13 +39,13 @@ const FAQModal: React.FC<FAQModalProps> = ({
           {/* Chat With Us */}
           <TouchableOpacity style={styles.supportButton}>
             <Text style={styles.supportButtonText}>Chat With Us</Text>
-            <Image source={images.message} style={styles.supportIcon} />
+            <PurpleMessage style={styles.supportIcon} />
           </TouchableOpacity>
 
           {/* Call Us */}
           <TouchableOpacity style={styles.supportButton}>
             <Text style={styles.supportButtonText}>Call Us</Text>
-            <Image source={images.phone} style={styles.supportIcon} />
+            <PurplePhone style={styles.supportIcon} />
           </TouchableOpacity>
         </View>
       </View>

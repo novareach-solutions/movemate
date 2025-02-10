@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {ReactNode} from 'react';
+import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   AppScreens,
@@ -12,7 +12,6 @@ import Onboarding from '../components/Onboarding';
 import OtpScreen from '../Screens/OtpScreen';
 import SelectServiceScreen from '../Screens/SelectServiceScreen';
 import DAPCompleteProfileScreen from '../Screens/DeliverPackage/CompleteProfileScreen';
-import DAPUploadDocumentDetailsScreen from '../Screens/DeliverPackage/UploadDocumentDetailsScreen';
 import DAPUploadDocumentsScreen from '../Screens/DeliverPackage/UploadDocumentsScreen';
 import DocumentReviewScreen from '../Screens/DocumentReviewScreen';
 import EnterVehicleDetailsScreen from '../Screens/DeliverPackage/EnterVehicleDetailsScreen';
@@ -37,7 +36,12 @@ import ReplaceVehicleScreen from '../Screens/Profile/AccountScreen/ReplaceVehicl
 import SignupNumberScreen from '../Screens/SignupNumberScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import ChatScreen from '../Screens/ChatScreen';
-import {navigationRef} from './NavigationService';
+import EarningsScreen from '../Screens/Profile/EarningsScreen';
+import RatingsScreen from '../Screens/Profile/RatingScreen';
+import OrderDetailsScreen from '../Screens/Profile/OrderDetailsScreen';
+import HelpAndSupportScreen from '../Screens/Profile/HelpAndSupportScreen';
+import PayoutSummaryScreen from '../Screens/Profile/WalletScreen/PayoutSummaryScreen';
+import DAPUploadDocumentDetailsScreen from '../Screens/DeliverPackage/UploadDocumentDetailsScreen';
 import PickUpOrderDetailsScreen from '../Screens/PickUpOrderDetailsScreen';
 import DropOffOrderDetailsScreen from '../Screens/DropOffOrderDetailsScreen';
 import EarningsDetailsScreen from '../Screens/EarningDetailsScreen';
@@ -48,9 +52,17 @@ interface AppNavigatorProps {
   children?: ReactNode;
 }
 
-const App: React.FC<AppNavigatorProps> = ({ children }) => {
+const RiderTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#2a1d3d',
+  },
+};
+
+const App: React.FC<AppNavigatorProps> = ({children}) => {
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer theme={RiderTheme}>
       <Stack.Navigator initialRouteName={AuthScreens.Onboarding}>
         <Stack.Screen
           name={AuthScreens.Onboarding}
@@ -141,52 +153,77 @@ const App: React.FC<AppNavigatorProps> = ({ children }) => {
         <Stack.Screen
           name={ProfileScreens.Inbox}
           component={InboxScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.ReferFriends}
           component={ReferFriendsScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Wallet}
           component={WalletScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Payout}
           component={PayoutScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Account}
           component={AccountScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Documents}
           component={DocumentsScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.ManageAccount}
           component={ManageAccountScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.EarningMode}
           component={EarningsModeScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.SubscriptionPlans}
           component={SubscriptionPlansScreen as React.FC}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.ReplaceVehicle}
           component={ReplaceVehicleScreen}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={ProfileScreens.Earnings}
+          component={EarningsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={ProfileScreens.Ratings}
+          component={RatingsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={ProfileScreens.OrderDetails}
+          component={OrderDetailsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={ProfileScreens.HelpAndSupport}
+          component={HelpAndSupportScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={ProfileScreens.PayoutSummary}
+          component={PayoutSummaryScreen}
+          options={{headerShown: false}}
         />
 
         {/* App */}
@@ -218,7 +255,7 @@ const App: React.FC<AppNavigatorProps> = ({ children }) => {
         <Stack.Screen
           name={AppScreens.ComingSoon}
           component={ComingSoonScreen}
-          options={{headerShown: true}}
+          options={{headerShown: false}}
         />
       </Stack.Navigator>
       {children}

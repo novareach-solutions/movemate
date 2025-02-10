@@ -1,5 +1,3 @@
-// src/components/ConfirmPhotoModal.tsx
-
 import React from 'react';
 import {
   View,
@@ -10,17 +8,17 @@ import {
   Image,
   TextStyle,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { formStyles } from '../../theme/form';
-import { ImageSourcePropType } from 'react-native';
+import {colors} from '../../theme/colors';
+import {typography} from '../../theme/typography';
+import {formStyles} from '../../theme/form';
+import PlaceHolderProfile from '../../assets/icons/placeHolderProfile.svg';
 
 interface ConfirmPhotoModalProps {
   isVisible: boolean;
   onClose: () => void;
   onRetry: () => void;
   onDone: () => void;
-  image: string | null; // URI of the selected image
+  image: string | null;
 }
 
 const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
@@ -41,11 +39,7 @@ const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
 
         {/* Display Selected Image */}
         <View style={styles.imageContainer}>
-          {image ? (
-            <Image source={{ uri: image }} style={styles.image} />
-          ) : (
-            <Text style={styles.noImageText}>No Image Selected</Text>
-          )}
+          <PlaceHolderProfile style={styles.image} />
         </View>
 
         {/* Buttons */}

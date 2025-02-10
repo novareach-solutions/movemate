@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
@@ -12,11 +13,22 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import { UpdateResult } from "typeorm";
 
 import { Agent } from "../../entity/Agent";
 import { RequiredDocument } from "../../entity/RequiredDocument";
+import { SendPackageOrder } from "../../entity/SendPackageOrder";
+import {
+  AgentDeleteDocumentSwagger,
+  AgentGetProfileSwagger,
+  AgentPatchProfileSwagger,
+  AgentPatchStatusSwagger,
+  AgentPostDocumentByIdSwagger,
+  AgentSignUpSwagger,
+  AgentUpdateLocationSwagger,
+} from "../../shared/decorators/agents/agent.decorators";
 import { Roles } from "../../shared/decorators/roles.decorator";
 import {
   AgentStatusEnum,
@@ -31,28 +43,39 @@ import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { AgentService } from "./agent.service";
 import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
-import { SendPackageOrder } from "../../entity/SendPackageOrder";
-import { logger } from "../../logger";
 
+@ApiTags("Agent")
 @Controller("agent")
 export class AgentController {
+  private readonly logger = new Logger(AgentController.name);
+
   constructor(
     private readonly agentService: AgentService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
+  // *** Agent Sign Up, Status and List Specific Controllers ***
   @Post("signup")
   @UseGuards(OnboardingGuard)
+  @AgentSignUpSwagger()
   async create(
     @Req() request: ICustomRequest,
     @Body() agent: TAgent,
     @Res({ passthrough: true }) response: Response,
   ): Promise<IApiResponse<{ agent: Agent; accessToken: string }>> {
+    this.logger.log(
+      `AgentController.create: Attempting agent signup for phone number: ${agent.user.phoneNumber}`,
+    );
+
     const phoneNumberFromGuard = request.user.phoneNumber;
     if (
       agent.user.phoneNumber &&
       agent.user.phoneNumber !== phoneNumberFromGuard
     ) {
+      this.logger.warn(
+        `AgentController.create: Phone number mismatch during signup. Provided: ${agent.user.phoneNumber}, Auth: ${phoneNumberFromGuard}`,
+      );
+
       throw new UnauthorizedError(
         "The provided phone number does not match the authenticated user's phone number.",
       );
@@ -71,6 +94,10 @@ export class AgentController {
       maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
     });
 
+    this.logger.log(
+      `AgentController.create: Agent successfully created with ID: ${createdAgent.id}`,
+    );
+
     return {
       success: true,
       message: "Agent created successfully.",
@@ -81,7 +108,7 @@ export class AgentController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
   async getOngoingOrder(
-    @Req() request: any
+    @Req() request: any,
   ): Promise<IApiResponse<SendPackageOrder | null>> {
     const agentId = request.user.agent?.id;
 
@@ -105,11 +132,19 @@ export class AgentController {
   @Get("profile")
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
+  @AgentGetProfileSwagger()
   async getOwnProfile(
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<Agent>> {
     const agentId = request.user.agent.id;
+    this.logger.debug(
+      `AgentController.getOwnProfile: Retrieving profile for agent ${agentId}`,
+    );
     const agent = await this.agentService.getAgentById(agentId);
+    this.logger.log(
+      `AgentController.getOwnProfile: Profile for agent ${agentId} retrieved successfully.`,
+      agent,
+    );
     return {
       success: true,
       message: "Agent profile retrieved successfully.",
@@ -120,14 +155,28 @@ export class AgentController {
   @Patch("profile")
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
+  @AgentPatchProfileSwagger()
   async updateOwnProfile(
     @Body() updateAgentPartial: TAgentPartial,
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<UpdateResult>> {
     const agentId = request.user.agent.id;
+
+    this.logger.debug(
+      `AgentController.updateOwnProfile: Updating profile for agent ${agentId}`,
+      {
+        updatedFields: Object.keys(updateAgentPartial),
+      },
+    );
+
     const data = await this.agentService.updateAgentProfile(
       agentId,
       updateAgentPartial,
+    );
+
+    this.logger.log(
+      `AgentController.updateOwnProfile: Profile for agent ${agentId} updated successfully.`,
+      data,
     );
     return {
       success: true,
@@ -157,32 +206,24 @@ export class AgentController {
     };
   }
 
-  @Delete("document/:documentId")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.AGENT)
-  async removeOwnDocument(
-    @Param("documentId", ParseIntPipe) documentId: number,
-    @Req() request: ICustomRequest,
-  ): Promise<IApiResponse<null>> {
-    const agentId = request.user.agent.id;
-    await this.agentService.removeDocument(agentId, documentId);
-    return {
-      success: true,
-      message: "Document removed successfully.",
-      data: null,
-    };
-  }
-
   @Patch("status")
   @UseGuards(AuthGuard)
   @Roles(UserRoleEnum.AGENT)
+  @AgentPatchStatusSwagger()
   async setOwnAgentStatus(
     @Body() body: { status: AgentStatusEnum },
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<UpdateResult>> {
     const { status } = body;
     const agentId = request.user.agent.id;
+    this.logger.debug(
+      `AgentController.setOwnAgentStatus: Setting status for agent ${agentId} to ${status}`,
+    );
     const data = await this.agentService.setAgentStatus(agentId, status);
+    this.logger.log(
+      `AgentController.setOwnAgentStatus: Status for agent ${agentId} set to ${status}.`,
+      data,
+    );
     return {
       success: true,
       message: `Agent status updated to ${status}.`,
@@ -196,7 +237,14 @@ export class AgentController {
   async getAgentProfile(
     @Param("id", ParseIntPipe) agentId: number,
   ): Promise<IApiResponse<Agent>> {
+    this.logger.debug(
+      `AgentController.getAgentProfile: Retrieving profile for agent ${agentId}`,
+    );
     const agent = await this.agentService.getAgentById(agentId);
+    this.logger.log(
+      `AgentController.getAgentProfile: Profile for agent ${agentId} retrieved successfully.`,
+      agent,
+    );
     return {
       success: true,
       message: "Agent profile retrieved successfully.",
@@ -211,11 +259,18 @@ export class AgentController {
     @Param("id", ParseIntPipe) agentId: number,
     @Body() updateAgentPartial: TAgentPartial,
   ): Promise<IApiResponse<UpdateResult>> {
+    this.logger.debug(
+      `AgentController.updateAgentProfile: Updating profile for agent ${agentId}`,
+    );
     const isAdmin = true;
     const data = await this.agentService.updateAgentProfile(
       agentId,
       updateAgentPartial,
       isAdmin,
+    );
+    this.logger.log(
+      `AgentController.updateAgentProfile: Profile for agent ${agentId} updated successfully.`,
+      data,
     );
     return {
       success: true,
@@ -224,18 +279,51 @@ export class AgentController {
     };
   }
 
+  @Delete("document/:documentId")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.AGENT)
+  @AgentDeleteDocumentSwagger()
+  async removeOwnDocument(
+    @Param("documentId", ParseIntPipe) documentId: number,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<null>> {
+    const agentId = request.user.agent.id;
+    this.logger.debug(
+      `AgentController.removeOwnDocument: Removing document ${documentId} for agent ${agentId}`,
+    );
+    await this.agentService.removeDocument(agentId, documentId);
+
+    this.logger.log(
+      `AgentController.removeOwnDocument: Document ${documentId} for agent ${agentId} removed successfully.`,
+    );
+    return {
+      success: true,
+      message: "Document removed successfully.",
+      data: null,
+    };
+  }
+
   @Post("document/:id")
-  // @UseGuards(AuthGuard, RoleGuard)
-  // @Roles(UserRoleEnum.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.ADMIN)
+  @AgentPostDocumentByIdSwagger()
   async submitAgentDocument(
     @Param("id", ParseIntPipe) agentId: number,
     @Body() submitDocumentDto: TAgentDocument,
   ): Promise<IApiResponse<TAgentDocument>> {
+    this.logger.debug(
+      `AgentController.submitAgentDocument: Submitting document for agent ${agentId}`,
+    );
     const document: TAgentDocument = {
       ...submitDocumentDto,
       agentId,
     };
     const data = await this.agentService.submitDocument(agentId, document);
+
+    this.logger.log(
+      `AgentController.submitAgentDocument: Document for agent ${agentId} submitted successfully.`,
+      data,
+    );
     return {
       success: true,
       message: "Document submitted successfully.",
@@ -243,6 +331,7 @@ export class AgentController {
     };
   }
 
+  // Seperate controller for updating document approval status for ADMIN role
   @Delete("document/:id/:documentId")
   // @UseGuards(AuthGuard, RoleGuard)
   // @Roles(UserRoleEnum.ADMIN)
@@ -258,11 +347,17 @@ export class AgentController {
     };
   }
 
+  // *** Other Controllers ***
   @Get("list")
   // @UseGuards(AuthGuard, RoleGuard)
   // @Roles(UserRoleEnum.ADMIN)
   async getAllAgents(): Promise<IApiResponse<Agent[]>> {
+    this.logger.debug(`AgentController.getAllAgents: Retrieving all agents.`);
     const agents = await this.agentService.getAllAgents();
+    this.logger.log(
+      `AgentController.getAllAgents: All agents retrieved successfully.`,
+      agents,
+    );
     return {
       success: true,
       message: "All agents retrieved successfully.",
@@ -273,13 +368,22 @@ export class AgentController {
   @Patch("location")
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
+  @AgentUpdateLocationSwagger()
   async updateLocation(
     @Body() body: { latitude: number; longitude: number },
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<null>> {
     const agentId = request.user.agent.id;
+
+    this.logger.debug(
+      `AgentController.updateLocation: Updating location for agent ${agentId}`,
+    );
     const { latitude, longitude } = body;
     await this.agentService.updateAgentLocation(agentId, latitude, longitude);
+
+    this.logger.log(
+      `AgentController.updateLocation: Location for agent ${agentId} updated successfully.`,
+    );
     return {
       success: true,
       message: "Location updated successfully.",
