@@ -36,4 +36,7 @@ export class User extends BaseEntity {
 
   @Column({ type: "integer", nullable: true })
   postalCode: number;
+
+  @Column("simple-array", { nullable: true })
+  deviceTokens: string[];
 }
