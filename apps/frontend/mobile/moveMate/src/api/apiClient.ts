@@ -23,6 +23,7 @@ apiClient.interceptors.request.use(
       config.headers['onboarding_token'] = onboardingToken;
     }
     config.headers['Content-Type'] = 'application/json';
+    config.headers['role'] = 'CUSTOMER';
 
     const curlCommand = generateCurlCommand(config);
     console.log('cURL Command:', curlCommand);

@@ -1,5 +1,5 @@
 // const baseURL = 'http://18.225.92.240:3000';
-const baseURL = 'http://ec2-18-225-92-240.us-east-2.compute.amazonaws.com:3000';
+const baseURL = 'https://backend.vamoose.com.au';
 
 const createEndpoint = (path: string) => `${baseURL}${path}`;
 

@@ -56,7 +56,8 @@ export const CustomerScreens = {
   OrderDetails:'OrderDetails',
   OrderCompletedScreen:'OrderCompleted',
   ReportAnIssue:'Report an issue ',
-  HelpSupportScreen:'HelpSupportScreen'
+  HelpSupportScreen:'HelpSupportScreen',
+  AcceptOrder:'accept order'
 }
 
 export const ProfileScreens = {

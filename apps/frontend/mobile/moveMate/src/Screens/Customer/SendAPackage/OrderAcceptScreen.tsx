@@ -25,7 +25,7 @@ const routeLineStyle = {
   lineWidth: 3,
 };
 
-const DeliveryTrackingScreen = () => {
+const OrderAcceptScreen = () => {
   const orderId = useAppSelector(state => state.deliverAPackage.id);
   const pickupLocationData = useAppSelector(state => state.deliverAPackage.pickupLocation);
   const dropLocationData = useAppSelector(state => state.deliverAPackage.dropLocation);
@@ -74,8 +74,8 @@ useEffect(() => {
 
   useEffect(()=>{
     setTimeout(()=>{
-      navigation.navigate(CustomerScreens.AcceptOrder)
-    },15000)
+        navigation.navigate(CustomerScreens.OrderCompletedScreen)
+    },5000)
   },[])
 
 
@@ -162,43 +162,48 @@ useEffect(() => {
 
       {/* Details Section */}
       <View style={styles.detailsContainer}>
-        <View style={styles.deliveryBox}>
-          <Text style={styles.headingText}>Looking for a delivery partner near you...</Text>
-          <Image source={images.deliveryMan} style={styles.deliveryImage} />
+      <View style={styles.container1}>
+      {/* Delivery Status */}
+      <View style={styles.statusRow}>
+        <Text style={styles.statusText}>Delivery partner is on the way to pick up</Text>
+        <View style={styles.timeBadge}>
+          <Text style={styles.timeText}>5 min</Text>
         </View>
-        {/* Address Details */}
-        <View style={styles.addressContainer}>
-          {/* Pickup Address */}
-          <View style={styles.addressRow}>
-            <View style={[styles.dot, { backgroundColor: "green" }]} />
-            <View style={styles.addressTextContainer}>
-              <Text style={styles.addressTitle}>{pickupLocationData?.name}</Text>
-              <Text style={styles.addressSubtitle}>{pickupLocationData?.address}</Text>
-            </View>
-            <TouchableOpacity style={styles.detailButton} onPress={viewDetails}>
-              <Text style={styles.detailText}>View details</Text>
-            </TouchableOpacity>
-          </View>
+      </View>
 
-          {/* Drop Address */}
-          <View style={styles.addressRow}>
-            <View style={[styles.dot, { backgroundColor: "red" }]} />
-            <View style={styles.addressTextContainer}>
-              <Text style={styles.addressTitle}>{dropLocationData?.name}</Text>
-              <Text style={styles.addressSubtitle}>{dropLocationData?.address}</Text>
-            </View>
-          </View>
+      {/* Partner Info */}
+      <View style={styles.partnerCard}>
+        <Image
+          source={{ uri: "https://via.placeholder.com/50" }} // Replace with actual image URL
+          style={styles.avatar}
+        />
+        <View style={styles.partnerInfo}>
+          <Text style={styles.partnerName}>Alexander V.</Text>
+          <Text style={styles.rating}>⭐ 4.9</Text>
         </View>
-
-        <View style={styles.footerStyle}>
-          <View style={styles.textContainer}>
-            <Text style={styles.amountText}>$36</Text>
-            <Text style={styles.paymentInfo}>Paid via card ending in 8930</Text>
-          </View>
-          <TouchableOpacity style={styles.cancelButton} onPress={CancelOrder}>
-            <Text style={styles.cancelText}>Cancel</Text>
+        <View style={styles.iconRow}>
+          <TouchableOpacity>
+            <Text style={styles.iconText}>📞</Text>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Text style={styles.iconText}>💬</Text>
           </TouchableOpacity>
         </View>
+      </View>
+
+      {/* Pickup Info */}
+      <View style={styles.footerStyle}>
+      <View style={[styles.pickupContainer]}>
+        <Text style={styles.pickupLabel}>Pickup from</Text>
+        <View style={styles.pickupRow}>
+          <Text style={styles.pickupAddress}>{pickupLocationData?.address}</Text>
+          <TouchableOpacity style={styles.detailButton} onPress={viewDetails}>
+                        <Text style={styles.detailText}>View details</Text>
+                      </TouchableOpacity>
+        </View>
+      </View>
+      </View>
+    </View>
 
 
       </View>
@@ -206,7 +211,7 @@ useEffect(() => {
   );
 };
 
-export default DeliveryTrackingScreen;
+export default OrderAcceptScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -292,9 +297,11 @@ const styles = StyleSheet.create({
   },
 
   footerStyle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    // flex:0.25,
+    marginTop:20,
+    // flexDirection: 'row',
+    // alignItems: 'center',
+    justifyContent: 'flex-end',
     padding: 10,
     // backgroundColor: '#fff',
   },
@@ -336,6 +343,99 @@ const styles = StyleSheet.create({
   },
   markerContainer: { alignItems: "center", justifyContent: "center" },
   marker: { width: 20, height: 20, borderRadius: 10, borderWidth: 5, backgroundColor: colors.white },
+
+  statusRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    padding:20,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    width:'70%'
+  },
+  timeBadge: {
+    backgroundColor: "#E6D7FB",
+    borderRadius: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+  },
+  timeText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#6C47FF",
+  },
+  partnerCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F9F9F9",
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
+  },
+  partnerInfo: {
+    flex: 1,
+  },
+  partnerName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#222",
+  },
+  rating: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginTop: 4,
+    color: "#777",
+  },
+  iconRow: {
+    flexDirection: "row",
+    gap: 16,
+  },
+  iconText: {
+    fontSize: 20, // Adjust size for better visibility
+    color: "#6C47FF",
+  },
+  pickupContainer: {
+    borderTopWidth: 1,
+    borderTopColor: "#EAEAEA",
+    paddingTop: 12,
+  },
+  pickupLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#777",
+  },
+  pickupRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  pickupAddress: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+  detailsButton: {
+    backgroundColor: "#F3E8FF",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  detailsText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#6C47FF",
+  },
   // routeLine: { lineColor: "blue", lineWidth: 3 },
 });
 

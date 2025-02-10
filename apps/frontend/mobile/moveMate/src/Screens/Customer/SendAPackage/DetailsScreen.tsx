@@ -14,10 +14,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CustomerScreens, ProfileScreens } from '../../../navigation/ScreenNames';
 import { useNavigation } from '@react-navigation/native';
 import { beforeYouSendPoints } from '../../../constants/staticData';
+import { useAppSelector } from '../../../redux/hook';
 
 const SAPDetailsScreen = () => {
     const address = '123 Main Street, Springfield, USA';
-
+ const currentLocationData = useAppSelector(state => state.auth.currentLocation);
     const navigation=useNavigation()
 
     const renderPoint = ({ item }) => (
@@ -41,7 +42,13 @@ const SAPDetailsScreen = () => {
                                           <images.Account width={30} height={30} />
                                           </TouchableOpacity>
                 </View>
-                <Text style={styles.address}>{address}</Text>
+               <Text style={styles.address}>
+                                   {currentLocationData?.address
+                                       ? currentLocationData.address.length > 40
+                                           ? `${currentLocationData.address.slice(0, 40)}...`
+                                           : currentLocationData.address
+                                       : ""}
+                               </Text>
             </View>
             <View style={styles.horizontalLine} />
 

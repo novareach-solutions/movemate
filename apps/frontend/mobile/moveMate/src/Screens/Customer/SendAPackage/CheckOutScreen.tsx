@@ -24,7 +24,7 @@ const CheckoutScreen = () => {
   const dropLocationData = useAppSelector(state => state.deliverAPackage.dropLocation);
   const [tip, setTip] = useState<number | "custom" | null>(null);
   const [customTip, setCustomTip] = useState("");
-  const [isCancelVisible,setIsCancelVisible] = useState(false);
+  const [isCancelVisible, setIsCancelVisible] = useState(false);
   const [selectedInstructions, setSelectedInstructions] = useState<string[]>([]);
   const navigation = useNavigation();
 
@@ -97,39 +97,39 @@ const CheckoutScreen = () => {
           </View>
           <View style={styles.divider} />
           <View style={styles.tagContainer}>
-          <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.tagScrollView}
-        snapToAlignment="start"
-        decelerationRate="fast"
-        snapToInterval={120} // Adjust card width
-      >
-     {deliveryInstructions.map((instruction, index) => {
-              const isSelected = selectedInstructions.includes(instruction.label);
-              const disabled = isDisabled(instruction.label);
-              return (
-                <TouchableOpacity
-                  key={index}
-                  style={[styles.tag, isSelected && styles.tagSelected, disabled && styles.tagDisabled]}
-                  onPress={() => !disabled && toggleInstruction(instruction.label)}
-                  disabled={disabled}
-                >
-                  <Image
-                    source={instruction.icon}
-                    style={[
-                      styles.icon,
-                      { tintColor: isSelected ? "#8123AD" : disabled ? "#ccc" : "#333" },
-                    ]}
-                  />
-                  <Text style={isSelected ? styles.tagTextSelected : disabled ? styles.tagTextDisabled : styles.tagText}>
-                    {instruction.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-      </ScrollView>
-      </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.tagScrollView}
+              snapToAlignment="start"
+              decelerationRate="fast"
+              snapToInterval={120} // Adjust card width
+            >
+              {deliveryInstructions.map((instruction, index) => {
+                const isSelected = selectedInstructions.includes(instruction.label);
+                const disabled = isDisabled(instruction.label);
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    style={[styles.tag, isSelected && styles.tagSelected, disabled && styles.tagDisabled]}
+                    onPress={() => !disabled && toggleInstruction(instruction.label)}
+                    disabled={disabled}
+                  >
+                    <Image
+                      source={instruction.icon}
+                      style={[
+                        styles.icon,
+                        { tintColor: isSelected ? "#8123AD" : disabled ? "#ccc" : "#333" },
+                      ]}
+                    />
+                    <Text style={isSelected ? styles.tagTextSelected : disabled ? styles.tagTextDisabled : styles.tagText}>
+                      {instruction.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
         </View>
 
         {/* Tip Section */}
@@ -144,36 +144,36 @@ const CheckoutScreen = () => {
           </View>
 
           <View style={styles.tipContainer}>
-          {[2, 4, 6, "custom"].map((amount) => (
-            <TouchableOpacity
-              key={amount}
-              style={[
-                styles.tipButton,
-                tip === amount && styles.tipButtonSelected,
-              ]}
-              onPress={() => setTip(amount)}
-            >
-              <Text
-                style={
-                  tip === amount
-                    ? styles.tipTextSelected
-                    : styles.tipText
-                }
+            {[2, 4, 6, "custom"].map((amount) => (
+              <TouchableOpacity
+                key={amount}
+                style={[
+                  styles.tipButton,
+                  tip === amount && styles.tipButtonSelected,
+                ]}
+                onPress={() => setTip(amount)}
               >
-                {amount === "custom" ? "Custom" : `$${amount}`}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        {tip === "custom" && (
-          <TextInput
-            style={styles.customTipInput}
-            placeholder="Enter custom amount"
-            keyboardType="numeric"
-            value={customTip}
-            onChangeText={setCustomTip}
-          />
-        )}
+                <Text
+                  style={
+                    tip === amount
+                      ? styles.tipTextSelected
+                      : styles.tipText
+                  }
+                >
+                  {amount === "custom" ? "Custom" : `$${amount}`}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {tip === "custom" && (
+            <TextInput
+              style={styles.customTipInput}
+              placeholder="Enter custom amount"
+              keyboardType="numeric"
+              value={customTip}
+              onChangeText={setCustomTip}
+            />
+          )}
         </View>
         <Text style={formStyles.inputLabel}>Bill Details</Text>
         {/* Bill Details Section */}
@@ -184,17 +184,17 @@ const CheckoutScreen = () => {
           <Text style={styles.totalText}>To Pay: $27</Text>
         </View>
 
-        <View style={[styles.sectionContainer,{backgroundColor:colors.lightGrey}]}>
+        <View style={[styles.sectionContainer, { backgroundColor: colors.lightGrey }]}>
           <Text style={formStyles.inputLabel}>Review details to avoid cancellation</Text>
           <Text>At Vamoose, we value the time and effort of our riders and believe in fair compensation for their work.</Text>
           <TouchableOpacity style={styles.cancelPolicyBtn} onPress={() => {
-          setIsCancelVisible(true)
-        }}>
-          <Text style={styles.cancelPolicyBtnTxt}>READ CANCELATION POLICY</Text>
-        </TouchableOpacity>
+            setIsCancelVisible(true)
+          }}>
+            <Text style={styles.cancelPolicyBtnTxt}>READ CANCELATION POLICY</Text>
+          </TouchableOpacity>
         </View>
 
-         <Text>By confirming, I agree that this order does not include illegal or restricted items.   <TouchableOpacity onPress={() => {
+        <Text>By confirming, I agree that this order does not include illegal or restricted items.   <TouchableOpacity onPress={() => {
           navigation.navigate(AuthScreens.PrivacyPolicyScreen)
         }}><Text style={styles.purpleText}>View T&C</Text></TouchableOpacity></Text>
 
@@ -206,7 +206,7 @@ const CheckoutScreen = () => {
         </TouchableOpacity>
       </ScrollView>
 
-      <CancellationPolicyModal onClose={()=>{setIsCancelVisible(false)}} isVisible={isCancelVisible} />
+      <CancellationPolicyModal onClose={() => { setIsCancelVisible(false) }} isVisible={isCancelVisible} />
     </SafeAreaView>
   );
 };
@@ -219,24 +219,24 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
   },
-  tagTextDisabled: { color: "#999",  fontSize: 12, },
+  tagTextDisabled: { color: "#999", fontSize: 12, },
   tagDisabled: { backgroundColor: "#e0e0e0" },
   pickupContainer: {
     backgroundColor: '#DDFBEF',
     padding: 10,
     width: 160
   },
-  purpleText:{
-    color:colors.purple,
-    fontWeight:'bold'
+  purpleText: {
+    color: colors.purple,
+    fontWeight: 'bold'
   },
-  fromText:{
-    color:colors.green_72,
-    fontWeight:'bold'
+  fromText: {
+    color: colors.green_72,
+    fontWeight: 'bold'
   },
-  toText:{
-    color:colors.red_00,
-    fontWeight:'bold'
+  toText: {
+    color: colors.red_00,
+    fontWeight: 'bold'
   },
   pickupWrapper: {
     marginTop: 10,
@@ -267,18 +267,18 @@ const styles = StyleSheet.create({
   tipIcon: {
     marginRight: 10
   },
-  cancelPolicyBtn:{
+  cancelPolicyBtn: {
     // padding:10,
-    paddingBottom:5,
+    paddingBottom: 5,
     // borderBottomColor:colors.purple,
     // borderBottomWidth:1,
     // borderStyle:'dashed'
     // textDecorationLine:'line-through',
 
   },
-  cancelPolicyBtnTxt:{
-    marginTop:10,
-    color:colors.purple,
+  cancelPolicyBtnTxt: {
+    marginTop: 10,
+    color: colors.purple,
     // textDecorationLine:'underline',
   },
   address: {
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   },
   tag: {
     width: 88,
-    height:80,
+    height: 80,
     flexDirection: "column",
     // alignItems: "center",
     justifyContent: "space-around",
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   tipContainer: {
     flexDirection: "row",
     marginTop: 8,
-    justifyContent:'space-between'
+    justifyContent: 'space-between'
   },
   tipButton: {
     backgroundColor: colors.whiteFd,
@@ -367,12 +367,12 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     // marginRight: 8,
-  
+
   },
   tipButtonSelected: {
     backgroundColor: "#FCF4FF",
-    borderWidth:1,
-    borderColor:'#8123AD'
+    borderWidth: 1,
+    borderColor: '#8123AD'
   },
   tipText: {
     color: "#555",
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightGreen,
     padding: 16,
     borderRadius: 8,
-    marginVertical:10,
+    marginVertical: 10,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -32,6 +32,7 @@ import OrderDetails from '../Screens/Customer/SendAPackage/OrderDetails';
 import OrderCompletedScreen from '../Screens/Customer/SendAPackage/OrderCompletedScreen';
 import ReportAnIssue from '../Screens/Customer/SendAPackage/ReportAnIssue';
 import HelpSupportScreen from '../Screens/Customer/HelpSupportScreen';
+import OrderAcceptScreen from '../Screens/Customer/SendAPackage/OrderAcceptScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -87,6 +88,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name={CustomerScreens.NotificationScreen}
           component={NotificationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.AcceptOrder}
+          component={OrderAcceptScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

@@ -19,14 +19,15 @@ import AccountIcon from "../../assets/images/Account.svg";
 import { useNavigation } from '@react-navigation/native';
 import { SvgProps } from 'react-native-svg';
 import { gridButtons } from '../../constants/staticData';
+import { useAppSelector } from '../../redux/hook';
 // Mock Data
-const address = '123 Main Street, Springfield, USA';
+// const address = '123 Main Street, Springfield, USA';
 type SvgComponent = React.FC<SvgProps>;
 
 const CustomerHomeScreen = () => {
-const navigation=useNavigation();
-const [isOngoingOrderModal,setIsOngoingOrderModal] = useState(true)
-
+    const navigation = useNavigation();
+    const [isOngoingOrderModal, setIsOngoingOrderModal] = useState(true)
+    const currentLocationData = useAppSelector(state => state.auth.currentLocation);
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.header}>
@@ -38,8 +39,8 @@ const [isOngoingOrderModal,setIsOngoingOrderModal] = useState(true)
                         <images.BackArrow width={15} height={15} style={styles.arrowStyle} />
 
                     </TouchableOpacity>
-                    <TouchableOpacity  style={{ marginLeft: "60%",}} onPress={()=>{navigation.navigate(ProfileScreens.ProfileScreen)}}>
-                    <images.Account width={30} height={30} />
+                    <TouchableOpacity style={{ marginLeft: "60%", }} onPress={() => { navigation.navigate(ProfileScreens.ProfileScreen) }}>
+                        <images.Account width={30} height={30} />
                     </TouchableOpacity>
                     {/* <Image
                         source={images.account}
@@ -47,7 +48,14 @@ const [isOngoingOrderModal,setIsOngoingOrderModal] = useState(true)
                     /> */}
                 </View>
 
-                <Text style={styles.address}>{address}</Text>
+                <Text style={styles.address}>
+                    {currentLocationData?.address
+                        ? currentLocationData.address.length > 40
+                            ? `${currentLocationData.address.slice(0, 40)}...`
+                            : currentLocationData.address
+                        : ""}
+                </Text>
+
             </View>
 
             <View style={styles.bannerContainer}>
@@ -62,26 +70,26 @@ const [isOngoingOrderModal,setIsOngoingOrderModal] = useState(true)
             </View>
 
             <View style={styles.gridContainer}>
-            <FlatList
-                data={gridButtons}
-                keyExtractor={item => item.id.toString()}
-                numColumns={2}
-                renderItem={({ item }) => {
-                    const SvgImage: SvgComponent = item.image;
-                    return (
-                        <TouchableOpacity 
-                            onPress={() => {
-                                navigation.navigate(CustomerScreens.SAPDetailsScreen);
-                            }} 
-                            style={styles.gridButton}
-                        >
-                            <Text style={styles.gridButtonText}>{item.title}</Text>
-                            <Text style={styles.gridButtonSubText}>{item.subTitle}</Text>
-                            <SvgImage width={91} height={91} style={styles.gridButtonImage} /> 
-                        </TouchableOpacity>
-                    );
-                }}
-            />
+                <FlatList
+                    data={gridButtons}
+                    keyExtractor={item => item.id.toString()}
+                    numColumns={2}
+                    renderItem={({ item }) => {
+                        const SvgImage: SvgComponent = item.image;
+                        return (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.navigate(CustomerScreens.SAPDetailsScreen);
+                                }}
+                                style={styles.gridButton}
+                            >
+                                <Text style={styles.gridButtonText}>{item.title}</Text>
+                                <Text style={styles.gridButtonSubText}>{item.subTitle}</Text>
+                                <SvgImage width={91} height={91} style={styles.gridButtonImage} />
+                            </TouchableOpacity>
+                        );
+                    }}
+                />
             </View>
 
             {/* {isOngoingOrderModal && (
@@ -97,7 +105,7 @@ const [isOngoingOrderModal,setIsOngoingOrderModal] = useState(true)
 )} */}
 
 
-           
+
             {/* <View style={styles.bannerContainer}>
                 <Image
                     source={images.banner2} // Replace with a static banner image
@@ -136,8 +144,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 50,
         width: '100%',
-        borderTopRightRadius:12,
-        borderTopLeftRadius:12,
+        borderTopRightRadius: 12,
+        borderTopLeftRadius: 12,
         backgroundColor: colors.purple,
         paddingVertical: 12,
         alignItems: 'center',
@@ -151,8 +159,8 @@ const styles = StyleSheet.create({
         color: colors.white,
         fontSize: typography.fontSize.medium,
         fontWeight: typography.fontWeight.bold as any,
-        marginHorizontal:5
-    },    
+        marginHorizontal: 5
+    },
     homeText: {
         fontSize: typography.fontSize.medium + 2,
         fontFamily: typography.fontFamily.regular,
@@ -226,9 +234,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    arrowStyle:{
+    arrowStyle: {
         transform: [{ rotate: '270deg' }],
-        marginLeft:5
+        marginLeft: 5
     },
     loadingScreen: {
         flex: 1,
