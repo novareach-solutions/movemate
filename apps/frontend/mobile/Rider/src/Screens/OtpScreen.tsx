@@ -69,10 +69,10 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
     try {
       if (isLogin) {
         // Dispatch login thunk
-        // const response = await dispatch(
-        //   login({phone: phoneNumber, otp: enteredOtp}),
-        // ).unwrap();
-        // console.log('Login Successful!', response);
+        const response = await dispatch(
+          login({phone: phoneNumber, otp: enteredOtp}),
+        ).unwrap();
+        console.log('Login Successful!', response);
         // Navigate to the main app screen or dashboard
         navigation.navigate(DeliverAPackage.Home);
       } else {

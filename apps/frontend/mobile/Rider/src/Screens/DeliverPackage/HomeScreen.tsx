@@ -33,8 +33,6 @@ import Money from '../../assets/icons/money.svg';
 import Order from '../../assets/icons/orders.svg';
 import Distance from '../../assets/icons/distance.svg';
 
-const SOCKET_SERVER_URL = 'http://192.168.29.63:3001';
-
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
@@ -128,7 +126,7 @@ const HomeScreen: React.FC = () => {
       console.error('Invalid agentId: Unable to convert to number.');
       return;
     }
-    const socket = io(SOCKET_SERVER_URL);
+    const socket = io(apiEndPoints.baseURL);
     socket.on('connect', () => {
       console.log('Connected to WebSocket server');
       socket.emit('joinRoom', {agentId: numericAgentId});

@@ -19,6 +19,7 @@ import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
 import {useAppDispatch} from '../redux/hook';
 import Header from '../components/Header';
 import Logo from '../assets/icons/logo.svg';
+import { requestOtp } from '../redux/slices/authSlice';
 
 const {width} = Dimensions.get('window');
 
@@ -38,7 +39,7 @@ const SignupNumberScreen: React.FC = () => {
 
   const handleSendCode = async () => {
     try {
-      // await dispatch(requestOtp({phone: phoneNumber})).unwrap();
+      await dispatch(requestOtp({phone: phoneNumber})).unwrap();
       navigation.navigate(AuthScreens.Otp, {phoneNumber});
     } catch {
       console.log('Request Otp failed');

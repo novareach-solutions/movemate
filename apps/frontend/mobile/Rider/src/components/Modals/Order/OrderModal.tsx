@@ -8,6 +8,7 @@ import {
   Image,
   Modal,
   Alert,
+  TextStyle,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
 import {acceptOrder, hideOrderModal} from '../../../redux/slices/orderSlice';
@@ -15,10 +16,12 @@ import {colors} from '../../../theme/colors';
 import {SendPackageOrder} from '../../../redux/slices/types/sendAPackage';
 import {useNavigation} from '@react-navigation/native';
 import {DeliverAPackage} from '../../../navigation/ScreenNames';
-import Alarm from '../../assets/icons/alarm.svg';
-import Cycle from '../../assets/icons/cycle.svg';
-import RedCircle from '../../assets/icons/redCircle.svg';
-import GreenCircle from '../../assets/icons/greenCircle.svg';
+import Alarm from '../../../assets/icons/alarm.svg';
+import Cycle from '../../../assets/icons/cycle.svg';
+import RedCircle from '../../../assets/icons/redCircle.svg';
+import GreenCircle from '../../../assets/icons/greenCircle.svg';
+import { SvgProps } from 'react-native-svg';
+import { typography } from '../../../theme/typography';
 
 interface ModalComponentProps {
   isVisible: boolean;

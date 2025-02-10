@@ -33,6 +33,8 @@ import {
 } from '../../redux/slices/orderSlice';
 import {SendPackageOrder} from '../../redux/slices/types/sendAPackage';
 import {uploadMedia} from '../../redux/slices/authSlice';
+import Camera from "../../assets/icons/camera.svg"
+import PhotoPickerModal from '../common/PhotoPickerModal';
 
 interface DeliveryModalProps {
   isVisible: boolean;
@@ -245,7 +247,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
                 }
                 onPress={hasPhoto ? handleViewPhoto : openPhotoPickerModal}>
                 {!hasPhoto && (
-                  <Image source={images.camera} style={styles.cameraIcon} />
+                  <Camera />
                 )}
 
                 <Text
@@ -289,7 +291,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
           onTakePhoto={handleTakePhoto}
           onChooseFromGallery={handleChooseFromGallery}
         />
-      </Modal>{' '}
+      </Modal>
     </>
   );
 };
