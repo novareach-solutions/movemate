@@ -7,13 +7,20 @@ import {
   Image,
   ScrollView,
   TextStyle,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
-import {images} from '../../../assets/images/images';
-import ProfileScreen from '..';
-import {ProfileScreens} from '../../../navigation/ScreenNames';
-import {useNavigation} from '@react-navigation/native';
+import {
+  ProfileScreens,
+  ProfileScreensParamList,
+} from '../../../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import Header from '../../../components/Header';
+import Calender from '../../../assets/icons/calender.svg';
+import PurpleArrow from '../../../assets/icons/purpleArrow.svg';
+import CheckIcon from '../../../assets/icons/checkIcon.svg';
+import WhiteArrow from '../../../assets/icons/whiteArrow.svg';
 
 const historyData = [
   {
@@ -41,36 +48,42 @@ const WalletScreen: React.FC = () => {
     'Wallet',
   );
   const [payoutFilter, setPayoutFilter] = useState('Week');
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const renderHistoryCard = (item: (typeof historyData)[0], index: number) => (
     <View key={index} style={styles.historyCard}>
       <View style={styles.historyDetailsContainer}>
         <Text style={styles.historyAmount}>{item.amount}</Text>
         <Text style={styles.historyDetails}>{item.cardDetails}</Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            gap: 10,
-            alignItems: 'center',
-            marginTop: 30,
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(ProfileScreens.PayoutSummary);
           }}>
-          <Text style={styles.viewDetails}>View details</Text>
-          <Image source={images.arrow} />
-        </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 10,
+              alignItems: 'center',
+              marginTop: 30,
+            }}>
+            <Text style={styles.viewDetails}>View details</Text>
+            <PurpleArrow width={10} height={10} style={styles.viewicon} />
+          </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.historyRightContainer}>
         <Text style={styles.historyDate}>{item.date}</Text>
         <View style={styles.successContainer}>
           <Text style={styles.successText}>{item.status}</Text>
-          <Image source={images.successIcon} style={styles.successIcon} />
+          <CheckIcon style={styles.successIcon} />
         </View>
       </View>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <Header title="Wallet" isBack />
       {/* Tabs */}
       <View style={styles.tabsContainer}>
         <TouchableOpacity
@@ -107,13 +120,13 @@ const WalletScreen: React.FC = () => {
               <Text style={styles.manageMethodsText}>
                 Manage payment methods
               </Text>
-              <Image source={images.whiteArrow} style={styles.arrowIcon} />
+              <WhiteArrow style={styles.arrowIcon} />
             </TouchableOpacity>
           </View>
 
           {/* Payout Scheduled */}
           <View style={styles.payoutSchedule}>
-            <Image source={images.payoutCalender} />
+            <Calender />
             <Text style={styles.payoutScheduleText}>
               Payout scheduled: 9th Dec
             </Text>
@@ -133,7 +146,7 @@ const WalletScreen: React.FC = () => {
             <Text style={styles.historyTitle}>Payout history</Text>
             <TouchableOpacity style={styles.dropdownButton}>
               <Text style={styles.dropdownText}>{payoutFilter}</Text>
-              <Image source={images.arrow} style={styles.dropdownIcon} />
+              <PurpleArrow width={10} height={10} style={styles.dropdownIcon} />
             </TouchableOpacity>
           </View>
           {historyData.map(renderHistoryCard)}
@@ -147,7 +160,7 @@ const WalletScreen: React.FC = () => {
           </Text>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -330,6 +343,11 @@ const styles = StyleSheet.create({
   virtualCardText: {
     fontSize: typography.fontSize.medium,
     color: colors.text.primaryGrey,
+  },
+  viewicon: {
+    width: 12,
+    height: 12,
+    objectFit: 'contain',
   },
 });
 

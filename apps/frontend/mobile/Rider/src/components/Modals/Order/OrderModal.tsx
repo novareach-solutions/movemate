@@ -1,6 +1,4 @@
-// src/components/Modals/OrderModal.tsx
-
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -10,16 +8,20 @@ import {
   Image,
   Modal,
   Alert,
+  TextStyle,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
-import { acceptOrder, hideOrderModal } from '../../../redux/slices/orderSlice';
-import { colors } from '../../../theme/colors';
-import { images } from '../../../assets/images/images';
-import apiClient from '../../../api/apiClient';
-import apiEndPoints from '../../../api/apiEndPoints';
-import { SendPackageOrder } from '../../../redux/slices/types/sendAPackage'; // Ensure correct import
-import { useNavigation } from '@react-navigation/native';
-import { DeliverAPackage } from '../../../navigation/ScreenNames';
+import {useDispatch} from 'react-redux';
+import {acceptOrder, hideOrderModal} from '../../../redux/slices/orderSlice';
+import {colors} from '../../../theme/colors';
+import {SendPackageOrder} from '../../../redux/slices/types/sendAPackage';
+import {useNavigation} from '@react-navigation/native';
+import {DeliverAPackage} from '../../../navigation/ScreenNames';
+import Alarm from '../../../assets/icons/alarm.svg';
+import Cycle from '../../../assets/icons/cycle.svg';
+import RedCircle from '../../../assets/icons/redCircle.svg';
+import GreenCircle from '../../../assets/icons/greenCircle.svg';
+import { SvgProps } from 'react-native-svg';
+import { typography } from '../../../theme/typography';
 
 interface ModalComponentProps {
   isVisible: boolean;
@@ -33,6 +35,37 @@ interface ModalComponentProps {
   orderId: string;
   onAcceptOrderSuccess: (order: SendPackageOrder) => void; // New Callback Prop
 }
+
+interface InfoRowProps {
+  iconSource: React.FC<SvgProps>;
+  text: string;
+  bold?: boolean;
+}
+
+export const InfoRow: React.FC<InfoRowProps> = ({
+  iconSource: Icon,
+  text,
+  bold,
+}) => (
+  <View style={styles.infoRow}>
+    <Icon width={15} height={15} style={styles.infoIcon} />
+    <Text
+      style={[
+        styles.infoText,
+        bold && {
+          fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+        },
+      ]}>
+      {text}
+    </Text>
+  </View>
+);
+
+const TipBadge: React.FC<{tip: string}> = ({tip}) => (
+  <View style={styles.tipBadge}>
+    <Text style={styles.tipBadgeText}>Tip: {tip}</Text>
+  </View>
+);
 
 const OrderModal: React.FC<ModalComponentProps> = ({
   isVisible,
@@ -49,7 +82,7 @@ const OrderModal: React.FC<ModalComponentProps> = ({
   const dispatch = useDispatch();
   const [progress] = useState(new Animated.Value(0));
   const timerDuration = 40000; // 40 seconds
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (isVisible) {
@@ -77,9 +110,11 @@ const OrderModal: React.FC<ModalComponentProps> = ({
     }
 
     try {
-      const acceptedOrder = await dispatch(acceptOrder({ orderId })).unwrap();
+      const acceptedOrder = await dispatch(acceptOrder({orderId})).unwrap();
       onAcceptOrderSuccess(acceptedOrder);
-      navigation.navigate(DeliverAPackage.PickUpOrderDetails, { order: acceptedOrder });
+      navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
+        order: acceptedOrder,
+      });
       dispatch(hideOrderModal());
     } catch (error) {
       console.error('Accept Order Error:', error);
@@ -104,32 +139,23 @@ const OrderModal: React.FC<ModalComponentProps> = ({
           </View>
 
           <View style={styles.infoContainer}>
-            <View style={styles.infoRow}>
-              <Image source={images.distanceIcon} style={styles.infoIcon} />
-              <Text style={styles.infoText}>{`${time} time to deliver`}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Image source={images.towing} style={styles.infoIcon} />
-              <Text style={styles.infoText}>{`${distance} kms`}</Text>
-            </View>
+            <InfoRow iconSource={Alarm} text={`${time} to deliver`} />
+            <InfoRow iconSource={Cycle} text={`${distance}`} />
           </View>
 
           <View style={styles.addressContainer}>
-            <View style={styles.infoRow}>
-              <Image source={images.greenCircle} style={styles.infoIcon} />
-              <Text style={styles.infoText}>{pickupAddress}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Image source={images.greenCircle} style={styles.infoIcon} />
-              <Text style={styles.infoText}>{dropoffAddress}</Text>
-            </View>
+            <InfoRow iconSource={RedCircle} text={pickupAddress} />
+            <InfoRow iconSource={GreenCircle} text={dropoffAddress} />
           </View>
 
           {/* Accept Order Button */}
           <View style={styles.timerButtonContainer}>
             <View style={styles.darkBackground} />
             <Animated.View
-              style={[styles.timerButtonBackground, { width: widthInterpolation }]}
+              style={[
+                styles.timerButtonBackground,
+                {width: widthInterpolation},
+              ]}
             />
             <TouchableOpacity
               style={styles.acceptOrderButton}

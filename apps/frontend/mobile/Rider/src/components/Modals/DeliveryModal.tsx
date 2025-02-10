@@ -1,5 +1,3 @@
-// src/components/DeliveryModal.tsx
-
 import React, { useState } from 'react';
 import {
   View,
@@ -12,30 +10,63 @@ import {
   Alert,
   Animated,
   Dimensions,
+  TouchableWithoutFeedback,
 } from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
-import { useDispatch, useSelector } from 'react-redux';
 import { colors } from '../../theme/colors';
 import { formStyles } from '../../theme/form';
 import { typography } from '../../theme/typography';
-import { images } from '../../assets/images/images';
-import { SendPackageOrder } from '../../redux/slices/types/sendAPackage';
-import { uploadMedia } from '../../redux/slices/authSlice';
+import ConfirmPhotoModal from './ConfirmPhotoModal';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {
+  AppScreens,
+  AppScreensParamList,
+  DeliverAPackage,
+} from '../../navigation/ScreenNames';
+import PurplePhone from '../../assets/icons/purplePhone.svg';
+import PurpleMessage from '../../assets/icons/purpleMessage.svg';
+import PurpleDoNotRing from '../../assets/icons/purpleDoNotRing.svg';
+import PurpleDoor from '../../assets/icons/purpleDoor.svg';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import ImagePicker from 'react-native-image-crop-picker';
+import { RootState } from '../../redux/store';
 import {
   completeOrder,
   fetchOngoingOrder,
   uploadProofOfDelivery,
 } from '../../redux/slices/orderSlice';
-import ConfirmPhotoModal from './ConfirmPhotoModal';
+import { SendPackageOrder } from '../../redux/slices/types/sendAPackage';
+import { uploadMedia } from '../../redux/slices/authSlice';
+import Camera from '../../assets/icons/camera.svg';
 import PhotoPickerModal from '../common/PhotoPickerModal';
-import { RootState } from '../../redux/store';
-import { useNavigation } from '@react-navigation/native';
-import { AppScreens, DeliverAPackage } from '../../navigation/ScreenNames';
-import { OrderStatusEnum } from '../../redux/slices/types/enums';
-import { InfoRow } from './ExpandedModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Get screen height
 const SCREEN_HEIGHT = Dimensions.get('window').height;
+
+/**  
+ * A simple InfoRow component (as seen in OrderExpandedModal)  
+ * that shows an icon and some text.
+ */
+const InfoRow = ({
+  iconSource,
+  text,
+  bold,
+}: {
+  iconSource: any;
+  text: string;
+  bold?: boolean;
+}) => (
+  <View style={styles.infoRow}>
+    <Image source={iconSource} style={styles.infoIcon} />
+    <Text
+      style={[
+        styles.infoText,
+        bold ? { fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'] } : {},
+      ]}>
+      {text}
+    </Text>
+  </View>
+);
 
 interface DeliveryModalProps {
   isVisible: boolean;
@@ -44,14 +75,14 @@ interface DeliveryModalProps {
 }
 
 const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order }) => {
-  // Animated expand/collapse state.
-  const [height] = useState(new Animated.Value(SCREEN_HEIGHT * 0.5)); // collapsed height
+  // Use animated height values similar to OrderExpandedModal.
+  const [height] = useState(new Animated.Value(SCREEN_HEIGHT * 0.22)); // collapsed height
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleExpand = () => {
     setIsExpanded(true);
     Animated.timing(height, {
-      toValue: SCREEN_HEIGHT * 0.73, // expanded height
+      toValue: SCREEN_HEIGHT * 0.8, // expanded height
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -60,7 +91,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
   const handleCollapse = () => {
     setIsExpanded(false);
     Animated.timing(height, {
-      toValue: SCREEN_HEIGHT * 0.15, // collapsed height
+      toValue: SCREEN_HEIGHT * 0.22, // collapsed height
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -71,12 +102,10 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
   const [isConfirmPhotoVisible, setIsConfirmPhotoVisible] = useState(false);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
+  const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
 
-  const currentOrder = useSelector((state: RootState) => state.order.ongoingOrder);
-
-  // ------------------ PHOTO HANDLING ------------------
+  const currentOrder = useAppSelector((state: RootState) => state.order.ongoingOrder);
+  const dispatch = useAppDispatch();
 
   const openPhotoPickerModal = () => {
     setIsPhotoOptionVisible(true);
@@ -184,7 +213,6 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
         Alert.alert('Error', 'User not logged in.');
         return;
       }
-      // Navigate to the ChatScreen.
       navigation.navigate(AppScreens.Chat, {
         orderId: order.id,
         senderId: userId,
@@ -199,105 +227,100 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
   const hasPhoto = !!currentOrder?.completionPhoto;
 
   return (
-    <Modal
-      visible={isVisible}
-      animationType="slide"
-      onRequestClose={onClose}
-      transparent
-    >
-      <View style={styles.overlay}>
-        {/* Animated container with dynamic height */}
-        <Animated.View style={[styles.modalContainer, { height }]}>
-          {/* Drag Indicator */}
-          <TouchableOpacity
-            onPress={isExpanded ? handleCollapse : handleExpand}
-            style={styles.dragIndicatorContainer}
-          >
-            <View style={styles.dragIndicator} />
-          </TouchableOpacity>
+    <>
+      <Modal visible={isVisible} animationType="slide" onRequestClose={onClose} transparent>
+        <View style={styles.overlay}>
+          {/* Use Animated.View to control modal height */}
+          <Animated.View style={[styles.modalContainer, { height }]}>
+            {/* Drag indicator toggles expand/collapse */}
+            <TouchableOpacity onPress={isExpanded ? handleCollapse : handleExpand}>
+              <View style={styles.dragIndicator} />
+            </TouchableOpacity>
 
-          <Text style={styles.title}>
-            {order.status === OrderStatusEnum.ACCEPTED ? 'Order Accepted' : 'Arriving in 10 mins'}
-          </Text>
-
-          {/* When collapsed, show only the location snippet.
-              When expanded, show the full content. */}
-          {!isExpanded ? (
+            {/* Conditionally show summary info when collapsed */}
             <View style={styles.location}>
-              <InfoRow
-                iconSource={images.package}
-                text={`${order?.senderName} (${order.pickupLocation?.addressLine1})`}
-              />
+              {!isExpanded && (
+                <InfoRow
+                  iconSource={require('../../assets/icons/package.png')} 
+                  text={`${order.customer?.firstName} (${order.dropLocation?.addressLine1})`}
+                />
+              )}
             </View>
-          ) : (
-            <>
-              {/* Expanded Content */}
-              <View style={styles.header}>
-                <View>
-                  <Text style={styles.driverName}>{order.customer?.firstName}</Text>
-                  <Text style={styles.deliveryAddress}>{order.dropLocation?.addressLine1}</Text>
-                </View>
-                <View style={styles.headerIcons}>
-                  <TouchableOpacity>
-                    <Image source={images.phone} style={styles.icon} />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={navigateChatScreen}>
-                    <Image source={images.message} style={styles.icon}/>
-                  </TouchableOpacity>
-                </View>
-              </View>
 
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Delivery Instructions</Text>
-                <View style={styles.instructionsContainer}>
+            {/* Header Section */}
+            <View style={styles.header}>
+              <View style={{ width: '70%' }}>
+                <Text style={styles.driverName}>{order.customer?.firstName}</Text>
+                <Text style={styles.deliveryAddress}>{order.dropLocation?.addressLine1}</Text>
+              </View>
+              <View style={styles.headerIcons}>
+                <TouchableOpacity>
+                  <PurplePhone style={styles.icon} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={navigateChatScreen}>
+                  <PurpleMessage style={styles.icon} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Delivery Instructions */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Delivery Instructions</Text>
+              <View style={styles.instructionsContainer}>
+                <View style={styles.instructionRow}>
+                  {order.deliveryInstructions === 'Do not ring the bell' ? (
+                    <PurpleDoNotRing style={styles.instructionIcon} />
+                  ) : (
+                    <PurpleDoor style={styles.instructionIcon} />
+                  )}
                   <Text style={styles.instructionText}>{order.deliveryInstructions}</Text>
                 </View>
               </View>
+            </View>
 
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Items to Deliver</Text>
-                <Text style={styles.itemText}>• {order.packageType}</Text>
-              </View>
+            {/* Items to Deliver */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Items to Deliver</Text>
+              <Text style={styles.itemText}>• {order.packageType}</Text>
+            </View>
 
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Proof of Delivery</Text>
-                <Text style={styles.proofText}>Take a photo to confirm delivery</Text>
-                <TouchableOpacity
+            {/* Proof of Delivery */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Proof of Delivery</Text>
+              <Text style={styles.proofText}>Take a photo to confirm delivery</Text>
+              <TouchableOpacity
+                style={
+                  hasPhoto
+                    ? styles.viewPhotoButton
+                    : [formStyles.button, formStyles.buttonEnabled]
+                }
+                onPress={hasPhoto ? handleViewPhoto : openPhotoPickerModal}>
+                {!hasPhoto && <Camera />}
+                <Text
                   style={
                     hasPhoto
-                      ? styles.viewPhotoButton
-                      : [formStyles.button, formStyles.buttonEnabled]
-                  }
-                  onPress={hasPhoto ? handleViewPhoto : openPhotoPickerModal}
-                >
-                  {!hasPhoto && <Image source={images.camera} style={styles.cameraIcon} />}
-                  <Text
-                    style={
-                      hasPhoto
-                        ? styles.viewPhotoText
-                        : [formStyles.buttonText, formStyles.buttonTextEnabled]
-                    }
-                  >
-                    {hasPhoto ? 'View Photo' : 'Take Photo'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <TouchableOpacity
-                style={[
-                  formStyles.button,
-                  formStyles.buttonSuccess,
-                  { opacity: hasPhoto ? 1 : 0.5 },
-                ]}
-                onPress={handleOrderDelivered}
-                disabled={!hasPhoto}
-              >
-                <Text style={formStyles.buttonText}>Order Delivered</Text>
+                      ? styles.viewPhotoText
+                      : [formStyles.buttonText, formStyles.buttonTextEnabled]
+                  }>
+                  {hasPhoto ? 'View Photo' : 'Take Photo'}
+                </Text>
               </TouchableOpacity>
-            </>
-          )}
-        </Animated.View>
-      </View>
+            </View>
+
+            {/* Order Delivered Button */}
+            <TouchableOpacity
+              style={[
+                formStyles.button,
+                formStyles.buttonSuccess,
+                { opacity: hasPhoto ? 1 : 0.5 },
+              ]}
+              onPress={handleOrderDelivered}
+              disabled={!hasPhoto}>
+              <Text style={formStyles.buttonText}>Order Delivered</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </Modal>
 
       {/* Confirm Photo Modal */}
       <ConfirmPhotoModal
@@ -315,7 +338,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
         onTakePhoto={handleTakePhoto}
         onChooseFromGallery={handleChooseFromGallery}
       />
-    </Modal>
+    </>
   );
 };
 
@@ -331,28 +354,20 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+    overflow: 'hidden', // ensures content does not bleed outside during animation
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
   },
-  dragIndicatorContainer: {
-    alignItems: 'center',
-    marginBottom: 10,
-  },
   dragIndicator: {
     width: 50,
     height: 5,
     backgroundColor: colors.text.subText,
+    alignSelf: 'center',
     borderRadius: 3,
-  },
-  title: {
-    fontSize: typography.fontSize.semiMedium,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
-    color: colors.text.primary,
     marginBottom: 10,
-    textAlign: 'center',
   },
   location: {
     flexDirection: 'row',
@@ -364,29 +379,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 14,
     paddingVertical: 20,
-    paddingHorizontal: 10,
     backgroundColor: '#F6F6F6',
     borderRadius: 12,
   },
   driverName: {
-    fontSize: typography.fontSize.large,
+    fontSize: 20,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.text.primary,
   },
   deliveryAddress: {
-    fontSize: typography.fontSize.medium,
+    fontSize: 14,
     color: colors.text.primaryGrey,
-    marginBottom: 10,
   },
   headerIcons: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     gap: 20,
   },
   icon: {
-    width: 20,
-    height: 20,
+    width: 23,
+    height: 23,
     tintColor: colors.text.primary,
   },
   section: {
@@ -402,6 +415,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 15,
   },
+  instructionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  instructionIcon: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
+    marginRight: 10,
+  },
   instructionText: {
     fontSize: typography.fontSize.medium,
     color: colors.text.primaryGrey,
@@ -415,12 +438,6 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.small,
     color: colors.text.primaryGrey,
     marginBottom: 10,
-  },
-  cameraIcon: {
-    width: 20,
-    height: 20,
-    tintColor: colors.white,
-    marginRight: 10,
   },
   viewPhotoButton: {
     marginTop: 10,
@@ -437,6 +454,22 @@ const styles = StyleSheet.create({
     color: colors.purple,
     fontSize: typography.fontSize.medium,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 3,
+  },
+  infoIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    resizeMode: 'contain',
+  },
+  infoText: {
+    fontSize: typography.fontSize.medium,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
   },
 });
 

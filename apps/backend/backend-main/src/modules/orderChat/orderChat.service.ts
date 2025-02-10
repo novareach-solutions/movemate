@@ -8,7 +8,7 @@ export interface IOrderChatMessageInput {
   orderId: number;
   senderId: number;
   content: string;
-  type?: string; 
+  type?: string;
 }
 
 @Injectable()

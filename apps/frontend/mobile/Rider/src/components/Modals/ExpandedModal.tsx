@@ -17,7 +17,6 @@ import {
 import { colors } from '../../theme/colors';
 import { formStyles } from '../../theme/form';
 import { typography } from '../../theme/typography';
-import { images } from '../../assets/images/images';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
 import { useDispatch, useSelector } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';

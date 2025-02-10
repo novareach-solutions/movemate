@@ -1,23 +1,13 @@
-// src/screens/PickUpOrderDetailsScreen.tsx
-
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { SendPackageOrder } from '../redux/slices/types/sendAPackage';
-import { colors } from '../theme/colors';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {useRoute} from '@react-navigation/native';
+import {SendPackageOrder} from '../redux/slices/types/sendAPackage';
+import {colors} from '../theme/colors';
 import OrderExpandedModal from '../components/Modals/ExpandedModal';
 
 const PickUpOrderDetailsScreen: React.FC = () => {
   const route = useRoute();
   const { order } = route.params as { order: SendPackageOrder };
-
-  if (!order) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.errorText}>Order not found.</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>

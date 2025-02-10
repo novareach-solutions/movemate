@@ -30,7 +30,6 @@ const apiEndPoints = {
     createEndpoint(`/order/send-package/agent/${orderId}/proof-of-delivery`),
   completeOrder: (orderId: number) =>
     createEndpoint(`/order/send-package/agent/${orderId}/complete`),
-
 };
 
 export default apiEndPoints;

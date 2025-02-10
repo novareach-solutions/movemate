@@ -3,14 +3,14 @@ import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../../../redux/store';
 import {hideOrderModal} from '../../../redux/slices/orderSlice';
 import OrderModal from './OrderModal';
-import { useNavigation } from '@react-navigation/native';
-import { DeliverAPackage } from '../../../navigation/ScreenNames';
-import { SendPackageOrder } from '../../../redux/slices/types/sendAPackage';
-import { navigate } from '../../../navigation/NavigationService';
+import {useNavigation} from '@react-navigation/native';
+import {DeliverAPackage} from '../../../navigation/ScreenNames';
+import {SendPackageOrder} from '../../../redux/slices/types/sendAPackage';
+import {navigate} from '../../../navigation/NavigationService';
 
 const GlobalOrderModal: React.FC = () => {
   const dispatch = useDispatch();
-  const navigation=useNavigation()
+  const navigation = useNavigation();
   const {isModalVisible, selectedOrder} = useSelector(
     (state: RootState) => state.order,
   );
@@ -20,7 +20,8 @@ const GlobalOrderModal: React.FC = () => {
   };
 
   const handleAcceptOrderSuccess = (order: SendPackageOrder) => {
-    navigation.navigate(DeliverAPackage.PickUpOrderDetails, { order });  };
+    navigation.navigate(DeliverAPackage.PickUpOrderDetails, {order});
+  };
 
   return (
     <OrderModal

@@ -9,16 +9,17 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   TextStyle,
+  SafeAreaView,
 } from 'react-native';
 import PhoneInput from 'react-native-phone-number-input';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
-import {requestOtp} from '../redux/slices/authSlice';
 import {useAppDispatch} from '../redux/hook';
+import Logo from '../assets/icons/logo.svg';
 import Header from '../components/Header';
+import { requestOtp } from '../redux/slices/authSlice';
 
 const {width} = Dimensions.get('window');
 
@@ -33,7 +34,7 @@ const LoginScreen: React.FC = () => {
   const handlePhoneNumberChange = (number: string) => {
     setIsFocused(true);
     setPhoneNumber(number);
-    setIsFilled(number.length > 0);
+    setIsFilled(number.length === 13);
   };
 
   const handleSendCode = async () => {
@@ -50,11 +51,14 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <View>
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
       <Header isBack />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
-          <Image source={images.logo} style={styles.logo} />
+          <Logo style={styles.logo} />
           <Text style={styles.heading}>Login</Text>
           <Text style={styles.subheading}>
             Enter phone number and we’ll send you a verification code
@@ -95,7 +99,7 @@ const LoginScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -110,12 +114,13 @@ const styles = StyleSheet.create({
     height: width * 0.3,
     resizeMode: 'contain',
     marginBottom: 30,
+    marginTop:20,
     alignSelf: 'center',
   },
   heading: {
     fontSize: typography.fontSize.large,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
-    color: colors.black,
+    color: colors.purple,
     textAlign: 'left',
     marginBottom: 10,
   },

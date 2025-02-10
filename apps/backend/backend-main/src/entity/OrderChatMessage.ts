@@ -22,7 +22,7 @@ export class OrderChatMessage extends BaseEntity {
   senderId: number;
 
   @Column({ type: "varchar", default: "TEXT" })
-  type: string; 
+  type: string;
 
   @Column({ type: "text" })
   content: string;

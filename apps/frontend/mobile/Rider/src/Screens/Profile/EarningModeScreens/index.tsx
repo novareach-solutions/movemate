@@ -5,18 +5,24 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  ScrollView,
+  Image,
 } from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
-import {ProfileScreens} from '../../../navigation/ScreenNames';
-import {useNavigation} from '@react-navigation/native';
+import {
+  ProfileScreens,
+  ProfileScreensParamList,
+} from '../../../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Header from '../../../components/Header';
+import {BenefitItem} from './SubscriptionPlansScreen';
 
 const EarningsModeScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Subscription' | 'Commission'>(
     'Subscription',
   );
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<ProfileScreensParamList>>();
 
   const renderContent = () => {
     if (activeTab === 'Subscription') {
@@ -40,18 +46,22 @@ const EarningsModeScreen: React.FC = () => {
             <Text style={styles.buttonText}>View Plans</Text>
           </TouchableOpacity>
           <View style={styles.benefitsContainer}>
-            <Text style={styles.benefit}>
-              <Text style={styles.bullet}>•</Text> 0% Commission: Keep 100% of
-              what you earn
-            </Text>
-            <Text style={styles.benefit}>
-              <Text style={styles.bullet}>•</Text> Special Perks: Get exclusive
-              benefits like priority rides, free cancellations, and more.
-            </Text>
-            <Text style={styles.benefit}>
-              <Text style={styles.bullet}>•</Text> Roll-Over Policy: Unused
-              subscription hours roll over to the next cycle.
-            </Text>
+            <BenefitItem
+              title={'0% Commission'}
+              description={'Keep 100% of what you earn'}
+            />
+            <BenefitItem
+              title={'Special Perks'}
+              description={
+                'Get exclusive benefits like priority rides, free cancellations, and more.'
+              }
+            />
+            <BenefitItem
+              title={'Roll-Over Policy'}
+              description={
+                'Unused subscription hours roll over to the next cycle.'
+              }
+            />
           </View>
         </View>
       );
@@ -67,14 +77,16 @@ const EarningsModeScreen: React.FC = () => {
             <Text style={styles.buttonText}>Activate</Text>
           </TouchableOpacity>
           <View style={styles.benefitsContainer}>
-            <Text style={styles.benefit}>
-              <Text style={styles.bullet}>•</Text> Only 10% Commission: Pay a
-              small fee per ride; no subscription needed.
-            </Text>
-            <Text style={styles.benefit}>
-              <Text style={styles.bullet}>•</Text> No Commitment: Ideal for
-              part-time drivers or occasional deliveries.
-            </Text>
+            <BenefitItem
+              title={'Only 10% Commission'}
+              description={'Pay a small fee per ride; no subscription needed.'}
+            />
+            <BenefitItem
+              title={'No Commitment'}
+              description={
+                'Ideal for part-time drivers or occasional deliveries.'
+              }
+            />
           </View>
         </View>
       );
@@ -82,45 +94,54 @@ const EarningsModeScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        {activeTab === 'Subscription'
-          ? 'Boost Earnings with'
-          : 'Deliver and earn with'}
-      </Text>
-      <Text style={styles.subtitle}>
-        {activeTab === 'Subscription' ? '0% Commission!' : '10% Commission!'}
-      </Text>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#2a1d3d'}}>
+      <Header isBack earningScreen />
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>
+          {activeTab === 'Subscription'
+            ? 'Boost Earnings with'
+            : 'Deliver and earn with'}
+        </Text>
+        <Text style={styles.subtitle}>
+          {activeTab === 'Subscription' ? '0% Commission!' : '10% Commission!'}
+        </Text>
 
-      {/* Tabs */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'Subscription' && styles.activeTab]}
-          onPress={() => setActiveTab('Subscription')}>
-          <Text
+        {/* Tabs */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
             style={[
-              styles.tabText,
-              activeTab === 'Subscription' && styles.activeTabText,
-            ]}>
-            Subscription
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'Commission' && styles.activeTab]}
-          onPress={() => setActiveTab('Commission')}>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'Commission' && styles.activeTabText,
-            ]}>
-            Commission
-          </Text>
-        </TouchableOpacity>
-      </View>
+              styles.tab,
+              activeTab === 'Subscription' && styles.activeTab,
+            ]}
+            onPress={() => setActiveTab('Subscription')}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'Subscription' && styles.activeTabText,
+              ]}>
+              Subscription
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'Commission' && styles.activeTab]}
+            onPress={() => setActiveTab('Commission')}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'Commission' && styles.activeTabText,
+              ]}>
+              Commission
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Dynamic Content */}
-      {renderContent()}
-    </View>
+        {/* Dynamic Content */}
+        {renderContent()}
+        {/* <Image source={images.subscriptionBanner} /> */}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -129,19 +150,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#2a1d3d',
     padding: 20,
-    alignItems: 'center',
+  },
+  scrollContent: {
+    paddingBottom: 40, // Added bottom padding here
   },
   title: {
     fontSize: typography.fontSize.large,
     fontWeight: 'bold',
     color: colors.white,
     marginTop: 40,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: typography.fontSize.large,
     fontWeight: 'bold',
     color: colors.white,
     marginBottom: 30,
+    textAlign: 'center',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -179,6 +204,9 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
     width: '100%',
+    borderWidth: 1,
+    borderColor: '#FC9BE5',
+    marginBottom: 20,
   },
   cardHeader: {
     flexDirection: 'row',

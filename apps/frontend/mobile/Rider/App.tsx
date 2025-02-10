@@ -12,7 +12,7 @@ const App = () => (
   <Provider store={store}>
     <SafeAreaProvider>
       <AppNavigator>
-      <GlobalOrderModal />
+        <GlobalOrderModal />
       </AppNavigator>
     </SafeAreaProvider>
   </Provider>

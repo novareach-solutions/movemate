@@ -6,18 +6,23 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
-import {images} from '../../../assets/images/images';
+import Header from '../../../components/Header';
+import Lightning from '../../../assets/icons/lightning.svg';
+import Visa from '../../../assets/icons/visa.svg';
+import Info from '../../../assets/icons/info.svg';
+import {SvgProps} from 'react-native-svg';
 
 const PayoutOption: React.FC<{
   title: string;
   description: string;
-  icon: any;
+  icon: React.FC<SvgProps>;
   isSelected: boolean;
   onPress: () => void;
-}> = ({title, description, icon, isSelected, onPress}) => {
+}> = ({title, description, icon: Icon, isSelected, onPress}) => {
   return (
     <View>
       <TouchableOpacity
@@ -35,7 +40,7 @@ const PayoutOption: React.FC<{
           alignItems: 'center',
           marginBottom: 10,
         }}>
-        <Image source={icon} />
+        <Icon />
         <Text style={styles.optionDescription}>{description}</Text>
       </View>
     </View>
@@ -51,7 +56,8 @@ const PayoutScreen: React.FC = () => {
   >(null);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <Header title="Payout" isBack />
       <ScrollView contentContainerStyle={styles.content}>
         {/* Amount Section */}
         <View style={styles.sectionContainer}>
@@ -66,7 +72,7 @@ const PayoutScreen: React.FC = () => {
           <PayoutOption
             title="Instant Payout"
             description="Funds will be transferred within 2-3 minutes at 5% transfer rate"
-            icon={images.lightningIcon}
+            icon={Lightning}
             isSelected={selectedPayoutType === 'Instant'}
             onPress={() => setSelectedPayoutType('Instant')}
           />
@@ -74,7 +80,7 @@ const PayoutScreen: React.FC = () => {
           <PayoutOption
             title="Normal Payout"
             description="Funds will be transferred within 2-3 hours at 0% transfer rate"
-            icon={images.helpIcon}
+            icon={Info}
             isSelected={selectedPayoutType === 'Normal'}
             onPress={() => setSelectedPayoutType('Normal')}
           />
@@ -96,7 +102,7 @@ const PayoutScreen: React.FC = () => {
                 gap: 20,
                 alignItems: 'center',
               }}>
-              <Image source={images.visaIcon} />
+              <Visa />
               <View>
                 <Text style={styles.optionTitle}>Bank of Melbourne</Text>
                 <Text style={styles.optionDescription}>**** 1234</Text>
@@ -124,7 +130,7 @@ const PayoutScreen: React.FC = () => {
           <Text style={styles.confirmButtonText}>Confirm</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -172,7 +178,6 @@ const styles = StyleSheet.create({
   optionDescription: {
     fontSize: typography.fontSize.small,
     color: colors.text.primaryGrey,
-    marginTop: 5,
   },
   checkbox: {
     width: 20,

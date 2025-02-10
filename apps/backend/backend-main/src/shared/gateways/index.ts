@@ -3,4 +3,5 @@ export * from "./base.socket";
 export * from "./chat.support.gateway";
 export * from "./customer.notification.gateway";
 export * from "./notification.gateway";
-export * from "./orderChat.gateway"
+export * from "./orderChat.gateway";
+export * from "./live-tracking.gateway";

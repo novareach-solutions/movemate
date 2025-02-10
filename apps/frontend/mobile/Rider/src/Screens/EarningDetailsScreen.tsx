@@ -1,32 +1,35 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import EarningsModal from '../components/Modals/EarningsModal';
-import { colors } from '../theme/colors';
-import { useNavigation } from '@react-navigation/native';
-import { DeliverAPackage } from '../navigation/ScreenNames';
+import {colors} from '../theme/colors';
+import {useNavigation} from '@react-navigation/native';
+import {DeliverAPackage} from '../navigation/ScreenNames';
 
 const EarningsDetailsScreen: React.FC = () => {
-  const [isEarningsModalVisible, setIsEarningsModalVisible] = useState<boolean>(true);
-  const navigation=useNavigation()
+  const [isEarningsModalVisible, setIsEarningsModalVisible] =
+    useState<boolean>(true);
+  const navigation = useNavigation();
 
   const handleOpenEarningsModal = () => {
     setIsEarningsModalVisible(true);
   };
 
   const handleCloseEarningsModal = () => {
-    navigation.navigate(DeliverAPackage.Home)
+    navigation.navigate(DeliverAPackage.Home);
     setIsEarningsModalVisible(false);
   };
 
   const tripTime = '30 minutes';
-  const tripDistance = '15'; 
+  const tripDistance = '15';
   const tripPay = 20;
   const tip = 5;
   const totalEarnings = 25;
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.openModalButton} onPress={handleOpenEarningsModal}>
+      <TouchableOpacity
+        style={styles.openModalButton}
+        onPress={handleOpenEarningsModal}>
         <Text style={styles.openModalButtonText}>View Earnings Details</Text>
       </TouchableOpacity>
 

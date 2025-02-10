@@ -18,8 +18,8 @@ import { OrderChatModule } from "../orderChat/orderChat.module";
     CustomerNotificationGateway,
     SupportService,
     NotificationService,
-    OrderChatGateway 
+    OrderChatGateway,
   ],
-  exports: [ChatSupportGateway, CustomerNotificationGateway,OrderChatGateway],
+  exports: [ChatSupportGateway, CustomerNotificationGateway, OrderChatGateway],
 })
 export class GatewayModule {}

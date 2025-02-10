@@ -1,6 +1,4 @@
-// src/screens/HomeScreen.tsx
-
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -13,27 +11,27 @@ import {
   Alert,
 } from 'react-native';
 import StatCard from '../../components/StatCard';
-import { images } from '../../assets/images/images';
-import { colors } from '../../theme/colors';
 import HelpButton from '../../components/HelpButton';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AppScreens, AppScreensParamList, DeliverAPackage } from '../../navigation/ScreenNames';
-import Header from '../../components/Header';
-import { useSelector, useDispatch } from 'react-redux';
+import {AppScreens, DeliverAPackage} from '../../navigation/ScreenNames';
+import {useSelector, useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   AgentStatusEnum,
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
-import { showOrderModal, fetchOngoingOrder } from '../../redux/slices/orderSlice';
-import { io } from 'socket.io-client';
+import {showOrderModal, fetchOngoingOrder} from '../../redux/slices/orderSlice';
+import {io} from 'socket.io-client';
 import apiClient from '../../api/apiClient';
 import apiEndPoints from '../../api/apiEndPoints';
-import GetLocation from 'react-native-get-location';
-import { RootState } from '../../redux/store';
-import { OrderStatusEnum } from '../../redux/slices/types/enums';
-
-const SOCKET_SERVER_URL = 'http://192.168.29.63:3001';
+import {RootState} from '../../redux/store';
+import {OrderStatusEnum} from '../../redux/slices/types/enums';
+import {colors} from '../../theme/colors';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AppScreensParamList} from '../../navigation/ScreenNames';
+import Header from '../../components/Header';
+import Money from '../../assets/icons/money.svg';
+import Order from '../../assets/icons/orders.svg';
+import Distance from '../../assets/icons/distance.svg';
 
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
@@ -128,10 +126,10 @@ const HomeScreen: React.FC = () => {
       console.error('Invalid agentId: Unable to convert to number.');
       return;
     }
-    const socket = io(SOCKET_SERVER_URL);
+    const socket = io(apiEndPoints.baseURL);
     socket.on('connect', () => {
       console.log('Connected to WebSocket server');
-      socket.emit('joinRoom', { agentId: numericAgentId });
+      socket.emit('joinRoom', {agentId: numericAgentId});
       console.log(`Joined room for agentId: ${numericAgentId}`);
     });
     socket.on('disconnect', () => {
@@ -163,15 +161,21 @@ const HomeScreen: React.FC = () => {
   }, [agentId, dispatch]);
 
   useEffect(() => {
-    console.log("Ongoingon order value", ongoingOrder);
+    console.log('Ongoingon order value', ongoingOrder);
     if (ongoingOrder && !hasNavigated) {
       setHasNavigated(true);
-      if (ongoingOrder.status===OrderStatusEnum.PICKEDUP_ORDER) {
-        navigation.navigate(DeliverAPackage.DropOffOrderDetails, { order: ongoingOrder });
+      if (ongoingOrder.status === OrderStatusEnum.PICKEDUP_ORDER) {
+        navigation.navigate(DeliverAPackage.DropOffOrderDetails, {
+          order: ongoingOrder,
+        });
       }
-      if (ongoingOrder.status===OrderStatusEnum.ACCEPTED || ongoingOrder.status===OrderStatusEnum.PENDING)
-      {
-        navigation.navigate(DeliverAPackage.PickUpOrderDetails, { order: ongoingOrder });
+      if (
+        ongoingOrder.status === OrderStatusEnum.ACCEPTED ||
+        ongoingOrder.status === OrderStatusEnum.PENDING
+      ) {
+        navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
+          order: ongoingOrder,
+        });
       }
     }
   }, [ongoingOrder, hasNavigated, navigation]);
@@ -190,56 +194,44 @@ const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Header logo home />
+      <Header logo home help />
+      {/* Map Image */}
       <View style={styles.mapContainer}>
-        <Image source={images.map} style={styles.mapImage} />
+        <Image
+          source={require('../../assets/images/Map.png')}
+          style={styles.mapImage}
+        />
       </View>
+
+      {/* Status Button */}
       <View style={styles.statusContainer}>
         <TouchableOpacity
           onPress={toggleStatus}
           style={[
             styles.statusButton,
             isOnline ? styles.stopButton : styles.goButton,
-          ]}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator
-              color={isOnline ? colors.white : colors.purple}
-            />
-          ) : (
-            <Text
-              style={[
-                styles.statusButtonText,
-                isOnline ? styles.stopText : styles.goText,
-              ]}
-            >
-              {isOnline ? 'Stop' : 'GO'}
-            </Text>
-          )}
+          ]}>
+          <Text
+            style={[
+              styles.statusButtonText,
+              isOnline ? styles.stopText : styles.goText,
+            ]}>
+            {isOnline ? 'Stop' : 'GO'}
+          </Text>
         </TouchableOpacity>
         <Text style={styles.statusText}>
           {isOnline ? "You're Online" : "You're Offline"}
         </Text>
       </View>
-      <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
+
+      {/* Sliding Drawer */}
+      <Animated.View style={[styles.drawer, {height: drawerHeight}]}>
         <View style={styles.statsContainer}>
-          <StatCard icon={images.money} value="$50" label="EARNINGS" />
-          <StatCard icon={images.cart} value="7" label="ORDERS" />
-          <StatCard
-            icon={images.directionIcon}
-            value="30 Km"
-            label="DISTANCE"
-          />
+          <StatCard icon={Money} value="$50" label="EARNINGS" />
+          <StatCard icon={Order} value="7" label="ORDERS" />
+          <StatCard icon={Distance} value="30 Km" label="DISTANCE" />
         </View>
       </Animated.View>
-      <View style={styles.helpButtonContainer}>
-        <HelpButton
-          onPress={() => {
-            navigation.navigate(AppScreens.FAQScreen);
-          }}
-        />
-      </View>
     </SafeAreaView>
   );
 };
@@ -247,7 +239,7 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.lightButtonBackground,
   },
   mapContainer: {
     flex: 2,
@@ -263,8 +255,8 @@ const styles = StyleSheet.create({
   },
   statusContainer: {
     alignItems: 'center',
-    marginTop: -60,
-    marginBottom: 20,
+    marginTop: -100,
+    backgroundColor: colors.white,
   },
   statusButton: {
     width: 80,
@@ -273,6 +265,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
+    marginTop: -40,
   },
   stopButton: {
     backgroundColor: colors.error,
@@ -306,13 +299,14 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: {width: 0, height: -2},
     paddingHorizontal: 20,
     paddingTop: 10,
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    backgroundColor: colors.white,
   },
   helpButtonContainer: {
     position: 'absolute',

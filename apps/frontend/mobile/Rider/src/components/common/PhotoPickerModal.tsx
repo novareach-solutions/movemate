@@ -1,9 +1,16 @@
 // src/components/PhotoPickerModal.tsx
 
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, TextStyle } from 'react-native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextStyle,
+} from 'react-native';
+import {colors} from '../../theme/colors';
+import {typography} from '../../theme/typography';
 
 interface PhotoPickerModalProps {
   isVisible: boolean;

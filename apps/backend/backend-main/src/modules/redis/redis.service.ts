@@ -1,13 +1,13 @@
-import { Injectable, OnModuleDestroy } from "@nestjs/common";
+import { Injectable, Logger, OnModuleDestroy } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import Redis, { RedisOptions } from "ioredis";
-
 import { logger } from "../../logger";
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
   private readonly redisClient: Redis; // For general commands
   private readonly subscriberClient: Redis; // For Pub/Sub
+  private readonly logger = new Logger(RedisService.name);
 
   constructor(private readonly configService: ConfigService) {
     const redisOptions: RedisOptions = {
@@ -18,19 +18,22 @@ export class RedisService implements OnModuleDestroy {
     this.subscriberClient = new Redis(redisOptions);
 
     this.redisClient.on("connect", () => {
-      logger.debug("Connected to Redis server (General Client)");
+      this.logger.debug("Connected to Redis server (General Client)");
     });
 
     this.subscriberClient.on("connect", () => {
-      logger.debug("Connected to Redis server (Subscriber Client)");
+      this.logger.debug("Connected to Redis server (Subscriber Client)");
     });
 
     this.redisClient.on("error", (error: unknown) => {
-      logger.error("Error connecting to Redis (General Client):", error);
+      this.logger.error("Error connecting to Redis (General Client):", error);
     });
 
     this.subscriberClient.on("error", (error: unknown) => {
-      logger.error("Error connecting to Redis (Subscriber Client):", error);
+      this.logger.error(
+        "Error connecting to Redis (Subscriber Client):",
+        error,
+      );
     });
   }
 
@@ -89,6 +92,6 @@ export class RedisService implements OnModuleDestroy {
   async onModuleDestroy(): Promise<void> {
     await this.redisClient.quit();
     await this.subscriberClient.quit();
-    logger.debug("Redis clients disconnected");
+    this.logger.debug("Redis clients disconnected");
   }
 }
