@@ -1,7 +1,8 @@
 import { Module } from "@nestjs/common";
-import { OrderChatService } from "./orderChat.service";
-import { OrderChatController } from "./orderChat.controller";
+
 import { OrderChatGateway } from "../../shared/gateways/orderChat.gateway";
+import { OrderChatController } from "./orderChat.controller";
+import { OrderChatService } from "./orderChat.service";
 
 @Module({
   controllers: [OrderChatController],

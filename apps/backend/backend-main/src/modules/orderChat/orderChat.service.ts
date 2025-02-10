@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+
 import { OrderChatMessage } from "../../entity/OrderChatMessage";
 import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import { User } from "../../entity/User";
 import { dbReadRepo, dbRepo } from "../database/database.service";
 
 export interface IOrderChatMessageInput {
+  content: string;
   orderId: number;
   senderId: number;
-  content: string;
   type?: string;
 }
 

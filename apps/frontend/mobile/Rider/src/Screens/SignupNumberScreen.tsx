@@ -19,7 +19,7 @@ import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
 import {useAppDispatch} from '../redux/hook';
 import Header from '../components/Header';
 import Logo from '../assets/icons/logo.svg';
-import { requestOtp } from '../redux/slices/authSlice';
+import {requestOtp} from '../redux/slices/authSlice';
 
 const {width} = Dimensions.get('window');
 

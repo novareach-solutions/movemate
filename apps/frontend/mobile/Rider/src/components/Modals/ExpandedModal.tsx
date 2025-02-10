@@ -1,6 +1,6 @@
 // src/components/OrderExpandedModal.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -14,15 +14,15 @@ import {
   Alert,
   TextStyle,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { formStyles } from '../../theme/form';
-import { typography } from '../../theme/typography';
+import {colors} from '../../theme/colors';
+import {formStyles} from '../../theme/form';
+import {typography} from '../../theme/typography';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
-import { uploadMedia } from '../../redux/slices/authSlice';
-import { OrderStatusEnum } from '../../redux/slices/types/enums';
-import { SendPackageOrder } from '../../redux/slices/types/sendAPackage';
+import {uploadMedia} from '../../redux/slices/authSlice';
+import {OrderStatusEnum} from '../../redux/slices/types/enums';
+import {SendPackageOrder} from '../../redux/slices/types/sendAPackage';
 import PhotoPickerModal from '../common/PhotoPickerModal';
 import {
   fetchOngoingOrder,
@@ -30,9 +30,9 @@ import {
   updateItemVerifiedPhoto,
   updateOrderStatus,
 } from '../../redux/slices/orderSlice';
-import { RootState } from '../../redux/store';
-import { AppScreens, DeliverAPackage } from '../../navigation/ScreenNames';
-import { useNavigation } from '@react-navigation/native';
+import {RootState} from '../../redux/store';
+import {AppScreens, DeliverAPackage} from '../../navigation/ScreenNames';
+import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -45,17 +45,19 @@ interface ExpandedModalProps {
   disableClose?: boolean;
 }
 
-export const InfoRow: React.FC<{ iconSource: any; text: string; bold?: boolean }> = ({
-  iconSource,
-  text,
-  bold,
-}) => (
+export const InfoRow: React.FC<{
+  iconSource: any;
+  text: string;
+  bold?: boolean;
+}> = ({iconSource, text, bold}) => (
   <View style={styles.infoRow}>
     <Image source={iconSource} style={styles.infoIcon} />
     <Text
       style={[
         styles.infoText,
-        bold ? { fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'] } : {},
+        bold
+          ? {fontWeight: typography.fontWeight.bold as TextStyle['fontWeight']}
+          : {},
       ]}>
       {text}
     </Text>
@@ -128,7 +130,12 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
     }
 
     try {
-      await dispatch(updateItemVerifiedPhoto({ orderId: currentOrder.id, url: uploadedImageUrl })).unwrap();
+      await dispatch(
+        updateItemVerifiedPhoto({
+          orderId: currentOrder.id,
+          url: uploadedImageUrl,
+        }),
+      ).unwrap();
 
       // Fetch updated order details.
       const fetchResponse = await dispatch(fetchOngoingOrder()).unwrap();
@@ -137,18 +144,23 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
       }
     } catch (error: any) {
       console.error('Failed to update photo or refresh order:', error);
-      Alert.alert('Error', error.message || 'Failed to update photo or refresh order.');
+      Alert.alert(
+        'Error',
+        error.message || 'Failed to update photo or refresh order.',
+      );
     }
 
     setIsConfirmPhotoVisible(false);
   };
 
-  const currentOrder = useSelector((state: RootState) => state.order.ongoingOrder);
+  const currentOrder = useSelector(
+    (state: RootState) => state.order.ongoingOrder,
+  );
 
   const handleOrderAction = async () => {
     if (currentOrder?.status === OrderStatusEnum.ACCEPTED) {
       try {
-        await dispatch(startOrder({ orderId: currentOrder.id })).unwrap();
+        await dispatch(startOrder({orderId: currentOrder.id})).unwrap();
         await dispatch(fetchOngoingOrder()).unwrap();
       } catch (error: any) {
         console.error('Failed to start order:', error);
@@ -158,12 +170,19 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
 
     if (currentOrder?.status !== OrderStatusEnum.ACCEPTED) {
       try {
-        await dispatch(updateOrderStatus({ orderId: currentOrder.id, status: OrderStatusEnum.PICKEDUP_ORDER })).unwrap();
+        await dispatch(
+          updateOrderStatus({
+            orderId: currentOrder.id,
+            status: OrderStatusEnum.PICKEDUP_ORDER,
+          }),
+        ).unwrap();
         await dispatch(fetchOngoingOrder()).unwrap();
         if (!disableClose) {
           onClose();
         }
-        navigation.navigate(DeliverAPackage.DropOffOrderDetails, { order: currentOrder });
+        navigation.navigate(DeliverAPackage.DropOffOrderDetails, {
+          order: currentOrder,
+        });
       } catch (error: any) {
         console.error('Failed to update order status:', error);
         Alert.alert('Error', error.message || 'Failed to update order status.');
@@ -172,7 +191,9 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   };
 
   const getButtonText = () => {
-    return currentOrder?.status === OrderStatusEnum.ACCEPTED ? 'I Have Arrived' : 'Order Picked Up';
+    return currentOrder?.status === OrderStatusEnum.ACCEPTED
+      ? 'I Have Arrived'
+      : 'Order Picked Up';
   };
 
   const handleVerifyItems = () => {
@@ -257,9 +278,12 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
 
   const isVerifyItemsDisabled =
     currentOrder?.status === OrderStatusEnum.ACCEPTED ||
-    (currentOrder?.status === OrderStatusEnum.PENDING && !currentOrder.itemVerifiedPhoto);
+    (currentOrder?.status === OrderStatusEnum.PENDING &&
+      !currentOrder.itemVerifiedPhoto);
 
-  const isOrderPickedUpDisabled = !currentOrder?.itemVerifiedPhoto && currentOrder?.status !== OrderStatusEnum.ACCEPTED;
+  const isOrderPickedUpDisabled =
+    !currentOrder?.itemVerifiedPhoto &&
+    currentOrder?.status !== OrderStatusEnum.ACCEPTED;
 
   return (
     <>
@@ -268,16 +292,26 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
         transparent
         animationType="none"
         onRequestClose={disableClose ? () => {} : handleCollapse}>
-        <TouchableWithoutFeedback onPress={disableClose ? () => {} : handleCollapse}>
+        <TouchableWithoutFeedback
+          onPress={disableClose ? () => {} : handleCollapse}>
           <View style={styles.overlay}>
             <TouchableWithoutFeedback>
-              <Animated.View style={[styles.modalContainer, { height }]}>
-                <TouchableOpacity onPress={isExpanded ? (disableClose ? () => {} : handleCollapse) : handleExpand}>
+              <Animated.View style={[styles.modalContainer, {height}]}>
+                <TouchableOpacity
+                  onPress={
+                    isExpanded
+                      ? disableClose
+                        ? () => {}
+                        : handleCollapse
+                      : handleExpand
+                  }>
                   <View style={styles.dragIndicator} />
                 </TouchableOpacity>
 
                 <Text style={styles.title}>
-                  {order.status === OrderStatusEnum.ACCEPTED ? 'Order Accepted' : 'Arriving in 10 mins'}
+                  {order.status === OrderStatusEnum.ACCEPTED
+                    ? 'Order Accepted'
+                    : 'Arriving in 10 mins'}
                 </Text>
 
                 <View style={styles.location}>
@@ -292,45 +326,79 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                 {isExpanded && (
                   <>
                     <View style={styles.sectionContainer}>
-                      <InfoRow iconSource={images.greenCircle} text="PickUp Details" bold />
+                      <InfoRow
+                        iconSource={images.greenCircle}
+                        text="PickUp Details"
+                        bold
+                      />
                       <View style={styles.pickUpDetails}>
                         <View style={styles.pickUpDetailsTextContainer}>
-                          <Text style={styles.infoBoldText}>{currentOrder?.senderName}</Text>
+                          <Text style={styles.infoBoldText}>
+                            {currentOrder?.senderName}
+                          </Text>
                           <Text style={styles.infoText}>
-                            {`${currentOrder.pickupLocation?.addressLine1} ${currentOrder.pickupLocation?.addressLine2}` || 'N/A'}
+                            {`${currentOrder.pickupLocation?.addressLine1} ${currentOrder.pickupLocation?.addressLine2}` ||
+                              'N/A'}
                           </Text>
                         </View>
                         <View style={styles.pickupIcons}>
-                          <TouchableOpacity onPress={() => Alert.alert('Call Driver')}>
-                            <Image source={images.phone} style={styles.pickupIcon} />
+                          <TouchableOpacity
+                            onPress={() => Alert.alert('Call Driver')}>
+                            <Image
+                              source={images.phone}
+                              style={styles.pickupIcon}
+                            />
                           </TouchableOpacity>
                           <TouchableOpacity onPress={navigateChatScreen}>
-                            <Image source={images.message} style={styles.pickupIcon} />
+                            <Image
+                              source={images.message}
+                              style={styles.pickupIcon}
+                            />
                           </TouchableOpacity>
                         </View>
                       </View>
                     </View>
 
                     <View style={styles.sectionContainer}>
-                      <InfoRow iconSource={images.pickUpNotesIcon} text="Pickup Notes" bold />
+                      <InfoRow
+                        iconSource={images.pickUpNotesIcon}
+                        text="Pickup Notes"
+                        bold
+                      />
                       <View style={styles.pickUpDetails}>
-                        <Text style={styles.infoText}>{order.deliveryInstructions}</Text>
+                        <Text style={styles.infoText}>
+                          {order.deliveryInstructions}
+                        </Text>
                       </View>
                     </View>
 
                     <View style={styles.sectionContainer}>
-                      <InfoRow iconSource={images.cartItemsIcon} text="Items to Pickup" bold />
-                      <View style={[styles.itemsContainer, styles.pickUpDetailsTextContainer]}>
-                        <Text style={styles.itemText}>• {order.packageType}</Text>
+                      <InfoRow
+                        iconSource={images.cartItemsIcon}
+                        text="Items to Pickup"
+                        bold
+                      />
+                      <View
+                        style={[
+                          styles.itemsContainer,
+                          styles.pickUpDetailsTextContainer,
+                        ]}>
+                        <Text style={styles.itemText}>
+                          • {order.packageType}
+                        </Text>
                         <TouchableOpacity
                           style={[
-                            currentOrder.itemVerifiedPhoto ? styles.viewImageButton : styles.verifyItemsButton,
+                            currentOrder.itemVerifiedPhoto
+                              ? styles.viewImageButton
+                              : styles.verifyItemsButton,
                             isVerifyItemsDisabled && styles.buttonDisabled,
                           ]}
                           onPress={() => {
                             if (!isVerifyItemsDisabled) {
                               if (currentOrder.itemVerifiedPhoto) {
-                                setSelectedImage(currentOrder.itemVerifiedPhoto);
+                                setSelectedImage(
+                                  currentOrder.itemVerifiedPhoto,
+                                );
                                 setIsConfirmPhotoVisible(true);
                               } else {
                                 handleVerifyItems();
@@ -340,10 +408,15 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                           disabled={isVerifyItemsDisabled}>
                           <Text
                             style={[
-                              currentOrder.itemVerifiedPhoto ? styles.viewImageText : styles.verifyItemsText,
-                              isVerifyItemsDisabled && styles.buttonTextDisabled,
+                              currentOrder.itemVerifiedPhoto
+                                ? styles.viewImageText
+                                : styles.verifyItemsText,
+                              isVerifyItemsDisabled &&
+                                styles.buttonTextDisabled,
                             ]}>
-                            {currentOrder.itemVerifiedPhoto ? 'View Image' : 'Verify Items'}
+                            {currentOrder.itemVerifiedPhoto
+                              ? 'View Image'
+                              : 'Verify Items'}
                           </Text>
                         </TouchableOpacity>
                       </View>
@@ -355,14 +428,18 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                   <TouchableOpacity
                     style={[
                       formStyles.button,
-                      isOrderPickedUpDisabled ? styles.buttonDisabled : formStyles.buttonSuccess,
+                      isOrderPickedUpDisabled
+                        ? styles.buttonDisabled
+                        : formStyles.buttonSuccess,
                     ]}
                     onPress={handleOrderAction}
                     disabled={isOrderPickedUpDisabled}>
                     <Text
                       style={[
                         formStyles.buttonText,
-                        isOrderPickedUpDisabled ? styles.buttonTextDisabled : formStyles.buttonTextEnabled,
+                        isOrderPickedUpDisabled
+                          ? styles.buttonTextDisabled
+                          : formStyles.buttonTextEnabled,
                       ]}>
                       {getButtonText()}
                     </Text>
@@ -407,7 +484,7 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'flex-start',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,

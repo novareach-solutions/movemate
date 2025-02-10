@@ -7,7 +7,7 @@ import OrderExpandedModal from '../components/Modals/ExpandedModal';
 
 const PickUpOrderDetailsScreen: React.FC = () => {
   const route = useRoute();
-  const { order } = route.params as { order: SendPackageOrder };
+  const {order} = route.params as {order: SendPackageOrder};
 
   return (
     <View style={styles.container}>

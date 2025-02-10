@@ -20,8 +20,8 @@ import Alarm from '../../../assets/icons/alarm.svg';
 import Cycle from '../../../assets/icons/cycle.svg';
 import RedCircle from '../../../assets/icons/redCircle.svg';
 import GreenCircle from '../../../assets/icons/greenCircle.svg';
-import { SvgProps } from 'react-native-svg';
-import { typography } from '../../../theme/typography';
+import {SvgProps} from 'react-native-svg';
+import {typography} from '../../../theme/typography';
 
 interface ModalComponentProps {
   isVisible: boolean;

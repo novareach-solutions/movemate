@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import ChatModule from '../components/ChatModule';
 import io from 'socket.io-client';
 import axios from 'axios';
-import { useRoute } from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import apiEndPoints from '../api/apiEndPoints';
 
 const SOCKET_URL = `${apiEndPoints.baseURL}/order-chat`;
 
 const ChatScreen = () => {
   const route = useRoute();
-  const { orderId, senderId, headerTitle } = route.params as {
+  const {orderId, senderId, headerTitle} = route.params as {
     orderId: number;
     senderId: number;
     headerTitle: string;
@@ -22,9 +22,9 @@ const ChatScreen = () => {
     const fetchPreviousMessages = async () => {
       try {
         const response = await axios.get(
-          `${apiEndPoints.baseURL}/order-chat/${orderId}/messages`
+          `${apiEndPoints.baseURL}/order-chat/${orderId}/messages`,
         );
-        console.log("Response",response)
+        console.log('Response', response);
         setMessages(response.data.reverse());
       } catch (error) {
         console.error('Error fetching previous messages:', error);
@@ -42,12 +42,12 @@ const ChatScreen = () => {
 
     newSocket.on('connect', () => {
       console.log('Connected to order-chat socket', newSocket.id);
-      newSocket.emit('joinOrderRoom', { orderId });
+      newSocket.emit('joinOrderRoom', {orderId});
     });
 
     newSocket.on('newOrderMessage', (message: any) => {
       console.log('New order message received:', message);
-      setMessages((prevMessages) => [message, ...prevMessages]);
+      setMessages(prevMessages => [message, ...prevMessages]);
     });
 
     newSocket.on('userTyping', (data: any) => {
@@ -56,7 +56,7 @@ const ChatScreen = () => {
 
     return () => {
       if (newSocket) {
-        newSocket.emit('leaveOrderRoom', { orderId });
+        newSocket.emit('leaveOrderRoom', {orderId});
         newSocket.disconnect();
       }
     };

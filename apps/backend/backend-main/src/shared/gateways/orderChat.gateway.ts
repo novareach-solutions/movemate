@@ -1,16 +1,17 @@
+import { forwardRef, Inject } from "@nestjs/common";
 import {
-  WebSocketGateway,
-  SubscribeMessage,
-  MessageBody,
   ConnectedSocket,
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
 } from "@nestjs/websockets";
 import { Socket } from "socket.io";
+
 import {
   IOrderChatMessageInput,
   OrderChatService,
 } from "../../modules/orderChat/orderChat.service";
 import { BaseSocketGateway } from "./base.socket";
-import { forwardRef, Inject } from "@nestjs/common";
 
 @WebSocketGateway({
   namespace: "order-chat",

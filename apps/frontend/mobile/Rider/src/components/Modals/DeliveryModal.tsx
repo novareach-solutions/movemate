@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -12,11 +12,11 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { formStyles } from '../../theme/form';
-import { typography } from '../../theme/typography';
+import {colors} from '../../theme/colors';
+import {formStyles} from '../../theme/form';
+import {typography} from '../../theme/typography';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {
   AppScreens,
   AppScreensParamList,
@@ -26,16 +26,16 @@ import PurplePhone from '../../assets/icons/purplePhone.svg';
 import PurpleMessage from '../../assets/icons/purpleMessage.svg';
 import PurpleDoNotRing from '../../assets/icons/purpleDoNotRing.svg';
 import PurpleDoor from '../../assets/icons/purpleDoor.svg';
-import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
 import ImagePicker from 'react-native-image-crop-picker';
-import { RootState } from '../../redux/store';
+import {RootState} from '../../redux/store';
 import {
   completeOrder,
   fetchOngoingOrder,
   uploadProofOfDelivery,
 } from '../../redux/slices/orderSlice';
-import { SendPackageOrder } from '../../redux/slices/types/sendAPackage';
-import { uploadMedia } from '../../redux/slices/authSlice';
+import {SendPackageOrder} from '../../redux/slices/types/sendAPackage';
+import {uploadMedia} from '../../redux/slices/authSlice';
 import Camera from '../../assets/icons/camera.svg';
 import PhotoPickerModal from '../common/PhotoPickerModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -43,8 +43,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Get screen height
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-/**  
- * A simple InfoRow component (as seen in OrderExpandedModal)  
+/**
+ * A simple InfoRow component (as seen in OrderExpandedModal)
  * that shows an icon and some text.
  */
 const InfoRow = ({
@@ -61,7 +61,9 @@ const InfoRow = ({
     <Text
       style={[
         styles.infoText,
-        bold ? { fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'] } : {},
+        bold
+          ? {fontWeight: typography.fontWeight.bold as TextStyle['fontWeight']}
+          : {},
       ]}>
       {text}
     </Text>
@@ -74,7 +76,11 @@ interface DeliveryModalProps {
   order: SendPackageOrder;
 }
 
-const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order }) => {
+const DeliveryModal: React.FC<DeliveryModalProps> = ({
+  isVisible,
+  onClose,
+  order,
+}) => {
   // Use animated height values similar to OrderExpandedModal.
   const [height] = useState(new Animated.Value(SCREEN_HEIGHT * 0.22)); // collapsed height
   const [isExpanded, setIsExpanded] = useState(false);
@@ -104,7 +110,9 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
 
-  const currentOrder = useAppSelector((state: RootState) => state.order.ongoingOrder);
+  const currentOrder = useAppSelector(
+    (state: RootState) => state.order.ongoingOrder,
+  );
   const dispatch = useAppDispatch();
 
   const openPhotoPickerModal = () => {
@@ -118,10 +126,10 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
       height: 400,
       cropping: true,
     })
-      .then(async (photo) => {
+      .then(async photo => {
         await uploadAndSetPhoto(photo);
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('Camera error:', error);
         Alert.alert('Error', 'Failed to take photo. Please try again.');
       });
@@ -134,10 +142,10 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
       height: 400,
       cropping: true,
     })
-      .then(async (photo) => {
+      .then(async photo => {
         await uploadAndSetPhoto(photo);
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('Gallery error:', error);
         Alert.alert('Error', 'Failed to select photo. Please try again.');
       });
@@ -177,7 +185,9 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
       return;
     }
     try {
-      await dispatch(uploadProofOfDelivery({ orderId: order.id, url: uploadedImageUrl })).unwrap();
+      await dispatch(
+        uploadProofOfDelivery({orderId: order.id, url: uploadedImageUrl}),
+      ).unwrap();
       await dispatch(fetchOngoingOrder()).unwrap();
     } catch (error) {
       console.error('Failed to upload proof of delivery:', error);
@@ -198,7 +208,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
 
   const handleOrderDelivered = async () => {
     try {
-      await dispatch(completeOrder({ orderId: currentOrder.id })).unwrap();
+      await dispatch(completeOrder({orderId: currentOrder.id})).unwrap();
       navigation.navigate(DeliverAPackage.EarningsDetails);
     } catch (error) {
       console.error('Error completing order:', error);
@@ -228,12 +238,17 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
 
   return (
     <>
-      <Modal visible={isVisible} animationType="slide" onRequestClose={onClose} transparent>
+      <Modal
+        visible={isVisible}
+        animationType="slide"
+        onRequestClose={onClose}
+        transparent>
         <View style={styles.overlay}>
           {/* Use Animated.View to control modal height */}
-          <Animated.View style={[styles.modalContainer, { height }]}>
+          <Animated.View style={[styles.modalContainer, {height}]}>
             {/* Drag indicator toggles expand/collapse */}
-            <TouchableOpacity onPress={isExpanded ? handleCollapse : handleExpand}>
+            <TouchableOpacity
+              onPress={isExpanded ? handleCollapse : handleExpand}>
               <View style={styles.dragIndicator} />
             </TouchableOpacity>
 
@@ -241,7 +256,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
             <View style={styles.location}>
               {!isExpanded && (
                 <InfoRow
-                  iconSource={require('../../assets/icons/package.png')} 
+                  iconSource={require('../../assets/icons/package.png')}
                   text={`${order.customer?.firstName} (${order.dropLocation?.addressLine1})`}
                 />
               )}
@@ -249,9 +264,13 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
 
             {/* Header Section */}
             <View style={styles.header}>
-              <View style={{ width: '70%' }}>
-                <Text style={styles.driverName}>{order.customer?.firstName}</Text>
-                <Text style={styles.deliveryAddress}>{order.dropLocation?.addressLine1}</Text>
+              <View style={{width: '70%'}}>
+                <Text style={styles.driverName}>
+                  {order.customer?.firstName}
+                </Text>
+                <Text style={styles.deliveryAddress}>
+                  {order.dropLocation?.addressLine1}
+                </Text>
               </View>
               <View style={styles.headerIcons}>
                 <TouchableOpacity>
@@ -273,7 +292,9 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
                   ) : (
                     <PurpleDoor style={styles.instructionIcon} />
                   )}
-                  <Text style={styles.instructionText}>{order.deliveryInstructions}</Text>
+                  <Text style={styles.instructionText}>
+                    {order.deliveryInstructions}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -287,7 +308,9 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
             {/* Proof of Delivery */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Proof of Delivery</Text>
-              <Text style={styles.proofText}>Take a photo to confirm delivery</Text>
+              <Text style={styles.proofText}>
+                Take a photo to confirm delivery
+              </Text>
               <TouchableOpacity
                 style={
                   hasPhoto
@@ -312,7 +335,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isVisible, onClose, order
               style={[
                 formStyles.button,
                 formStyles.buttonSuccess,
-                { opacity: hasPhoto ? 1 : 0.5 },
+                {opacity: hasPhoto ? 1 : 0.5},
               ]}
               onPress={handleOrderDelivered}
               disabled={!hasPhoto}>
@@ -356,7 +379,7 @@ const styles = StyleSheet.create({
     padding: 20,
     overflow: 'hidden', // ensures content does not bleed outside during animation
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
