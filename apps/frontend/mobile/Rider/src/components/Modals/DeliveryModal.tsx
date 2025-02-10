@@ -256,7 +256,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
             <View style={styles.location}>
               {!isExpanded && (
                 <InfoRow
-                  iconSource={require('../../assets/icons/package.png')}
+                  iconSource={require('../../assets/icons/deliverAPackageIcon.svg')}
                   text={`${order.customer?.firstName} (${order.dropLocation?.addressLine1})`}
                 />
               )}
