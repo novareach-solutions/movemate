@@ -6,7 +6,6 @@ import { OrderReview } from "../../../entity/OrderReview";
 import { PickupLocation } from "../../../entity/PickupLocation";
 import { Report } from "../../../entity/Report";
 import { SendPackageOrder } from "../../../entity/SendPackageOrder";
-import { logger } from "../../../logger";
 import {
   OrderStatusEnum,
   OrderTypeEnum,
@@ -42,7 +41,7 @@ export class SendAPackageService {
     private readonly customerNotificationGateway: CustomerNotificationGateway,
   ) {}
   async create(data: TSendPackageOrder): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       "SendAPackageService.create: Creating a new send package order",
     );
     const queryRunner =
@@ -89,11 +88,11 @@ export class SendAPackageService {
           PickupLocation,
           pickupLocation,
         );
-        logger.debug(
+        this.logger.debug(
           `SendAPackageService.create: Created new PickupLocation with ID ${pickupLocation.id}`,
         );
       } else {
-        logger.debug(
+        this.logger.debug(
           `SendAPackageService.create: Reusing existing PickupLocation with ID ${pickupLocation.id}`,
         );
       }
@@ -114,11 +113,11 @@ export class SendAPackageService {
           DropLocation,
           dropLocation,
         );
-        logger.debug(
+        this.logger.debug(
           `SendAPackageService.create: Created new DropLocation with ID ${dropLocation.id}`,
         );
       } else {
-        logger.debug(
+        this.logger.debug(
           `SendAPackageService.create: Reusing existing DropLocation with ID ${dropLocation.id}`,
         );
       }
@@ -153,7 +152,7 @@ export class SendAPackageService {
         SendPackageOrder,
         sendPackageOrder,
       );
-      logger.debug(
+      this.logger.debug(
         `SendAPackageService.create: Created SendPackageOrder with ID ${savedOrder.id}`,
       );
 
@@ -161,7 +160,7 @@ export class SendAPackageService {
       return savedOrder;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      logger.error(
+      this.logger.error(
         `SendAPackageService.create: Failed to create order - ${error}`,
         {
           stack: (error as Error).stack,
@@ -185,7 +184,7 @@ export class SendAPackageService {
     orderId: number,
     reason: string,
   ): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.cancelOrder: Attempting to cancel order ID ${orderId}`,
     );
 
@@ -214,7 +213,7 @@ export class SendAPackageService {
     order.canceledBy = UserRoleEnum.CUSTOMER;
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.cancelOrder: Order ID ${orderId} canceled successfully`,
     );
     return updatedOrder;
@@ -225,7 +224,7 @@ export class SendAPackageService {
     reason: string,
     details: string,
   ): Promise<Report> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.reportAgent: Reporting agent for order ID ${orderId}`,
     );
 
@@ -250,7 +249,7 @@ export class SendAPackageService {
       customer: order.customer,
       sendPackageOrderId: order.id,
     });
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.reportAgent: Report created with ID ${savedReport.id} for order ID ${orderId}`,
     );
     return savedReport;
@@ -261,7 +260,7 @@ export class SendAPackageService {
     rating: number,
     comment: string,
   ): Promise<OrderReview> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.leaveReview: Leaving review for order ID ${orderId}`,
     );
 
@@ -295,7 +294,7 @@ export class SendAPackageService {
       customer: order.customer,
       sendPackageOrderId: order.id,
     });
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.leaveReview: Review created with ID ${savedReview.id} for order ID ${orderId}`,
     );
 
@@ -303,7 +302,7 @@ export class SendAPackageService {
   }
 
   async getOrderDetails(orderId: number): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.getOrderDetails: Fetching details for order ID ${orderId}`,
     );
 
@@ -323,7 +322,7 @@ export class SendAPackageService {
       throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
     }
 
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.getOrderDetails: Successfully fetched details for order ID ${orderId}`,
     );
     return order;
@@ -378,7 +377,7 @@ export class SendAPackageService {
     orderId: number,
     agentId: number,
   ): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.startOrder: Agent attempting to start order ID ${orderId}`,
     );
 
@@ -406,14 +405,14 @@ export class SendAPackageService {
     order.startedAt = new Date();
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.startOrder: Order ID ${orderId} started successfully`,
     );
     return updatedOrder;
   }
 
   async completeOrder(orderId: number): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.completeOrder: Agent attempting to complete order ID ${orderId}`,
     );
 
@@ -435,7 +434,7 @@ export class SendAPackageService {
     order.completedAt = new Date();
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.completeOrder: Order ID ${orderId} completed successfully`,
     );
     return updatedOrder;
@@ -445,7 +444,7 @@ export class SendAPackageService {
     orderId: number,
     reason: string,
   ): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.agentCancelOrder: Agent attempting to cancel order ID ${orderId}`,
     );
 
@@ -478,14 +477,14 @@ export class SendAPackageService {
     order.canceledBy = UserRoleEnum.AGENT;
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.agentCancelOrder: Order ID ${orderId} canceled successfully by agent`,
     );
     return updatedOrder;
   }
 
   async reportIssue(orderId: number, issue: string): Promise<Report> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.reportIssue: Agent reporting issue for order ID ${orderId}`,
     );
 
@@ -507,7 +506,7 @@ export class SendAPackageService {
       customerId: order.customerId,
       orderId: order.id,
     });
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.reportIssue: Issue reported with ID ${savedReport.id} for order ID ${orderId}`,
     );
     return savedReport;
@@ -516,7 +515,7 @@ export class SendAPackageService {
   // ====== Admin Service Methods ======
 
   async getAllOrders(query: any): Promise<SendPackageOrder[]> {
-    logger.debug(
+    this.logger.debug(
       "SendAPackageService.getAllOrders: Retrieving all orders with filters",
     );
 
@@ -549,7 +548,7 @@ export class SendAPackageService {
       ],
     });
 
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.getAllOrders: Retrieved ${orders.length} orders`,
     );
     return orders;
