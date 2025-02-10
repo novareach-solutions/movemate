@@ -1,13 +1,13 @@
+import { ConfigService } from "@nestjs/config";
 import * as winston from "winston";
 
-import configuration from "./config/configuration";
-
-const config = configuration();
+const configService = new ConfigService();
 
 export const logger = winston.createLogger({
-  level: config.environment === "production" ? "warn" : "info",
+  level:
+    configService.get<string>("environment") === "production" ? "warn" : "info",
   format: winston.format.cli(),
-  defaultMeta: { environment: config.environment },
+  defaultMeta: { environment: configService.get<string>("environment") },
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(

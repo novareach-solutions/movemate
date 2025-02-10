@@ -2,7 +2,11 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 
+import appConfig from "./config/app.config";
 import configuration from "./config/configuration";
+import databaseConfig from "./config/database.config";
+import jwtConfig from "./config/jwt.config";
+import redisConfig from "./config/redis.config";
 import { HealthModule } from "./health/health.module";
 import { AgentModule } from "./modules/agent/agent.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -22,7 +26,7 @@ import { RoleGuard } from "./shared/guards/roles.guard";
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [configuration],
+      load: [configuration, databaseConfig, jwtConfig, redisConfig, appConfig],
     }),
     DatabaseModule,
     HealthModule,
