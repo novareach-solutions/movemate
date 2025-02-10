@@ -6,10 +6,12 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
-import {images} from '../../../assets/images/images';
+import Header from '../../../components/Header';
+import PlaceHolderProfile from "../../../assets/icons/placeHolderProfile.svg"
 
 const ManageAccountScreen: React.FC = () => {
   const [email, setEmail] = useState('johndoe@gmail.com');
@@ -25,10 +27,14 @@ const ManageAccountScreen: React.FC = () => {
   };
 
   return (
+    <SafeAreaView style={{
+      flex:1
+    }}>
+      <Header isBack title='Manage Account' />
     <View style={styles.container}>
       {/* Profile Picture */}
       <View style={styles.profileContainer}>
-        <Image source={images.placeholderprofile} style={styles.profileImage} />
+        <PlaceHolderProfile style={styles.profileImage} />
         <Text style={styles.editProfileText}>EDIT</Text>
       </View>
 
@@ -64,7 +70,7 @@ const ManageAccountScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </View></SafeAreaView>
   );
 };
 

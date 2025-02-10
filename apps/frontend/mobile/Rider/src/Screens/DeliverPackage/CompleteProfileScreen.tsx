@@ -1,19 +1,19 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet, View} from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
 import ProfileForm from '../../components/ProfileForm';
 import StepIndicator from '../../components/StepIndicator';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {colors} from '../../theme/colors';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { colors } from '../../theme/colors';
 import {
   DeliverAPackage,
   DeliverAPackageParamList,
 } from '../../navigation/ScreenNames';
-import {useAppDispatch} from '../../redux/hook';
-import {setSignupData} from '../../redux/slices/authSlice';
+import { useAppDispatch } from '../../redux/hook';
+import { setSignupData } from '../../redux/slices/authSlice';
 import Header from '../../components/Header';
 
 type FormFields = {
-  role: 'AGENT';
+  role: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -41,13 +41,13 @@ const DAPCompleteProfileScreen = () => {
 
     console.log('user', user);
 
-    await dispatch(setSignupData({user}));
+    await dispatch(setSignupData({ user }));
     navigation.navigate(DeliverAPackage.EnterVehicleDetails);
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
-      <Header logo />
+    <SafeAreaView style={{ flex: 1 }}>
+      <Header logo isBack />
       <View style={styles.container}>
         <StepIndicator current={1} total={5} />
         <ProfileForm

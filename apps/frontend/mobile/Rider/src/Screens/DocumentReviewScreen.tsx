@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,15 +7,15 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
-import {colors} from '../theme/colors';
-import {formStyles} from '../theme/form';
-import StepIndicator from '../components/StepIndicator';
+import { colors } from '../theme/colors';
+import { formStyles } from '../theme/form';
 import TitleDescription from '../components/TitleDescription';
 import PhotoPickerModal from '../components/common/PhotoPickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
-import {uploadAgentDoc, uploadMedia} from '../redux/slices/authSlice';
-import {useAppDispatch} from '../redux/hook';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { DeliverAPackage, DeliverAPackageParamList } from '../navigation/ScreenNames';
 import Header from '../components/Header';
+
 interface DocumentReviewProps {
   route: {
     params: {
@@ -25,46 +25,41 @@ interface DocumentReviewProps {
   };
 }
 
-const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
-  const {title, uploadedImage} = route.params;
+const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({ route }) => {
+  const { title, uploadedImage } = route.params;
   const [image, setImage] = useState(uploadedImage);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
-  const dispatch = useAppDispatch();
-  const documents = [
-    {id: '1', title: 'Police Verification', value: 'POLICE_VERIFICATION'},
-    {id: '2', title: 'Driver’s License', value: 'DRIVER_LICENSE'},
-    {id: '3', title: 'Australian ID Proof', value: 'AUSTRALIAN_ID_PROOF'},
-  ];
+  const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
 
   const handleSubmit = async () => {
-    // Find the document object matching the provided title
-    const selectedDocument = documents.find(doc => doc.title === title);
-
-    // If a matching document is found, use its value; otherwise, default to a generic name
+    console.log('Document submitted:', image);
+    // API call commented out
+    /*
     const payload = {
-      name: selectedDocument ? selectedDocument.value : 'UNKNOWN_DOCUMENT',
-      description: selectedDocument
-        ? `${selectedDocument.title} front and back`
-        : 'Unknown document',
+      name: title.replace(' ', '_').toUpperCase(),
+      description: `${title} front and back`,
       url: image,
     };
 
     try {
       await dispatch(uploadAgentDoc(payload)).unwrap();
-      // navigate to success screen
-      console.log('Agent Doc upload successful');
-      // Navigate to the OTP screen or desired screen
+      SimpleToast('Document uploaded successfully!', true);
+      navigation.navigate(DeliverAPackage.UploadDocuments);
     } catch (error) {
-      console.log('Request Otp failed', error);
+      SimpleToast('Failed to upload the document. Please try again.', true);
+      navigation.goBack();
     }
+    */
+    navigation.navigate(DeliverAPackage.UploadDocuments);
   };
 
   const handleRetry = () => {
     setIsPhotoOptionVisible(true);
-    console.log('Retry');
   };
 
-  const handleTakePhoto = () => {};
+  const handleTakePhoto = () => {
+    // Placeholder for taking a new photo
+  };
 
   const handleChooseFromGallery = () => {
     setIsPhotoOptionVisible(false);
@@ -74,25 +69,7 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
       cropping: true,
     })
       .then(photo => {
-        // Construct FormData for upload
-        const formData = new FormData();
-        formData.append('file', {
-          uri: photo.path, // Use the file path
-          type: photo.mime, // File type (e.g., image/jpeg)
-          name: photo.filename || `photo_${Date.now()}.jpg`, // Use filename or fallback to a generated one
-        });
-
-        // Perform the upload via Redux or direct API call
-        dispatch(uploadMedia(formData))
-          .unwrap()
-          .then(response => {
-            if (response) {
-              setImage(response?.location);
-            }
-          })
-          .catch(error => {
-            console.error('Upload failed:', error);
-          });
+        setImage(photo.path);
       })
       .catch(error => {
         console.log('Gallery error:', error);
@@ -108,11 +85,17 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
           description="Review your uploaded document below"
         />
         <View style={styles.imageContainer}>
-          <Image source={{uri: image}} style={styles.image} />
+          <Image
+            source={image ? { uri: image } : require("../assets/icons/placeHolderProfile.svg")}
+            style={styles.image}
+          />
         </View>
         <View style={styles.footer}>
           <TouchableOpacity
-            style={[formStyles.button, styles.halfButton]}
+            style={[formStyles.button, styles.halfButton,{
+              borderWidth:1,
+              borderColor:colors.purple
+            }]}
             onPress={handleRetry}>
             <Text style={formStyles.buttonText}>Retry</Text>
           </TouchableOpacity>

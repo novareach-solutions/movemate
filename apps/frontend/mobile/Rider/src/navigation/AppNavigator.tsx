@@ -1,6 +1,6 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   AppScreens,
   AuthScreens,
@@ -38,165 +38,203 @@ import ReplaceVehicleScreen from '../Screens/Profile/AccountScreen/ReplaceVehicl
 import SignupNumberScreen from '../Screens/SignupNumberScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import ChatScreen from '../Screens/ChatScreen';
+import EarningsScreen from '../Screens/Profile/EarningsScreen';
+import RatingsScreen from '../Screens/Profile/RatingScreen';
+import OrderDetailsScreen from '../Screens/Profile/OrderDetailsScreen';
+import HelpAndSupportScreen from '../Screens/Profile/HelpAndSupportScreen';
+import PayoutSummaryScreen from '../Screens/Profile/WalletScreen/PayoutSummaryScreen';
 
 const Stack = createNativeStackNavigator();
 
+const RiderTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#2a1d3d',
+  },
+};
+
 const App = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={RiderTheme}>
       <Stack.Navigator initialRouteName={AuthScreens.Onboarding}>
         <Stack.Screen
           name={AuthScreens.Onboarding}
           component={Onboarding}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AuthScreens.Login}
           component={LoginScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AuthScreens.SignupNumber}
           component={SignupNumberScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AuthScreens.Otp}
           component={OtpScreen as React.FC}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AuthScreens.SelectService}
           component={SelectServiceScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
 
         {/* Deliver a Package */}
         <Stack.Screen
           name={DeliverAPackage.CompleteProfile}
           component={DAPCompleteProfileScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={DeliverAPackage.UploadDocuments}
           component={DAPUploadDocumentsScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={DeliverAPackage.UploadDocumentDetails}
           component={DAPUploadDocumentDetailsScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={DeliverAPackage.EnterVehicleDetails}
           component={EnterVehicleDetailsScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={DeliverAPackage.EnterABN}
           component={EnterABNScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={DeliverAPackage.AddProfilePhoto}
           component={AddProfilePhotoScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={DeliverAPackage.Home}
           component={HomeScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
 
         {/* Buy From Store */}
         <Stack.Screen
           name={BuyFromStore.ItemsReviewScreen}
           component={ItemsReviewScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
 
         {/* Profile */}
         <Stack.Screen
           name={ProfileScreens.Inbox}
           component={InboxScreen as React.FC}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.ReferFriends}
           component={ReferFriendsScreen as React.FC}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.Wallet}
           component={WalletScreen as React.FC}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.Payout}
           component={PayoutScreen as React.FC}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.Account}
           component={AccountScreen as React.FC}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.Documents}
           component={DocumentsScreen as React.FC}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.ManageAccount}
           component={ManageAccountScreen as React.FC}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.EarningMode}
           component={EarningsModeScreen as React.FC}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.SubscriptionPlans}
           component={SubscriptionPlansScreen as React.FC}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={ProfileScreens.ReplaceVehicle}
           component={ReplaceVehicleScreen}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={ProfileScreens.Earnings}
+          component={EarningsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={ProfileScreens.Ratings}
+          component={RatingsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={ProfileScreens.OrderDetails}
+          component={OrderDetailsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={ProfileScreens.HelpAndSupport}
+          component={HelpAndSupportScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={ProfileScreens.PayoutSummary}
+          component={PayoutSummaryScreen}
+          options={{ headerShown: false }}
         />
 
         {/* App */}
         <Stack.Screen
           name={AppScreens.DocumentReview}
           component={DocumentReviewScreen as React.FC}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AppScreens.FAQScreen}
           component={FAQScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AppScreens.CancellationReason}
           component={CancellationReasonScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AppScreens.Profile}
           component={ProfileScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AppScreens.Chat}
           component={ChatScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AppScreens.ComingSoon}
           component={ComingSoonScreen}
-          options={{headerShown: true}}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

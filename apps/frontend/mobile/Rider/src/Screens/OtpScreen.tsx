@@ -37,7 +37,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
   const [timer, setTimer] = useState(60);
   const [error, setError] = useState(false);
   const inputs = useRef<TextInput[]>([]);
-  const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
+  const navigation = useNavigation<NavigationProp<any>>();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -48,10 +48,13 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
   }, []);
 
   const handleChange = (value: string, index: number) => {
+    // Allow only numbers
+    if (!/^\d*$/.test(value)) return;
+  
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-
+  
     // Focus handling
     if (value && index < 5) {
       inputs.current[index + 1]?.focus();
@@ -59,6 +62,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
       inputs.current[index - 1]?.focus();
     }
   };
+  
 
   const handleVerify = async () => {
     const enteredOtp = otp.join('');
@@ -66,19 +70,15 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
     try {
       if (isLogin) {
         // Dispatch login thunk
-        const response = await dispatch(
-          login({phone: phoneNumber, otp: enteredOtp}),
-        ).unwrap();
-        console.log('Login Successful!', response);
+        // const response = await dispatch(
+        //   login({phone: phoneNumber, otp: enteredOtp}),
+        // ).unwrap();
+        // console.log('Login Successful!', response);
         // Navigate to the main app screen or dashboard
         navigation.navigate(DeliverAPackage.Home);
       } else {
         // Dispatch verifyOtp thunk
-        await dispatch(
-          verifyOtp({phone: phoneNumber, otp: enteredOtp}),
-        ).unwrap();
-        console.log('OTP Verified Successfully!');
-        // Navigate to the next screen after OTP verification
+      123
         navigation.navigate(AuthScreens.SelectService);
       }
     } catch (err: any) {
@@ -96,7 +96,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+    <SafeAreaView style={{flex: 1}}>
       <Header logo isBack />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
@@ -130,7 +130,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
             {error && (
               <Text
                 style={{fontSize: 14, color: colors.error, marginVertical: 10}}>
-                Incorrect code, please try again
+                An error, please try again
               </Text>
             )}
           </View>
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: colors.white,
-    marginTop: 60,
+    paddingTop: 60,
   },
   otpContainer: {
     flexDirection: 'row',

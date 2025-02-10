@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import {typography} from '../theme/typography';
 import {colors} from '../theme/colors';
-import {images} from '../assets/images/images';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, DeliverAPackage} from '../navigation/ScreenNames';
 
@@ -24,7 +23,6 @@ interface Slide {
   id: number;
   title: string;
   subtitle: string;
-  image: ImageSourcePropType;
   description: string;
 }
 
@@ -33,7 +31,6 @@ const slides: Slide[] = [
     id: 0,
     title: 'Become our trusted service provider',
     subtitle: '',
-    image: images.introImage1,
     description: 'Join us today!',
   },
 ];
@@ -57,7 +54,8 @@ const Onboarding: React.FC = () => {
     // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
   const handleLogin = () => {
-    navigation.navigate(AuthScreens.Login);
+    navigation.navigate(AuthScreens.Login)
+    // navigation.navigate(DeliverAPackage.Home);
     // navigation.navigate(DeliverAPackage.CompleteProfile);
     // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
     // navigation.navigate(DeliverAPackage.EnterABN);
@@ -75,7 +73,7 @@ const Onboarding: React.FC = () => {
         onMomentumScrollEnd={updateSlidePosition}
         renderItem={({item}) => (
           <View style={styles.slide}>
-            <Image source={item.image} style={styles.image} />
+            <Image source={require("../assets/images/womanHoldingPackage.png")} style={styles.image} />
             <Text style={styles.title}>
               {item.title}
               <Text style={styles.subtitle}>{item.subtitle}</Text>

@@ -4,6 +4,7 @@ export const colors = {
   error: '#FF0000',
   warning: '#5F2C93',
   purple: '#8123AD',
+  orange: '#EE8D1E',
   lightPurple: 'rgba(129, 35, 173, 0.22)',
   green: 'rgba(34, 165, 110, 1)',
   darkGreen: 'rgb(1, 73, 43)',

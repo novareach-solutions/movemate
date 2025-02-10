@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,17 @@ import {
   Image,
   TextStyle,
 } from 'react-native';
-import {colors} from '../../theme/colors';
-import {formStyles} from '../../theme/form';
-import {typography} from '../../theme/typography';
-import {images} from '../../assets/images/images';
+import { colors } from '../../theme/colors';
+import { formStyles } from '../../theme/form';
+import { typography } from '../../theme/typography';
+import ConfirmPhotoModal from './ConfirmPhotoModal';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AppScreens, AppScreensParamList } from '../../navigation/ScreenNames';
+import PurplePhone from "../../assets/icons/purplePhone.svg"
+import PurpleMessage from "../../assets/icons/purpleMessage.svg"
+import PurpleDoNotRing from "../../assets/icons/purpleDoNotRing.svg"
+import PurpleDoor from "../../assets/icons/purpleDoor.svg"
+import Camera from "../../assets/icons/camera.svg"
 
 interface DeliveryModalProps {
   isVisible: boolean;
@@ -31,97 +38,111 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
   itemsToDeliver,
 }) => {
   const [isTakingPhoto, setIsTakingPhoto] = useState(false);
+  const navigation = useNavigation<NavigationProp<AppScreensParamList>>()
 
   const handleTakePhoto = () => {
     setIsTakingPhoto(true);
-    console.log('Take Photo button clicked', isTakingPhoto); // Replace this with your camera logic
+    console.log('Take Photo button clicked', isTakingPhoto);
   };
 
   const handleOrderDelivered = () => {
     console.log('Order Delivered button clicked');
-    onClose(); // Close the modal when delivered
+    onClose(); 
   };
 
   return (
-    <Modal
-      visible={isVisible}
-      animationType="slide"
-      onRequestClose={onClose}
-      transparent>
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          {/* Header Section */}
-          <View style={styles.header}>
-            <Text style={styles.driverName}>{driverName}</Text>
-            <Text style={styles.deliveryAddress}>{deliveryAddress}</Text>
-            <View style={styles.headerIcons}>
-              <TouchableOpacity>
-                <Image source={images.phone} style={styles.icon} />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Image source={images.message} style={styles.icon} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Delivery Instructions */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Delivery Instructions</Text>
-            <View style={styles.instructionsContainer}>
-              {deliveryInstructions.map((instruction, index) => (
-                <View key={index} style={styles.instructionRow}>
-                  <Image
-                    source={
-                      instruction === 'Do not ring the bell'
-                        ? images.doNotRing
-                        : images.doorDropOff
-                    }
-                    style={styles.instructionIcon}
+    <>
+      <Modal
+        visible={isVisible}
+        animationType="slide"
+        onRequestClose={onClose}
+        transparent>
+        <View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            {/* Header Section */}
+            <View style={styles.header}>
+              <View style={{
+                width: "70%"
+              }}>
+                <Text style={styles.driverName}>{driverName}</Text>
+                <Text style={styles.deliveryAddress}>{deliveryAddress}</Text>
+              </View>
+              <View style={styles.headerIcons}>
+                <TouchableOpacity>
+                  <PurplePhone style={styles.icon} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate(AppScreens.Chat);
+                  }}>
+                  <PurpleMessage
+                    style={styles.icon}
                   />
-                  <Text style={styles.instructionText}>{instruction}</Text>
-                </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Delivery Instructions */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Delivery Instructions</Text>
+              <View style={styles.instructionsContainer}>
+                {deliveryInstructions.map((instruction, index) => (
+                  <View key={index} style={styles.instructionRow}>
+                    {instruction === 'Do not ring the bell' ? <PurpleDoNotRing style={styles.instructionIcon} /> : <PurpleDoor style={styles.instructionIcon} />}
+                    <Text style={styles.instructionText}>{instruction}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            {/* Items to Deliver */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Items to Deliver</Text>
+              {itemsToDeliver.map((item, index) => (
+                <Text key={index} style={styles.itemText}>
+                  • {item}
+                </Text>
               ))}
             </View>
-          </View>
 
-          {/* Items to Deliver */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Items to Deliver</Text>
-            {itemsToDeliver.map((item, index) => (
-              <Text key={index} style={styles.itemText}>
-                • {item}
+            {/* Proof of Delivery */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Proof of Delivery</Text>
+              <Text style={styles.proofText}>
+                Take a photo to confirm delivery
               </Text>
-            ))}
-          </View>
+              <TouchableOpacity
+                style={[formStyles.button, formStyles.buttonEnabled, {
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }]}
+                onPress={handleTakePhoto}>
+                <Camera style={styles.cameraIcon} />
+                <Text
+                  style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
+                  Take Photo
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-          {/* Proof of Delivery */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Proof of Delivery</Text>
-            <Text style={styles.proofText}>
-              Take a photo to confirm delivery
-            </Text>
+            {/* Order Delivered Button */}
             <TouchableOpacity
-              style={[formStyles.button, formStyles.buttonEnabled]}
-              onPress={handleTakePhoto}>
-              <Image source={images.camera} style={styles.cameraIcon} />
-              <Text
-                style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
-                Take Photo
+              style={[formStyles.button, formStyles.buttonSuccess]}
+              onPress={handleOrderDelivered}>
+              <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
+                Order Delivered
               </Text>
             </TouchableOpacity>
           </View>
-
-          {/* Order Delivered Button */}
-          <TouchableOpacity
-            style={[formStyles.button, formStyles.buttonSuccess]}
-            onPress={handleOrderDelivered}>
-            <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
-              Order Delivered
-            </Text>
-          </TouchableOpacity>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+      <ConfirmPhotoModal
+        isVisible={isTakingPhoto}
+        onClose={() => setIsTakingPhoto(false)}
+        onRetry={() => setIsTakingPhoto(false)}
+        onDone={() => setIsTakingPhoto(false)}
+      /></>
   );
 };
 
@@ -138,32 +159,37 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
   },
   header: {
     marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 20,
+    backgroundColor: "#F6F6F6",
+    borderRadius: 12
   },
   driverName: {
-    fontSize: typography.fontSize.large,
+    fontSize: 20,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.text.primary,
   },
   deliveryAddress: {
-    fontSize: typography.fontSize.medium,
+    fontSize: 14,
     color: colors.text.primaryGrey,
-    marginBottom: 10,
   },
   headerIcons: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     gap: 20,
   },
   icon: {
-    width: 20,
-    height: 20,
+    width: 23,
+    height: 23,
     tintColor: colors.text.primary,
   },
   section: {
@@ -186,6 +212,7 @@ const styles = StyleSheet.create({
   instructionIcon: {
     width: 20,
     height: 20,
+    objectFit: "contain",
     marginRight: 10,
   },
   instructionText: {
@@ -204,7 +231,7 @@ const styles = StyleSheet.create({
   },
   cameraIcon: {
     width: 20,
-    height: 20,
+    height: 20, objectFit: "contain",
     tintColor: colors.white,
     marginRight: 10,
   },

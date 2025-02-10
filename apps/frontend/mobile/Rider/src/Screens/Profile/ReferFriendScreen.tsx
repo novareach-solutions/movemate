@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,13 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
-import {colors} from '../../theme/colors';
-import {typography} from '../../theme/typography';
-import {images} from '../../assets/images/images';
+import { colors } from '../../theme/colors';
+import { typography } from '../../theme/typography';
+import Header from '../../components/Header';
+import ReferalBG from "../../assets/images/referalBG.svg"
+import GoldCoin from "../../assets/icons/goldCoin.svg"
 
 const ReferFriendsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Invite Friend' | 'Status'>(
@@ -17,134 +20,137 @@ const ReferFriendsScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'Invite Friend' && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab('Invite Friend')}>
-          <Text
+    <SafeAreaView style={{
+      flex: 1
+    }}>
+      <Header isBack title='Refer A Friend' />
+      <View style={styles.container}>
+        {/* Tabs */}
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity
             style={[
-              styles.tabText,
-              activeTab === 'Invite Friend' && styles.activeTabText,
-            ]}>
-            Invite Friend
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'Status' && styles.activeTab]}
-          onPress={() => setActiveTab('Status')}>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'Status' && styles.activeTabText,
-            ]}>
-            Status
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {activeTab === 'Invite Friend' && (
-        <View style={styles.content}>
-          {/* Friends Circle */}
-          <View style={styles.circleImageContainer}>
-            <Image
-              source={images.referPlaceholder}
-              style={styles.circleImage}
-            />
-          </View>
-
-          <View
-            style={{
-              width: '100%',
-            }}>
-            {/* Referral Card */}
-            <View style={styles.referralCard}>
-              <Image source={images.currencyCoin} style={styles.icon} />
-              <Text style={styles.referralText}>
-                Refer your friends and earn $30 for every successful referral!
-              </Text>
-            </View>
-
-            {/* Footer Invite Button */}
-            <View style={styles.footer}>
-              <TouchableOpacity style={styles.inviteButton}>
-                <Text style={styles.inviteButtonText}>Invite Friends</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+              styles.tab,
+              activeTab === 'Invite Friend' && styles.activeTab,
+            ]}
+            onPress={() => setActiveTab('Invite Friend')}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'Invite Friend' && styles.activeTabText,
+              ]}>
+              Invite Friend
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'Status' && styles.activeTab]}
+            onPress={() => setActiveTab('Status')}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'Status' && styles.activeTabText,
+              ]}>
+              Status
+            </Text>
+          </TouchableOpacity>
         </View>
-      )}
 
-      {activeTab === 'Status' && (
-        <View style={{flex: 1, paddingHorizontal: 20}}>
-          {/* Summary Card */}
-          <View style={styles.summaryCard}>
-            <Image source={images.rewardCoin} style={styles.icon} />
-            <View>
-              <Text style={styles.summaryText}>
-                ₹2,000 earned from 4 referrals
-              </Text>
-              <Text style={styles.subSummaryText}>
-                Total rewards earned so far
-              </Text>
+        {activeTab === 'Invite Friend' && (
+          <View style={styles.content}>
+            {/* Friends Circle */}
+            <View style={styles.circleImageContainer}>
+              <ReferalBG
+                style={styles.circleImage}
+              />
             </View>
-          </View>
 
-          {/* Referral Status List */}
-          <Text style={styles.referralStatusHeading}>Your Referral Status</Text>
-          <View style={{flex: 1}}>
-            <View style={styles.statusItem}>
-              <View>
-                <Text style={styles.amountText}>$30</Text>
-                <Text style={styles.dateText}>1/11/2024</Text>
-              </View>
-              <View style={[styles.statusBadge, styles.pendingBadge]}>
-                <Text style={[styles.statusText, styles.pendingText]}>
-                  Pending
+            <View
+              style={{
+                width: '100%',
+              }}>
+              {/* Referral Card */}
+              <View style={styles.referralCard}>
+                <GoldCoin style={styles.icon} />
+                <Text style={styles.referralText}>
+                  Refer your friends and earn $30 for every successful referral!
                 </Text>
               </View>
-            </View>
-            <View style={styles.statusItem}>
-              <View>
-                <Text style={styles.amountText}>$30</Text>
-                <Text style={styles.dateText}>1/11/2024</Text>
-              </View>
-              <View style={[styles.statusBadge, styles.earnedBadge]}>
-                <Text style={[styles.statusText, styles.earnedText]}>
-                  Earned
-                </Text>
-              </View>
-            </View>
-            <View style={styles.statusItem}>
-              <View>
-                <Text style={styles.amountText}>$30</Text>
-                <Text style={styles.dateText}>1/11/2024</Text>
-              </View>
-              <View style={[styles.statusBadge, styles.pendingBadge]}>
-                <Text style={[styles.statusText, styles.pendingText]}>
-                  Pending
-                </Text>
-              </View>
-            </View>
-            <View style={styles.statusItem}>
-              <View>
-                <Text style={styles.amountText}>$30</Text>
-                <Text style={styles.dateText}>1/11/2024</Text>
-              </View>
-              <View style={[styles.statusBadge, styles.earnedBadge]}>
-                <Text style={[styles.statusText, styles.earnedText]}>
-                  Earned
-                </Text>
+
+              {/* Footer Invite Button */}
+              <View style={styles.footer}>
+                <TouchableOpacity style={styles.inviteButton}>
+                  <Text style={styles.inviteButtonText}>Invite Friends</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
-        </View>
-      )}
-    </View>
+        )}
+
+        {activeTab === 'Status' && (
+          <View style={{ flex: 1, paddingHorizontal: 20 }}>
+            {/* Summary Card */}
+            <View style={styles.summaryCard}>
+              <GoldCoin style={styles.icon} />
+              <View>
+                <Text style={styles.summaryText}>
+                  ₹2,000 earned from 4 referrals
+                </Text>
+                <Text style={styles.subSummaryText}>
+                  Total rewards earned so far
+                </Text>
+              </View>
+            </View>
+
+            {/* Referral Status List */}
+            <Text style={styles.referralStatusHeading}>Your Referral Status</Text>
+            <View style={{ flex: 1 }}>
+              <View style={styles.statusItem}>
+                <View>
+                  <Text style={styles.amountText}>$30</Text>
+                  <Text style={styles.dateText}>1/11/2024</Text>
+                </View>
+                <View style={[styles.statusBadge, styles.pendingBadge]}>
+                  <Text style={[styles.statusText, styles.pendingText]}>
+                    Pending
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.statusItem}>
+                <View>
+                  <Text style={styles.amountText}>$30</Text>
+                  <Text style={styles.dateText}>1/11/2024</Text>
+                </View>
+                <View style={[styles.statusBadge, styles.earnedBadge]}>
+                  <Text style={[styles.statusText, styles.earnedText]}>
+                    Earned
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.statusItem}>
+                <View>
+                  <Text style={styles.amountText}>$30</Text>
+                  <Text style={styles.dateText}>1/11/2024</Text>
+                </View>
+                <View style={[styles.statusBadge, styles.pendingBadge]}>
+                  <Text style={[styles.statusText, styles.pendingText]}>
+                    Pending
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.statusItem}>
+                <View>
+                  <Text style={styles.amountText}>$30</Text>
+                  <Text style={styles.dateText}>1/11/2024</Text>
+                </View>
+                <View style={[styles.statusBadge, styles.earnedBadge]}>
+                  <Text style={[styles.statusText, styles.earnedText]}>
+                    Earned
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
+      </View></SafeAreaView>
   );
 };
 
