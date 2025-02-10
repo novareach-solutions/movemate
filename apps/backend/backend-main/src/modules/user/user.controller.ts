@@ -42,7 +42,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   /**
    * Create a new user.
@@ -55,7 +55,7 @@ export class UserController {
     @Body() createUserDto: TCreateUser,
     @Req() request: ICustomRequest,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<IApiResponse<{ accessToken: string }>> {
+  ): Promise<IApiResponse<{ accessToken: string, userId: number }>> {
     const phoneNumberFromGuard = request.user.phoneNumber;
     if (
       createUserDto.phoneNumber &&
@@ -77,7 +77,7 @@ export class UserController {
       )}`,
     );
 
-    const { accessToken, refreshToken } =
+    const { accessToken, refreshToken, userId } =
       await this.userService.createUser(createUserDto);
 
     response.cookie("refresh_token", refreshToken, {
@@ -90,7 +90,7 @@ export class UserController {
     return {
       success: true,
       message: "User created successfully.",
-      data: { accessToken },
+      data: { accessToken, userId },
     };
   }
 

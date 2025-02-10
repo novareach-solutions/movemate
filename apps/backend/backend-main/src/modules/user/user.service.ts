@@ -15,7 +15,7 @@ import { TCreateUser, TGetUserProfile, TUpdateUser } from "./user.types";
 export class UserService {
   private readonly logger = new Logger(UserService.name);
 
-  constructor(private readonly tokenService: TokenService) {}
+  constructor(private readonly tokenService: TokenService) { }
 
   /**
    * Create a new user.
@@ -24,7 +24,7 @@ export class UserService {
    */
   async createUser(
     createUserDto: TCreateUser,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string, userId: number }> {
     const { email, phoneNumber, role } = createUserDto;
 
     const existingUser = await dbReadRepo(User).findOne({
@@ -49,7 +49,7 @@ export class UserService {
     );
     const refreshToken = this.tokenService.generateRefreshToken(user.id);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, userId: user.id };
   }
 
   /**
