@@ -1,14 +1,25 @@
 import { images } from "../assets/images/images";
 import { AuthScreens, ProfileScreens } from "../navigation/ScreenNames";
+
+//help and support image imports
+import UserIcon from "../assets/images/helpNSupport/userIcon.svg";
+import CancelNRefundIcon from "../assets/images/helpNSupport/CancelNRefund.svg";
+import BillingIcon from "../assets/images/helpNSupport/billingIcon.svg";
+import OngoingOrderIcon from "../assets/images/helpNSupport/ongoingOrder.svg";
+import PostOrderSupportIcon from "../assets/images/helpNSupport/postOrderSupport.svg";
+import PromoCodeIcon from "../assets/images/helpNSupport/promoCode.svg";
+import ReportIssueIcon from "../assets/images/helpNSupport/reportIssue.svg";
+import ThreeDotIcon from "../assets/images/helpNSupport/threeDot.svg";
+
 // home screen data
 export const gridButtons = [
     {
         id: 1,
         title: 'SEND A PACKAGE',
-        subTitle: 'Hassle-Free',
+        subTitle: 'Fast and secure delivery, every time.',
         image: images.PackageImg,
     },
-    { id: 2, title: 'BUY FROM STORE', subTitle: 'Easy Shop', image: images.Store },
+    { id: 2, title: 'BUY FROM STORE', subTitle: 'From store to your door, hassle-free.', image: images.Store },
     { id: 3, title: 'CAR TOWING', subTitle: 'Fast Tow', image: images.TowTruck },
     {
         id: 4,
@@ -115,6 +126,24 @@ export const packageOptions = [
         icon: images.otherIcon,
         title: 'Others'
     },
+];
+
+export const beforeYouSendPoints = [
+    'Avoid sending expensive or fragile items',
+    'Items should weigh less than 8 kg and fit comfortably in a car.',
+    'No alcohol, illegal, or restricted items',
+];
+
+export const supportOptions = [
+    { id: "1", title: "Account & Profile", icon: UserIcon },
+    { id: "2", title: "Payments & Billing", icon: BillingIcon },
+    { id: "3", title: "Cancellation & Refunds", icon: CancelNRefundIcon },
+    { id: "4", title: "Ongoing Orders", icon: OngoingOrderIcon },
+    { id: "5", title: "Post-Order Support", icon: PostOrderSupportIcon },
+    { id: "6", title: "Promo Codes & Referrals", icon: PromoCodeIcon },
+    { id: "7", title: "Reports & Issue Management", icon: ReportIssueIcon },
+    { id: "8", title: "Buy From A Store", icon: UserIcon },
+    { id: "9", title: "Others", icon: ThreeDotIcon },
 ];
 
 // export const savedLocationType = [

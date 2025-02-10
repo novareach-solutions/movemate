@@ -28,5 +28,19 @@ export const colors = {
   },
   grey: '#636464',
   blue: '#18487F',
-  whiteFd:'#FDFDFD'
+  whiteFd:'#FDFDFD',
+
+  // grey
+  grey_77:'#777777',
+
+  //green
+  green_72:'#1CA672',
+
+
+  //Red
+  red_00:'#D81A00',
+
+  //purple
+  purple_ad:'#8123AD'
+
 };

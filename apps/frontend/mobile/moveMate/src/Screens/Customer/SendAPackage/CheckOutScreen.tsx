@@ -7,9 +7,10 @@ import {
   ScrollView,
   SafeAreaView,
   Image,
+  TextInput,
 } from "react-native";
 import Header from "../../../components/Header";
-import { CustomerScreens } from "../../../navigation/ScreenNames";
+import { AuthScreens, CustomerScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../../theme/colors";
 import { deliveryInstructions } from "../../../constants/staticData";
@@ -21,10 +22,36 @@ import CancellationPolicyModal from "../../../components/Modals/CancellationPoli
 const CheckoutScreen = () => {
   const pickupLocationData = useAppSelector(state => state.deliverAPackage.pickupLocation);
   const dropLocationData = useAppSelector(state => state.deliverAPackage.dropLocation);
-  const [tip, setTip] = useState(null);
+  const [tip, setTip] = useState<number | "custom" | null>(null);
+  const [customTip, setCustomTip] = useState("");
   const [isCancelVisible,setIsCancelVisible] = useState(false);
-  const [selectedInstruction, setSelectedInstruction] = useState(null);
-  const navigation = useNavigation()
+  const [selectedInstructions, setSelectedInstructions] = useState<string[]>([]);
+  const navigation = useNavigation();
+
+
+  const toggleInstruction = (instructionLabel: string) => {
+    setSelectedInstructions((prev) => {
+      if (prev.includes(instructionLabel)) {
+        return prev.filter((label) => label !== instructionLabel);
+      } else {
+        return [...prev, instructionLabel];
+      }
+    });
+  };
+
+  const isDisabled = (instructionLabel: string) => {
+    if (selectedInstructions.includes("OTP Verification")) {
+      return instructionLabel === "Drop-off at the door" || instructionLabel === "Avoid calling";
+    }
+    if (selectedInstructions.includes("Avoid calling")) {
+      return instructionLabel === "OTP Verification";
+    }
+    if (selectedInstructions.includes("Drop-off at the door")) {
+      return instructionLabel === "OTP Verification";
+    }
+    return false;
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -33,12 +60,12 @@ const CheckoutScreen = () => {
         {/* From and To Section */}
         <View style={styles.addressContainer}>
           <View style={styles.addressRow}>
-            <Text style={styles.label}>From:</Text>
+            <Text style={styles.fromText}>From:</Text>
             <Text style={styles.address}>{pickupLocationData?.address}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.addressRow}>
-            <Text style={styles.label}>To:</Text>
+            <Text style={styles.toText}>To:</Text>
             <Text style={styles.address}>{dropLocationData?.address}</Text>
           </View>
         </View>
@@ -78,29 +105,29 @@ const CheckoutScreen = () => {
         decelerationRate="fast"
         snapToInterval={120} // Adjust card width
       >
-        {deliveryInstructions.map((instruction, index) => {
-          const isSelected = selectedInstruction === instruction.label;
-          return (
-            <TouchableOpacity
-              key={index}
-              style={[styles.tag, isSelected && styles.tagSelected]}
-              onPress={() =>
-                setSelectedInstruction(isSelected ? null : instruction.label)
-              }
-            >
-              <Image
-                source={instruction.icon}
-                style={[
-                  styles.icon,
-                  { tintColor: isSelected ? "#8123AD" : "#333" }, // Change color dynamically
-                ]}
-              />
-              <Text style={isSelected ? styles.tagTextSelected : styles.tagText}>
-                {instruction.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+     {deliveryInstructions.map((instruction, index) => {
+              const isSelected = selectedInstructions.includes(instruction.label);
+              const disabled = isDisabled(instruction.label);
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.tag, isSelected && styles.tagSelected, disabled && styles.tagDisabled]}
+                  onPress={() => !disabled && toggleInstruction(instruction.label)}
+                  disabled={disabled}
+                >
+                  <Image
+                    source={instruction.icon}
+                    style={[
+                      styles.icon,
+                      { tintColor: isSelected ? "#8123AD" : disabled ? "#ccc" : "#333" },
+                    ]}
+                  />
+                  <Text style={isSelected ? styles.tagTextSelected : disabled ? styles.tagTextDisabled : styles.tagText}>
+                    {instruction.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
       </ScrollView>
       </View>
         </View>
@@ -117,27 +144,36 @@ const CheckoutScreen = () => {
           </View>
 
           <View style={styles.tipContainer}>
-            {[2, 4, 6].map((amount) => (
-              <TouchableOpacity
-                key={amount}
-                style={[
-                  styles.tipButton,
-                  tip === amount && styles.tipButtonSelected,
-                ]}
-                onPress={() => setTip(amount)}
+          {[2, 4, 6, "custom"].map((amount) => (
+            <TouchableOpacity
+              key={amount}
+              style={[
+                styles.tipButton,
+                tip === amount && styles.tipButtonSelected,
+              ]}
+              onPress={() => setTip(amount)}
+            >
+              <Text
+                style={
+                  tip === amount
+                    ? styles.tipTextSelected
+                    : styles.tipText
+                }
               >
-                <Text
-                  style={
-                    tip === amount
-                      ? styles.tipTextSelected
-                      : styles.tipText
-                  }
-                >
-                  ${amount}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                {amount === "custom" ? "Custom" : `$${amount}`}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        {tip === "custom" && (
+          <TextInput
+            style={styles.customTipInput}
+            placeholder="Enter custom amount"
+            keyboardType="numeric"
+            value={customTip}
+            onChangeText={setCustomTip}
+          />
+        )}
         </View>
         <Text style={formStyles.inputLabel}>Bill Details</Text>
         {/* Bill Details Section */}
@@ -157,6 +193,10 @@ const CheckoutScreen = () => {
           <Text style={styles.cancelPolicyBtnTxt}>READ CANCELATION POLICY</Text>
         </TouchableOpacity>
         </View>
+
+         <Text>By confirming, I agree that this order does not include illegal or restricted items.   <TouchableOpacity onPress={() => {
+          navigation.navigate(AuthScreens.PrivacyPolicyScreen)
+        }}><Text style={styles.purpleText}>View T&C</Text></TouchableOpacity></Text>
 
         {/* Payment Button */}
         <TouchableOpacity style={styles.paymentButton} onPress={() => {
@@ -179,10 +219,24 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
   },
+  tagTextDisabled: { color: "#999",  fontSize: 12, },
+  tagDisabled: { backgroundColor: "#e0e0e0" },
   pickupContainer: {
     backgroundColor: '#DDFBEF',
     padding: 10,
     width: 160
+  },
+  purpleText:{
+    color:colors.purple,
+    fontWeight:'bold'
+  },
+  fromText:{
+    color:colors.green_72,
+    fontWeight:'bold'
+  },
+  toText:{
+    color:colors.red_00,
+    fontWeight:'bold'
   },
   pickupWrapper: {
     marginTop: 10,
@@ -303,6 +357,7 @@ const styles = StyleSheet.create({
   tipContainer: {
     flexDirection: "row",
     marginTop: 8,
+    justifyContent:'space-between'
   },
   tipButton: {
     backgroundColor: colors.whiteFd,
@@ -311,7 +366,8 @@ const styles = StyleSheet.create({
     color: '#232525',
     padding: 12,
     borderRadius: 12,
-    marginRight: 8,
+    // marginRight: 8,
+  
   },
   tipButtonSelected: {
     backgroundColor: "#FCF4FF",
@@ -336,6 +392,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightGreen,
     padding: 16,
     borderRadius: 8,
+    marginVertical:10,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -343,6 +400,8 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontWeight: "bold",
   },
+  customTipInput: { borderWidth: 1, borderColor: "#ccc", borderRadius: 10, padding: 10, marginTop: 10, textAlign: "center" },
+
 });
 
 export default CheckoutScreen;

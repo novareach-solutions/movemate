@@ -7,7 +7,7 @@ import {typography} from '../theme/typography';
 const PrivacyPolicyScreen = () => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
-      <Header />
+      <Header isBack />
       <View style={{padding: 15}}>
         <Text style={styles.headerTitle}>Privacy Policy</Text>
         <Text style={styles.privacyHeader}>Information We Collect</Text>

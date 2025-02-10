@@ -12,6 +12,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../../../assets/images/images";
@@ -19,11 +20,13 @@ import Header from "../../../components/Header";
 import LocationModal, { ILocation } from "../../../components/Modals/LocationModal";
 import PackageTypeModal from "../../../components/Modals/PackageTypeModal"; // New import
 import SenderReceiverModal from "../../../components/Modals/SenderRecieverModal";
-import { CustomerScreens } from "../../../navigation/ScreenNames";
+import { AuthScreens, CustomerScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import { useAppDispatch } from "../../../redux/hook";
 import { createOrder, updatePickupLoaction, updatePkgId } from "../../../redux/slices/deliverAPackageSlice";
 import { colors } from "../../../theme/colors";
+import { beforeYouSendPoints } from "../../../constants/staticData";
+import { typography } from "../../../theme/typography";
 
 const EnterLocationDetailsScreen = () => {
   interface orderPayload {
@@ -197,6 +200,13 @@ const EnterLocationDetailsScreen = () => {
     setPickupNotes("");
   };
 
+   const renderPoint = ({ item }) => (
+          <View style={styles.pointContainer}>
+              <images.greenTick style={styles.checkmark} />
+              <Text style={styles.pointText}>{item}</Text>
+          </View>
+      );
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
       <Header isBack bgColor="#F8F8F8" />
@@ -303,8 +313,21 @@ const EnterLocationDetailsScreen = () => {
           />
         </View>
 
+         <View style={styles.sectionContainer}>
+                            <Text style={styles.sectionTitle}>Before you send</Text>
+                            <FlatList
+                                data={beforeYouSendPoints}
+                                renderItem={renderPoint}
+                                keyExtractor={(item, index) => index.toString()}
+                                style={styles.listContainer}
+                            />
+                        </View>
+
         {/* Confirm Button */}
          <View style={styles.footer}>
+          <Text>By confirming, I agree that this order does not include illegal or restricted items. <TouchableOpacity onPress={() => {
+                    navigation.navigate(AuthScreens.PrivacyPolicyScreen)
+                  }}><Text style={styles.purpleText}>View T&C</Text></TouchableOpacity></Text>
         <TouchableOpacity style={styles.confirmButton} onPress={confirmOrder}>
           <Text style={styles.confirmButtonText}>Confirm Order</Text>
         </TouchableOpacity>
@@ -349,6 +372,7 @@ const EnterLocationDetailsScreen = () => {
         <PackageTypeModal
           isVisible={isPackageTypeModalVisible}
           onClose={closePackageTypeModal}
+          packageType={packageType}
         />
       </ScrollView></KeyboardAvoidingView>
     </SafeAreaView>
@@ -362,6 +386,11 @@ const EnterLocationDetailsScreen = () => {
     headerContainer: {
       marginBottom: 16,
     },
+    purpleText:{
+      color:colors.purple,
+      fontWeight:'bold',
+      top:3
+    },
     headerTitle: {
       fontSize: 20,
       fontWeight: "bold",
@@ -374,6 +403,36 @@ const EnterLocationDetailsScreen = () => {
       color: "#9E9E9E", // Gray color
       textAlign: "left",
     },
+    pointContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 10,
+  },
+   checkmark: {
+          fontSize: 16,
+          color: colors.green,
+          marginRight: 10,
+      },
+      pointText: {
+          fontSize: typography.fontSize.medium,
+          color: colors.text.primary,
+      },
+      sectionContainer: {
+        borderWidth: 1, 
+        borderColor: colors.border.lightGray, 
+        borderRadius: 12, 
+        padding: 16, 
+        backgroundColor: colors.white, 
+        marginBottom: 20, 
+    },
+    listContainer: {
+      marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: typography.fontSize.medium,
+    fontWeight: 'bold',
+    marginBottom: 10,
+},
     stepsContainer: {
       flexDirection: "row",
       alignItems: "flex-start",

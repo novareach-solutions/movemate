@@ -13,6 +13,7 @@ interface AuthState {
   isLogin:boolean;
   loading: boolean;
   error: string | null;
+  currentLocation:any;
 }
 
 // Initial state
@@ -21,6 +22,7 @@ const initialState: AuthState = {
   isLogin:false,
   loading: false,
   error: null,
+  currentLocation:null
 };
 
 // Payload structure for signup
@@ -196,6 +198,9 @@ const authSlice = createSlice({
     },
     setIsLogin:(state,action)=>{
       state.isLogin = action.payload;
+    },
+    updateCurrentLocation:(state,action)=>{
+      state.currentLocation = action.payload
     }
     
   },
@@ -217,5 +222,5 @@ const authSlice = createSlice({
 });
 
 // Export the reducer
-export const { logout,setIsLogin } = authSlice.actions;
+export const { logout,setIsLogin ,updateCurrentLocation} = authSlice.actions;
 export default authSlice.reducer;

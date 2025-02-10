@@ -33,6 +33,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formStyles } from "../../theme/form";
+import { mapSuggestions } from "../../api/mapboxAPI";
 
 Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
@@ -98,20 +99,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
     suburb: "",        // Added
     postalCode: "",    // Added
     landmark: "",
+    saveAs: ""
   });
   const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    setTimeout(() => {
-
-      requestLocationpermission();
-    }, 1000);
-  }, [])
-
-  const responseCallback = (placenameData: any) => {
-    let getPlacename = placenameData?.data?.features[0]?.place_name;
-    console.log('placenameData', placenameData)
-  };
 
   const addressLine1 = watch("addressLine1");
   const suburb = watch("suburb");
@@ -119,11 +109,11 @@ const LocationModal: React.FC<LocationModalProps> = ({
   const postalCode = watch("postalCode");
 
   const requestLocationpermission = () => {
-    // if (locationStatus) {
-    //   getCurrentLocation(callback);
-    // } else {
+    if (locationStatus) {
+      getCurrentLocation(callback);
+    } else {
     getLocationPermission();
-    // }
+    }
   };
 
   const getLocationPermission = async () => {
@@ -138,6 +128,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
     if (data?.coords) {
       const latitude = await data?.coords?.latitude;
       const longitude = await data?.coords?.longitude;
+      // setCoordinates([longitude,latitude]);
+      // setIsMapModalVisible(true);
+      mapSuggestions(longitude,latitude,responseCallback);
       const altitude = await data?.coords?.altitude;
       const horizontal_accuracy = await data?.coords?.accuracy;
       const vertical_accuracy = await data?.coords?.altitudeAccuracy;
@@ -149,6 +142,26 @@ const LocationModal: React.FC<LocationModalProps> = ({
       }
     }
   };
+
+    const responseCallback = async (data: any) => {
+      const locationData = {
+        name: data.text,
+        address: data.place_name,
+        latitude: data.center[1],
+        longitude: data.center[0],
+        suburb: data.context?.find((c: any) => c.id.includes("place"))?.text || "",
+        state: data.context?.find((c: any) => c.id.includes("region"))?.text || "",
+        postalCode: data.context?.find((c: any) => c.id.includes("postcode"))?.text || "",
+      }
+      handleSelectLocation(locationData);
+      setSelectedLocation(locationData);
+      if (type === 'pickup') {
+        console.log('pickup')
+        dispatch(updatePickupLoaction(locationData));
+      } else {
+        dispatch(updateDropLoaction(locationData));
+      }
+    }
 
   // Example saved locations array
   const savedLocations: LocationItem[] = [
@@ -214,8 +227,14 @@ const LocationModal: React.FC<LocationModalProps> = ({
       suburb: "",        // Reset
       postalCode: "",    // Reset
       landmark: "",
+      saveAs: ''
     });
   };
+
+  const handleAddressDetailEdit = () => {
+    setIsMapModalVisible(true);
+    setIsAddressDetailsVisible(false);
+  }
 
 
   return (
@@ -236,6 +255,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
         </View>
 
         {/* ######### Current Location Section ################# */}
+        <TouchableOpacity onPress={requestLocationpermission}>
         <View style={styles.currentLocation}>
           <Image source={images.gps} style={styles.locationIcon} />
           <View>
@@ -243,6 +263,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
             <Text style={styles.gpsText}>Using GPS</Text>
           </View>
         </View>
+        </TouchableOpacity>
 
         {/* Saved Locations or Search Results */}
         <FlatList
@@ -309,7 +330,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
               <View style={styles.mapContainer}>
                 <View>
                   <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
-                    <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [0, 0]} />
+                    <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [151.209900, -33.865143]} />
 
                     {coordinates && (
                       <Mapbox.PointAnnotation id={`marker-${coordinates[0]}-${coordinates[1]}`} coordinate={coordinates}>
@@ -376,7 +397,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
                 <ScrollView contentContainerStyle={styles.addressForm}>
                   <View style={styles.addMapContainer}>
                     <Mapbox.MapView style={styles.detailAddressMapImage} styleURL="mapbox://styles/mapbox/light-v11">
-                      <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [0, 0]} />
+                      <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [151.209900, -33.865143]} />
 
                       {coordinates && (
                         <Mapbox.PointAnnotation id={`marker-${coordinates[0]}-${coordinates[1]}`} coordinate={coordinates}>
@@ -394,7 +415,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
                         <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
                       </Svg>
                       <Text style={styles.addressTitle}>{selectedLocation?.name}</Text>
-                      <TouchableOpacity>
+                      <TouchableOpacity onPress={handleAddressDetailEdit}>
                         <Text style={styles.editText1}>Edit</Text>
                       </TouchableOpacity>
                     </View>
@@ -417,19 +438,19 @@ const LocationModal: React.FC<LocationModalProps> = ({
                   </View>
 
                   <View style={formStyles.inputWrapper}>
-                  <Text style={formStyles.inputLabel}>Address Line 2<Text style={styles.optional}>(optional)</Text></Text>
-                  <TextInput
-                    style={formStyles.input}
-                    placeholder="Address Line 2 (Optional)"
-                    value={addressDetails.addressLine2}
-                    placeholderTextColor={colors.grey}
-                    onChangeText={(text) =>
-                      setAddressDetails({
-                        ...addressDetails,
-                        addressLine2: text,
-                      })
-                    }
-                  />
+                    <Text style={formStyles.inputLabel}>Address Line 2<Text style={styles.optional}>(optional)</Text></Text>
+                    <TextInput
+                      style={formStyles.input}
+                      placeholder="Address Line 2 (Optional)"
+                      value={addressDetails.addressLine2}
+                      placeholderTextColor={colors.grey}
+                      onChangeText={(text) =>
+                        setAddressDetails({
+                          ...addressDetails,
+                          addressLine2: text,
+                        })
+                      }
+                    />
                   </View>
 
                   <View style={formStyles.inputWrapper}>
@@ -500,27 +521,45 @@ const LocationModal: React.FC<LocationModalProps> = ({
                     <Text style={styles.checkboxText}>Add to saved addresses</Text>
                   </View>
                   {/* Address Tags */}
-                  <View style={styles.tagsContainer}>
-                    {["Home", "Work", "Other"].map((tag) => (
-                      <TouchableOpacity
-                        key={tag}
-                        style={[
-                          styles.tag,
-                          selectedTag === tag && styles.selectedTag,
-                        ]}
-                        onPress={() => setSelectedTag(tag)}
-                      >
-                        <Text
+                  {
+                    isSaved && <View style={styles.tagsContainer}>
+                      {["Home", "Work", "Other"].map((tag) => (
+                        <TouchableOpacity
+                          key={tag}
                           style={[
-                            styles.tagText,
-                            selectedTag === tag && styles.selectedTagText,
+                            styles.tag,
+                            selectedTag === tag && styles.selectedTag,
                           ]}
+                          onPress={() => setSelectedTag(tag)}
                         >
-                          {tag}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                          <Text
+                            style={[
+                              styles.tagText,
+                              selectedTag === tag && styles.selectedTagText,
+                            ]}
+                          >
+                            {tag}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  }
+
+                  {
+                    selectedTag === 'Other' && <TextInput
+                      style={formStyles.input}
+                      placeholder="Save As"
+                      placeholderTextColor={colors.grey}
+                      value={addressDetails.saveAs}
+                      onChangeText={(text) =>
+                        setAddressDetails({
+                          ...addressDetails,
+                          saveAs: text,
+                        })
+                      }
+                    />
+                  }
+
                   <View style={styles.cnfAddress}>
                     <TouchableOpacity
                       style={styles.confirmButton}

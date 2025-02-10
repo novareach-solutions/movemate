@@ -1,4 +1,5 @@
-const baseURL = 'http://18.225.92.240:3000';
+// const baseURL = 'http://18.225.92.240:3000';
+const baseURL = 'http://ec2-18-225-92-240.us-east-2.compute.amazonaws.com:3000';
 
 const createEndpoint = (path: string) => `${baseURL}${path}`;
 
@@ -19,6 +20,7 @@ const apiEndpoints = {
     leaveAReview:createEndpoint('/order/send-package/:orderId/review'),
     getOrderDetails:createEndpoint('/order/send-package/:orderId'),
     assignRider:createEndpoint('assign-rider/:orderId'),
+    currentStatus:createEndpoint('/user/currentstatus')
   };
   
   export default apiEndpoints;

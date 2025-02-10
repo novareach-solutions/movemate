@@ -16,7 +16,7 @@ export const mapSuggestions = (longitude:number, latitude:number, responseCallba
       // access_token: tokenmapbox,
     })
     .then(r => {
-      responseCallback(r);
+      responseCallback(r.data.features?.[0]);
     })
     .catch(e => console.log('--------e', e));
 };

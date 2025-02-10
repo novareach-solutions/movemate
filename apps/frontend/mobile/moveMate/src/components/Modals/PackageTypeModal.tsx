@@ -19,16 +19,18 @@ type SvgComponent = React.FC<SvgProps>;
 interface PackageTypeModalProps {
   isVisible: boolean;
   onClose: (selectedType?: string) => void;
+  packageType:string;
 }
 
 const PackageTypeModal: React.FC<PackageTypeModalProps> = ({
   isVisible,
   onClose,
+  packageType
 }) => {
-  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(packageType || null);
   const [isOtherSelected, setIsOtherSelected] = useState(false);
   const [otherType, setOtherType] = useState('');
-
+  console.log('packageType', packageType)
   const handleSelect = (type: string) => {
     setSelectedType(type);
     if (type === 'Others') {

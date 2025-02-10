@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,21 +12,27 @@ import {
   NativeSyntheticEvent,
   ImageSourcePropType,
 } from 'react-native';
-import {typography} from '../theme/typography';
-import {colors} from '../theme/colors';
-import {images} from '../assets/images/images';
+import { typography } from '../theme/typography';
+import { colors } from '../theme/colors';
+import { images } from '../assets/images/images';
 import { useNavigation } from '@react-navigation/native';
 import { AuthScreens, CustomerScreens, ProfileScreens } from '../navigation/ScreenNames';
 import { useAppDispatch } from '../redux/hook';
-import { setIsLogin } from '../redux/slices/authSlice';
+import { setIsLogin, updateCurrentLocation } from '../redux/slices/authSlice';
 import { SvgProps } from 'react-native-svg';
+import Onboarding1 from "../assets/images/onboarding/onboarding1.png";
+import Onboarding2 from "../assets/images/onboarding/onboarding2.png";
+import Onboarding3 from "../assets/images/onboarding/onboarding3.png";
+import Onboarding4 from "../assets/images/onboarding/onboarding4.png";
+import { getCurrentLocation, requestLocation } from '../utils/helpers';
+import { mapSuggestions } from '../api/mapboxAPI';
 type SvgComponent = React.FC<SvgProps>;
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 interface Slide {
   id: number;
   title: string;
   subtitle: string;
-  image: ImageSourcePropType;
+  image: any;
   description: string;
 }
 
@@ -35,7 +41,7 @@ const slides: Slide[] = [
     id: 0,
     title: 'Send a',
     subtitle: 'Package',
-    image: images.PackageArrived,
+    image: Onboarding1,
     description:
       'Quickly send packages with ease. Choose pickup and delivery, and we handle the rest',
   },
@@ -43,7 +49,7 @@ const slides: Slide[] = [
     id: 1,
     title: 'Buy from a',
     subtitle: 'Store',
-    image: images.Trolley,
+    image: Onboarding2,
     description:
       'Shop from your favorite stores effortlessly. Select, pay, and have it delivered right to your door.',
   },
@@ -51,7 +57,7 @@ const slides: Slide[] = [
     id: 2,
     title: 'Car',
     subtitle: 'Towing',
-    image: images.CarTowing,
+    image: Onboarding3,
     description:
       'Shop from your favorite stores effortlessly. Select, pay, and have it delivered right to your door.',
   },
@@ -59,7 +65,7 @@ const slides: Slide[] = [
     id: 3,
     title: 'Home',
     subtitle: 'Moving',
-    image: images.HouseMoving,
+    image: Onboarding4,
     description:
       'Quickly send packages with ease. Choose pickup and delivery, and we handle the rest',
   },
@@ -75,6 +81,59 @@ const Onboarding: React.FC = () => {
     setCurrentSlideIndex(currentIndex);
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+
+      requestLocationpermission();
+    }, 1000);
+  }, [])
+
+  const requestLocationpermission = () => {
+    // if (locationStatus) {
+    //   getCurrentLocation(callback);
+    // } else {
+    getLocationPermission();
+    // }
+  };
+
+  const getLocationPermission = async () => {
+    const isAllowed = await requestLocation();
+    if (isAllowed) {
+      await getCurrentLocation(callback);
+    }
+  };
+
+  const callback = async (data: any) => {
+    console.log('-----callback------', data);
+    if (data?.coords) {
+      const latitude = await data?.coords?.latitude;
+      const longitude = await data?.coords?.longitude;
+      mapSuggestions(longitude, latitude, responseCallback)
+      const altitude = await data?.coords?.altitude;
+      const horizontal_accuracy = await data?.coords?.accuracy;
+      const vertical_accuracy = await data?.coords?.altitudeAccuracy;
+      const heading = await data?.coords?.heading;
+      const timestamp = await data?.timestamp;
+      if (latitude && longitude) {
+        const isAllowed = await requestLocation();
+
+      }
+    }
+  };
+
+  const responseCallback = async (data: any) => {
+    const locationData = {
+      name: data.text,
+      address: data.place_name,
+      latitude: data.center[1],
+      longitude: data.center[0],
+      suburb: data.context?.find((c: any) => c.id.includes("place"))?.text || "",
+      state: data.context?.find((c: any) => c.id.includes("region"))?.text || "",
+      postalCode: data.context?.find((c: any) => c.id.includes("postcode"))?.text || "",
+    }
+    dispatch(updateCurrentLocation(locationData));
+  }
+
   const handleNavigation = () => {
     dispatch(setIsLogin(false))
     navigation.navigate(AuthScreens.LoginScreen);
@@ -83,7 +142,7 @@ const Onboarding: React.FC = () => {
   const handleLogin = () => {
     dispatch(setIsLogin(true))
     navigation.navigate(AuthScreens.LoginScreen);
-    // navigation.navigate(CustomerScreens.EnterLocationDetailsScreen);
+    // navigation.navigate(CustomerScreens.DeliveryScreen);
     // navigation.navigate(ProfileScreens.ProfileScreen);
   };
   const Footer = () => (
@@ -99,26 +158,28 @@ const Onboarding: React.FC = () => {
           />
         ))}
       </View>
-      <TouchableOpacity onPress={handleNavigation} style={styles.button}>
-        <Text style={styles.buttonText}>
-          {currentSlideIndex === slides.length - 1
-            ? 'Get Started'
-            : 'Continue >'}
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={handleLogin}
-        style={[
-          styles.button,
-          {
-            backgroundColor: colors.lightButtonBackground,
-            bottom: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
-          },
-        ]}>
-        <Text style={styles.skip}>Skip</Text>
-      </TouchableOpacity>
+      <View style={styles.btnContainer}>
+        <TouchableOpacity onPress={handleNavigation} style={styles.button}>
+          <Text style={styles.buttonText}>
+            {currentSlideIndex === slides.length - 1
+              ? 'Get Started'
+              : 'Continue >'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleLogin}
+          style={[
+            styles.button,
+            {
+              backgroundColor: colors.lightButtonBackground,
+              bottom: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+          ]}>
+          <Text style={styles.skip}>Skip</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -130,20 +191,20 @@ const Onboarding: React.FC = () => {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={updateSlidePosition}
-        renderItem={({item}) => {
+        renderItem={({ item }) => {
           const SvgImage: SvgComponent = item.image;
-          return(
+          return (
             <View style={styles.slide}>
-              <SvgImage width={width * 0.7} height={height * 0.6}/>
-            {/* <Image source={item.image} style={styles.image} /> */}
-            <Text style={styles.title}>
-              {item.title} <Text style={styles.subtitle}>{item.subtitle}</Text>
-            </Text>
-            <Text style={styles.description}>{item.description}</Text>
-          </View>
+              {/* <SvgImage /> */}
+              <Image source={item.image} style={styles.image} />
+              <Text style={styles.title}>
+                {item.title} <Text style={styles.subtitle}>{item.subtitle}</Text>
+              </Text>
+              <Text style={styles.description}>{item.description}</Text>
+            </View>
           )
         }
-        
+
         }
       />
       <Footer />
@@ -152,32 +213,35 @@ const Onboarding: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: colors.white},
-  slide: {width, alignItems: 'center', justifyContent: 'center'},
-  // image: {height: height * 0.5, width: width * 0.8, resizeMode: 'contain'},
+  container: { flex: 1, backgroundColor: colors.white },
+  slide: { width },
+  image: { height: height * 0.53, width: "100%", resizeMode: 'contain' },
   title: {
     fontSize: typography.fontSize.large,
     fontFamily: typography.fontFamily.regular,
     color: colors.text.primary,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    paddingHorizontal: 20,
   },
-  subtitle: {color: colors.purple},
+  btnContainer: { width, alignItems: 'center', justifyContent: 'space-between', height: 130 },
+  subtitle: { color: colors.purple },
   description: {
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
-    textAlign: 'center',
+    // textAlign: 'center',
     marginTop: 10,
     color: colors.text.primary,
     paddingHorizontal: 20,
+    paddingRight: 100,
     fontWeight: typography.fontWeight.medium as TextStyle['fontWeight'],
   },
   footer: {
-    height: height * 0.25,
-    justifyContent: 'space-between',
+    height: height * 0.35,
+    justifyContent: 'space-around',
     alignItems: 'center',
-    paddingVertical:20
+    paddingVertical: 20
   },
-  indicatorContainer: {flexDirection: 'row', marginTop: 10},
+  indicatorContainer: { flexDirection: 'row', marginTop: 10 },
   indicator: {
     height: 10,
     width: 10,
@@ -185,10 +249,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: 5,
   },
-  activeIndicator: {backgroundColor: colors.purple},
+  activeIndicator: { backgroundColor: colors.purple },
   button: {
     backgroundColor: colors.purple,
-    width: '80%',
+    width: '90%',
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
@@ -202,7 +266,6 @@ const styles = StyleSheet.create({
   },
   skip: {
     color: colors.purple,
-    marginTop: 10,
     fontSize: typography.fontSize.medium,
     fontWeight: typography.fontWeight.medium as TextStyle['fontWeight'],
   },

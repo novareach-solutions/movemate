@@ -63,9 +63,10 @@ useEffect(() => {
   };
   useEffect(() => {
     setTimeout(() => {
-      if (pickupLocationData?.latitude && pickupLocationData?.longitude && dropLocationData?.latitude && dropLocationData?.longitude) {
+      // if (pickupLocationData?.latitude && pickupLocationData?.longitude && dropLocationData?.latitude && dropLocationData?.longitude) {
         fetchRoute();
-      }
+        console.log('executedRoute')
+      // }
     }, 4000);
     
   }, [pickupLocation,dropLocation]);
@@ -100,6 +101,7 @@ useEffect(() => {
 
   const viewDetails = () => {
     navigation.navigate(CustomerScreens.OrderDetails);
+    // navigation.navigate(CustomerScreens.ReportAnIssue);
   }
 
   return (
@@ -108,7 +110,7 @@ useEffect(() => {
       <View style={styles.mapContainer}>
         <View>
           <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
-            <Mapbox.Camera zoomLevel={12} centerCoordinate={pickupLocation} />
+            <Mapbox.Camera zoomLevel={12} centerCoordinate={pickupLocation || [151.209900, -33.865143]} />
 
             {/* Pickup Marker */}
             <Mapbox.PointAnnotation id="pickup" coordinate={pickupLocation}>

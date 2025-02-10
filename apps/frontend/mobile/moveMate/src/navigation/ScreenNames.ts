@@ -53,7 +53,10 @@ export const CustomerScreens = {
   DeliveryScreen:'DeliveryScreen',
   CancelOrderScreen:'CancelOrderScreen',
   CancelSuccessScreen:'CancelSuccessScreen',
-  OrderDetails:'OrderDetails'
+  OrderDetails:'OrderDetails',
+  OrderCompletedScreen:'OrderCompleted',
+  ReportAnIssue:'Report an issue ',
+  HelpSupportScreen:'HelpSupportScreen'
 }
 
 export const ProfileScreens = {

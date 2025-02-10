@@ -5,7 +5,7 @@ import { View, TouchableOpacity, StyleSheet, Image, Text, TextStyle } from 'reac
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import { images } from '../assets/images/images';
-import { AppScreens, AuthScreensParamList } from '../navigation/ScreenNames';
+import { AppScreens, AuthScreensParamList, CustomerScreens } from '../navigation/ScreenNames';
 import { typography } from '../theme/typography';
 
 interface HeaderProps {
@@ -15,14 +15,18 @@ interface HeaderProps {
   title?: string;
   earningScreen?: boolean;
   bgColor?:string;
+  help?:boolean;
   onClickButton?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScreen, bgColor = 'white',onClickButton }) => {
+const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScreen, bgColor = 'white',help,onClickButton }) => {
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
 
   const handleHomePress = () => {
     navigation.navigate(AppScreens.Profile);
+  };
+  const handleHelpPress = () => {
+    navigation.navigate(CustomerScreens.HelpSupportScreen);
   };
 
   return (
@@ -63,6 +67,15 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScree
       {title && (
         <Text style={styles.title}>{title}</Text>
       )}
+
+      {
+        help && <TouchableOpacity style={styles.helpButton} onPress={handleHelpPress}>
+          <View style={styles.helpButtonWrapper}>
+
+         <images.helpIconPurple/> <Text style={styles.helpText}>Help</Text>
+          </View>
+      </TouchableOpacity>
+      }
     </View>
   );
 };
@@ -104,6 +117,19 @@ const styles = StyleSheet.create({
     // Position it to the right side
     position: 'absolute',
     left: 20,
+  },
+  helpButton:{
+    position:'absolute',
+    right:10,
+    padding:10,
+  },
+  helpText:{
+    color:colors.purple,
+    fontWeight:'bold',
+    marginLeft:5
+  },
+  helpButtonWrapper:{
+    flexDirection:'row'
   },
   profileIcon: {
     resizeMode: 'contain',

@@ -177,6 +177,26 @@ export const getOrederDetails = createAsyncThunk(
     }
   }
 );
+export const getOrderStatus = createAsyncThunk(
+  apiEndpoints.currentStatus,
+  async () => {
+    try {
+
+      const response = await apiClient.get(apiEndpoints.currentStatus);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // Axios error: Has response, request, and other properties
+        console.error('API Error:', error.response?.data || error.message);
+        throw error;
+      } else {
+        // Non-Axios error: Handle accordingly
+        console.error('Unexpected Error:', error);
+        throw new Error('An unexpected error occurred');
+      }
+    }
+  }
+);
 
 const deliverAPackage = createSlice({
   name: 'deliverAPackage',

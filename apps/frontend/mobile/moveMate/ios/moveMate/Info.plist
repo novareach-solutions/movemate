@@ -33,14 +33,18 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
- <string>Always Location access required to track your activity</string>
- <key>NSLocationAlwaysUsageDescription</key>
- <string>Always Location access required to track your activity</string>
- <key>NSLocationWhenInUseUsageDescription</key>
- <string>Always Location access required to track your activity</string>
- <key>NSMotionUsageDescription</key>
- <string>Always Location access required to track your activity</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>We need your location to provide better services.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>We need your location even when the app is in background.</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app requires access to your location.</string>
+
+<key>NSCameraUsageDescription</key>
+  <string>We need your Camera to provide better services.</string>
+  <key>NSContactsUsageDescription</key>
+  <string>We need your Contacts to provide better services.</string>
+
 	<key>UIAppFonts</key>
 	<array>
 		<string>Inter-Italic-VariableFont_opsz,wght.ttf</string>

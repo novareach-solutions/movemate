@@ -14,22 +14,16 @@ import { images } from "../../../assets/images/images";
 import { CustomerScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../../theme/colors";
+import { useAppSelector } from "../../../redux/hook";
 
 const OrderDetails = () => {
-  const [tip, setTip] = useState(null);
-  const [selectedInstruction, setSelectedInstruction] = useState(null);
   const navigation=useNavigation()
-
-  const deliveryInstructions = [
-    { label: "OTP Verification", icon: images.pickUpNotesIcon },
-    { label: "Do not ring the bell", icon: images.doNotRing },
-    { label: "Drop-off at the door", icon: images.doorDropOff },
-    { label: "Avoid calling", icon: images.phone },
-  ];
+    const pickupLocationData = useAppSelector(state => state.deliverAPackage.pickupLocation);
+    const dropLocationData = useAppSelector(state => state.deliverAPackage.dropLocation);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header isBack title="Order Detail" bgColor={colors.lightGrey} />
+      <Header isBack title="Order Detail" bgColor={colors.lightGrey} help />
       <View style={styles.container}>
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -39,14 +33,14 @@ const OrderDetails = () => {
       <View style={styles.addressContainer}>
         <Text style={styles.label}>
           <Text style={{ color: 'green', fontWeight: 'bold' }}>From: </Text>
-          120 Waldeck Street, 26301 (home)
+          {pickupLocationData?.address}
         </Text>
 
         <View style={styles.dashedLine}></View>
 
         <Text style={styles.label}>
           <Text style={{ color: 'red', fontWeight: 'bold' }}>To: </Text>
-          120 Berkshire RG1, 2RI (work)
+          {dropLocationData?.address}
         </Text>
       </View>
 

@@ -13,15 +13,10 @@ import { images } from '../../../assets/images/images';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CustomerScreens, ProfileScreens } from '../../../navigation/ScreenNames';
 import { useNavigation } from '@react-navigation/native';
+import { beforeYouSendPoints } from '../../../constants/staticData';
 
 const SAPDetailsScreen = () => {
     const address = '123 Main Street, Springfield, USA';
-
-    const beforeYouSendPoints = [
-        'Avoid sending expensive or fragile items',
-        'Items should weigh less than 8 kg and fit comfortably in a car.',
-        'No alcohol, illegal, or restricted items',
-    ];
 
     const navigation=useNavigation()
 

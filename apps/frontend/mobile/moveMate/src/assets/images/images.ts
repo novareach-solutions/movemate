@@ -3,7 +3,6 @@ import introImage2 from '../images/IntroImage2.png';
 import introImage3 from '../images/IntroImage3.png';
 import introImage4 from '../images/IntroImage4.png';
 import logo from '../images/Logo.png';
-import location from '../images/Location.png';
 import Location from '../images/Location.svg';
 import notificatons from './Notification.png';
 import orders from './Orders.png';
@@ -106,7 +105,8 @@ import distance from "./distance.svg";
 import timeJar from "./timeJar.svg";
 import sad from "./formkit_sad.svg";
 import refundIcon from "./gridicons_refund.svg";
-import cancelGuide from "./cancelGuide.svg"
+import cancelGuide from "./cancelGuide.svg";
+import helpIconPurple from "./helpIcon.svg"
 
 export const images = {
   introImage1,
@@ -114,7 +114,6 @@ export const images = {
   introImage3,
   introImage4,
   logo,
-  location,
   notificatons,
   orders,
   home,
@@ -137,5 +136,5 @@ export const images = {
   Account,
   Location,
   PackageImg,ShoppingCart,Store,TowTruck,LocaionSteps,BackArrow,Logo,
-  OfficeIcon,HomeIcon,ForwardArrow,EmailIcon,PhoneIcon,ReferFriend,Refund,HelpNSupport,LegalNAbout,InviteFriends,ManageAddress,ReferFriendImage,PackageArrived,CarTowing,HouseMoving,Trolley,Logout,SuccessGreen,VisaIcon,Open,greenTick,DashedLine,ForwardWhiteArrow,PickupNotes,Marker,Gps,outlineHome,outlineAccount,outlineNotification,outlineOrder,PaypalIcon,AppleIcon,MasterCardIcon,laundryIcon,repairIcon,otherIcon,documentIcon,foodIcon,electricIcon,pkgWeightIcon,tipIcon,deliveryBoy,distance,clock,avoidCall,otpVerify,timeJar,sad,refundIcon,cancelGuide
+  OfficeIcon,HomeIcon,ForwardArrow,EmailIcon,PhoneIcon,ReferFriend,Refund,HelpNSupport,LegalNAbout,InviteFriends,ManageAddress,ReferFriendImage,PackageArrived,CarTowing,HouseMoving,Trolley,Logout,SuccessGreen,VisaIcon,Open,greenTick,DashedLine,ForwardWhiteArrow,PickupNotes,Marker,Gps,outlineHome,outlineAccount,outlineNotification,outlineOrder,PaypalIcon,AppleIcon,MasterCardIcon,laundryIcon,repairIcon,otherIcon,documentIcon,foodIcon,electricIcon,pkgWeightIcon,tipIcon,deliveryBoy,distance,clock,avoidCall,otpVerify,timeJar,sad,refundIcon,cancelGuide,helpIconPurple
 };

@@ -12,32 +12,20 @@ import { images } from '../../assets/images/images';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { CustomerScreens, ProfileScreens } from '../../navigation/ScreenNames';
+import SearchIcon from "../../assets/images/searchWithLightPurple.svg";
+import WhiteArrow from "../../assets/images/whiteArrow.svg";
 import LocationIcon from "../../assets/images/Location.svg";
 import AccountIcon from "../../assets/images/Account.svg";
 import { useNavigation } from '@react-navigation/native';
 import { SvgProps } from 'react-native-svg';
+import { gridButtons } from '../../constants/staticData';
 // Mock Data
 const address = '123 Main Street, Springfield, USA';
 type SvgComponent = React.FC<SvgProps>;
-const gridButtons = [
-    {
-        id: 1,
-        title: 'SEND A PACKAGE',
-        subTitle: 'Hassle-Free',
-        image: images.PackageImg,
-    },
-    { id: 2, title: 'BUY FROM STORE', subTitle: 'Easy Shop', image: images.Store },
-    { id: 3, title: 'CAR TOWING', subTitle: 'Fast Tow', image: images.TowTruck },
-    {
-        id: 4,
-        title: 'HOME MOVING',
-        subTitle: 'Swift Shifting',
-        image: images.ShoppingCart,
-    },
-];
 
 const CustomerHomeScreen = () => {
-const navigation=useNavigation()
+const navigation=useNavigation();
+const [isOngoingOrderModal,setIsOngoingOrderModal] = useState(true)
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -96,6 +84,19 @@ const navigation=useNavigation()
             />
             </View>
 
+            {/* {isOngoingOrderModal && (
+    <View style={styles.ongoingOrderBanner}>
+        <TouchableOpacity style={styles.ongoingOrderButton}>
+            <SearchIcon />
+            <Text style={styles.ongoingOrderText}>
+                Looking for a delivery partner near you...
+            </Text>
+            <WhiteArrow/>
+        </TouchableOpacity>
+    </View>
+)} */}
+
+
            
             {/* <View style={styles.bannerContainer}>
                 <Image
@@ -114,11 +115,11 @@ export default CustomerHomeScreen;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: colors.white,
+        backgroundColor: colors.lightGrey,
     },
     header: {
         padding: 16,
-        backgroundColor: colors.white,
+        backgroundColor: colors.lightGrey,
         // borderBottomWidth: 1,
         // borderBottomColor: '#ddd',
     },
@@ -131,6 +132,27 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginHorizontal: 4,
     },
+    ongoingOrderBanner: {
+        position: 'absolute',
+        bottom: 50,
+        width: '100%',
+        borderTopRightRadius:12,
+        borderTopLeftRadius:12,
+        backgroundColor: colors.purple,
+        paddingVertical: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    ongoingOrderButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    ongoingOrderText: {
+        color: colors.white,
+        fontSize: typography.fontSize.medium,
+        fontWeight: typography.fontWeight.bold as any,
+        marginHorizontal:5
+    },    
     homeText: {
         fontSize: typography.fontSize.medium + 2,
         fontFamily: typography.fontFamily.regular,
@@ -175,7 +197,7 @@ const styles = StyleSheet.create({
         flex: 1,
         margin: 8,
         padding: 16,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: colors.white,
         elevation: 5,
         borderRadius: 8,
     },
