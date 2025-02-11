@@ -34,6 +34,12 @@ import {RootState} from '../../redux/store';
 import {AppScreens, DeliverAPackage} from '../../navigation/ScreenNames';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { InfoRow } from './Order/OrderModal';
+import GreenCircle from "../../assets/icons/greenCircle.svg"
+import Phone from "../../assets/icons/purplePhone.svg"
+import Message from "../../assets/icons/purpleMessage.svg"
+import PickUpNotes from "../../assets/icons/pickupNotes.svg"
+import Cart from "../../assets/icons/cart.svg"
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -45,24 +51,24 @@ interface ExpandedModalProps {
   disableClose?: boolean;
 }
 
-export const InfoRow: React.FC<{
-  iconSource: any;
-  text: string;
-  bold?: boolean;
-}> = ({iconSource, text, bold}) => (
-  <View style={styles.infoRow}>
-    <Image source={iconSource} style={styles.infoIcon} />
-    <Text
-      style={[
-        styles.infoText,
-        bold
-          ? {fontWeight: typography.fontWeight.bold as TextStyle['fontWeight']}
-          : {},
-      ]}>
-      {text}
-    </Text>
-  </View>
-);
+// export const InfoRow: React.FC<{
+//   iconSource: any;
+//   text: string;
+//   bold?: boolean;
+// }> = ({iconSource, text, bold}) => (
+//   <View style={styles.infoRow}>
+//     <Image source={iconSource} style={styles.infoIcon} />
+//     <Text
+//       style={[
+//         styles.infoText,
+//         bold
+//           ? {fontWeight: typography.fontWeight.bold as TextStyle['fontWeight']}
+//           : {},
+//       ]}>
+//       {text}
+//     </Text>
+//   </View>
+// );
 
 const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   isVisible,
@@ -317,7 +323,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                 <View style={styles.location}>
                   {!isExpanded && (
                     <InfoRow
-                      iconSource={images.package}
+                      iconSource={i}
                       text={`${order?.senderName} (${order.pickupLocation?.addressLine1})`}
                     />
                   )}
@@ -327,7 +333,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                   <>
                     <View style={styles.sectionContainer}>
                       <InfoRow
-                        iconSource={images.greenCircle}
+                        iconSource={GreenCircle}
                         text="PickUp Details"
                         bold
                       />
@@ -345,13 +351,13 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                           <TouchableOpacity
                             onPress={() => Alert.alert('Call Driver')}>
                             <Image
-                              source={images.phone}
+                              source={Phone}
                               style={styles.pickupIcon}
                             />
                           </TouchableOpacity>
                           <TouchableOpacity onPress={navigateChatScreen}>
                             <Image
-                              source={images.message}
+                              source={Message}
                               style={styles.pickupIcon}
                             />
                           </TouchableOpacity>
@@ -361,7 +367,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
 
                     <View style={styles.sectionContainer}>
                       <InfoRow
-                        iconSource={images.pickUpNotesIcon}
+                        iconSource={PickUpNotes}
                         text="Pickup Notes"
                         bold
                       />
@@ -374,7 +380,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
 
                     <View style={styles.sectionContainer}>
                       <InfoRow
-                        iconSource={images.cartItemsIcon}
+                        iconSource={Cart}
                         text="Items to Pickup"
                         bold
                       />

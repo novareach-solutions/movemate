@@ -115,6 +115,7 @@ export const verifyOtp = createAsyncThunk(
         phoneNumber: phone,
         otp,
       });
+      console.log(response.headers)
       // Store onboarding token if present in the response headers
       const onboardingToken = response.headers['onboarding_token'];
       if (onboardingToken) {

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,14 +11,14 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {useForm} from 'react-hook-form';
-import {z} from 'zod';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {formStyles} from '../theme/form';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { formStyles } from '../theme/form';
 import TitleDescription from './TitleDescription';
-import {colors} from '../theme/colors';
-import {ZCreateAccountSchema} from '../utils/zod/Registration';
-import {fetchPlaceSuggestions} from '../utils/fetchPlaceSuggesttions';
+import { colors } from '../theme/colors';
+import { ZCreateAccountSchema } from '../utils/zod/Registration';
+import { fetchPlaceSuggestions } from '../utils/fetchPlaceSuggesttions';
 
 type FormFields = z.infer<typeof ZCreateAccountSchema>;
 
@@ -37,10 +37,40 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     handleSubmit,
     setValue,
     watch,
-    formState: {errors, isValid},
+    formState: { errors, isValid },
   } = useForm<FormFields>({
     resolver: zodResolver(ZCreateAccountSchema),
     mode: 'onChange',
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      address: '',
+      suburb: '',
+      state: '',
+      postalCode: '',
+      role: 'AGENT', // Added default value for role so it passes validation
+    },
+  });
+
+  // Log errors and validity whenever they change
+  useEffect(() => {
+    console.log('Form errors:', errors);
+    console.log('Form is valid:', isValid);
+  }, [errors, isValid]);
+
+  // Log all form values on each render
+  useEffect(() => {
+    console.log('Current form values:', {
+      firstName: watch('firstName'),
+      lastName: watch('lastName'),
+      email: watch('email'),
+      address: watch('address'),
+      suburb: watch('suburb'),
+      state: watch('state'),
+      postalCode: watch('postalCode'),
+      role: watch('role'),
+    });
   });
 
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -52,10 +82,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   const postalCode = watch('postalCode');
 
   const handleAddressChange = async (text: string) => {
-    setValue('address', text, {shouldValidate: true});
+    console.log('handleAddressChange - text:', text);
+    setValue('address', text, { shouldValidate: true, shouldTouch: true });
 
     if (text.length > 2) {
       const places = await fetchPlaceSuggestions(text);
+      console.log('Fetched suggestions:', places);
       setSuggestions(places);
       setShowSuggestions(true);
     } else {
@@ -64,10 +96,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   };
 
   const handleSelectAddress = (place: any) => {
-    setValue('address', place.address, {shouldValidate: true});
-    setValue('suburb', place.suburb, {shouldValidate: true});
-    setValue('state', place.state, {shouldValidate: true});
-    setValue('postalCode', place.postalCode, {shouldValidate: true});
+    console.log('Selected address:', place);
+    setValue('address', place.address, { shouldValidate: true });
+    setValue('suburb', place.suburb, { shouldValidate: true });
+    setValue('state', place.state, { shouldValidate: true });
+    setValue('postalCode', place.postalCode, { shouldValidate: true });
 
     setShowSuggestions(false);
   };
@@ -75,12 +108,14 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{flex: 1}}>
+      style={{ flex: 1 }}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           <ScrollView
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{flexGrow: 1}}>
+            contentContainerStyle={{ flexGrow: 1 }}
+          >
             <TitleDescription title={title} description={description} />
 
             {/* First Name */}
@@ -93,8 +128,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                   formStyles.input,
                   errors.firstName && formStyles.errorInput,
                 ]}
-                onChangeText={text =>
-                  setValue('firstName', text, {shouldValidate: true})
+                onChangeText={(text) =>
+                  setValue('firstName', text, {
+                    shouldValidate: true,
+                    shouldTouch: true,
+                  })
                 }
               />
               {errors.firstName && (
@@ -114,8 +152,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                   formStyles.input,
                   errors.lastName && formStyles.errorInput,
                 ]}
-                onChangeText={text =>
-                  setValue('lastName', text, {shouldValidate: true})
+                onChangeText={(text) =>
+                  setValue('lastName', text, {
+                    shouldValidate: true,
+                    shouldTouch: true,
+                  })
                 }
               />
               {errors.lastName && (
@@ -136,12 +177,17 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                   formStyles.input,
                   errors.email && formStyles.errorInput,
                 ]}
-                onChangeText={text =>
-                  setValue('email', text, {shouldValidate: true})
+                onChangeText={(text) =>
+                  setValue('email', text, {
+                    shouldValidate: true,
+                    shouldTouch: true,
+                  })
                 }
               />
               {errors.email && (
-                <Text style={formStyles.errorText}>{errors.email.message}</Text>
+                <Text style={formStyles.errorText}>
+                  {errors.email.message}
+                </Text>
               )}
             </View>
 
@@ -170,10 +216,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                   <FlatList
                     data={suggestions}
                     keyExtractor={(item, index) => index.toString()}
-                    renderItem={({item}) => (
+                    renderItem={({ item }) => (
                       <TouchableOpacity
                         style={formStyles.suggestionItem}
-                        onPress={() => handleSelectAddress(item)}>
+                        onPress={() => handleSelectAddress(item)}
+                      >
                         <Text style={formStyles.suggestionText}>
                           {item.address}
                         </Text>
@@ -195,8 +242,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                   errors.suburb && formStyles.errorInput,
                 ]}
                 value={suburb}
-                onChangeText={text =>
-                  setValue('suburb', text, {shouldValidate: true})
+                onChangeText={(text) =>
+                  setValue('suburb', text, {
+                    shouldValidate: true,
+                    shouldTouch: true,
+                  })
                 }
               />
             </View>
@@ -211,8 +261,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                   errors.state && formStyles.errorInput,
                 ]}
                 value={state}
-                onChangeText={text =>
-                  setValue('state', text, {shouldValidate: true})
+                onChangeText={(text) =>
+                  setValue('state', text, {
+                    shouldValidate: true,
+                    shouldTouch: true,
+                  })
                 }
               />
             </View>
@@ -228,10 +281,18 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                   errors.postalCode && formStyles.errorInput,
                 ]}
                 value={postalCode}
-                onChangeText={text =>
-                  setValue('postalCode', text, {shouldValidate: true})
+                onChangeText={(text) =>
+                  setValue('postalCode', text.replace(/[^0-9]/g, ''), {
+                    shouldValidate: true,
+                    shouldTouch: true,
+                  })
                 }
               />
+              {errors.postalCode && (
+                <Text style={formStyles.errorText}>
+                  {errors.postalCode.message}
+                </Text>
+              )}
             </View>
           </ScrollView>
 
@@ -243,14 +304,16 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                 isValid ? formStyles.buttonEnabled : formStyles.buttonDisabled,
               ]}
               onPress={handleSubmit(onSubmit)}
-              disabled={!isValid}>
+              disabled={!isValid}
+            >
               <Text
                 style={[
                   formStyles.buttonText,
                   isValid
                     ? formStyles.buttonTextEnabled
                     : formStyles.buttonTextDisabled,
-                ]}>
+                ]}
+              >
                 Continue
               </Text>
             </TouchableOpacity>
