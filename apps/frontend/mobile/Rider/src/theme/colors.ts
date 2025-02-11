@@ -11,6 +11,7 @@ export const colors = {
   lightButtonBackground: '#fafafa',
   black: 'rgba(24, 24, 27, 1)',
   yellow: '#FFFCAA',
+  disabled: '#D3D3D3',
   text: {
     primary: '#000000',
     primaryGrey: '#1D1D1D',

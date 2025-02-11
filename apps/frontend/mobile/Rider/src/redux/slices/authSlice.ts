@@ -111,10 +111,11 @@ export const verifyOtp = createAsyncThunk(
   'auth/verifyOtp',
   async ({phone, otp}: {phone: string; otp: string}, {rejectWithValue}) => {
     try {
-      const response = await apiClient.post(apiEndPoints.veryfyOtp, {
+      const response = await apiClient.post(apiEndPoints.verifyOtp, {
         phoneNumber: phone,
         otp,
       });
+      console.log(response.headers)
       // Store onboarding token if present in the response headers
       const onboardingToken = response.headers['onboarding_token'];
       if (onboardingToken) {
@@ -154,12 +155,16 @@ export const login = createAsyncThunk(
       );
 
       // Assuming the response contains tokens
-      const {accessToken} = response.data.data;
+      const {accessToken, agentId, userId} = response.data.data;
       if (accessToken) {
         console.log(
           'saving access token',
+          response.data.data.agentId,
+          response.data.data.userId,
         );
         await saveToken('accessToken', accessToken);
+        await saveToken('userId', String(userId));
+        await saveToken('agentId', String(agentId));
       }
       SimpleToast('Login successful!');
       return response.data;
@@ -196,12 +201,14 @@ export const agentSignup = createAsyncThunk(
 
       // Correctly access the accessToken in the nested response
       const accessToken = response.data?.data?.accessToken;
-      const agentId = response.data?.data?.agent.id;
-      const userId = response.data?.data?.userId;
+      const agentId = String(response.data?.data?.agent.id);
+      const userId = String(response.data?.data?.agent.userId);
 
       if (accessToken) {
         console.log('🔑 Access Token Received:', accessToken);
         await AsyncStorage.setItem('accessToken', accessToken);
+        await AsyncStorage.setItem('userId', userId);
+        await AsyncStorage.setItem('agentId', agentId);
       } else {
         console.error('❌ No Access Token Found in Response');
         throw new Error('AccessToken is missing in the server response');

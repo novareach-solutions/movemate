@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
-
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {colors} from '../theme/colors';
+import {typography} from '../theme/typography';
 
 interface Benefit {
   title: string;
@@ -64,7 +63,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
+    shadowOffset: {width: 0, height: 5},
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,

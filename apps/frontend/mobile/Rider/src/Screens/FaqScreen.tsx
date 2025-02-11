@@ -17,7 +17,7 @@ import FAQModal from '../components/Modals/FaqModal';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AppScreens, AppScreensParamList} from '../navigation/ScreenNames';
 import Header from '../components/Header';
-import BlackArrow from "../assets/icons/blackArrow.svg"
+import BlackArrow from '../assets/icons/blackArrow.svg';
 
 interface FAQ {
   question: string;
@@ -62,9 +62,11 @@ const FAQScreen: React.FC = () => {
       style={styles.faqItem}
       onPress={() => setSelectedFAQ(item)}>
       <Text style={styles.faqQuestion}>{item.question}</Text>
-      <BlackArrow style={{
-        transform:[{rotate:"180deg"}]
-      }} />
+      <BlackArrow
+        style={{
+          transform: [{rotate: '180deg'}],
+        }}
+      />
     </TouchableOpacity>
   );
 
@@ -83,7 +85,7 @@ const FAQScreen: React.FC = () => {
         />
 
         {/* Cancel Order Button */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[formStyles.button, styles.cancelButton]}
           onPress={() => {
             navigation.navigate(AppScreens.CancellationReason);
@@ -91,7 +93,7 @@ const FAQScreen: React.FC = () => {
           <Text style={[formStyles.buttonText, styles.cancelButtonText]}>
             Cancel Order
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* FAQ Modal */}
         {selectedFAQ && (

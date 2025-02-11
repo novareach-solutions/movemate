@@ -26,9 +26,9 @@ export type AppScreensParamList = {
   ProfileScreen: undefined;
   ComingSoonScreen: undefined;
   DocumentReviewScreen: {
-    title: string,
-    uploadedImage: any
-  }
+    title: string;
+    uploadedImage: any;
+  };
 };
 
 export const AppScreens = {
@@ -45,7 +45,7 @@ export const AppScreens = {
 export type DeliverAPackageParamList = {
   CompleteProfileScreen: undefined;
   UploadDocumentDetails: {
-    title: string
+    title: string;
   };
   UploadDocumentsScreen: undefined;
   DashboardScreen: undefined;
@@ -57,13 +57,16 @@ export type DeliverAPackageParamList = {
 
 export const DeliverAPackage = {
   CompleteProfile: 'CompleteProfileScreen',
-  UploadDocumentDetails: 'UploadDocumentDetails',
+  UploadDocumentDetails: 'DAPUploadDocumentDetailsScreen',
   UploadDocuments: 'UploadDocumentsScreen',
   Dashboard: 'DashboardScreen',
   EnterVehicleDetails: 'EnterVehicleDetailsScreen',
   EnterABN: 'EnterABNScreen',
   AddProfilePhoto: 'AddProfilePhotoScreen',
   Home: 'HomeScreen',
+  PickUpOrderDetails: 'PickUpOrderDetailsScreen',
+  DropOffOrderDetails: 'DropOffOrderDetailsScreen',
+  EarningsDetails: 'EarningsDetailsScreen',
 } as const;
 
 export type BuyFromStoreParamList = {
@@ -86,7 +89,7 @@ export type ProfileScreensParamList = {
   SubscriptionPlansScreen: undefined;
   PayoutSummaryScreen: undefined;
   OrderDetailsScreen: {
-    orderId: number
+    orderId: number;
   };
 };
 

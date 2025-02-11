@@ -1,11 +1,6 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  SafeAreaView,
-  StyleSheet,
-} from 'react-native';
-import { colors } from '../../../theme/colors';
+import {View, Text, SafeAreaView, StyleSheet} from 'react-native';
+import {colors} from '../../../theme/colors';
 import Header from '../../../components/Header';
 
 const payoutDetails = {
@@ -20,15 +15,17 @@ const payoutDetails = {
 
 const PayoutSummaryScreen = () => {
   return (
-    <SafeAreaView style={{
-      flex: 1
-    }}>
-      <Header isBack title='Payout Summary' help />
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
+      <Header isBack title="Payout Summary" help />
       <View style={styles.container}>
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Total Transfer Amount</Text>
-          <Text style={styles.amount}>${payoutDetails.totalTransferAmount}</Text>
+          <Text style={styles.amount}>
+            ${payoutDetails.totalTransferAmount}
+          </Text>
         </View>
 
         <View style={styles.divider} />
@@ -56,13 +53,17 @@ const PayoutSummaryScreen = () => {
         </View>
         <View style={styles.summaryRow}>
           <Text style={styles.label}>Transfer deductions</Text>
-          <Text style={styles.negativeValue}>-${payoutDetails.transferDeductions}</Text>
+          <Text style={styles.negativeValue}>
+            -${payoutDetails.transferDeductions}
+          </Text>
         </View>
 
         <View style={styles.transferAmountContainer}>
           <View style={styles.transferAmountRow}>
             <Text style={styles.summaryTitle}>Transfer Amount</Text>
-            <Text style={styles.value}>${payoutDetails.totalTransferAmount}</Text>
+            <Text style={styles.value}>
+              ${payoutDetails.totalTransferAmount}
+            </Text>
           </View>
         </View>
 
@@ -75,7 +76,8 @@ const PayoutSummaryScreen = () => {
           <Text style={styles.label}>Date & Time</Text>
           <Text style={styles.subText}>{payoutDetails.dateTime}</Text>
         </View>
-      </View></SafeAreaView>
+      </View>
+    </SafeAreaView>
   );
 };
 

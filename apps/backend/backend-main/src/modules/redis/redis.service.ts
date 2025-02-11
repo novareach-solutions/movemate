@@ -2,6 +2,8 @@ import { Injectable, Logger, OnModuleDestroy } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import Redis, { RedisOptions } from "ioredis";
 
+import { logger } from "../../logger";
+
 @Injectable()
 export class RedisService implements OnModuleDestroy {
   private readonly redisClient: Redis; // For general commands
@@ -43,7 +45,13 @@ export class RedisService implements OnModuleDestroy {
     expiryMode: "EX" = "EX",
     time?: number,
   ): Promise<void> {
-    await this.redisClient.set(key, value, expiryMode, time || 300);
+    logger.debug(`Setting Redis key: ${key}, value: ${value}`);
+    try {
+      await this.redisClient.set(key, value, expiryMode, time || 300);
+    } catch (error) {
+      logger.error(`Failed to set Redis key ${key}:`, error);
+      throw error;
+    }
   }
 
   async incr(key: string): Promise<number> {
@@ -55,7 +63,15 @@ export class RedisService implements OnModuleDestroy {
   }
 
   async get(key: string): Promise<string | null> {
-    return await this.redisClient.get(key);
+    logger.debug(`Fetching Redis key: ${key}`);
+    try {
+      const value = await this.redisClient.get(key);
+      logger.debug(`Fetched Redis key: ${key}, value: ${value}`);
+      return value;
+    } catch (error) {
+      logger.error(`Failed to fetch Redis key ${key}:`, error);
+      throw error;
+    }
   }
 
   async del(key: string): Promise<number> {

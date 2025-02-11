@@ -11,10 +11,10 @@ import {
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
 import Header from '../../../components/Header';
-import Lightning from "../../../assets/icons/lightning.svg"
-import Visa from "../../../assets/icons/visa.svg"
-import Info from "../../../assets/icons/info.svg"
-import { SvgProps } from 'react-native-svg';
+import Lightning from '../../../assets/icons/lightning.svg';
+import Visa from '../../../assets/icons/visa.svg';
+import Info from '../../../assets/icons/info.svg';
+import {SvgProps} from 'react-native-svg';
 
 const PayoutOption: React.FC<{
   title: string;
@@ -22,7 +22,7 @@ const PayoutOption: React.FC<{
   icon: React.FC<SvgProps>;
   isSelected: boolean;
   onPress: () => void;
-}> = ({title, description, icon:Icon, isSelected, onPress}) => {
+}> = ({title, description, icon: Icon, isSelected, onPress}) => {
   return (
     <View>
       <TouchableOpacity
@@ -57,7 +57,7 @@ const PayoutScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title='Payout' isBack />
+      <Header title="Payout" isBack />
       <ScrollView contentContainerStyle={styles.content}>
         {/* Amount Section */}
         <View style={styles.sectionContainer}>

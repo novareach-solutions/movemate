@@ -1,6 +1,6 @@
-import React from 'react';
-import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, {ReactNode} from 'react';
+import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   AppScreens,
   AuthScreens,
@@ -9,11 +9,9 @@ import {
   ProfileScreens,
 } from './ScreenNames';
 import Onboarding from '../components/Onboarding';
-import Login from '../Screens/SignupNumberScreen';
 import OtpScreen from '../Screens/OtpScreen';
 import SelectServiceScreen from '../Screens/SelectServiceScreen';
 import DAPCompleteProfileScreen from '../Screens/DeliverPackage/CompleteProfileScreen';
-import DAPUploadDocumentDetailsScreen from '../Screens/DeliverPackage/UploadDocumentDetailsScreen';
 import DAPUploadDocumentsScreen from '../Screens/DeliverPackage/UploadDocumentsScreen';
 import DocumentReviewScreen from '../Screens/DocumentReviewScreen';
 import EnterVehicleDetailsScreen from '../Screens/DeliverPackage/EnterVehicleDetailsScreen';
@@ -43,8 +41,16 @@ import RatingsScreen from '../Screens/Profile/RatingScreen';
 import OrderDetailsScreen from '../Screens/Profile/OrderDetailsScreen';
 import HelpAndSupportScreen from '../Screens/Profile/HelpAndSupportScreen';
 import PayoutSummaryScreen from '../Screens/Profile/WalletScreen/PayoutSummaryScreen';
+import DAPUploadDocumentDetailsScreen from '../Screens/DeliverPackage/UploadDocumentDetailsScreen';
+import PickUpOrderDetailsScreen from '../Screens/PickUpOrderDetailsScreen';
+import DropOffOrderDetailsScreen from '../Screens/DropOffOrderDetailsScreen';
+import EarningsDetailsScreen from '../Screens/EarningDetailsScreen';
 
 const Stack = createNativeStackNavigator();
+
+interface AppNavigatorProps {
+  children?: ReactNode;
+}
 
 const RiderTheme = {
   ...DefaultTheme,
@@ -54,189 +60,205 @@ const RiderTheme = {
   },
 };
 
-const App = () => {
+const App: React.FC<AppNavigatorProps> = ({children}) => {
   return (
     <NavigationContainer theme={RiderTheme}>
       <Stack.Navigator initialRouteName={AuthScreens.Onboarding}>
         <Stack.Screen
           name={AuthScreens.Onboarding}
           component={Onboarding}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={AuthScreens.Login}
           component={LoginScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={AuthScreens.SignupNumber}
           component={SignupNumberScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={AuthScreens.Otp}
           component={OtpScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={AuthScreens.SelectService}
           component={SelectServiceScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         {/* Deliver a Package */}
         <Stack.Screen
           name={DeliverAPackage.CompleteProfile}
           component={DAPCompleteProfileScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={DeliverAPackage.UploadDocuments}
           component={DAPUploadDocumentsScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={DeliverAPackage.UploadDocumentDetails}
           component={DAPUploadDocumentDetailsScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={DeliverAPackage.EnterVehicleDetails}
           component={EnterVehicleDetailsScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={DeliverAPackage.EnterABN}
           component={EnterABNScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={DeliverAPackage.AddProfilePhoto}
           component={AddProfilePhotoScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={DeliverAPackage.Home}
           component={HomeScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={DeliverAPackage.PickUpOrderDetails}
+          component={PickUpOrderDetailsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={DeliverAPackage.DropOffOrderDetails}
+          component={DropOffOrderDetailsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={DeliverAPackage.EarningsDetails}
+          component={EarningsDetailsScreen}
+          options={{headerShown: false}}
         />
 
         {/* Buy From Store */}
         <Stack.Screen
           name={BuyFromStore.ItemsReviewScreen}
           component={ItemsReviewScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         {/* Profile */}
         <Stack.Screen
           name={ProfileScreens.Inbox}
           component={InboxScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.ReferFriends}
           component={ReferFriendsScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Wallet}
           component={WalletScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Payout}
           component={PayoutScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Account}
           component={AccountScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Documents}
           component={DocumentsScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.ManageAccount}
           component={ManageAccountScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.EarningMode}
           component={EarningsModeScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.SubscriptionPlans}
           component={SubscriptionPlansScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.ReplaceVehicle}
           component={ReplaceVehicleScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Earnings}
           component={EarningsScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.Ratings}
           component={RatingsScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.OrderDetails}
           component={OrderDetailsScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.HelpAndSupport}
           component={HelpAndSupportScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={ProfileScreens.PayoutSummary}
           component={PayoutSummaryScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
 
         {/* App */}
         <Stack.Screen
           name={AppScreens.DocumentReview}
           component={DocumentReviewScreen as React.FC}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={AppScreens.FAQScreen}
           component={FAQScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={AppScreens.CancellationReason}
           component={CancellationReasonScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={AppScreens.Profile}
           component={ProfileScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={AppScreens.Chat}
           component={ChatScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name={AppScreens.ComingSoon}
           component={ComingSoonScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
       </Stack.Navigator>
+      {children}
     </NavigationContainer>
   );
 };

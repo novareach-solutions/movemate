@@ -13,7 +13,7 @@ import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {formStyles} from '../theme/form';
 import Header from '../components/Header';
-import Camera from "../assets/icons/camera.svg"
+import Camera from '../assets/icons/camera.svg';
 
 const CancellationReasonScreen: React.FC = () => {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);

@@ -18,7 +18,8 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
 import {useAppDispatch} from '../redux/hook';
 import Header from '../components/Header';
-import Logo from "../assets/icons/logo.svg"
+import Logo from '../assets/icons/logo.svg';
+import {requestOtp} from '../redux/slices/authSlice';
 
 const {width} = Dimensions.get('window');
 
@@ -38,7 +39,7 @@ const SignupNumberScreen: React.FC = () => {
 
   const handleSendCode = async () => {
     try {
-      // await dispatch(requestOtp({phone: phoneNumber})).unwrap();
+      await dispatch(requestOtp({phone: phoneNumber})).unwrap();
       navigation.navigate(AuthScreens.Otp, {phoneNumber});
     } catch {
       console.log('Request Otp failed');
@@ -50,9 +51,10 @@ const SignupNumberScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{
-      flex:1
-    }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
       <Header isBack />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>

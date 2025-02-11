@@ -19,16 +19,13 @@ import { UpdateResult } from "typeorm";
 
 import { Agent } from "../../entity/Agent";
 import { RequiredDocument } from "../../entity/RequiredDocument";
+import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import {
   AgentDeleteDocumentSwagger,
-  AgentGetAllSwagger,
-  AgentGetProfileByIdSwagger,
   AgentGetProfileSwagger,
-  AgentPatchProfileByIdSwagger,
   AgentPatchProfileSwagger,
   AgentPatchStatusSwagger,
   AgentPostDocumentByIdSwagger,
-  AgentPostDocumentSwagger,
   AgentSignUpSwagger,
   AgentUpdateLocationSwagger,
 } from "../../shared/decorators/agents/agent.decorators";
@@ -107,6 +104,30 @@ export class AgentController {
       data: { agent: createdAgent, accessToken },
     };
   }
+  @Get("ongoingorder")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.AGENT)
+  async getOngoingOrder(
+    @Req() request: any,
+  ): Promise<IApiResponse<SendPackageOrder | null>> {
+    const agentId = request.user.agent?.id;
+
+    const ongoingOrder = await this.agentService.getOngoingOrder(agentId);
+
+    if (!ongoingOrder) {
+      return {
+        success: true,
+        message: "No ongoing order found.",
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      message: "Ongoing order retrieved successfully.",
+      data: ongoingOrder,
+    };
+  }
 
   @Get("profile")
   @UseGuards(AuthGuard, RoleGuard)
@@ -164,6 +185,27 @@ export class AgentController {
     };
   }
 
+  @Post("document")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.AGENT)
+  async submitOwnDocument(
+    @Body() submitDocumentDto: TAgentDocument,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<TAgentDocument>> {
+    const agentId = request.user.agent.id;
+    const document: TAgentDocument = {
+      ...submitDocumentDto,
+      agentId,
+      url: submitDocumentDto.url,
+    };
+    const data = await this.agentService.submitDocument(agentId, document);
+    return {
+      success: true,
+      message: "Document submitted successfully.",
+      data,
+    };
+  }
+
   @Patch("status")
   @UseGuards(AuthGuard)
   @Roles(UserRoleEnum.AGENT)
@@ -190,9 +232,8 @@ export class AgentController {
   }
 
   @Get("profile/:id")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.ADMIN)
-  @AgentGetProfileByIdSwagger()
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async getAgentProfile(
     @Param("id", ParseIntPipe) agentId: number,
   ): Promise<IApiResponse<Agent>> {
@@ -212,9 +253,8 @@ export class AgentController {
   }
 
   @Patch("profile/:id")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.ADMIN)
-  @AgentPatchProfileByIdSwagger()
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async updateAgentProfile(
     @Param("id", ParseIntPipe) agentId: number,
     @Body() updateAgentPartial: TAgentPartial,
@@ -235,38 +275,6 @@ export class AgentController {
     return {
       success: true,
       message: "Agent profile updated successfully.",
-      data,
-    };
-  }
-
-  // *** Document Specific Controllers ***
-  @Post("document")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.AGENT)
-  @AgentPostDocumentSwagger()
-  async submitOwnDocument(
-    @Body() submitDocumentDto: TAgentDocument,
-    @Req() request: ICustomRequest,
-  ): Promise<IApiResponse<TAgentDocument>> {
-    const agentId = request.user.agent.id;
-    this.logger.debug(
-      `AgentController.submitOwnDocument: Submitting document for agent ${agentId}`,
-    );
-
-    const document: TAgentDocument = {
-      ...submitDocumentDto,
-      agentId,
-      url: submitDocumentDto.url,
-    };
-    const data = await this.agentService.submitDocument(agentId, document);
-
-    this.logger.log(
-      `AgentController.submitOwnDocument: Document for agent ${agentId} submitted successfully.`,
-      data,
-    );
-    return {
-      success: true,
-      message: "Document submitted successfully.",
       data,
     };
   }
@@ -325,8 +333,8 @@ export class AgentController {
 
   // Seperate controller for updating document approval status for ADMIN role
   @Delete("document/:id/:documentId")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.ADMIN)
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async removeAgentDocument(
     @Param("id", ParseIntPipe) agentId: number,
     @Param("documentId", ParseIntPipe) documentId: number,
@@ -341,9 +349,8 @@ export class AgentController {
 
   // *** Other Controllers ***
   @Get("list")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.ADMIN)
-  @AgentGetAllSwagger()
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async getAllAgents(): Promise<IApiResponse<Agent[]>> {
     this.logger.debug(`AgentController.getAllAgents: Retrieving all agents.`);
     const agents = await this.agentService.getAllAgents();
@@ -408,8 +415,8 @@ export class AgentController {
   }
 
   @Patch(":agentId/document/:documentId/approval-status")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.ADMIN)
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async updateDocumentApprovalStatus(
     @Param("agentId", ParseIntPipe) agentId: number,
     @Param("documentId", ParseIntPipe) documentId: number,

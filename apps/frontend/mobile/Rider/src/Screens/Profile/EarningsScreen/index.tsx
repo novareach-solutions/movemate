@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,21 @@ import {
   StyleSheet,
   TextStyle,
 } from 'react-native';
-import { colors } from '../../../theme/colors';
+import {colors} from '../../../theme/colors';
 import Header from '../../../components/Header';
-import { typography } from '../../../theme/typography';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { ProfileScreens, ProfileScreensParamList } from '../../../navigation/ScreenNames';
+import {typography} from '../../../theme/typography';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {
+  ProfileScreens,
+  ProfileScreensParamList,
+} from '../../../navigation/ScreenNames';
 import BlackArrow from '../../../assets/icons/blackArrow.svg';
 
 // Data for earnings and orders
 const earningsData = {
-  daily: { amount: 45, orderEarnings: 40, tips: 5 },
-  weekly: { amount: 317, orderEarnings: 300, tips: 17 },
-  monthly: { amount: 1280, orderEarnings: 1200, tips: 80 },
+  daily: {amount: 45, orderEarnings: 40, tips: 5},
+  weekly: {amount: 317, orderEarnings: 300, tips: 17},
+  monthly: {amount: 1280, orderEarnings: 1200, tips: 80},
 };
 
 const orders = [
@@ -43,26 +46,40 @@ const orders = [
 
 // Helper functions to format dates
 const formatDaily = (date: Date) =>
-  date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
 const formatWeekly = (start: Date) => {
   const end = new Date(start);
   end.setDate(start.getDate() + 6);
-  const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const endStr = end.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+  const startStr = start.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+  const endStr = end.toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'short',
+  });
   return `${startStr} - ${endStr}`;
 };
 
 const formatMonthly = (date: Date) =>
-  date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  date.toLocaleDateString('en-US', {month: 'short', year: 'numeric'});
 
 const EarningsScreen = () => {
   const navigation = useNavigation<NavigationProp<ProfileScreensParamList>>();
-  const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
+  const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>(
+    'weekly',
+  );
   const [dailyDate, setDailyDate] = useState(new Date());
-  const [weeklyStartDate, setWeeklyStartDate] = useState(new Date(2024, 11, 15));
+  const [weeklyStartDate, setWeeklyStartDate] = useState(
+    new Date(2024, 11, 15),
+  );
   const [monthlyDate, setMonthlyDate] = useState(
-    new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+    new Date(new Date().getFullYear(), new Date().getMonth(), 1),
   );
 
   let displayDate = '';
@@ -107,17 +124,21 @@ const EarningsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{flex: 1}}>
       <Header isBack title="Earnings" />
       <View style={styles.container}>
         {/* Tabs */}
         <View style={styles.tabsContainer}>
-          {(['daily', 'weekly', 'monthly'] as const).map((tab) => (
+          {(['daily', 'weekly', 'monthly'] as const).map(tab => (
             <TouchableOpacity
               key={tab}
               style={[styles.tab, activeTab === tab && styles.activeTab]}
               onPress={() => setActiveTab(tab)}>
-              <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === tab && styles.activeTabText,
+                ]}>
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </Text>
             </TouchableOpacity>
@@ -133,7 +154,9 @@ const EarningsScreen = () => {
             </TouchableOpacity>
             <View style={styles.earningsInfo}>
               <Text style={styles.dateRange}>{displayDate}</Text>
-              <Text style={styles.earningsAmount}>${earningsData[activeTab].amount}</Text>
+              <Text style={styles.earningsAmount}>
+                ${earningsData[activeTab].amount}
+              </Text>
               <Text style={styles.earningsTime}>25hr 47 mins online</Text>
             </View>
             {/* Right Arrow */}
@@ -146,11 +169,15 @@ const EarningsScreen = () => {
           <View style={styles.earningsBottom}>
             <View style={styles.earningsBreakdown}>
               <Text style={styles.breakdownText}>Order Earnings</Text>
-              <Text style={styles.breakdownAmount}>${earningsData[activeTab].orderEarnings}</Text>
+              <Text style={styles.breakdownAmount}>
+                ${earningsData[activeTab].orderEarnings}
+              </Text>
             </View>
             <View style={styles.earningsBreakdown}>
               <Text style={styles.breakdownText}>Tips</Text>
-              <Text style={styles.breakdownAmount}>${earningsData[activeTab].tips}</Text>
+              <Text style={styles.breakdownAmount}>
+                ${earningsData[activeTab].tips}
+              </Text>
             </View>
           </View>
         </View>
@@ -163,12 +190,14 @@ const EarningsScreen = () => {
         {/* Orders List */}
         <ScrollView style={styles.ordersContainer}>
           <Text style={styles.ordersHeader}>Today, Mon, Dec 20</Text>
-          {orders.map((order) => (
+          {orders.map(order => (
             <TouchableOpacity
               key={order.id}
               style={styles.orderCard}
               onPress={() =>
-                navigation.navigate(ProfileScreens.OrderDetails, { orderId: order.id })
+                navigation.navigate(ProfileScreens.OrderDetails, {
+                  orderId: order.id,
+                })
               }>
               <View style={styles.orderInfo}>
                 <Text style={styles.orderType}>{order.type}</Text>
@@ -247,7 +276,7 @@ const styles = StyleSheet.create({
   },
   earningsAmount: {
     fontSize: 30,
-    fontWeight: typography.fontWeight.extraBold as TextStyle["fontWeight"],
+    fontWeight: typography.fontWeight.extraBold as TextStyle['fontWeight'],
     color: colors.purple,
   },
   earningsTime: {
@@ -255,7 +284,7 @@ const styles = StyleSheet.create({
     color: colors.text.subText,
   },
   arrow: {
-    transform: [{ rotate: '180deg' }],
+    transform: [{rotate: '180deg'}],
   },
   earningsBottom: {
     marginTop: 35,

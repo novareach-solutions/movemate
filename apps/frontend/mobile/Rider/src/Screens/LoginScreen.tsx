@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, {useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -12,15 +12,16 @@ import {
   SafeAreaView,
 } from 'react-native';
 import PhoneInput from 'react-native-phone-number-input';
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AuthScreens, AuthScreensParamList } from '../navigation/ScreenNames';
-import { useAppDispatch } from '../redux/hook';
-import Logo from "../assets/icons/logo.svg"
+import {colors} from '../theme/colors';
+import {typography} from '../theme/typography';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
+import {useAppDispatch} from '../redux/hook';
+import Logo from '../assets/icons/logo.svg';
 import Header from '../components/Header';
+import {requestOtp} from '../redux/slices/authSlice';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const LoginScreen: React.FC = () => {
   const phoneInput = useRef<PhoneInput>(null);
@@ -38,8 +39,8 @@ const LoginScreen: React.FC = () => {
 
   const handleSendCode = async () => {
     try {
-      // await dispatch(requestOtp({phone: phoneNumber})).unwrap();
-      navigation.navigate(AuthScreens.Otp, { phoneNumber, login: true });
+      await dispatch(requestOtp({phone: phoneNumber})).unwrap();
+      navigation.navigate(AuthScreens.Otp, {phoneNumber, login: true});
     } catch {
       console.log('Request Otp failed');
     }
@@ -50,9 +51,10 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{
-      flex: 1
-    }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
       <Header isBack />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
@@ -69,7 +71,7 @@ const LoginScreen: React.FC = () => {
             onChangeFormattedText={handlePhoneNumberChange}
             containerStyle={[
               styles.phoneContainer,
-              isFocused && { borderColor: colors.purple },
+              isFocused && {borderColor: colors.purple},
             ]}
             textContainerStyle={styles.textInput}
             textInputStyle={styles.textInputStyle}
@@ -112,6 +114,7 @@ const styles = StyleSheet.create({
     height: width * 0.3,
     resizeMode: 'contain',
     marginBottom: 30,
+    marginTop: 20,
     alignSelf: 'center',
   },
   heading: {

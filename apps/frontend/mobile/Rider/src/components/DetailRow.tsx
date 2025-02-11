@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, Image, StyleSheet, TextStyle} from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
-import { SvgProps } from 'react-native-svg';
+import {SvgProps} from 'react-native-svg';
 
 interface DetailRowProps {
   label: string;
@@ -10,7 +10,7 @@ interface DetailRowProps {
   icon?: React.FC<SvgProps>;
 }
 
-const DetailRow: React.FC<DetailRowProps> = ({icon:Icon, label, value}) => {
+const DetailRow: React.FC<DetailRowProps> = ({icon: Icon, label, value}) => {
   return (
     <View style={styles.detailRow}>
       {Icon && <Icon style={styles.icon} />}

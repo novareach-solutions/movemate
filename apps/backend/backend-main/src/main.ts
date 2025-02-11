@@ -4,6 +4,7 @@ import { NestFactory } from "@nestjs/core";
 import { IoAdapter } from "@nestjs/platform-socket.io";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { apiReference } from "@scalar/nestjs-api-reference";
+import cookieParser from "cookie-parser";
 
 import { AppModule } from "./app.module";
 import { CustomExceptionFilter } from "./errorFilter";
@@ -43,19 +44,12 @@ async function bootstrap(): Promise<void> {
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   });
-
+  app.use(cookieParser());
   // Configure WebSocket adapter
   app.useWebSocketAdapter(new IoAdapter(app));
 
   await app.listen(configService.get<number>("app.port") ?? 3000);
 
-  /**
-   * These logs for PORT and CORS Origin are used to verify if the environment
-   * variables are being correctly loaded in the application.
-   *
-   * If the application is running on the correct PORT and CORS Origin, then they
-   * can be removed from the codebase.
-   */
   logger.log(
     `🚩 CORS Origin is running on: ${configService.get<string>("app.corsOrigin")}`,
   );

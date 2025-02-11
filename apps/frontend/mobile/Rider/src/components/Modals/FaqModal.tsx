@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import {colors} from '../../theme/colors';
 import {typography} from '../../theme/typography';
-import PurplePhone from "../../assets/icons/purplePhone.svg"
-import PurpleMessage from "../../assets/icons/purpleMessage.svg"
+import PurplePhone from '../../assets/icons/purplePhone.svg';
+import PurpleMessage from '../../assets/icons/purpleMessage.svg';
 
 interface FAQModalProps {
   isVisible: boolean;

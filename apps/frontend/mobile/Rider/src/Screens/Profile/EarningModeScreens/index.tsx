@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,15 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { ProfileScreens, ProfileScreensParamList } from '../../../navigation/ScreenNames';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {colors} from '../../../theme/colors';
+import {typography} from '../../../theme/typography';
+import {
+  ProfileScreens,
+  ProfileScreensParamList,
+} from '../../../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Header from '../../../components/Header';
-import { BenefitItem } from './SubscriptionPlansScreen';
+import {BenefitItem} from './SubscriptionPlansScreen';
 
 const EarningsModeScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Subscription' | 'Commission'>(
@@ -44,19 +47,19 @@ const EarningsModeScreen: React.FC = () => {
           </TouchableOpacity>
           <View style={styles.benefitsContainer}>
             <BenefitItem
-              title={"0% Commission"}
-              description={"Keep 100% of what you earn"}
+              title={'0% Commission'}
+              description={'Keep 100% of what you earn'}
             />
             <BenefitItem
-              title={"Special Perks"}
+              title={'Special Perks'}
               description={
-                "Get exclusive benefits like priority rides, free cancellations, and more."
+                'Get exclusive benefits like priority rides, free cancellations, and more.'
               }
             />
             <BenefitItem
-              title={"Roll-Over Policy"}
+              title={'Roll-Over Policy'}
               description={
-                "Unused subscription hours roll over to the next cycle."
+                'Unused subscription hours roll over to the next cycle.'
               }
             />
           </View>
@@ -75,13 +78,13 @@ const EarningsModeScreen: React.FC = () => {
           </TouchableOpacity>
           <View style={styles.benefitsContainer}>
             <BenefitItem
-              title={"Only 10% Commission"}
-              description={"Pay a small fee per ride; no subscription needed."}
+              title={'Only 10% Commission'}
+              description={'Pay a small fee per ride; no subscription needed.'}
             />
             <BenefitItem
-              title={"No Commitment"}
+              title={'No Commitment'}
               description={
-                "Ideal for part-time drivers or occasional deliveries."
+                'Ideal for part-time drivers or occasional deliveries.'
               }
             />
           </View>
@@ -91,7 +94,7 @@ const EarningsModeScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#2a1d3d" }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#2a1d3d'}}>
       <Header isBack earningScreen />
       <ScrollView
         style={styles.container}
@@ -122,10 +125,7 @@ const EarningsModeScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.tab,
-              activeTab === 'Commission' && styles.activeTab,
-            ]}
+            style={[styles.tab, activeTab === 'Commission' && styles.activeTab]}
             onPress={() => setActiveTab('Commission')}>
             <Text
               style={[
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
+    shadowOffset: {width: 0, height: 5},
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,

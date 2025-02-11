@@ -2,7 +2,7 @@ import React from 'react';
 import {SafeAreaView, View} from 'react-native';
 import ImageText from '../components/ImageText';
 import Header from '../components/Header';
-import ComingSoon from "../assets/icons/comingSoon.svg"
+import ComingSoon from '../assets/icons/comingSoon.svg';
 
 const ComingSoonScreen: React.FC = () => {
   return (
