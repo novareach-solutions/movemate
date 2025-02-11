@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   RelationId,
 } from "typeorm";
@@ -17,6 +18,7 @@ import { Agent } from "./Agent";
 import { BaseEntity } from "./BaseEntity";
 import { DropLocation } from "./DropLocation";
 import { OrderReview } from "./OrderReview";
+import { Payment } from "./Payment";
 import { PickupLocation } from "./PickupLocation";
 import { Report } from "./Report";
 import { User } from "./User";
@@ -95,6 +97,10 @@ export class SendPackageOrder extends BaseEntity {
     nullable: true,
     onDelete: "SET NULL",
   })
+  @ManyToOne(() => Agent, (agent) => agent.id, {
+    nullable: true,
+    onDelete: "SET NULL",
+  })
   @JoinColumn({ name: "agentId" })
   agent: Agent;
 
@@ -112,6 +118,7 @@ export class SendPackageOrder extends BaseEntity {
   actualTime: number;
 
   @Column({ type: "varchar", nullable: true })
+  @Column({ type: "varchar", nullable: true })
   cancellationReason: string;
 
   @Column({
@@ -120,6 +127,7 @@ export class SendPackageOrder extends BaseEntity {
   })
   canceledBy: UserRoleEnum;
 
+  @Column({ type: "varchar", nullable: true })
   @Column({ type: "varchar", nullable: true })
   completionPhoto: string;
 
@@ -142,6 +150,7 @@ export class SendPackageOrder extends BaseEntity {
   @OneToOne(() => Report, (report) => report.sendPackageOrder, {
     nullable: true,
     onDelete: "SET NULL",
+    cascade: true,
   })
   @JoinColumn({ name: "reportId" })
   report: Report;
@@ -160,4 +169,16 @@ export class SendPackageOrder extends BaseEntity {
   @RelationId((order: SendPackageOrder) => order.review)
   @Column({ type: "integer", nullable: true })
   orderReviewId: number;
+
+  // ---- Payment Specific Fields ----
+  @Column({
+    type: "enum",
+    enum: PaymentStatusEnum,
+    default: PaymentStatusEnum.NOT_PAID,
+    nullable: false,
+  })
+  paymentStatus: PaymentStatusEnum;
+
+  @OneToMany(() => Payment, (payment) => payment.order)
+  payments: Payment[];
 }
