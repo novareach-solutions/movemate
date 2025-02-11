@@ -97,10 +97,6 @@ export class SendPackageOrder extends BaseEntity {
     nullable: true,
     onDelete: "SET NULL",
   })
-  @ManyToOne(() => Agent, (agent) => agent.id, {
-    nullable: true,
-    onDelete: "SET NULL",
-  })
   @JoinColumn({ name: "agentId" })
   agent: Agent;
 
@@ -118,7 +114,6 @@ export class SendPackageOrder extends BaseEntity {
   actualTime: number;
 
   @Column({ type: "varchar", nullable: true })
-  @Column({ type: "varchar", nullable: true })
   cancellationReason: string;
 
   @Column({
@@ -127,7 +122,6 @@ export class SendPackageOrder extends BaseEntity {
   })
   canceledBy: UserRoleEnum;
 
-  @Column({ type: "varchar", nullable: true })
   @Column({ type: "varchar", nullable: true })
   completionPhoto: string;
 
@@ -172,13 +166,11 @@ export class SendPackageOrder extends BaseEntity {
 
   // ---- Payment Specific Fields ----
   @Column({
-    type: "enum",
+    type: "varchar",
     enum: PaymentStatusEnum,
     default: PaymentStatusEnum.NOT_PAID,
     nullable: false,
   })
-  paymentStatus: PaymentStatusEnum;
-
   @OneToMany(() => Payment, (payment) => payment.order)
   payments: Payment[];
 }

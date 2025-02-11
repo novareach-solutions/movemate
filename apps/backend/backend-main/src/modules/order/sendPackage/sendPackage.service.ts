@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from "@nestjs/common";
 import { Between, In } from "typeorm";
 
 import { DropLocation } from "../../../entity/DropLocation";
@@ -31,14 +35,18 @@ import { UserHasRunningOrderError } from "../../../shared/errors/user";
 import { CustomerNotificationGateway } from "../../../shared/gateways/customer.notification.gateway";
 import { parseTimeToMinutes } from "../../../utils/timeFns";
 import { dbReadRepo, dbRepo } from "../../database/database.service";
+import { NotificationService } from "../../notification/notification.service";
 import { PricingService } from "../../pricing/pricing.service";
 import { TSendPackageOrder } from "./sendPackage.types";
 
 @Injectable()
 export class SendAPackageService {
+  private readonly logger = new Logger(SendAPackageService.name);
+
   constructor(
     private readonly pricingService: PricingService,
     private readonly customerNotificationGateway: CustomerNotificationGateway,
+    private readonly orderNotificationService: NotificationService,
   ) {}
   async create(data: TSendPackageOrder): Promise<SendPackageOrder> {
     this.logger.debug(
@@ -65,7 +73,7 @@ export class SendAPackageService {
       );
 
       if (existingRunningOrder) {
-        logger.error(
+        this.logger.error(
           `SendAPackageService.create: User with ID ${data.customerId} already has a running order with ID ${existingRunningOrder.id}`,
         );
         throw new UserHasRunningOrderError(`You already have a running order.`);
@@ -334,7 +342,7 @@ export class SendAPackageService {
     orderId: number,
     agentId: number,
   ): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendPackageService.acceptOrder: Agent attempting to accept order ID ${orderId}`,
     );
 
@@ -363,12 +371,12 @@ export class SendAPackageService {
     order.acceptedAt = new Date();
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    logger.debug(
+    this.logger.debug(
       `SendPackageService.acceptOrder: Order ID ${orderId} accepted successfully`,
     );
 
     // Notify customer about acceptance
-    await this.notifyCustomerOrderAccepted(updatedOrder);
+    await this.orderNotificationService.notifyOrderAccepted(updatedOrder);
 
     return updatedOrder;
   }
@@ -437,6 +445,10 @@ export class SendAPackageService {
     this.logger.debug(
       `SendAPackageService.completeOrder: Order ID ${orderId} completed successfully`,
     );
+
+    // Notify customer about completion
+    await this.orderNotificationService.notifyOrderCompleted(updatedOrder);
+
     return updatedOrder;
   }
 
@@ -480,6 +492,10 @@ export class SendAPackageService {
     this.logger.debug(
       `SendAPackageService.agentCancelOrder: Order ID ${orderId} canceled successfully by agent`,
     );
+
+    // Notify customer about cancellation
+    await this.orderNotificationService.notifyOrderCancelled(updatedOrder);
+
     return updatedOrder;
   }
 
@@ -567,7 +583,7 @@ export class SendAPackageService {
       "agentAcceptedRequest",
       notificationData,
     );
-    logger.debug(
+    this.logger.debug(
       `SendPackageService.notifyCustomerOrderAccepted: Notified customer ID ${order.customerId} about order acceptance.`,
     );
   }

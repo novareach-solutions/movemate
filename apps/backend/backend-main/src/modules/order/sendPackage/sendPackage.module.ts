@@ -11,6 +11,7 @@ import { TokenService } from "../../auth/utils/generateTokens";
 import { OtpService } from "../../auth/utils/otp";
 import { AwsModule } from "../../media/aws.module";
 import { MediaService } from "../../media/media.service";
+import { NotificationModule } from "../../notification/notification.module";
 import { PricingService } from "../../pricing/pricing.service";
 import { RedisService } from "../../redis/redis.service";
 import { SendPackageController } from "./sendPackage.controller";
@@ -22,6 +23,7 @@ import { SendAPackageService } from "./sendPackage.service";
       isGlobal: true,
     }),
     AwsModule,
+    NotificationModule,
   ],
   controllers: [SendPackageController],
   providers: [
