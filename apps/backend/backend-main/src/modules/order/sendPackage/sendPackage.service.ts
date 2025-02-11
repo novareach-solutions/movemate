@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Between, In } from "typeorm";
 
 import { DropLocation } from "../../../entity/DropLocation";
@@ -39,6 +39,7 @@ export class SendAPackageService {
   constructor(
     private readonly pricingService: PricingService,
     private readonly customerNotificationGateway: CustomerNotificationGateway,
+    private readonly logger = new Logger(SendAPackageService.name)
   ) {}
   async create(data: TSendPackageOrder): Promise<SendPackageOrder> {
     this.logger.debug(
@@ -65,7 +66,7 @@ export class SendAPackageService {
       );
 
       if (existingRunningOrder) {
-        logger.error(
+        this.logger.error(
           `SendAPackageService.create: User with ID ${data.customerId} already has a running order with ID ${existingRunningOrder.id}`,
         );
         throw new UserHasRunningOrderError(`You already have a running order.`);
@@ -334,7 +335,7 @@ export class SendAPackageService {
     orderId: number,
     agentId: number,
   ): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendPackageService.acceptOrder: Agent attempting to accept order ID ${orderId}`,
     );
 
@@ -363,7 +364,7 @@ export class SendAPackageService {
     order.acceptedAt = new Date();
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    logger.debug(
+    this.logger.debug(
       `SendPackageService.acceptOrder: Order ID ${orderId} accepted successfully`,
     );
 
@@ -567,7 +568,7 @@ export class SendAPackageService {
       "agentAcceptedRequest",
       notificationData,
     );
-    logger.debug(
+    this.logger.debug(
       `SendPackageService.notifyCustomerOrderAccepted: Notified customer ID ${order.customerId} about order acceptance.`,
     );
   }
