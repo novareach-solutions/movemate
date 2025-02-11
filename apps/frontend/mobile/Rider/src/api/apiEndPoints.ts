@@ -9,7 +9,7 @@ const apiEndPoints = {
   requestOtp: createEndpoint('/auth/otp/request'),
   verifyOtp: createEndpoint('/auth/otp/verify'),
   login: createEndpoint('/auth/login'),
-  refreshToken: createEndpoint('/auth/refresh_token'),
+  refreshToken: createEndpoint('/auth/refresh-token'),
   agentSignup: createEndpoint('/agent/signup'),
   fetchProfile: createEndpoint('/agent/profile'),
   fetchVehicles: createEndpoint('/vehicles'),
