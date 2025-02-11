@@ -19,6 +19,8 @@ import {
   AgentStatusEnum,
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
+import Mapbox from '@rnmapbox/maps';
+import { MAPBOX_ACCESS_TOKEN } from "../../utils/constants";
 import {showOrderModal, fetchOngoingOrder} from '../../redux/slices/orderSlice';
 import {io} from 'socket.io-client';
 import apiClient from '../../api/apiClient';
@@ -32,7 +34,7 @@ import Header from '../../components/Header';
 import Money from '../../assets/icons/money.svg';
 import Order from '../../assets/icons/orders.svg';
 import Distance from '../../assets/icons/distance.svg';
-
+Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
@@ -197,10 +199,10 @@ const HomeScreen: React.FC = () => {
       <Header logo home help />
       {/* Map Image */}
       <View style={styles.mapContainer}>
-        <Image
-          source={require('../../assets/images/Map.png')}
-          style={styles.mapImage}
-        />
+      <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+                    <Mapbox.Camera zoomLevel={14} centerCoordinate={ [151.209900, -33.865143]} />
+
+                  </Mapbox.MapView>
       </View>
 
       {/* Status Button */}
