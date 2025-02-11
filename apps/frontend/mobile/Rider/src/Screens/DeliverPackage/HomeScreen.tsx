@@ -171,7 +171,7 @@ const HomeScreen: React.FC = () => {
       }
       if (
         ongoingOrder.status === OrderStatusEnum.ACCEPTED ||
-        ongoingOrder.status === OrderStatusEnum.PENDING
+        ongoingOrder.status === OrderStatusEnum.PENDING || OrderStatusEnum.IN_PROGRESS
       ) {
         navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
           order: ongoingOrder,

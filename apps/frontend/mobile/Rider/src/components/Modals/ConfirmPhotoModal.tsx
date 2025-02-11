@@ -8,9 +8,9 @@ import {
   Image,
   TextStyle,
 } from 'react-native';
-import {colors} from '../../theme/colors';
-import {typography} from '../../theme/typography';
-import {formStyles} from '../../theme/form';
+import { colors } from '../../theme/colors';
+import { typography } from '../../theme/typography';
+import { formStyles } from '../../theme/form';
 import PlaceHolderProfile from '../../assets/icons/placeHolderProfile.svg';
 
 interface ConfirmPhotoModalProps {
@@ -39,7 +39,11 @@ const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
 
         {/* Display Selected Image */}
         <View style={styles.imageContainer}>
-          <PlaceHolderProfile style={styles.image} />
+          {image ? (
+            <Image source={{ uri: image }} style={styles.image} />
+          ) : (
+            <PlaceHolderProfile style={styles.image} />
+          )}
         </View>
 
         {/* Buttons */}

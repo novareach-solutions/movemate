@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import EarningsModal from '../components/Modals/EarningsModal';
-import {colors} from '../theme/colors';
-import {useNavigation} from '@react-navigation/native';
-import {DeliverAPackage} from '../navigation/ScreenNames';
+import { colors } from '../theme/colors';
+import { useNavigation } from '@react-navigation/native';
+import { DeliverAPackage } from '../navigation/ScreenNames';
 
 const EarningsDetailsScreen: React.FC = () => {
   const [isEarningsModalVisible, setIsEarningsModalVisible] =
@@ -27,11 +27,12 @@ const EarningsDetailsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.openModalButton}
-        onPress={handleOpenEarningsModal}>
-        <Text style={styles.openModalButtonText}>View Earnings Details</Text>
-      </TouchableOpacity>
+      <View style={styles.mapContainer}>
+        <Image
+          source={require('../assets/images/Map.png')}
+          style={styles.mapImage}
+        />
+      </View>
 
       <EarningsModal
         isVisible={isEarningsModalVisible}
@@ -63,6 +64,14 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  mapContainer: {
+    flex: 1,
+  },
+  mapImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 });
 
