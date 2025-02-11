@@ -12,6 +12,7 @@ import {
 } from "@nestjs/common";
 
 import { AuthGuard } from "../../shared/guards/auth.guard";
+import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse } from "../../shared/interface";
 import {
   TConnectAccountRequest,
@@ -24,7 +25,7 @@ import { PaymentService } from "./payment.service";
 import { StripeService } from "./stripe.service";
 
 @Controller("stripe")
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RoleGuard)
 export class StripeController {
   private readonly logger = new Logger(StripeController.name);
   constructor(

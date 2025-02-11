@@ -1,0 +1,248 @@
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Image,
+  Animated,
+} from 'react-native';
+import StatCard from '../../components/StatCard';
+import { colors } from '../../theme/colors';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AppScreensParamList } from '../../navigation/ScreenNames';
+import Header from '../../components/Header';
+import DeliveryModal from '../../components/Modals/DeliveryModal';
+import ExpandedModal from '../../components/Modals/ExpandedModal';
+import EarningsModal from '../../components/Modals/EarningsModal';
+import OrderModal from '../../components/Modals/OrderModal';
+import Money from "../../assets/icons/money.svg"
+import Order from "../../assets/icons/orders.svg"
+import Distance from "../../assets/icons/distance.svg"
+
+
+const HomeScreen: React.FC = () => {
+  const [isOnline, setIsOnline] = useState(false);
+  const [drawerHeight] = useState(new Animated.Value(0));
+  const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
+  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
+  const [isDeliveryModal, setIsDeliveryModal] = useState(false);
+  const [isEarningsModal, setIsEarningsModal] = useState(false);
+  const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
+
+  const toggleStatus = () => {
+    setIsOnline(!isOnline);
+    Animated.timing(drawerHeight, {
+      toValue: isOnline ? 0 : 120,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  // Show the `DeliveryModal` after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsOrderModalVisible(true);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleTakePhoto = () => {
+    console.log('Taking a photo for proof...');
+    // Add your camera logic here
+  };
+
+  const handleOrderDelivered = () => {
+    console.log('Order marked as delivered.');
+    setIsDeliveryModal(false);
+    setTimeout(() => {
+      setIsEarningsModal(true);
+    }, 300);
+  };
+  const handleOrderStarted = () => {
+    console.log('Order marked as delivered.');
+    setIsExpandedModalVisible(false);
+    setTimeout(() => {
+      setIsDeliveryModal(true);
+    }, 300);
+  };
+
+  // Handle "Accept Order" button press
+  const handleAcceptOrder = () => {
+    setIsOrderModalVisible(false);
+    setTimeout(() => {
+      setIsExpandedModalVisible(true);
+    }, 300);
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <Header logo home help />
+        {/* Map Image */}
+        <View style={styles.mapContainer}>
+          <Image source={require('../../assets/images/Map.png')} style={styles.mapImage} />
+        </View>
+
+        {/* Status Button */}
+        <View style={styles.statusContainer}>
+          <TouchableOpacity
+            onPress={toggleStatus}
+            style={[
+              styles.statusButton,
+              isOnline ? styles.stopButton : styles.goButton,
+            ]}>
+            <Text
+              style={[
+                styles.statusButtonText,
+                isOnline ? styles.stopText : styles.goText,
+              ]}>
+              {isOnline ? 'Stop' : 'GO'}
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.statusText}>
+            {isOnline ? "You're Online" : "You're Offline"}
+          </Text>
+        </View>
+
+        {/* Sliding Drawer */}
+        <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
+          <View style={styles.statsContainer}>
+            <StatCard icon={Money} value="$50" label="EARNINGS" />
+            <StatCard icon={Order} value="7" label="ORDERS" />
+            <StatCard
+              icon={Distance}
+              value="30 Km"
+              label="DISTANCE"
+            />
+          </View>
+        </Animated.View>
+
+
+        {/* Order Modal */}
+        <OrderModal
+          isVisible={isOrderModalVisible}
+          onClose={handleAcceptOrder}
+          earnings="$21.89"
+          tip="$11.89"
+          time="15 mins"
+          distance="7.6 Km"
+          pickupAddress="Yocha (Tom Roberts Parade)"
+          dropoffAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
+        />
+
+        {/* Earnings Modal */}
+        <EarningsModal
+          isVisible={isEarningsModal}
+          onClose={() => setIsEarningsModal(false)}
+          tripTime="26 mins"
+          tripDistance="5.2 km"
+          tripPay={55}
+          tip={5}
+          totalEarnings={60}
+        />
+
+        {/* Delivery Modal */}
+        <DeliveryModal
+          isVisible={isDeliveryModal}
+          onClose={handleOrderDelivered}
+          driverName="Alexander V."
+          deliveryAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
+          deliveryInstructions={['Do not ring the bell', 'Drop-off at the door']}
+          itemsToDeliver={['Documents']}
+        />
+
+        {/*Order Expanded Modal */}
+        <ExpandedModal
+          isVisible={isExpandedModalVisible}
+          onClose={handleOrderStarted}
+          driverName="Alexander V."
+          pickupAddress="Yocha (Tom Roberts Parade)"
+          pickupNotes="Deliver to the back door, main gate is locked."
+          items={['Documents', 'Laptop', 'Bag']}
+        />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.lightButtonBackground
+  },
+  mapContainer: {
+    flex: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  mapImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  statusContainer: {
+    alignItems: 'center',
+    marginTop: -100,
+    backgroundColor:colors.white
+  },
+  statusButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    marginTop:-40
+  },
+  stopButton: {
+    backgroundColor: colors.error,
+    borderColor: colors.error,
+  },
+  goButton: {
+    backgroundColor: colors.white,
+    borderColor: colors.purple,
+  },
+  statusButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  stopText: {
+    color: colors.white,
+  },
+  goText: {
+    color: colors.purple,
+  },
+  statusText: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: '500',
+    color: colors.text.primary,
+  },
+  drawer: {
+    backgroundColor: colors.white,
+    overflow: 'hidden',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: -2 },
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor:colors.white
+  },
+  helpButtonContainer: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+  },
+});
+
+export default HomeScreen;

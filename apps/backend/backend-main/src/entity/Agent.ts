@@ -93,8 +93,7 @@ export class Agent extends BaseEntity implements TAgent {
   subscriptions: AgentSubscription[];
 
   @Column({
-    type: "enum",
-    enum: ApprovalStatusEnum,
+    type: "varchar",
     default: ApprovalStatusEnum.PENDING,
     nullable: false,
   })

@@ -1,12 +1,11 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { Between } from "typeorm";
+import { Between, In } from "typeorm";
 
 import { DropLocation } from "../../../entity/DropLocation";
 import { OrderReview } from "../../../entity/OrderReview";
 import { PickupLocation } from "../../../entity/PickupLocation";
 import { Report } from "../../../entity/Report";
 import { SendPackageOrder } from "../../../entity/SendPackageOrder";
-import { logger } from "../../../logger";
 import {
   OrderStatusEnum,
   OrderTypeEnum,
@@ -28,13 +27,21 @@ import {
   SendPackageOrderNotCompletedError,
   SendPackageReviewCommentRequiredError,
 } from "../../../shared/errors/sendAPackage";
+import { UserHasRunningOrderError } from "../../../shared/errors/user";
+import { CustomerNotificationGateway } from "../../../shared/gateways/customer.notification.gateway";
+import { parseTimeToMinutes } from "../../../utils/timeFns";
 import { dbReadRepo, dbRepo } from "../../database/database.service";
+import { PricingService } from "../../pricing/pricing.service";
 import { TSendPackageOrder } from "./sendPackage.types";
 
 @Injectable()
 export class SendAPackageService {
+  constructor(
+    private readonly pricingService: PricingService,
+    private readonly customerNotificationGateway: CustomerNotificationGateway,
+  ) {}
   async create(data: TSendPackageOrder): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       "SendAPackageService.create: Creating a new send package order",
     );
     const queryRunner =
@@ -42,6 +49,29 @@ export class SendAPackageService {
     await queryRunner.startTransaction();
 
     try {
+      // Check if the user already has a running order
+      const existingRunningOrder = await queryRunner.manager.findOne(
+        SendPackageOrder,
+        {
+          where: {
+            customerId: data.customerId,
+            status: In([
+              OrderStatusEnum.PENDING,
+              OrderStatusEnum.IN_PROGRESS,
+              OrderStatusEnum.ACCEPTED,
+            ]),
+          },
+        },
+      );
+
+      if (existingRunningOrder) {
+        logger.error(
+          `SendAPackageService.create: User with ID ${data.customerId} already has a running order with ID ${existingRunningOrder.id}`,
+        );
+        throw new UserHasRunningOrderError(`You already have a running order.`);
+      }
+
+      // Check or create PickupLocation
       let pickupLocation = await queryRunner.manager.findOne(PickupLocation, {
         where: {
           latitude: data.pickupLocation.latitude,
@@ -58,11 +88,11 @@ export class SendAPackageService {
           PickupLocation,
           pickupLocation,
         );
-        logger.debug(
+        this.logger.debug(
           `SendAPackageService.create: Created new PickupLocation with ID ${pickupLocation.id}`,
         );
       } else {
-        logger.debug(
+        this.logger.debug(
           `SendAPackageService.create: Reusing existing PickupLocation with ID ${pickupLocation.id}`,
         );
       }
@@ -83,14 +113,22 @@ export class SendAPackageService {
           DropLocation,
           dropLocation,
         );
-        logger.debug(
+        this.logger.debug(
           `SendAPackageService.create: Created new DropLocation with ID ${dropLocation.id}`,
         );
       } else {
-        logger.debug(
+        this.logger.debug(
           `SendAPackageService.create: Reusing existing DropLocation with ID ${dropLocation.id}`,
         );
       }
+
+      const estimatedTimeInMinutes = parseTimeToMinutes(data.estimatedTime);
+
+      const price = this.pricingService.calculateFare({
+        distance: data.estimatedDistance,
+        estimatedTime: estimatedTimeInMinutes,
+        packageWeight: 3, // Static value for now
+      });
 
       const sendPackageOrder = queryRunner.manager.create(SendPackageOrder, {
         senderName: data.senderName,
@@ -104,7 +142,7 @@ export class SendAPackageService {
         estimatedDistance: data.estimatedDistance,
         estimatedTime: data.estimatedTime,
         customerId: data.customerId,
-        price: data.price,
+        price,
         type: OrderTypeEnum.DELIVERY,
         status: OrderStatusEnum.PENDING,
         paymentStatus: PaymentStatusEnum.NOT_PAID,
@@ -114,7 +152,7 @@ export class SendAPackageService {
         SendPackageOrder,
         sendPackageOrder,
       );
-      logger.debug(
+      this.logger.debug(
         `SendAPackageService.create: Created SendPackageOrder with ID ${savedOrder.id}`,
       );
 
@@ -122,13 +160,18 @@ export class SendAPackageService {
       return savedOrder;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      logger.error(
+      this.logger.error(
         `SendAPackageService.create: Failed to create order - ${error}`,
         {
           stack: (error as Error).stack,
           ...error,
         },
       );
+
+      if (error instanceof UserHasRunningOrderError) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(
         "Failed to create send package order",
       );
@@ -141,7 +184,7 @@ export class SendAPackageService {
     orderId: number,
     reason: string,
   ): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.cancelOrder: Attempting to cancel order ID ${orderId}`,
     );
 
@@ -170,7 +213,7 @@ export class SendAPackageService {
     order.canceledBy = UserRoleEnum.CUSTOMER;
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.cancelOrder: Order ID ${orderId} canceled successfully`,
     );
     return updatedOrder;
@@ -181,7 +224,7 @@ export class SendAPackageService {
     reason: string,
     details: string,
   ): Promise<Report> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.reportAgent: Reporting agent for order ID ${orderId}`,
     );
 
@@ -206,7 +249,7 @@ export class SendAPackageService {
       customer: order.customer,
       sendPackageOrderId: order.id,
     });
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.reportAgent: Report created with ID ${savedReport.id} for order ID ${orderId}`,
     );
     return savedReport;
@@ -217,7 +260,7 @@ export class SendAPackageService {
     rating: number,
     comment: string,
   ): Promise<OrderReview> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.leaveReview: Leaving review for order ID ${orderId}`,
     );
 
@@ -251,7 +294,7 @@ export class SendAPackageService {
       customer: order.customer,
       sendPackageOrderId: order.id,
     });
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.leaveReview: Review created with ID ${savedReview.id} for order ID ${orderId}`,
     );
 
@@ -259,7 +302,7 @@ export class SendAPackageService {
   }
 
   async getOrderDetails(orderId: number): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.getOrderDetails: Fetching details for order ID ${orderId}`,
     );
 
@@ -279,7 +322,7 @@ export class SendAPackageService {
       throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
     }
 
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.getOrderDetails: Successfully fetched details for order ID ${orderId}`,
     );
     return order;
@@ -292,7 +335,7 @@ export class SendAPackageService {
     agentId: number,
   ): Promise<SendPackageOrder> {
     logger.debug(
-      `SendAPackageService.acceptOrder: Agent attempting to accept order ID ${orderId}`,
+      `SendPackageService.acceptOrder: Agent attempting to accept order ID ${orderId}`,
     );
 
     const order = await dbRepo(SendPackageOrder).findOne({
@@ -305,7 +348,13 @@ export class SendAPackageService {
 
     if (order.status !== OrderStatusEnum.PENDING) {
       throw new SendPackageAgentAcceptError(
-        `Order ID ${orderId} cannot be accepted in its current status`,
+        `This Order cannot be accepted in its current status`,
+      );
+    }
+
+    if (order.agentId) {
+      throw new SendPackageAgentAcceptError(
+        `This Order cannot be accepted as it is already assigned`,
       );
     }
 
@@ -315,8 +364,12 @@ export class SendAPackageService {
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
     logger.debug(
-      `SendAPackageService.acceptOrder: Order ID ${orderId} accepted successfully`,
+      `SendPackageService.acceptOrder: Order ID ${orderId} accepted successfully`,
     );
+
+    // Notify customer about acceptance
+    await this.notifyCustomerOrderAccepted(updatedOrder);
+
     return updatedOrder;
   }
 
@@ -324,7 +377,7 @@ export class SendAPackageService {
     orderId: number,
     agentId: number,
   ): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.startOrder: Agent attempting to start order ID ${orderId}`,
     );
 
@@ -352,14 +405,14 @@ export class SendAPackageService {
     order.startedAt = new Date();
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.startOrder: Order ID ${orderId} started successfully`,
     );
     return updatedOrder;
   }
 
   async completeOrder(orderId: number): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.completeOrder: Agent attempting to complete order ID ${orderId}`,
     );
 
@@ -381,7 +434,7 @@ export class SendAPackageService {
     order.completedAt = new Date();
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.completeOrder: Order ID ${orderId} completed successfully`,
     );
     return updatedOrder;
@@ -391,7 +444,7 @@ export class SendAPackageService {
     orderId: number,
     reason: string,
   ): Promise<SendPackageOrder> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.agentCancelOrder: Agent attempting to cancel order ID ${orderId}`,
     );
 
@@ -424,14 +477,14 @@ export class SendAPackageService {
     order.canceledBy = UserRoleEnum.AGENT;
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.agentCancelOrder: Order ID ${orderId} canceled successfully by agent`,
     );
     return updatedOrder;
   }
 
   async reportIssue(orderId: number, issue: string): Promise<Report> {
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.reportIssue: Agent reporting issue for order ID ${orderId}`,
     );
 
@@ -453,7 +506,7 @@ export class SendAPackageService {
       customerId: order.customerId,
       orderId: order.id,
     });
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.reportIssue: Issue reported with ID ${savedReport.id} for order ID ${orderId}`,
     );
     return savedReport;
@@ -462,7 +515,7 @@ export class SendAPackageService {
   // ====== Admin Service Methods ======
 
   async getAllOrders(query: any): Promise<SendPackageOrder[]> {
-    logger.debug(
+    this.logger.debug(
       "SendAPackageService.getAllOrders: Retrieving all orders with filters",
     );
 
@@ -495,9 +548,27 @@ export class SendAPackageService {
       ],
     });
 
-    logger.debug(
+    this.logger.debug(
       `SendAPackageService.getAllOrders: Retrieved ${orders.length} orders`,
     );
     return orders;
+  }
+
+  // private methods
+  private notifyCustomerOrderAccepted(order: SendPackageOrder): void {
+    const notificationData = {
+      orderId: order.id,
+      agentId: order.agentId,
+      message: `Your order has been accepted by Agent ID ${order.agentId}.`,
+      timestamp: new Date(),
+    };
+    this.customerNotificationGateway.sendMessageToClient(
+      order.customerId.toString(),
+      "agentAcceptedRequest",
+      notificationData,
+    );
+    logger.debug(
+      `SendPackageService.notifyCustomerOrderAccepted: Notified customer ID ${order.customerId} about order acceptance.`,
+    );
   }
 }
