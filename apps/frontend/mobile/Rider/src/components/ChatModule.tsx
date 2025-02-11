@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,15 +11,16 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {colors} from '../theme/colors';
-import {typography} from '../theme/typography';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
 import Header from './Header';
 import SendIcon from '../assets/icons/sendIcon.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Message {
   id: string;
-  text: string;
-  sender: 'user' | 'receiver';
+  content: string;
+  senderId: number;
   time: string;
   senderImage?: string;
 }
@@ -31,8 +32,17 @@ interface ChatModuleProps {
   onReport?: () => void;
 }
 
-const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
+const ChatModule: React.FC<ChatModuleProps> = ({ messages, onSend }) => {
   const [inputText, setInputText] = useState('');
+  const [senderId, setSenderId] = useState<string | null>(null); // Added state for senderId
+
+  useEffect(() => {
+    const fetchSenderId = async () => {
+      const id = await AsyncStorage.getItem('userId');
+      setSenderId(id);
+    };
+    fetchSenderId();
+  }, []);
 
   const handleSend = () => {
     if (inputText.trim()) {
@@ -41,29 +51,32 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
     }
   };
 
-  const renderMessageBubble = ({item}: {item: Message}) => {
-    const isUser = item.sender === 'user';
+  const renderMessageBubble = ({ item }: { item: Message }) => {
+    const isUser = item.senderId.toString() === senderId;
     return (
       <View style={styles.messageWrapper}>
         <View
           style={[
             styles.messageBubble,
             isUser ? styles.userMessage : styles.receiverMessage,
-          ]}>
+          ]}
+        >
           {!isUser && item.senderImage && (
             <Image
-              source={{uri: item.senderImage}}
+              source={{ uri: item.senderImage }}
               style={styles.senderImage}
             />
           )}
           <View
-            style={[styles.textContainer, isUser && styles.userTextContainer]}>
+            style={[styles.textContainer, isUser && styles.userTextContainer]}
+          >
             <Text
               style={[
                 styles.messageText,
                 isUser ? styles.userText : styles.receiverText,
-              ]}>
-              {item.text}
+              ]}
+            >
+              {item.content}
             </Text>
           </View>
         </View>
@@ -71,7 +84,8 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
           style={[
             styles.timeText,
             isUser ? styles.userTimeText : styles.receiverTimeText,
-          ]}>
+          ]}
+        >
           {item.time}
         </Text>
       </View>
@@ -81,19 +95,17 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
   return (
     <SafeAreaView style={styles.container}>
       <Header logo isBack />
-      {/* Messages */}
       <FlatList
         data={messages}
         renderItem={renderMessageBubble}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={styles.messageList}
         inverted
       />
-
-      {/* Input Field */}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={80}>
+        keyboardVerticalOffset={80}
+      >
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.inputField}
@@ -168,7 +180,7 @@ const styles = StyleSheet.create({
   },
   receiverTimeText: {
     alignSelf: 'flex-start',
-    marginLeft: 45, // Account for the sender image width
+    marginLeft: 45,
   },
   messageList: {
     paddingHorizontal: 15,

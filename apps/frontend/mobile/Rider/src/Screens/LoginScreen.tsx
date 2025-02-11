@@ -19,7 +19,7 @@ import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
 import {useAppDispatch} from '../redux/hook';
 import Logo from '../assets/icons/logo.svg';
 import Header from '../components/Header';
-import { requestOtp } from '../redux/slices/authSlice';
+import {requestOtp} from '../redux/slices/authSlice';
 
 const {width} = Dimensions.get('window');
 
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     height: width * 0.3,
     resizeMode: 'contain',
     marginBottom: 30,
-    marginTop:20,
+    marginTop: 20,
     alignSelf: 'center',
   },
   heading: {

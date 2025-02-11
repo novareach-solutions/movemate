@@ -42,7 +42,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   /**
    * Create a new user.
@@ -55,7 +55,7 @@ export class UserController {
     @Body() createUserDto: TCreateUser,
     @Req() request: ICustomRequest,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<IApiResponse<{ accessToken: string, userId: number }>> {
+  ): Promise<IApiResponse<{ accessToken: string; userId: number }>> {
     const phoneNumberFromGuard = request.user.phoneNumber;
     if (
       createUserDto.phoneNumber &&

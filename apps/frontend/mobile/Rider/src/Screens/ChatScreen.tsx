@@ -1,49 +1,82 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import ChatModule from '../components/ChatModule';
+import io from 'socket.io-client';
+import axios from 'axios';
+import {useRoute} from '@react-navigation/native';
+import apiEndPoints from '../api/apiEndPoints';
+
+const SOCKET_URL = `${apiEndPoints.baseURL}/order-chat`;
 
 const ChatScreen = () => {
-  const [messages, setMessages] = useState([
-    {
-      id: '1',
-      text: 'Hi, Johnathon',
-      sender: 'receiver' as const, // Explicitly cast to union type
-      time: '12:56 PM',
-      senderImage: 'https://i.pravatar.cc/100',
-    },
-    {id: '2', text: 'Hey, Yes', sender: 'user' as const, time: '12:57 PM'},
-    {
-      id: '3',
-      text: 'How can I help you?',
-      sender: 'receiver' as const,
-      time: '12:58 PM',
-      senderImage: 'https://i.pravatar.cc/100',
-    },
-    {
-      id: '4',
-      text: 'I need some assistance with my order.',
-      sender: 'user' as const,
-      time: '12:59 PM',
-    },
-  ]);
+  const route = useRoute();
+  const {orderId, senderId, headerTitle} = route.params as {
+    orderId: number;
+    senderId: number;
+    headerTitle: string;
+  };
 
-  const handleSend = (message: string) => {
-    const newMessage = {
-      id: `${messages.length + 1}`,
-      text: message,
-      sender: 'user' as const, // Explicitly cast to union type
-      time: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
+  const [messages, setMessages] = useState<any[]>([]);
+  const [socket, setSocket] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchPreviousMessages = async () => {
+      try {
+        const response = await axios.get(
+          `${apiEndPoints.baseURL}/order-chat/${orderId}/messages`,
+        );
+        console.log('Response', response);
+        setMessages(response.data.reverse());
+      } catch (error) {
+        console.error('Error fetching previous messages:', error);
+      }
     };
-    setMessages([newMessage, ...messages]);
+
+    fetchPreviousMessages();
+  }, [orderId]);
+
+  useEffect(() => {
+    const newSocket = io(SOCKET_URL, {
+      transports: ['websocket'],
+    });
+    setSocket(newSocket);
+
+    newSocket.on('connect', () => {
+      console.log('Connected to order-chat socket', newSocket.id);
+      newSocket.emit('joinOrderRoom', {orderId});
+    });
+
+    newSocket.on('newOrderMessage', (message: any) => {
+      console.log('New order message received:', message);
+      setMessages(prevMessages => [message, ...prevMessages]);
+    });
+
+    newSocket.on('userTyping', (data: any) => {
+      console.log('User typing:', data);
+    });
+
+    return () => {
+      if (newSocket) {
+        newSocket.emit('leaveOrderRoom', {orderId});
+        newSocket.disconnect();
+      }
+    };
+  }, [orderId]);
+
+  const handleSend = (messageText: string) => {
+    if (socket) {
+      socket.emit('sendOrderMessage', {
+        orderId,
+        senderId,
+        content: messageText,
+      });
+    }
   };
 
   return (
     <ChatModule
       messages={messages}
       onSend={handleSend}
-      headerTitle="Alexander V."
+      headerTitle={headerTitle || 'Chat'}
       onReport={() => console.log('Report pressed')}
     />
   );
