@@ -16,7 +16,10 @@ import {typography} from '../theme/typography';
 import {colors} from '../theme/colors';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, DeliverAPackage} from '../navigation/ScreenNames';
-
+import { getCurrentLocation, requestLocation } from '../utils/helpers';
+import { mapSuggestions } from '../api/mapboxApi';
+import { updateCurrentLocation } from '../redux/slices/authSlice';
+import { useDispatch } from 'react-redux';
 const {width, height} = Dimensions.get('window');
 
 interface Slide {
@@ -38,18 +41,74 @@ const slides: Slide[] = [
 const Onboarding: React.FC = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const navigation = useNavigation();
-
+  const dispatch = useDispatch();
   const updateSlidePosition = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
     const currentIndex = Math.round(contentOffsetX / width);
     setCurrentSlideIndex(currentIndex);
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+
+      requestLocationpermission();
+    }, 1000);
+  }, [])
+
+  const requestLocationpermission = () => {
+    // if (locationStatus) {
+    //   getCurrentLocation(callback);
+    // } else {
+    getLocationPermission();
+    // }
+  };
+
+  const getLocationPermission = async () => {
+    const isAllowed = await requestLocation();
+    if (isAllowed) {
+      await getCurrentLocation(callback);
+    }
+  };
+
+  const callback = async (data: any) => {
+    console.log('-----callback------', data);
+    if (data?.coords) {
+      const latitude = await data?.coords?.latitude;
+      const longitude = await data?.coords?.longitude;
+      mapSuggestions(longitude, latitude, responseCallback)
+      const altitude = await data?.coords?.altitude;
+      const horizontal_accuracy = await data?.coords?.accuracy;
+      const vertical_accuracy = await data?.coords?.altitudeAccuracy;
+      const heading = await data?.coords?.heading;
+      const timestamp = await data?.timestamp;
+      if (latitude && longitude) {
+        const isAllowed = await requestLocation();
+
+      }
+    }
+  };
+
+  const responseCallback = async (data: any) => {
+    const locationData = {
+      name: data.text,
+      address: data.place_name,
+      latitude: data.center[1],
+      longitude: data.center[0],
+      suburb: data.context?.find((c: any) => c.id.includes("place"))?.text || "",
+      state: data.context?.find((c: any) => c.id.includes("region"))?.text || "",
+      postalCode: data.context?.find((c: any) => c.id.includes("postcode"))?.text || "",
+    }
+    dispatch(updateCurrentLocation(locationData));
+  }
+
+
   const handleNavigation = () => {
     navigation.navigate(AuthScreens.SignupNumber);
-    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
     // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
     // navigation.navigate(DeliverAPackage.EnterABN);
+    // navigation.navigate(DeliverAPackage.DropOffOrderDetails);
+    // navigation.navigate(DeliverAPackage.PickUpOrderDetails);
+    // navigation.navigate(DeliverAPackage.EarningsDetails);
     // navigation.navigate(DeliverAPackage.AddProfilePhoto);
     // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
