@@ -163,8 +163,8 @@ export const login = createAsyncThunk(
           response.data.data.userId,
         );
         await saveToken('accessToken', accessToken);
-        await saveToken('userId', userId.toString());
-        await saveToken('agentId', agentId.toString());
+        await saveToken('userId', String(userId));
+        await saveToken('agentId', String(agentId));
       }
       SimpleToast('Login successful!');
       return response.data;
@@ -201,8 +201,8 @@ export const agentSignup = createAsyncThunk(
 
       // Correctly access the accessToken in the nested response
       const accessToken = response.data?.data?.accessToken;
-      const agentId = response.data?.data?.agent.id.toString();
-      const userId = response.data?.data?.agent.userId.toString();
+      const agentId = String(response.data?.data?.agent.id);
+      const userId = String(response.data?.data?.agent.userId);
 
       if (accessToken) {
         console.log('🔑 Access Token Received:', accessToken);
