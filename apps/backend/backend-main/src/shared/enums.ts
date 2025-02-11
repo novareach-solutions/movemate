@@ -37,6 +37,7 @@ export enum OrderStatusEnum {
   COMPLETED = "COMPLETED",
   IN_PROGRESS = "IN_PROGRESS",
   PENDING = "PENDING",
+  PICKEDUP_ORDER = "PICKEDUP_ORDER",
 }
 
 export enum OrderTypeEnum {
