@@ -5,6 +5,7 @@ import {
   Headers,
   Logger,
   Post,
+  Query,
   Req,
   Res,
 } from "@nestjs/common";
@@ -76,20 +77,20 @@ export class AuthController {
   @AuthPostLoginSwagger()
   async login(
     @Body() body: { phoneNumber: string; otp: string },
-    @Headers("role") role: UserRoleEnum,
+    @Query("role") role: UserRoleEnum,
     @Res() response: Response,
   ): Promise<void> {
     const { phoneNumber, otp } = body;
     const { accessToken, refreshToken, userId, agentId } =
       await this.authService.login(phoneNumber, otp, role);
-
+  
     response.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: this.configService.get<string>("ENVIRONMENT") === "production",
       sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
     });
-
+  
     this.logger.log(
       `AuthController.login: Login successful for ${phoneNumber}`,
     );
@@ -103,6 +104,7 @@ export class AuthController {
       },
     });
   }
+  
 
   @Post("refresh-token")
   @AuthPostRefreshTokenSwagger()

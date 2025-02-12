@@ -56,7 +56,6 @@ export class AgentController {
 
   // *** Agent Sign Up, Status and List Specific Controllers ***
   @Post("signup")
-  @UseGuards(OnboardingGuard)
   @AgentSignUpSwagger()
   async create(
     @Req() request: ICustomRequest,
@@ -67,20 +66,6 @@ export class AgentController {
       `AgentController.create: Attempting agent signup for phone number: ${agent.user.phoneNumber}`,
     );
 
-    const phoneNumberFromGuard = request.user.phoneNumber;
-    if (
-      agent.user.phoneNumber &&
-      agent.user.phoneNumber !== phoneNumberFromGuard
-    ) {
-      this.logger.warn(
-        `AgentController.create: Phone number mismatch during signup. Provided: ${agent.user.phoneNumber}, Auth: ${phoneNumberFromGuard}`,
-      );
-
-      throw new UnauthorizedError(
-        "The provided phone number does not match the authenticated user's phone number.",
-      );
-    }
-    agent.user.phoneNumber = phoneNumberFromGuard;
     const {
       agent: createdAgent,
       accessToken,
