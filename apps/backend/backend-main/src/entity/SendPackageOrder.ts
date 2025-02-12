@@ -173,15 +173,6 @@ export class SendPackageOrder extends BaseEntity {
   @Column({ type: "integer", nullable: true })
   orderReviewId: number;
 
-  // ---- Payment Specific Fields ----
-  @Column({
-    type: "enum",
-    enum: PaymentStatusEnum,
-    default: PaymentStatusEnum.NOT_PAID,
-    nullable: false,
-  })
-  paymentStatus: PaymentStatusEnum;
-
   @OneToMany(() => Payment, (payment) => payment.order)
   payments: Payment[];
 }

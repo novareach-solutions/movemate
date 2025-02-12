@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Between, In } from "typeorm";
 
 import { DropLocation } from "../../../entity/DropLocation";
@@ -34,12 +34,14 @@ import { parseTimeToMinutes } from "../../../utils/timeFns";
 import { dbReadRepo, dbRepo } from "../../database/database.service";
 import { PricingService } from "../../pricing/pricing.service";
 import { TSendPackageOrder } from "./sendPackage.types";
+import { logger } from "../../../logger";
 
 @Injectable()
 export class SendAPackageService {
   constructor(
     private readonly pricingService: PricingService,
     private readonly customerNotificationGateway: CustomerNotificationGateway,
+    // private readonly logger = new Logger(SendAPackageService.name)
   ) {}
   async create(data: TSendPackageOrder): Promise<SendPackageOrder> {
     logger.debug(
