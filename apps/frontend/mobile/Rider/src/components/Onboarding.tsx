@@ -98,6 +98,7 @@ const Onboarding: React.FC = () => {
       state: data.context?.find((c: any) => c.id.includes("region"))?.text || "",
       postalCode: data.context?.find((c: any) => c.id.includes("postcode"))?.text || "",
     }
+    console.log('locationData', locationData)
     dispatch(updateCurrentLocation(locationData));
   }
 

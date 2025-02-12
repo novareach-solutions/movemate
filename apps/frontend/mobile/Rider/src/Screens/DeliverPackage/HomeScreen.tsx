@@ -44,6 +44,9 @@ const HomeScreen: React.FC = () => {
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated,
   );
+  const currentLocation = useSelector(
+    (state: RootState) => state.auth.currentLocation,
+  );
   const ongoingOrder = useSelector(
     (state: RootState) => state.order.ongoingOrder,
   );
@@ -63,12 +66,12 @@ const HomeScreen: React.FC = () => {
       console.error('Error updating location:', error);
     }
   };
-
+console.log('currentLocation', currentLocation)
   useEffect(() => {
     let locationInterval: NodeJS.Timeout | null = null;
     if (isOnline) {
       locationInterval = setInterval(() => {
-        updateLocationAPI(40.712579, -74.218993);
+        updateLocationAPI(currentLocation?.latitude, currentLocation?.longitude);
       }, 15000);
     } else if (locationInterval) {
       clearInterval(locationInterval);
@@ -200,7 +203,7 @@ const HomeScreen: React.FC = () => {
       {/* Map Image */}
       <View style={styles.mapContainer}>
       <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
-                    <Mapbox.Camera zoomLevel={14} centerCoordinate={ [151.209900, -33.865143]} />
+                    <Mapbox.Camera zoomLevel={13} centerCoordinate={ [currentLocation?.longitude || 151.209900, currentLocation?.latitude || -33.865143]} />
 
                   </Mapbox.MapView>
       </View>

@@ -30,8 +30,11 @@ const PickUpOrderDetailsScreen: React.FC = () => {
       const response = await fetch(
         `${MAPBOX_DRIVING_URL}${currentLocationData.longitude},${currentLocationData.latitude};${order?.pickupLocation?.longitude},${order?.pickupLocation?.latitude}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`
       );
+      console.log('order?.pickupLocation?.latitude', order?.pickupLocation?.latitude);
+      console.log('currentLocationData.latitude', currentLocationData.latitude)
       const data = await response.json();
-      if (data.routes.length) {
+      console.log('data', data)
+      if (data?.routes?.length) {
         setRouteCoords(data.routes[0].geometry.coordinates);
       }
     } catch (error) {
