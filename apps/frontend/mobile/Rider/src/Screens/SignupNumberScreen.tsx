@@ -16,16 +16,17 @@ import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
-import {useAppDispatch} from '../redux/hook';
+import {useAppDispatch, useAppSelector} from '../redux/hook';
 import Header from '../components/Header';
 import Logo from '../assets/icons/logo.svg';
-import {requestOtp} from '../redux/slices/authSlice';
+import {requestOtp, updatePhoneNumber} from '../redux/slices/authSlice';
 
 const {width} = Dimensions.get('window');
 
 const SignupNumberScreen: React.FC = () => {
   const phoneInput = useRef<PhoneInput>(null);
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
+  
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isFilled, setIsFilled] = useState(false);
   const [isFocused, setIsFocused] = useState(false); // Track focus state
@@ -40,6 +41,7 @@ const SignupNumberScreen: React.FC = () => {
   const handleSendCode = async () => {
     try {
       await dispatch(requestOtp({phone: phoneNumber})).unwrap();
+      dispatch(updatePhoneNumber(phoneNumber))
       navigation.navigate(AuthScreens.Otp, {phoneNumber});
     } catch {
       console.log('Request Otp failed');
