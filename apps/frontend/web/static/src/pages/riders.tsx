@@ -43,98 +43,27 @@ export default function RiderPage() {
   // Updated data for SignupEssentials using Lucide icons instead of URL placeholders
   const signupEssentialsData = {
     title: "Here’s What You Need To Sign Up",
-    subtitle: "Signup ",
+    subtitle: "Signup Essentials",
     tabs: [
       {
         tab: "On-Demand Delivery",
         cards: [
           {
-            // Use the imported Lucide icon as a JSX element
-            icon: <Require />,
+            icon: "/svgs/require.svg", // Image path instead of JSX
             title: "Requirements",
-            points: [
-              "Be at least 18 years old",
-              "Clear a background screening",
-            ],
+            points: ["Be at least 18 years old", "Clear a background screening"],
           },
           {
-            icon: <Document />,
+            icon: "/svgs/document.svg",
             title: "Documents",
             points: [
-              "Valid Driver’s License (private or commercial), if you plan to drive",
+              "Valid Driver’s License",
               "Proof of residency in your city, state or province",
               "Car documents such as commercial insurance, vehicle registration certificate, permit",
             ],
           },
           {
-            icon: <Signup />,
-            title: "Process",
-            points: [
-              "Visit the nearest Partner Seva Kendra in your city",
-              "Submit documents and photo",
-              "Provide information for a background check",
-            ],
-          },
-        ],
-      },
-      {
-        tab: "Car Towing",
-        cards: [
-          {
-            icon: <Check size={24} />,
-            title: "Requirements",
-            points: [
-              "Valid driver's license",
-              "Smartphone (iOS/Android)",
-              "18+ years old",
-              "Clean background check",
-            ],
-          },
-          {
-            icon: <FileText size={24} />,
-            title: "Documents",
-            points: [
-              "ID Proof",
-              "Vehicle insurance",
-              "Bank account details",
-              "Profile photo",
-            ],
-          },
-          {
-            icon: <RefreshCcw size={24} />,
-            title: "Process",
-            points: [
-              "Submit application",
-              "Document verification",
-              "Training session",
-              "Start earning!",
-            ],
-          },
-        ],
-      },
-      {
-        tab: "House Moving",
-        cards: [
-          {
-            // Use the imported Lucide icon as a JSX element
-            icon: <Require />,
-            title: "Requirements",
-            points: [
-              "Be at least 18 years old",
-              "Clear a background screening",
-            ],
-          },
-          {
-            icon: <Document />,
-            title: "Documents",
-            points: [
-              "Valid Driver’s License (private or commercial), if you plan to drive",
-              "Proof of residency in your city, state or province",
-              "Car documents such as commercial insurance, vehicle registration certificate, permit",
-            ],
-          },
-          {
-            icon: <Signup />,
+            icon: "/svgs/signup.svg",
             title: "Process",
             points: [
               "Visit the nearest Partner Seva Kendra in your city",
@@ -146,6 +75,7 @@ export default function RiderPage() {
       },
     ],
   };
+  
 
   // Updated data for FlexibleModels using images from the public folder
   const flexibleModelsData = {
