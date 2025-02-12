@@ -32,7 +32,6 @@ const WhyVamoose: React.FC<WhyVamooseProps> = ({
   firstRowCards,
   secondRowFirstCard, // New prop
   secondRowCard,
-  firstRowBg = "bg-white",
   secondRowFirstBg = "bg-gray-100",
 }) => {
   const SimpleCard = ({ icon, heading, description, bgColor }: SimpleCard) => (

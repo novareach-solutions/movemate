@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ShieldCheck, Wallet, Bell, Clock, Award, Bike } from "lucide-react";
 import { Tp } from "../../public/svgs/Tp";
 import { Frc } from "../../public/svgs/Frc";
 import { Cf } from "../../public/svgs/Cf";
