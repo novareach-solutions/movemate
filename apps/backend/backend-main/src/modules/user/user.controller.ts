@@ -49,26 +49,12 @@ export class UserController {
    * POST /user/signup
    */
   @Post("signup")
-  @UseGuards(OnboardingGuard)
   @UserPostSignUpSwagger()
   async createUser(
     @Body() createUserDto: TCreateUser,
     @Req() request: ICustomRequest,
     @Res({ passthrough: true }) response: Response,
   ): Promise<IApiResponse<{ accessToken: string; userId: number }>> {
-    const phoneNumberFromGuard = request.user.phoneNumber;
-    if (
-      createUserDto.phoneNumber &&
-      createUserDto.phoneNumber !== phoneNumberFromGuard
-    ) {
-      this.logger.warn(
-        `UserController.createUser: The provided phone number ${createUserDto.phoneNumber} does not match the authenticated user's phone number ${phoneNumberFromGuard}.`,
-      );
-      throw new UnauthorizedError(
-        "The provided phone number does not match the authenticated user's phone number.",
-      );
-    }
-    createUserDto.phoneNumber = phoneNumberFromGuard;
     createUserDto.role = UserRoleEnum.CUSTOMER;
 
     this.logger.debug(
