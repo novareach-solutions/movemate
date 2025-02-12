@@ -8,7 +8,7 @@ import {
   DeliverAPackage,
   DeliverAPackageParamList,
 } from '../../navigation/ScreenNames';
-import {useAppDispatch} from '../../redux/hook';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
 import {setSignupData} from '../../redux/slices/authSlice';
 import Header from '../../components/Header';
 
@@ -26,6 +26,7 @@ type FormFields = {
 const DAPCompleteProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
   const dispatch = useAppDispatch();
+   const phoneNumber = useAppSelector(state => state.auth.phoneNumber);
   const handleFormSubmit = async (formData: FormFields) => {
     console.log('Form submitted:', formData);
     const user = {
@@ -37,6 +38,7 @@ const DAPCompleteProfileScreen = () => {
       suburb: formData.suburb,
       state: formData.state,
       postalCode: Number(formData.postalCode),
+      phoneNumber:phoneNumber
     };
 
     console.log('user', user);
