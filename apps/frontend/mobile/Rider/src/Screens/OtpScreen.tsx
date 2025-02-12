@@ -1,6 +1,6 @@
 // OtpScreen.tsx
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -12,27 +12,26 @@ import {
   SafeAreaView,
   TextStyle,
 } from 'react-native';
-import {colors} from '../theme/colors';
-import {typography} from '../theme/typography';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
 import TitleDescription from '../components/TitleDescription';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import {
   AuthScreens,
-  AuthScreensParamList,
   DeliverAPackage,
 } from '../navigation/ScreenNames';
-import {useAppDispatch} from '../redux/hook';
-import {verifyOtp, login} from '../redux/slices/authSlice';
+import { useAppDispatch } from '../redux/hook';
+import { verifyOtp, login } from '../redux/slices/authSlice';
 import Header from '../components/Header';
 
 interface OtpScreenProps {
   route: {
-    params: {phoneNumber: string; login: boolean};
+    params: { phoneNumber: string; login: boolean };
   };
 }
 
-const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
-  const {phoneNumber, login: isLogin} = route.params;
+const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
+  const { phoneNumber, login: isLogin } = route.params;
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [error, setError] = useState(false);
@@ -42,7 +41,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer(prev => (prev > 0 ? prev - 1 : 0));
+      setTimer((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -55,10 +54,11 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Focus handling
-    if (value && index < 5) {
+    // Focus handling: if a digit is entered, move focus to the next input
+    if (value && index < otp.length - 1) {
       inputs.current[index + 1]?.focus();
     } else if (!value && index > 0) {
+      // Optionally, if value is deleted, move focus to the previous input
       inputs.current[index - 1]?.focus();
     }
   };
@@ -70,16 +70,16 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
       if (isLogin) {
         // Dispatch login thunk
         const response = await dispatch(
-          login({phone: phoneNumber, otp: enteredOtp}),
+          login({ phone: phoneNumber, otp: enteredOtp })
         ).unwrap();
         console.log('Login Successful!', response);
         // Navigate to the main app screen or dashboard
         navigation.navigate(DeliverAPackage.Home);
       } else {
         const response = await dispatch(
-          verifyOtp({phone: phoneNumber, otp: enteredOtp}),
+          verifyOtp({ phone: phoneNumber, otp: enteredOtp })
         ).unwrap();
-        console.log('Login Successful!', response);
+        console.log('OTP Verification Successful!', response);
         navigation.navigate(AuthScreens.SelectService);
       }
     } catch (err: any) {
@@ -97,56 +97,53 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1,backgroundColor: colors.white}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
       <Header logo isBack />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <TitleDescription
             title="Enter verification code"
-            description={`Enter the code sent to: ${phoneNumber}`}
+            description={`Enter the 4-digit verification code sent to your phone: ${phoneNumber}`}
           />
 
-          <View style={{marginBottom: 30}}>
+          <View style={{ marginBottom: 30 }}>
             <View style={styles.otpContainer}>
               {otp.map((digit, index) => (
                 <TextInput
                   key={index}
-                  ref={ref => (inputs.current[index] = ref!)}
+                  ref={(ref) => (inputs.current[index] = ref!)}
                   style={[
                     styles.input,
                     error
-                      ? {borderColor: colors.error}
+                      ? { borderColor: colors.error }
                       : digit
-                        ? {borderColor: colors.purple}
-                        : {borderColor: colors.border.primary},
+                      ? { borderColor: colors.purple }
+                      : { borderColor: colors.border.primary },
                   ]}
                   keyboardType="numeric"
                   maxLength={1}
                   value={digit}
-                  onChangeText={value => handleChange(value, index)}
+                  // Automatically select the text on focus so that any new input replaces it
+                  selectTextOnFocus
+                  onChangeText={(value) => handleChange(value, index)}
                 />
               ))}
             </View>
 
             {error && (
-              <Text
-                style={{fontSize: 14, color: colors.error, marginVertical: 10}}>
+              <Text style={{ fontSize: 14, color: colors.error, marginVertical: 10 }}>
                 An error, please try again
               </Text>
             )}
           </View>
 
           <TouchableOpacity
-            style={[
-              styles.button,
-              otp.every(digit => digit) && styles.buttonFilled,
-            ]}
-            onPress={handleVerify}>
+            style={[styles.button, otp.every((digit) => digit) && styles.buttonFilled]}
+            onPress={handleVerify}
+          >
             <Text
-              style={[
-                styles.buttonText,
-                otp.every(digit => digit) && styles.buttonTextFilled,
-              ]}>
+              style={[styles.buttonText, otp.every((digit) => digit) && styles.buttonTextFilled]}
+            >
               {isLogin ? 'Login' : 'Verify Now'}
             </Text>
           </TouchableOpacity>
@@ -164,6 +161,13 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
               </TouchableOpacity>
             )}
           </Text>
+
+          {/* "Change phone number" clickable text */}
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.changeContainer}>
+            <Text style={styles.changeText}>
+              Change <Text style={styles.changeHighlight}>phone number</Text>
+            </Text>
+          </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
     </SafeAreaView>
@@ -215,6 +219,19 @@ const styles = StyleSheet.create({
   },
   timer: {
     color: colors.purple,
+  },
+  changeContainer: {
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  changeText: {
+    textAlign: 'center',
+    fontSize: typography.fontSize.medium,
+    color: colors.text.primary,
+  },
+  changeHighlight: {
+    color: colors.purple,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
   },
 });
 

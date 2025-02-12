@@ -54,7 +54,7 @@ const DAPCompleteProfileScreen = () => {
         <StepIndicator current={1} total={5} />
         <ProfileForm
           title="Complete your Profile"
-          description="Add your details to get started"
+          description="Let’s get to know you. Provide your details to kick-start your journey!"
           onSubmit={handleFormSubmit}
         />
       </View>

@@ -58,11 +58,10 @@ const SignupNumberScreen: React.FC = () => {
         flex: 1,
         backgroundColor: colors.white,
       }}>
-      <Header isBack />
+      <Header logo />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
-          <Logo style={styles.logo} />
-          <Text style={styles.heading}>Create an Account</Text>
+          <Text style={styles.heading}>Welcome To Vamoose!</Text>
           <Text style={styles.subheading}>
             Enter phone number and we’ll send you a verification code
           </Text>
@@ -116,7 +115,6 @@ const styles = StyleSheet.create({
     width: width * 0.3,
     height: width * 0.3,
     resizeMode: 'contain',
-    marginBottom: 30,
     alignSelf: 'center',
   },
   heading: {
@@ -124,6 +122,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.purple,
     textAlign: 'left',
+    marginTop: 30,
     marginBottom: 10,
   },
   subheading: {
