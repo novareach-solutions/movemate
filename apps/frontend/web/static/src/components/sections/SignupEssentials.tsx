@@ -4,7 +4,7 @@ import { useState } from "react";
 interface TabContent {
   tab: string;
   cards: {
-    icon: string;
+    icon: any;
     title: string;
     points: string[];
   }[];

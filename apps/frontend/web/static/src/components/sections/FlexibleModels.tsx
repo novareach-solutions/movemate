@@ -2,10 +2,11 @@ interface FlexibleModelSection {
   image: string;
   title: string;
   description: string;
-  paragraph: string;
-  points: string[];
-  buttonText?: string; // Made optional with ?
+  points?: string[]; 
+  paragraph?: string; 
+  buttonText?: string;
 }
+
 
 interface FlexibleModelsProps {
   sections: FlexibleModelSection[];

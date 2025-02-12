@@ -151,8 +151,8 @@ export default function RiderPage() {
   const flexibleModelsData = {
     sections: [
       {
-        image: "/images/Sbm.png", // image stored in public/images/schedule.png
-        title: "Subscription based model ",
+        image: "/images/Sbm.png",
+        title: "Subscription based model",
         description: "Earn Directly with Zero Commissions and Full Control",
         points: [
           "0% commission 100% earning",
@@ -162,15 +162,15 @@ export default function RiderPage() {
         buttonText: "Explore Plans",
       },
       {
-        image: "/images/Sbm2.png", // image stored in public/images/schedule.png
-        title: "Low commision per ride model ",
+        image: "/images/Sbm2.png",
+        title: "Low commission per ride model",
         description: "Affordable, Pay-Per-Ride Model",
-        paragraph: [
+        paragraph:
           "Pay a small commission per ride and enjoy the flexibility of earning without upfront costs. Ideal for part-time drivers or those who prefer a pay-as-you-go approach.",
-        ],
       },
     ],
   };
+  
 
   // Sample data for FAQs (remains unchanged)
   const faqsData = [
