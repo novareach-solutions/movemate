@@ -9,6 +9,7 @@ import {images} from '../assets/images/images';
 import HomeScreen from './Home/HomeScreen';
 import ProfileScreen from './Profile/ProfileScreen';
 import NotificationScreen from './Notification/NotificationScreen';
+import { HomeStackNavigator } from '../navigation/HomeStackNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -42,7 +43,7 @@ const AppLayoutScreen = () => {
       <Tab.Screen
         options={{tabBarLabel: 'Home'}}
         name={AppScreens.HomeScreen}
-        component={HomeScreen}
+        component={HomeStackNavigator}
       />
       <Tab.Screen
         options={{tabBarLabel: 'Orders'}}

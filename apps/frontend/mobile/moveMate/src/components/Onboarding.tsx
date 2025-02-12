@@ -143,7 +143,7 @@ const Onboarding: React.FC = () => {
     dispatch(setIsLogin(true))
     navigation.navigate(AuthScreens.LoginScreen);
     // navigation.navigate(CustomerScreens.DeliveryScreen);
-    // navigation.navigate(ProfileScreens.ProfileScreen);
+    // navigation.navigate(ProfileScr eens.ProfileScreen);
   };
   const Footer = () => (
     <View style={styles.footer}>

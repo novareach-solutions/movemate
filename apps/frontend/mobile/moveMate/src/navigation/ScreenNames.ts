@@ -11,6 +11,7 @@ export const AuthScreens: Record<
   OnboardingScreen: 'OnboardingScreen',
   LoginScreen: 'LoginScreen',
   OtpScreen: 'OtpScreen',
+  Login:'Login',
   CompleteProfileScreen: 'CompleteProfileScreen',
   PrivacyPolicyScreen: 'PrivacyPolicyScreen',
   CustomerScreens:'CustomerScreens'

@@ -5,6 +5,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 export type AuthStackParamList = {
   OnboardingScreen: undefined;
   LoginScreen: undefined;
+  Login:undefined;
   OtpScreen: {phoneNumber: string};
   CompleteProfileScreen: undefined;
   PrivacyPolicyScreen: undefined;
