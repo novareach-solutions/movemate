@@ -10,10 +10,11 @@ import {SafeAreaView} from 'react-native';
 import Header from '../../components/Header';
 import PhotoPickerModal from '../../components/common/PhotoPickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
+import { colors } from '../../theme/colors';
 
 const DAPUploadDocumentDetailsScreen = () => {
   const route = useRoute();
-  const {title} = route.params as {title: string};
+  const {title,value} = route.params;
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
   const [image, setImage] = useState('');
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
@@ -38,6 +39,7 @@ const DAPUploadDocumentDetailsScreen = () => {
         // Navigation will happen without uploading
         navigation.navigate(AppScreens.DocumentReview, {
           title,
+          value,
           uploadedImage: photo.path,
         });
 
@@ -69,7 +71,7 @@ const DAPUploadDocumentDetailsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1,backgroundColor: colors.white}}>
       <Header logo isBack />
       <DocumentUpload
         title={title}

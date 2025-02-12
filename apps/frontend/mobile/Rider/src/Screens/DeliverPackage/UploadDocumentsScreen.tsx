@@ -20,6 +20,7 @@ const DAPUploadDocumentsScreen = () => {
   const handleCardPress = (title: string) => {
     navigation.navigate(DeliverAPackage.UploadDocumentDetails, {
       title,
+      value,
       onUploadSuccess: () => handleUploadSuccess(title),
     });
   };
