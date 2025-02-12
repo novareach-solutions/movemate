@@ -94,7 +94,7 @@ const [loading, setLoading] = useState(false);
 
      setLoading(true); 
         try {
-          // await dispatch(userSignup(payload)).unwrap();
+          await dispatch(userSignup(payload)).unwrap();
           // navigation.navigate(CustomerScreens.CustomerHomeScreen);
             // navigation.reset(({
             //         index: 0,

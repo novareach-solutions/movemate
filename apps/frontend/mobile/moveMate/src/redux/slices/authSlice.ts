@@ -122,7 +122,11 @@ export const Login = createAsyncThunk(
   apiEndpoints.login,
   async ({ phone,otp }: { phone: string;otp: string }) => {
     try {
-      const response = await apiClient.post(apiEndpoints.login, { phoneNumber:phone,otp });
+      const response = await apiClient.post(apiEndpoints.login, { phoneNumber:phone,otp },{
+        headers: {
+          role: 'CUSTOMER',
+        },
+      },);
        // Store onboarding token if present in the response headers
        const onboardingToken = response.headers['onboarding_token'];
        const accessToken = response.headers['access_token'];
