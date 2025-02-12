@@ -14,17 +14,20 @@ import {
 import Header from '../../components/Header';
 import StepIndicator from '../../components/StepIndicator';
 import Dropdown from '../../components/Dropdown';
-import { colors } from '../../theme/colors';
-import { formStyles } from '../../theme/form';
-import { DeliverAPackage, DeliverAPackageParamList } from '../../navigation/ScreenNames';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { useAppDispatch } from '../../redux/hook';
-import { setSignupData } from '../../redux/slices/authSlice';
-import { australianCarData } from '../../utils/australianCarData';
-import { useForm, Controller } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ZVehicleSchema } from '../../utils/zod/Registration';
+import {colors} from '../../theme/colors';
+import {formStyles} from '../../theme/form';
+import {
+  DeliverAPackage,
+  DeliverAPackageParamList,
+} from '../../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {useAppDispatch} from '../../redux/hook';
+import {setSignupData} from '../../redux/slices/authSlice';
+import {australianCarData} from '../../utils/australianCarData';
+import {useForm, Controller} from 'react-hook-form';
+import {z} from 'zod';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {ZVehicleSchema} from '../../utils/zod/Registration';
 
 type FormFields = z.infer<typeof ZVehicleSchema>;
 
@@ -37,7 +40,7 @@ const EnterVehicleDetailsScreen: React.FC = () => {
     control,
     handleSubmit,
     watch,
-    formState: { isValid, errors },
+    formState: {isValid, errors},
   } = useForm<FormFields>({
     resolver: zodResolver(ZVehicleSchema),
     mode: 'onChange',
@@ -84,26 +87,28 @@ const EnterVehicleDetailsScreen: React.FC = () => {
             <Controller
               control={control}
               name="make"
-              render={({ field: { onChange, value } }) => (
+              render={({field: {onChange, value}}) => (
                 <Dropdown
                   label="Make"
                   placeholder="Select the make of your vehicle"
                   options={vehicleMakes}
                   selectedValue={value}
-                  onValueChange={(val) => {
+                  onValueChange={val => {
                     onChange(val);
                     // Optionally, you can reset the model field here if needed.
                   }}
                 />
               )}
             />
-            {errors.make && <Text style={formStyles.errorText}>{errors.make.message}</Text>}
+            {errors.make && (
+              <Text style={formStyles.errorText}>{errors.make.message}</Text>
+            )}
 
             {/* Model Dropdown using Controller */}
             <Controller
               control={control}
               name="model"
-              render={({ field: { onChange, value } }) => (
+              render={({field: {onChange, value}}) => (
                 <Dropdown
                   label="Model"
                   placeholder="Select the model of your vehicle"
@@ -113,13 +118,15 @@ const EnterVehicleDetailsScreen: React.FC = () => {
                 />
               )}
             />
-            {errors.model && <Text style={formStyles.errorText}>{errors.model.message}</Text>}
+            {errors.model && (
+              <Text style={formStyles.errorText}>{errors.model.message}</Text>
+            )}
 
             {/* Year Input using Controller */}
             <Controller
               control={control}
               name="year"
-              render={({ field: { onChange, value } }) => (
+              render={({field: {onChange, value}}) => (
                 <View style={formStyles.inputWrapper}>
                   <Text style={formStyles.inputLabel}>Year</Text>
                   <TextInput
@@ -137,7 +144,9 @@ const EnterVehicleDetailsScreen: React.FC = () => {
                 </View>
               )}
             />
-            {errors.year && <Text style={formStyles.errorText}>{errors.year.message}</Text>}
+            {errors.year && (
+              <Text style={formStyles.errorText}>{errors.year.message}</Text>
+            )}
           </ScrollView>
 
           {/* Fixed Footer with full-width Continue button */}
@@ -149,14 +158,14 @@ const EnterVehicleDetailsScreen: React.FC = () => {
                 isValid ? formStyles.buttonEnabled : formStyles.buttonDisabled,
               ]}
               onPress={handleSubmit(onSubmit)}
-              disabled={!isValid}
-            >
+              disabled={!isValid}>
               <Text
                 style={[
                   formStyles.buttonText,
-                  isValid ? formStyles.buttonTextEnabled : formStyles.buttonTextDisabled,
-                ]}
-              >
+                  isValid
+                    ? formStyles.buttonTextEnabled
+                    : formStyles.buttonTextDisabled,
+                ]}>
                 Continue
               </Text>
             </TouchableOpacity>

@@ -131,6 +131,9 @@ export class SendPackageOrder extends BaseEntity {
   @Column({ type: "varchar", nullable: true })
   completionPhoto: string;
 
+  @Column({ type: "varchar", nullable: true })
+  itemVerifiedPhoto: string;
+
   @Column({ type: "timestamp", nullable: true })
   acceptedAt: Date;
 

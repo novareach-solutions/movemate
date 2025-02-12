@@ -16,7 +16,7 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, AuthScreensParamList} from '../../navigation/ScreenNames';
 import {useAppDispatch} from '../../redux/hook';
 import {requestOtp} from '../../redux/slices/authSlice';
-import Logo from "../../assets/icons/logo.svg"
+import Logo from '../../assets/icons/logo.svg';
 
 const {width} = Dimensions.get('window');
 
@@ -25,7 +25,7 @@ const Register: React.FC = () => {
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isFilled, setIsFilled] = useState(false);
-  const [isFocused, setIsFocused] = useState(false); 
+  const [isFocused, setIsFocused] = useState(false);
   const dispatch = useAppDispatch();
 
   const handlePhoneNumberChange = (number: string) => {

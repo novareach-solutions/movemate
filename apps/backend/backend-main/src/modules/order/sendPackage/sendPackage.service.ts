@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Between, In } from "typeorm";
 
 import { DropLocation } from "../../../entity/DropLocation";
@@ -6,6 +6,7 @@ import { OrderReview } from "../../../entity/OrderReview";
 import { PickupLocation } from "../../../entity/PickupLocation";
 import { Report } from "../../../entity/Report";
 import { SendPackageOrder } from "../../../entity/SendPackageOrder";
+import { logger } from "../../../logger";
 import {
   OrderStatusEnum,
   OrderTypeEnum,
@@ -33,15 +34,17 @@ import { parseTimeToMinutes } from "../../../utils/timeFns";
 import { dbReadRepo, dbRepo } from "../../database/database.service";
 import { PricingService } from "../../pricing/pricing.service";
 import { TSendPackageOrder } from "./sendPackage.types";
+import { logger } from "../../../logger";
 
 @Injectable()
 export class SendAPackageService {
   constructor(
     private readonly pricingService: PricingService,
     private readonly customerNotificationGateway: CustomerNotificationGateway,
+    // private readonly logger = new Logger(SendAPackageService.name)
   ) {}
   async create(data: TSendPackageOrder): Promise<SendPackageOrder> {
-    this.logger.debug(
+    logger.debug(
       "SendAPackageService.create: Creating a new send package order",
     );
     const queryRunner =
@@ -88,11 +91,11 @@ export class SendAPackageService {
           PickupLocation,
           pickupLocation,
         );
-        this.logger.debug(
+        logger.debug(
           `SendAPackageService.create: Created new PickupLocation with ID ${pickupLocation.id}`,
         );
       } else {
-        this.logger.debug(
+        logger.debug(
           `SendAPackageService.create: Reusing existing PickupLocation with ID ${pickupLocation.id}`,
         );
       }
@@ -113,11 +116,11 @@ export class SendAPackageService {
           DropLocation,
           dropLocation,
         );
-        this.logger.debug(
+        logger.debug(
           `SendAPackageService.create: Created new DropLocation with ID ${dropLocation.id}`,
         );
       } else {
-        this.logger.debug(
+        logger.debug(
           `SendAPackageService.create: Reusing existing DropLocation with ID ${dropLocation.id}`,
         );
       }
@@ -152,7 +155,7 @@ export class SendAPackageService {
         SendPackageOrder,
         sendPackageOrder,
       );
-      this.logger.debug(
+      logger.debug(
         `SendAPackageService.create: Created SendPackageOrder with ID ${savedOrder.id}`,
       );
 
@@ -160,7 +163,7 @@ export class SendAPackageService {
       return savedOrder;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      this.logger.error(
+      logger.error(
         `SendAPackageService.create: Failed to create order - ${error}`,
         {
           stack: (error as Error).stack,
@@ -184,7 +187,7 @@ export class SendAPackageService {
     orderId: number,
     reason: string,
   ): Promise<SendPackageOrder> {
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.cancelOrder: Attempting to cancel order ID ${orderId}`,
     );
 
@@ -213,7 +216,7 @@ export class SendAPackageService {
     order.canceledBy = UserRoleEnum.CUSTOMER;
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.cancelOrder: Order ID ${orderId} canceled successfully`,
     );
     return updatedOrder;
@@ -224,7 +227,7 @@ export class SendAPackageService {
     reason: string,
     details: string,
   ): Promise<Report> {
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.reportAgent: Reporting agent for order ID ${orderId}`,
     );
 
@@ -249,7 +252,7 @@ export class SendAPackageService {
       customer: order.customer,
       sendPackageOrderId: order.id,
     });
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.reportAgent: Report created with ID ${savedReport.id} for order ID ${orderId}`,
     );
     return savedReport;
@@ -260,7 +263,7 @@ export class SendAPackageService {
     rating: number,
     comment: string,
   ): Promise<OrderReview> {
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.leaveReview: Leaving review for order ID ${orderId}`,
     );
 
@@ -294,7 +297,7 @@ export class SendAPackageService {
       customer: order.customer,
       sendPackageOrderId: order.id,
     });
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.leaveReview: Review created with ID ${savedReview.id} for order ID ${orderId}`,
     );
 
@@ -302,7 +305,7 @@ export class SendAPackageService {
   }
 
   async getOrderDetails(orderId: number): Promise<SendPackageOrder> {
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.getOrderDetails: Fetching details for order ID ${orderId}`,
     );
 
@@ -322,7 +325,7 @@ export class SendAPackageService {
       throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
     }
 
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.getOrderDetails: Successfully fetched details for order ID ${orderId}`,
     );
     return order;
@@ -373,11 +376,84 @@ export class SendAPackageService {
     return updatedOrder;
   }
 
+  async updateItemVerifiedPhoto(
+    orderId: number,
+    agentId: number,
+    photoUrl: string,
+  ): Promise<SendPackageOrder> {
+    logger.debug(
+      `SendAPackageService.updateItemVerifiedPhoto: Agent ID ${agentId} updating photo for order ID ${orderId}`,
+    );
+
+    if (!photoUrl) {
+      throw new SendPackageNotFoundError(
+        `An Error occured while uploading the image`,
+      );
+    }
+    const order = await dbReadRepo(SendPackageOrder).findOne({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
+    }
+
+    order.itemVerifiedPhoto = photoUrl;
+
+    try {
+      const updatedOrder = await dbRepo(SendPackageOrder).save(order);
+      logger.debug(
+        `SendAPackageService.updateItemVerifiedPhoto: Order ID ${orderId} updated with itemVerifiedPhoto`,
+      );
+      return updatedOrder;
+    } catch (error) {
+      logger.error(
+        `SendAPackageService.updateItemVerifiedPhoto: Failed to update order ID ${orderId} - ${error.message}`,
+        { stack: error.stack },
+      );
+      throw new InternalServerErrorException(
+        "Failed to update item verification photo",
+      );
+    }
+  }
+
+  async updateProofOfDelivery(
+    orderId: number,
+    agentId: number,
+    photoUrl: string,
+  ): Promise<SendPackageOrder> {
+    logger.debug(
+      `SendAPackageService.updateProofOfDelivery: Agent ID ${agentId} uploading proof of delivery for order ID ${orderId}`,
+    );
+
+    if (!photoUrl) {
+      throw new SendPackageNotFoundError(
+        `An error occurred while uploading the image`,
+      );
+    }
+
+    const order = await dbReadRepo(SendPackageOrder).findOne({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
+    }
+
+    order.completionPhoto = photoUrl;
+
+    const updatedOrder = await dbRepo(SendPackageOrder).save(order);
+    logger.debug(
+      `SendAPackageService.updateProofOfDelivery: Order ID ${orderId} updated with proof of delivery photo.`,
+    );
+    return updatedOrder;
+  }
+
   async startOrder(
     orderId: number,
     agentId: number,
   ): Promise<SendPackageOrder> {
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.startOrder: Agent attempting to start order ID ${orderId}`,
     );
 
@@ -405,14 +481,14 @@ export class SendAPackageService {
     order.startedAt = new Date();
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.startOrder: Order ID ${orderId} started successfully`,
     );
     return updatedOrder;
   }
 
   async completeOrder(orderId: number): Promise<SendPackageOrder> {
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.completeOrder: Agent attempting to complete order ID ${orderId}`,
     );
 
@@ -424,7 +500,7 @@ export class SendAPackageService {
       throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
     }
 
-    if (order.status !== OrderStatusEnum.IN_PROGRESS) {
+    if (order.status !== OrderStatusEnum.PICKEDUP_ORDER) {
       throw new SendPackageAgentCompleteError(
         `Order ID ${orderId} cannot be completed in its current status`,
       );
@@ -434,7 +510,7 @@ export class SendAPackageService {
     order.completedAt = new Date();
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.completeOrder: Order ID ${orderId} completed successfully`,
     );
     return updatedOrder;
@@ -444,7 +520,7 @@ export class SendAPackageService {
     orderId: number,
     reason: string,
   ): Promise<SendPackageOrder> {
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.agentCancelOrder: Agent attempting to cancel order ID ${orderId}`,
     );
 
@@ -477,14 +553,14 @@ export class SendAPackageService {
     order.canceledBy = UserRoleEnum.AGENT;
 
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.agentCancelOrder: Order ID ${orderId} canceled successfully by agent`,
     );
     return updatedOrder;
   }
 
   async reportIssue(orderId: number, issue: string): Promise<Report> {
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.reportIssue: Agent reporting issue for order ID ${orderId}`,
     );
 
@@ -506,7 +582,7 @@ export class SendAPackageService {
       customerId: order.customerId,
       orderId: order.id,
     });
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.reportIssue: Issue reported with ID ${savedReport.id} for order ID ${orderId}`,
     );
     return savedReport;
@@ -515,7 +591,7 @@ export class SendAPackageService {
   // ====== Admin Service Methods ======
 
   async getAllOrders(query: any): Promise<SendPackageOrder[]> {
-    this.logger.debug(
+    logger.debug(
       "SendAPackageService.getAllOrders: Retrieving all orders with filters",
     );
 
@@ -548,10 +624,87 @@ export class SendAPackageService {
       ],
     });
 
-    this.logger.debug(
+    logger.debug(
       `SendAPackageService.getAllOrders: Retrieved ${orders.length} orders`,
     );
     return orders;
+  }
+
+  // ====== Common APIs ======
+  async updateOrderStatus(
+    orderId: number,
+    status: OrderStatusEnum,
+  ): Promise<SendPackageOrder> {
+    logger.debug(
+      `SendAPackageService.updateOrderStatus: Updating status for order ID ${orderId} to ${status}`,
+    );
+
+    const order = await dbReadRepo(SendPackageOrder).findOne({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
+    }
+
+    // Define valid status transitions
+    // const validTransitions: Record<OrderStatusEnum, OrderStatusEnum[]> = {
+    //   [OrderStatusEnum.PENDING]: [
+    //     OrderStatusEnum.ACCEPTED,
+    //     OrderStatusEnum.CANCELED,
+    //   ],
+    //   [OrderStatusEnum.ACCEPTED]: [
+    //     OrderStatusEnum.IN_PROGRESS,
+    //     OrderStatusEnum.CANCELED,
+    //   ],
+    //   [OrderStatusEnum.IN_PROGRESS]: [
+    //     OrderStatusEnum.COMPLETED,
+    //     OrderStatusEnum.CANCELED,
+    //   ],
+    //   [OrderStatusEnum.COMPLETED]: [],
+    //   [OrderStatusEnum.CANCELED]: [],
+    //   [OrderStatusEnum.PICKEDUP_ORDER]: [OrderStatusEnum.COMPLETED],
+    // };
+
+    // if (!validTransitions[order.status].includes(status)) {
+    //   throw new BadRequestException(
+    //     `Cannot change status from ${order.status} to ${status}`,
+    //   );
+    // }
+
+    order.status = status;
+
+    // Additional logic based on status
+    switch (status) {
+      case OrderStatusEnum.ACCEPTED:
+        order.acceptedAt = new Date();
+        await this.notifyCustomerOrderAccepted(order);
+        break;
+      case OrderStatusEnum.IN_PROGRESS:
+        order.startedAt = new Date();
+        break;
+      case OrderStatusEnum.COMPLETED:
+        order.completedAt = new Date();
+        break;
+      case OrderStatusEnum.CANCELED:
+        break;
+      default:
+        break;
+    }
+
+    try {
+      const updatedOrder = await dbRepo(SendPackageOrder).save(order);
+      logger.debug(
+        `SendAPackageService.updateOrderStatus: Order ID ${orderId} status updated to ${status}`,
+      );
+      return updatedOrder;
+    } catch (error) {
+      logger.error(
+        `SendAPackageService.updateOrderStatus: Failed to update order ID ${orderId} - ${error.message}`,
+        { stack: error.stack },
+      );
+      throw new InternalServerErrorException("Failed to update order status");
+    }
   }
 
   // private methods

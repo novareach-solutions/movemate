@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   View,
   Text,
@@ -8,79 +8,76 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
-} from "react-native";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { colors } from "../../theme/colors";
-import { typography } from "../../theme/typography";
-import {
-  AuthScreens,
-  ProfileScreens,
-} from "../../navigation/ScreenNames";
-import Header from "../../components/Header";
-import Crown from "../../assets/icons/crown.svg";
-import Wallet from "../../assets/icons/wallet.svg";
-import Earnings from "../../assets/icons/earnings.svg";
-import Inbox from "../../assets/icons/inbox.svg";
-import Help from "../../assets/icons/blackHelp.svg";
-import Logout from "../../assets/icons/logout.svg";
-import Account from "../../assets/icons/account.svg";
-import Refer from "../../assets/icons/refer.svg";
-import BlackArrow from "../../assets/icons/blackArrow.svg";
+} from 'react-native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {colors} from '../../theme/colors';
+import {typography} from '../../theme/typography';
+import {AuthScreens, ProfileScreens} from '../../navigation/ScreenNames';
+import Header from '../../components/Header';
+import Crown from '../../assets/icons/crown.svg';
+import Wallet from '../../assets/icons/wallet.svg';
+import Earnings from '../../assets/icons/earnings.svg';
+import Inbox from '../../assets/icons/inbox.svg';
+import Help from '../../assets/icons/blackHelp.svg';
+import Logout from '../../assets/icons/logout.svg';
+import Account from '../../assets/icons/account.svg';
+import Refer from '../../assets/icons/refer.svg';
+import BlackArrow from '../../assets/icons/blackArrow.svg';
 
 const profileData = [
   {
-    id: "1",
-    title: "Earnings",
+    id: '1',
+    title: 'Earnings',
     icon: Earnings,
     screen: ProfileScreens.Earnings,
   },
   {
-    id: "2",
-    title: "Wallet",
+    id: '2',
+    title: 'Wallet',
     icon: Wallet,
     screen: ProfileScreens.Wallet,
   },
   {
-    id: "3",
-    title: "Earning Mode",
+    id: '3',
+    title: 'Earning Mode',
     icon: Crown,
     screen: ProfileScreens.EarningMode,
   },
   {
-    id: "4",
-    title: "Refer & Earn",
+    id: '4',
+    title: 'Refer & Earn',
     icon: Refer,
     screen: ProfileScreens.ReferFriends,
   },
   {
-    id: "5",
-    title: "Notifications",
+    id: '5',
+    title: 'Notifications',
     icon: Inbox,
     screen: ProfileScreens.Inbox,
   },
   {
-    id: "6",
-    title: "Ratings",
+    id: '6',
+    title: 'Ratings',
     icon: Inbox,
     screen: ProfileScreens.Ratings,
     notificationCount: 3,
   },
   {
-    id: "7",
-    title: "Help & Support",
+    id: '7',
+    title: 'Help & Support',
     icon: Help,
     screen: ProfileScreens.HelpAndSupport,
     notificationCount: 2,
   },
   {
-    id: "8",
-    title: "Account",
+    id: '8',
+    title: 'Account',
     icon: Account,
     screen: ProfileScreens.Account,
   },
   {
-    id: "9",
-    title: "Log Out",
+    id: '9',
+    title: 'Log Out',
     icon: Logout,
     screen: AuthScreens.Onboarding,
     isLogout: true,
@@ -90,7 +87,7 @@ const profileData = [
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<any>>();
 
-  const renderItem = ({ item }: { item: (typeof profileData)[0] }) => (
+  const renderItem = ({item}: {item: (typeof profileData)[0]}) => (
     <TouchableOpacity
       style={[styles.listItem]}
       onPress={() => navigation.navigate(item.screen)}>
@@ -102,7 +99,7 @@ const ProfileScreen: React.FC = () => {
                 </View>
             )} */}
       <View>
-        <BlackArrow style={{ transform: [{ rotate: '180deg' }], }} />
+        <BlackArrow style={{transform: [{rotate: '180deg'}]}} />
       </View>
     </TouchableOpacity>
   );
@@ -113,7 +110,7 @@ const ProfileScreen: React.FC = () => {
       {/* Fixed Profile Header */}
       <View style={styles.header}>
         <Image
-          source={{ uri: 'https://i.pravatar.cc/100' }}
+          source={{uri: 'https://i.pravatar.cc/100'}}
           style={styles.profileImage}
         />
         <View>
@@ -126,7 +123,7 @@ const ProfileScreen: React.FC = () => {
       </View>
 
       {/* Scrollable Area */}
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
         {/* Weekly Subscription Plan (Now Scrollable) */}
         <TouchableOpacity
           onPress={() => {
@@ -143,14 +140,12 @@ const ProfileScreen: React.FC = () => {
         <FlatList
           data={profileData}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.listContainer}
           scrollEnabled={false} // FlatList should not have its own scrolling
         />
       </ScrollView>
     </SafeAreaView>
-
-
   );
 };
 
@@ -158,7 +153,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.lightButtonBackground,
-    paddingBottom: 30
+    paddingBottom: 30,
   },
   header: {
     flexDirection: 'row',
@@ -197,7 +192,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 10,
     borderWidth: 1,
-    borderColor: colors.border.lightGray
+    borderColor: colors.border.lightGray,
   },
   subscriptionText: {
     fontSize: typography.fontSize.medium,

@@ -1,16 +1,23 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AppScreens, ProfileScreens } from '../../../navigation/ScreenNames';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  SafeAreaView,
+} from 'react-native';
+import {colors} from '../../../theme/colors';
+import {typography} from '../../../theme/typography';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AppScreens, ProfileScreens} from '../../../navigation/ScreenNames';
 import Header from '../../../components/Header';
-import Vehicle from "../../../assets/icons/vehicle.svg"
-import Documents from "../../../assets/icons/documents.svg"
-import Bank from "../../../assets/icons/bank.svg"
-import AccountAndProfile from "../../../assets/icons/accountAndProfile.svg"
-import Settings from "../../../assets/icons/settings.svg"
-import BlackArrow from "../../../assets/icons/blackArrow.svg"
+import Vehicle from '../../../assets/icons/vehicle.svg';
+import Documents from '../../../assets/icons/documents.svg';
+import Bank from '../../../assets/icons/bank.svg';
+import AccountAndProfile from '../../../assets/icons/accountAndProfile.svg';
+import Settings from '../../../assets/icons/settings.svg';
+import BlackArrow from '../../../assets/icons/blackArrow.svg';
 
 const AccountScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<any>>();
@@ -57,20 +64,26 @@ const AccountScreen: React.FC = () => {
         <item.icon />
       </View>
       <Text style={styles.menuTitle}>{item.title}</Text>
-      <BlackArrow style={{
-        transform: [{ rotate: '180deg' }]
-      }} />
+      <BlackArrow
+        style={{
+          transform: [{rotate: '180deg'}],
+        }}
+      />
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={{
-      flex: 1
-    }}>
-      <Header isBack title='Account' />
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
+      <Header isBack title="Account" />
       <View style={styles.container}>
-        <View style={styles.menuContainer}>{menuItems.map(renderMenuItem)}</View>
-      </View></SafeAreaView>
+        <View style={styles.menuContainer}>
+          {menuItems.map(renderMenuItem)}
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 

@@ -1,6 +1,6 @@
-import { StyleSheet, TextStyle } from 'react-native';
-import { colors } from './colors';
-import { typography } from './typography';
+import {StyleSheet, TextStyle} from 'react-native';
+import {colors} from './colors';
+import {typography} from './typography';
 
 export const formStyles = StyleSheet.create({
   inputLabel: {
@@ -38,6 +38,9 @@ export const formStyles = StyleSheet.create({
     paddingVertical: 12,
     marginTop: 20,
     alignItems: 'center',
+    flexDirection:"row",
+    justifyContent: 'center',
+    gap:10
   },
   buttonEnabled: {
     backgroundColor: colors.purple,
@@ -48,7 +51,7 @@ export const formStyles = StyleSheet.create({
     backgroundColor: colors.green,
   },
   buttonText: {
-    color: colors.text.primaryGrey,
+    color: colors.white,
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
     fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],
@@ -62,7 +65,7 @@ export const formStyles = StyleSheet.create({
   buttonDisabled: {
     backgroundColor: 'transparent',
     borderColor: colors.purple,
-    borderWidth: 1
+    borderWidth: 1,
   },
   footer: {
     marginTop: 20,
@@ -82,18 +85,18 @@ export const formStyles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   suggestionBox: {
-    position: "absolute",
+    position: 'absolute',
     top: 50,
     left: 0,
     right: 0,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 8,
     maxHeight: 200,
     zIndex: 1000,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
@@ -101,10 +104,10 @@ export const formStyles = StyleSheet.create({
   suggestionItem: {
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: '#eee',
   },
   suggestionText: {
     fontSize: 16,
-    color: "#333",
+    color: '#333',
   },
 });

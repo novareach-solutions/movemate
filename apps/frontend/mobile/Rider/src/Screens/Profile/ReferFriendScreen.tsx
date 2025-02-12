@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,11 @@ import {
   ScrollView,
   SafeAreaView,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
+import {colors} from '../../theme/colors';
+import {typography} from '../../theme/typography';
 import Header from '../../components/Header';
-import ReferalBG from "../../assets/images/referalBG.svg"
-import GoldCoin from "../../assets/icons/goldCoin.svg"
+import ReferalBG from '../../assets/images/referalBG.svg';
+import GoldCoin from '../../assets/icons/goldCoin.svg';
 
 const ReferFriendsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Invite Friend' | 'Status'>(
@@ -20,10 +20,11 @@ const ReferFriendsScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={{
-      flex: 1
-    }}>
-      <Header isBack title='Refer A Friend' />
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
+      <Header isBack title="Refer A Friend" />
       <View style={styles.container}>
         {/* Tabs */}
         <View style={styles.tabsContainer}>
@@ -58,9 +59,7 @@ const ReferFriendsScreen: React.FC = () => {
           <View style={styles.content}>
             {/* Friends Circle */}
             <View style={styles.circleImageContainer}>
-              <ReferalBG
-                style={styles.circleImage}
-              />
+              <ReferalBG style={styles.circleImage} />
             </View>
 
             <View
@@ -86,7 +85,7 @@ const ReferFriendsScreen: React.FC = () => {
         )}
 
         {activeTab === 'Status' && (
-          <View style={{ flex: 1, paddingHorizontal: 20 }}>
+          <View style={{flex: 1, paddingHorizontal: 20}}>
             {/* Summary Card */}
             <View style={styles.summaryCard}>
               <GoldCoin style={styles.icon} />
@@ -101,8 +100,10 @@ const ReferFriendsScreen: React.FC = () => {
             </View>
 
             {/* Referral Status List */}
-            <Text style={styles.referralStatusHeading}>Your Referral Status</Text>
-            <View style={{ flex: 1 }}>
+            <Text style={styles.referralStatusHeading}>
+              Your Referral Status
+            </Text>
+            <View style={{flex: 1}}>
               <View style={styles.statusItem}>
                 <View>
                   <Text style={styles.amountText}>$30</Text>
@@ -150,7 +151,8 @@ const ReferFriendsScreen: React.FC = () => {
             </View>
           </View>
         )}
-      </View></SafeAreaView>
+      </View>
+    </SafeAreaView>
   );
 };
 

@@ -14,6 +14,7 @@ import {colors} from '../../theme/colors';
 import {formStyles} from '../../theme/form';
 import {useAppDispatch, useAppSelector} from '../../redux/hook';
 import {
+  agentSignup,
   setSignupData,
   uploadMedia,
 } from '../../redux/slices/authSlice';
@@ -37,7 +38,6 @@ const AddProfilePhotoScreen: React.FC = () => {
   const handleUpload = () => {
     setIsPhotoOptionVisible(true);
 
-    console.log('Upload button pressed');
     const profilePhotoDetails = {
       profilePhoto: 'https://example.com/profile-photo1.jpg',
     };
@@ -91,8 +91,8 @@ const AddProfilePhotoScreen: React.FC = () => {
       .then(photo => {
         const formData = new FormData();
         formData.append('file', {
-          uri: photo.path, 
-          type: photo.mime, 
+          uri: photo.path,
+          type: photo.mime,
           name: photo.filename || `photo_${Date.now()}.jpg`,
         });
 
@@ -122,7 +122,8 @@ const AddProfilePhotoScreen: React.FC = () => {
   const handleContinue = async () => {
     if (signupData) {
       try {
-        // await dispatch(agentSignup(signupData)).unwrap();
+        console.log('signup initiated');
+        await dispatch(agentSignup(signupData)).unwrap();
         // Navigate to DeliverPackage.home on success
         navigation.navigate(DeliverAPackage.UploadDocuments);
       } catch {
@@ -162,7 +163,7 @@ const AddProfilePhotoScreen: React.FC = () => {
       </View>
       {/* Photo Options Modal */}
       <PhotoPickerModal
-        visible={isPhotoOptionVisible}
+        isVisible={isPhotoOptionVisible}
         onClose={() => setIsPhotoOptionVisible(false)}
         onTakePhoto={handleTakePhoto}
         onChooseFromGallery={handleChooseFromGallery}

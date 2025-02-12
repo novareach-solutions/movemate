@@ -80,14 +80,8 @@ export class AuthController {
     @Res() response: Response,
   ): Promise<void> {
     const { phoneNumber, otp } = body;
-    this.logger.debug(
-      `AuthController.login: Logging in with OTP for ${phoneNumber}`,
-    );
-    const { accessToken, refreshToken } = await this.authService.login(
-      phoneNumber,
-      otp,
-      role,
-    );
+    const { accessToken, refreshToken, userId, agentId } =
+      await this.authService.login(phoneNumber, otp, role);
 
     response.cookie("refresh_token", refreshToken, {
       httpOnly: true,
@@ -102,7 +96,11 @@ export class AuthController {
     response.json({
       success: true,
       message: "Login successful.",
-      data: { accessToken },
+      data: {
+        accessToken,
+        userId,
+        ...(agentId !== undefined && { agentId }),
+      },
     });
   }
 
@@ -112,8 +110,6 @@ export class AuthController {
     @Res() response: Response,
     @Req() request: Request,
   ): Promise<void> {
-    this.logger.debug("AuthController.refreshToken: Refreshing tokens");
-
     const refreshToken = request.cookies["refresh_token"];
     if (!refreshToken) {
       throw new ForbiddenException("Refresh token not found.");

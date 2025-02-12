@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
-import Help from "../assets/icons/help.svg"
+import Help from '../assets/icons/help.svg';
 
 const HelpButton: React.FC<{onPress: () => void}> = ({onPress}) => {
   return (

@@ -1,10 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextStyle } from 'react-native';
-import { typography } from '../theme/typography';
-import { colors } from '../theme/colors';
-import { SvgProps } from 'react-native-svg';
+import {View, Text, StyleSheet, TextStyle} from 'react-native';
+import {typography} from '../theme/typography';
+import {colors} from '../theme/colors';
+import {SvgProps} from 'react-native-svg';
 
-const ImageText: React.FC<{ icon: React.FC<SvgProps>; text: string }> = ({ icon:Icon, text }) => {
+const ImageText: React.FC<{icon: React.FC<SvgProps>; text: string}> = ({
+  icon: Icon,
+  text,
+}) => {
   return (
     <View style={styles.container}>
       <Icon style={styles.image} />

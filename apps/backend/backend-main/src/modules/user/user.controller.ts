@@ -21,7 +21,6 @@ import { User } from "../../entity/User";
 import { Roles } from "../../shared/decorators/roles.decorator";
 import {
   UserDeleteProfileByIdSwagger,
-  UserGetAllSwagger,
   UserGetByIdSwagger,
   UserGetProfileByIdSwagger,
   UserPatchProfileByIdSwagger,
@@ -56,7 +55,7 @@ export class UserController {
     @Body() createUserDto: TCreateUser,
     @Req() request: ICustomRequest,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<IApiResponse<{ accessToken: string }>> {
+  ): Promise<IApiResponse<{ accessToken: string; userId: number }>> {
     const phoneNumberFromGuard = request.user.phoneNumber;
     if (
       createUserDto.phoneNumber &&
@@ -78,7 +77,7 @@ export class UserController {
       )}`,
     );
 
-    const { accessToken, refreshToken } =
+    const { accessToken, refreshToken, userId } =
       await this.userService.createUser(createUserDto);
 
     response.cookie("refresh_token", refreshToken, {
@@ -91,7 +90,7 @@ export class UserController {
     return {
       success: true,
       message: "User created successfully.",
-      data: { accessToken },
+      data: { accessToken, userId },
     };
   }
 
@@ -199,9 +198,8 @@ export class UserController {
    * GET /user/list
    */
   @Get("list")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.ADMIN)
-  @UserGetAllSwagger()
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async getAllUsers(): Promise<IApiResponse<User[]>> {
     this.logger.debug(`UserController.getAllUsers: Retrieving all users.`);
     const users = await this.userService.getAllUsers();

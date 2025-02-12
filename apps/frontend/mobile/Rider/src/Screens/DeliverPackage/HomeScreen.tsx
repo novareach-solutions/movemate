@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,161 +7,233 @@ import {
   SafeAreaView,
   Image,
   Animated,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import StatCard from '../../components/StatCard';
-import { colors } from '../../theme/colors';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AppScreensParamList } from '../../navigation/ScreenNames';
+import HelpButton from '../../components/HelpButton';
+import {AppScreens, DeliverAPackage} from '../../navigation/ScreenNames';
+import {useSelector, useDispatch} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  AgentStatusEnum,
+  updateAgentStatus,
+} from '../../redux/slices/agentSlice';
+import Mapbox from '@rnmapbox/maps';
+import { MAPBOX_ACCESS_TOKEN } from "../../utils/constants";
+import {showOrderModal, fetchOngoingOrder} from '../../redux/slices/orderSlice';
+import {io} from 'socket.io-client';
+import apiClient from '../../api/apiClient';
+import apiEndPoints from '../../api/apiEndPoints';
+import {RootState} from '../../redux/store';
+import {OrderStatusEnum} from '../../redux/slices/types/enums';
+import {colors} from '../../theme/colors';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AppScreensParamList} from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
-import DeliveryModal from '../../components/Modals/DeliveryModal';
-import ExpandedModal from '../../components/Modals/ExpandedModal';
-import EarningsModal from '../../components/Modals/EarningsModal';
-import OrderModal from '../../components/Modals/OrderModal';
-import Money from "../../assets/icons/money.svg"
-import Order from "../../assets/icons/orders.svg"
-import Distance from "../../assets/icons/distance.svg"
-
-
+import Money from '../../assets/icons/money.svg';
+import Order from '../../assets/icons/orders.svg';
+import Distance from '../../assets/icons/distance.svg';
+Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
-  const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
-  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
-  const [isDeliveryModal, setIsDeliveryModal] = useState(false);
-  const [isEarningsModal, setIsEarningsModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
+  const ongoingOrder = useSelector(
+    (state: RootState) => state.order.ongoingOrder,
+  );
+  const [hasNavigated, setHasNavigated] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
 
-  const toggleStatus = () => {
-    setIsOnline(!isOnline);
+  const updateLocationAPI = async (latitude: number, longitude: number) => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      if (!accessToken) throw new Error('Access token not found.');
+      const response = await apiClient.patch(apiEndPoints.updateLocation, {
+        latitude,
+        longitude,
+      });
+      console.log('Location updated:', response.data);
+    } catch (error) {
+      console.error('Error updating location:', error);
+    }
+  };
+
+  useEffect(() => {
+    let locationInterval: NodeJS.Timeout | null = null;
+    if (isOnline) {
+      locationInterval = setInterval(() => {
+        updateLocationAPI(40.712579, -74.218993);
+      }, 15000);
+    } else if (locationInterval) {
+      clearInterval(locationInterval);
+    }
+    return () => {
+      if (locationInterval) clearInterval(locationInterval);
+    };
+  }, [isOnline]);
+
+  const toggleStatus = async () => {
+    if (!isAuthenticated) {
+      Alert.alert('Not Authenticated', 'Please log in to perform this action.');
+      return;
+    }
+    const newStatus = !isOnline;
+    setIsOnline(newStatus);
+    setIsLoading(true);
     Animated.timing(drawerHeight, {
-      toValue: isOnline ? 0 : 120,
+      toValue: newStatus ? 120 : 0,
       duration: 300,
       useNativeDriver: false,
     }).start();
+    const currentAccessToken = await AsyncStorage.getItem('accessToken');
+    console.log('🔍 Current Access Token:', currentAccessToken);
+    try {
+      const statusEnum = newStatus
+        ? AgentStatusEnum.ONLINE
+        : AgentStatusEnum.OFFLINE;
+      await updateAgentStatus(statusEnum);
+      console.log(`✅ Agent status set to ${statusEnum}`);
+    } catch (error) {
+      console.log('Error', error);
+      setIsOnline(!newStatus);
+      Animated.timing(drawerHeight, {
+        toValue: !newStatus ? 120 : 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+      console.error('❌ Failed to update status:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Show the `DeliveryModal` after 3 seconds
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsOrderModalVisible(true);
-    }, 8000);
-
-    return () => clearTimeout(timer);
+    const fetchAgentId = async () => {
+      const storedAgentId = await AsyncStorage.getItem('agentId');
+      setAgentId(storedAgentId);
+    };
+    fetchAgentId();
   }, []);
+
+  useEffect(() => {
+    if (!agentId) return;
+    const numericAgentId = parseInt(agentId, 10);
+    if (isNaN(numericAgentId)) {
+      console.error('Invalid agentId: Unable to convert to number.');
+      return;
+    }
+    const socket = io(apiEndPoints.baseURL);
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+      socket.emit('joinRoom', {agentId: numericAgentId});
+      console.log(`Joined room for agentId: ${numericAgentId}`);
+    });
+    socket.on('disconnect', () => {
+      console.log('Disconnected from WebSocket server');
+    });
+    socket.on('newRequest', (data: any) => {
+      console.log('Received newRequest:', data);
+      dispatch(
+        showOrderModal({
+          orderId: data.orderId,
+          earnings: `${data.earnings}$`,
+          tip: `${data.tip}$`,
+          time: data.estimatedTime,
+          distance: data.estimatedDistance,
+          pickupAddress: data.pickupAddress,
+          dropoffAddress: data.dropAddress,
+        }),
+      );
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [agentId, dispatch]);
+
+  useEffect(() => {
+    if (agentId) {
+      dispatch(fetchOngoingOrder());
+    }
+  }, [agentId, dispatch]);
+
+  useEffect(() => {
+    console.log('Ongoingon order value', ongoingOrder);
+    if (ongoingOrder && !hasNavigated) {
+      setHasNavigated(true);
+      if (ongoingOrder.status === OrderStatusEnum.PICKEDUP_ORDER) {
+        navigation.navigate(DeliverAPackage.DropOffOrderDetails, {
+          order: ongoingOrder,
+        });
+      }
+      if (
+        ongoingOrder.status === OrderStatusEnum.ACCEPTED ||
+        ongoingOrder.status === OrderStatusEnum.PENDING || OrderStatusEnum.IN_PROGRESS
+      ) {
+        navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
+          order: ongoingOrder,
+        });
+      }
+    }
+  }, [ongoingOrder, hasNavigated, navigation]);
 
   const handleTakePhoto = () => {
     console.log('Taking a photo for proof...');
-    // Add your camera logic here
   };
 
   const handleOrderDelivered = () => {
     console.log('Order marked as delivered.');
-    setIsDeliveryModal(false);
-    setTimeout(() => {
-      setIsEarningsModal(true);
-    }, 300);
-  };
-  const handleOrderStarted = () => {
-    console.log('Order marked as delivered.');
-    setIsExpandedModalVisible(false);
-    setTimeout(() => {
-      setIsDeliveryModal(true);
-    }, 300);
   };
 
-  // Handle "Accept Order" button press
   const handleAcceptOrder = () => {
-    setIsOrderModalVisible(false);
-    setTimeout(() => {
-      setIsExpandedModalVisible(true);
-    }, 300);
+    // Additional logic can be added here
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <Header logo home help />
-        {/* Map Image */}
-        <View style={styles.mapContainer}>
-          <Image source={require('../../assets/images/Map.png')} style={styles.mapImage} />
-        </View>
+      {/* Map Image */}
+      <View style={styles.mapContainer}>
+      <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+                    <Mapbox.Camera zoomLevel={14} centerCoordinate={ [151.209900, -33.865143]} />
 
-        {/* Status Button */}
-        <View style={styles.statusContainer}>
-          <TouchableOpacity
-            onPress={toggleStatus}
+                  </Mapbox.MapView>
+      </View>
+
+      {/* Status Button */}
+      <View style={styles.statusContainer}>
+        <TouchableOpacity
+          onPress={toggleStatus}
+          style={[
+            styles.statusButton,
+            isOnline ? styles.stopButton : styles.goButton,
+          ]}>
+          <Text
             style={[
-              styles.statusButton,
-              isOnline ? styles.stopButton : styles.goButton,
+              styles.statusButtonText,
+              isOnline ? styles.stopText : styles.goText,
             ]}>
-            <Text
-              style={[
-                styles.statusButtonText,
-                isOnline ? styles.stopText : styles.goText,
-              ]}>
-              {isOnline ? 'Stop' : 'GO'}
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.statusText}>
-            {isOnline ? "You're Online" : "You're Offline"}
+            {isOnline ? 'Stop' : 'GO'}
           </Text>
+        </TouchableOpacity>
+        <Text style={styles.statusText}>
+          {isOnline ? "You're Online" : "You're Offline"}
+        </Text>
+      </View>
+
+      {/* Sliding Drawer */}
+      <Animated.View style={[styles.drawer, {height: drawerHeight}]}>
+        <View style={styles.statsContainer}>
+          <StatCard icon={Money} value="$50" label="EARNINGS" />
+          <StatCard icon={Order} value="7" label="ORDERS" />
+          <StatCard icon={Distance} value="30 Km" label="DISTANCE" />
         </View>
-
-        {/* Sliding Drawer */}
-        <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
-          <View style={styles.statsContainer}>
-            <StatCard icon={Money} value="$50" label="EARNINGS" />
-            <StatCard icon={Order} value="7" label="ORDERS" />
-            <StatCard
-              icon={Distance}
-              value="30 Km"
-              label="DISTANCE"
-            />
-          </View>
-        </Animated.View>
-
-
-        {/* Order Modal */}
-        <OrderModal
-          isVisible={isOrderModalVisible}
-          onClose={handleAcceptOrder}
-          earnings="$21.89"
-          tip="$11.89"
-          time="15 mins"
-          distance="7.6 Km"
-          pickupAddress="Yocha (Tom Roberts Parade)"
-          dropoffAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
-        />
-
-        {/* Earnings Modal */}
-        <EarningsModal
-          isVisible={isEarningsModal}
-          onClose={() => setIsEarningsModal(false)}
-          tripTime="26 mins"
-          tripDistance="5.2 km"
-          tripPay={55}
-          tip={5}
-          totalEarnings={60}
-        />
-
-        {/* Delivery Modal */}
-        <DeliveryModal
-          isVisible={isDeliveryModal}
-          onClose={handleOrderDelivered}
-          driverName="Alexander V."
-          deliveryAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
-          deliveryInstructions={['Do not ring the bell', 'Drop-off at the door']}
-          itemsToDeliver={['Documents']}
-        />
-
-        {/*Order Expanded Modal */}
-        <ExpandedModal
-          isVisible={isExpandedModalVisible}
-          onClose={handleOrderStarted}
-          driverName="Alexander V."
-          pickupAddress="Yocha (Tom Roberts Parade)"
-          pickupNotes="Deliver to the back door, main gate is locked."
-          items={['Documents', 'Laptop', 'Bag']}
-        />
+      </Animated.View>
     </SafeAreaView>
   );
 };
@@ -169,7 +241,7 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.lightButtonBackground
+    backgroundColor: colors.lightButtonBackground,
   },
   mapContainer: {
     flex: 2,
@@ -186,7 +258,7 @@ const styles = StyleSheet.create({
   statusContainer: {
     alignItems: 'center',
     marginTop: -100,
-    backgroundColor:colors.white
+    backgroundColor: colors.white,
   },
   statusButton: {
     width: 80,
@@ -195,7 +267,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    marginTop:-40
+    marginTop: -40,
   },
   stopButton: {
     backgroundColor: colors.error,
@@ -229,14 +301,14 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: {width: 0, height: -2},
     paddingHorizontal: 20,
     paddingTop: 10,
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor:colors.white
+    backgroundColor: colors.white,
   },
   helpButtonContainer: {
     position: 'absolute',

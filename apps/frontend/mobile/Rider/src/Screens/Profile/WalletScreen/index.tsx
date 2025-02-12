@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -9,15 +9,18 @@ import {
   TextStyle,
   SafeAreaView,
 } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import { ProfileScreens, ProfileScreensParamList } from '../../../navigation/ScreenNames';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {colors} from '../../../theme/colors';
+import {typography} from '../../../theme/typography';
+import {
+  ProfileScreens,
+  ProfileScreensParamList,
+} from '../../../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Header from '../../../components/Header';
-import Calender from "../../../assets/icons/calender.svg"
-import PurpleArrow from "../../../assets/icons/purpleArrow.svg"
-import CheckIcon from "../../../assets/icons/checkIcon.svg"
-import WhiteArrow from "../../../assets/icons/whiteArrow.svg"
+import Calender from '../../../assets/icons/calender.svg';
+import PurpleArrow from '../../../assets/icons/purpleArrow.svg';
+import CheckIcon from '../../../assets/icons/checkIcon.svg';
+import WhiteArrow from '../../../assets/icons/whiteArrow.svg';
 
 const historyData = [
   {
@@ -52,18 +55,21 @@ const WalletScreen: React.FC = () => {
       <View style={styles.historyDetailsContainer}>
         <Text style={styles.historyAmount}>{item.amount}</Text>
         <Text style={styles.historyDetails}>{item.cardDetails}</Text>
-        <TouchableOpacity onPress={()=>{
-          navigation.navigate(ProfileScreens.PayoutSummary)
-        }}><View
-          style={{
-            flexDirection: 'row',
-            gap: 10,
-            alignItems: 'center',
-            marginTop: 30,
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(ProfileScreens.PayoutSummary);
           }}>
-          <Text style={styles.viewDetails}>View details</Text>
-          <PurpleArrow width={10} height={10} style={styles.viewicon}/>
-        </View></TouchableOpacity>
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 10,
+              alignItems: 'center',
+              marginTop: 30,
+            }}>
+            <Text style={styles.viewDetails}>View details</Text>
+            <PurpleArrow width={10} height={10} style={styles.viewicon} />
+          </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.historyRightContainer}>
         <Text style={styles.historyDate}>{item.date}</Text>
@@ -77,8 +83,7 @@ const WalletScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-
-      <Header title='Wallet' isBack />
+      <Header title="Wallet" isBack />
       {/* Tabs */}
       <View style={styles.tabsContainer}>
         <TouchableOpacity
@@ -342,8 +347,8 @@ const styles = StyleSheet.create({
   viewicon: {
     width: 12,
     height: 12,
-    objectFit: "contain"
-  }
+    objectFit: 'contain',
+  },
 });
 
 export default WalletScreen;

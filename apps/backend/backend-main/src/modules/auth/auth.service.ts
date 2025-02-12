@@ -7,6 +7,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Twilio } from "twilio";
 
+import { Agent } from "../../entity/Agent";
 import { User } from "../../entity/User";
 import { UserRoleEnum } from "../../shared/enums";
 import {
@@ -82,7 +83,12 @@ export class AuthService {
     phoneNumber: string,
     otp: string,
     role: UserRoleEnum,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    userId: number;
+    agentId?: number;
+  }> {
     this.logger.debug(
       `AuthService.login: Logging in user with phone number ${phoneNumber}`,
     );
@@ -112,7 +118,16 @@ export class AuthService {
     );
     const refreshToken = this.tokenService.generateRefreshToken(user.id);
 
-    return { accessToken, refreshToken };
+    // If the user is an agent, fetch their agentId
+    let agentId: number | undefined = undefined;
+    if (user.role === UserRoleEnum.AGENT) {
+      const agent = await dbRepo(Agent).findOne({ where: { userId: user.id } });
+      if (agent) {
+        agentId = agent.id;
+      }
+    }
+
+    return { accessToken, refreshToken, userId: user.id, agentId };
   }
 
   async refreshToken(
