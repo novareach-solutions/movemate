@@ -27,15 +27,12 @@ const noAuthEndpoints = [
 apiClient.interceptors.request.use(
   async config => {
     const accessToken = await AsyncStorage.getItem('accessToken');
-    const onboardingToken = await AsyncStorage.getItem('onboardingToken');
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-    if (onboardingToken) {
-      config.headers['onboarding_token'] = onboardingToken;
-    }
+
     config.headers['Content-Type'] = 'application/json';
 
     const curlCommand = generateCurlCommand(config);

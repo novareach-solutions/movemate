@@ -35,6 +35,7 @@ interface AgentSignupPayload {
     suburb: string;
     state: string;
     postalCode: number;
+    phoneNumber:number
   };
   agentType: string;
   abnNumber: string;
@@ -115,14 +116,6 @@ export const verifyOtp = createAsyncThunk(
         phoneNumber: phone,
         otp,
       });
-      console.log(response.headers)
-      // Store onboarding token if present in the response headers
-      const onboardingToken = response.headers['onboarding_token'];
-      if (onboardingToken) {
-        await saveToken('onboardingToken', onboardingToken);
-        console.log('Onboarding Token Stored:', onboardingToken);
-      }
-
       return response.data;
     } catch (error: any) {
       let errorMessage = 'An unexpected error occurred.';
