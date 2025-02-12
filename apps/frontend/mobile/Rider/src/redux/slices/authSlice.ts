@@ -17,6 +17,7 @@ interface AuthState {
   error: string | null;
   signupData: AgentSignupPayload | null;
   phoneNumber:string | null;
+  currentLocation:any;
 }
 
 const initialState: AuthState = {
@@ -24,7 +25,8 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   signupData: null,
-  phoneNumber:null
+  phoneNumber:null,
+  currentLocation:null
 };
 
 interface AgentSignupPayload {
@@ -276,6 +278,9 @@ const authSlice = createSlice({
 
     },
 
+    updateCurrentLocation:(state,action)=>{
+      state.currentLocation = action.payload
+    }
   },
   extraReducers: builder => {
     // Handle agentSignup
@@ -382,5 +387,5 @@ const authSlice = createSlice({
 });
 
 // Export the actions and reducer
-export const {logout, setSignupData,updatePhoneNumber} = authSlice.actions;
+export const {logout, setSignupData,updatePhoneNumber,updateCurrentLocation} = authSlice.actions;
 export default authSlice.reducer;
