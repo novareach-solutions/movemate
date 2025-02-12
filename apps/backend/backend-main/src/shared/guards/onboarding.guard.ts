@@ -42,6 +42,7 @@ export class OnboardingGuard implements CanActivate {
   }
 
   private extractTokenFromHeaders(request: any): string | null {
+    logger.info(request.headers)
     const token = request.headers["onboarding_token"];
     if (token) {
       logger.debug(
