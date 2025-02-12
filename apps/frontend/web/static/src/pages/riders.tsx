@@ -7,12 +7,6 @@ import { WhyUsSection } from "@/components/sections/WhyUsSection";
 import TryUsNow from "@/components/TryUsNow";
 import VamooseVsOthers from "@/components/VamooseVsOthers";
 
-// Import some icons from Lucide
-import { Check, FileText, RefreshCcw } from "lucide-react";
-import { Require } from "../../public/svgs/require";
-import { Document } from "../../public/svgs/Document";
-import { Signup } from "../../public/svgs/Signup";
-
 export default function RiderPage() {
   // Updated data for WhyUsSection using images from the public folder
   const whyUsData = {
