@@ -1,5 +1,5 @@
+import TermsAndConditions from "@/components/TermsAndConditions";
 import React from "react";
-import TermsAndConditions from "./TermsAndConditions";
 
 const termsContent = [
   {
@@ -13,7 +13,7 @@ const termsContent = [
   },
 ];
 
-const App: React.FC = () => {
+const TermsAndConditionsPage: React.FC = () => {
   return (
     <div>
       <TermsAndConditions sections={termsContent} />
@@ -21,4 +21,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default TermsAndConditionsPage;
