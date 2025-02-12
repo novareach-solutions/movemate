@@ -152,8 +152,8 @@ export class NotificationService {
   private createMessageEvent(event: INotificationEvent): IServerSentEvent {
     this.logger.debug("Creating message event", event);
     return {
-      data: `data: ${JSON.stringify(event)}\n\n`,
-      lastEventId: event.id,
+      data: JSON.stringify(event),
+      id: event.id?.toString(),
       type: event.type,
     };
   }

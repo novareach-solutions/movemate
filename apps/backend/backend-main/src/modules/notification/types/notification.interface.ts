@@ -24,6 +24,6 @@ export interface ISSEClient {
 
 export interface IServerSentEvent {
   data: string;
-  lastEventId: number;
+  id?: string;
   type: string;
 }
