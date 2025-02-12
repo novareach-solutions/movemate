@@ -1,7 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { DeleteResult, In, UpdateResult } from "typeorm";
 
+import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import { User } from "../../entity/User";
+import { OrderStatusEnum } from "../../shared/enums";
 import {
   UserAlreadyExistsError,
   UserNotFoundError,
@@ -10,8 +12,6 @@ import { filterEmptyValues } from "../../utils/filter";
 import { TokenService } from "../auth/utils/generateTokens";
 import { dbReadRepo, dbRepo } from "../database/database.service";
 import { TCreateUser, TGetUserProfile, TUpdateUser } from "./user.types";
-import { OrderStatusEnum } from "../../shared/enums";
-import { SendPackageOrder } from "../../entity/SendPackageOrder";
 
 @Injectable()
 export class UserService {
@@ -122,7 +122,7 @@ export class UserService {
 
   async getCurrentOrder(userId: number): Promise<SendPackageOrder | null> {
     this.logger.debug(
-      `UserService.getCurrentOrder: Fetching ongoing order for user ID: ${userId}`
+      `UserService.getCurrentOrder: Fetching ongoing order for user ID: ${userId}`,
     );
 
     const ongoingOrder = await dbReadRepo(SendPackageOrder).findOne({
@@ -147,5 +147,4 @@ export class UserService {
 
     return ongoingOrder;
   }
-
 }

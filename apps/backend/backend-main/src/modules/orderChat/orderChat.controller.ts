@@ -1,4 +1,4 @@
-import { Controller, Get, NotFoundException,Param } from "@nestjs/common";
+import { Controller, Get, NotFoundException, Param } from "@nestjs/common";
 
 import { OrderChatService } from "./orderChat.service";
 
@@ -7,7 +7,7 @@ export class OrderChatController {
   constructor(private readonly orderChatService: OrderChatService) {}
 
   @Get(":orderId/messages")
-  async getOrderMessages(@Param("orderId") orderId: number) {
+  async getOrderMessages(@Param("orderId") orderId: number): Promise<any> {
     const messages = await this.orderChatService.getMessages(orderId);
     if (!messages) {
       throw new NotFoundException("No messages found for this order");
