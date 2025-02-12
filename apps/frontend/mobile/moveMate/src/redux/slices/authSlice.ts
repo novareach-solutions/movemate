@@ -34,6 +34,7 @@ interface userSignupPayload {
     suburb: string;
     state: string;
     postalCode: number;
+    phoneNumber:string;
 }
 
 interface agentDoc {
@@ -161,7 +162,7 @@ export const userSignup = createAsyncThunk(
     console.log('payload', payload)
     try {
       const response = await apiClient.post(apiEndpoints.userSignup, payload);
-      await AsyncStorage.setItem('accessToken', response.data.accessToken);
+      await AsyncStorage.setItem('accessToken', response?.data?.accessToken);
       // await AsyncStorage.setItem('refreshToken', response.data.
       return response.data;
     } catch (error) {

@@ -19,9 +19,9 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-    if (onboardingToken) {
-      config.headers['onboarding_token'] = onboardingToken;
-    }
+    // if (onboardingToken) {
+    //   config.headers['onboarding_token'] = onboardingToken;
+    // }
     config.headers['Content-Type'] = 'application/json';
 
     const curlCommand = generateCurlCommand(config);
