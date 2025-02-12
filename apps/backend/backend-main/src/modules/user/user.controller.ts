@@ -263,4 +263,39 @@ export class UserController {
       data: result,
     };
   }
+
+  @Get("currentstatus")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async getCurrentOrder(
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<{ order: any | null }>> {
+    const userId = request.user.id;
+
+    this.logger.debug(
+      `UserController.getCurrentOrder: Checking ongoing orders for user ID: ${userId}`,
+    );
+
+    const ongoingOrder = await this.userService.getCurrentOrder(userId);
+
+    if (ongoingOrder) {
+      this.logger.log(
+        `UserController.getCurrentOrder: Ongoing order found for user ID: ${userId}`,
+      );
+      return {
+        success: true,
+        message: "Ongoing order found.",
+        data: { order: ongoingOrder },
+      };
+    } else {
+      this.logger.log(
+        `UserController.getCurrentOrder: No ongoing order found for user ID: ${userId}`,
+      );
+      return {
+        success: true,
+        message: "No ongoing order found.",
+        data: { order: null },
+      };
+    }
+  }
 }

@@ -34,7 +34,6 @@ import { parseTimeToMinutes } from "../../../utils/timeFns";
 import { dbReadRepo, dbRepo } from "../../database/database.service";
 import { PricingService } from "../../pricing/pricing.service";
 import { TSendPackageOrder } from "./sendPackage.types";
-import { logger } from "../../../logger";
 
 @Injectable()
 export class SendAPackageService {

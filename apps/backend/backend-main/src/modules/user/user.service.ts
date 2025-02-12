@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { DeleteResult, UpdateResult } from "typeorm";
+import { DeleteResult, In, UpdateResult } from "typeorm";
 
 import { User } from "../../entity/User";
 import {
@@ -10,6 +10,8 @@ import { filterEmptyValues } from "../../utils/filter";
 import { TokenService } from "../auth/utils/generateTokens";
 import { dbReadRepo, dbRepo } from "../database/database.service";
 import { TCreateUser, TGetUserProfile, TUpdateUser } from "./user.types";
+import { OrderStatusEnum } from "../../shared/enums";
+import { SendPackageOrder } from "../../entity/SendPackageOrder";
 
 @Injectable()
 export class UserService {
@@ -117,4 +119,33 @@ export class UserService {
     this.logger.debug(`UserService.deleteUser: Deleting user with ID ${id}`);
     return await dbRepo(User).softDelete(id);
   }
+
+  async getCurrentOrder(userId: number): Promise<SendPackageOrder | null> {
+    this.logger.debug(
+      `UserService.getCurrentOrder: Fetching ongoing order for user ID: ${userId}`
+    );
+
+    const ongoingOrder = await dbReadRepo(SendPackageOrder).findOne({
+      where: {
+        customer: { id: userId },
+        status: In([
+          OrderStatusEnum.PENDING,
+          OrderStatusEnum.ACCEPTED,
+          OrderStatusEnum.IN_PROGRESS,
+          OrderStatusEnum.PICKEDUP_ORDER,
+        ]), // Use In operator here
+      },
+      relations: [
+        "pickupLocation",
+        "dropLocation",
+        "customer",
+        "agent",
+        "report",
+        "review",
+      ],
+    });
+
+    return ongoingOrder;
+  }
+
 }
