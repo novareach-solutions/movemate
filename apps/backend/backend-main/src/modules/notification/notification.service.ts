@@ -1,46 +1,93 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { Response } from "express";
-import { v4 as uuidv4 } from "uuid";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { finalize, Observable, Subject } from "rxjs";
 
 import { Notification } from "../../entity/Notification";
 import { SendPackageOrder } from "../../entity/SendPackageOrder";
-import { CustomerNotificationGateway } from "../../shared/gateways/customer.notification.gateway";
+import { User } from "../../entity/User";
 import { dbRepo } from "../database/database.service";
 import {
   INotificationEvent,
-  ISSEClient,
+  IServerSentEvent,
   NotificationTypeEnum,
 } from "./types/notification.interface";
 
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name);
-  private clients: Map<number, ISSEClient[]> = new Map();
+  private clients: Map<number, Subject<IServerSentEvent>> = new Map();
 
-  constructor(
-    private readonly customerNotificationGateway: CustomerNotificationGateway,
-  ) {}
-
-  // Public methods first
-  createSSEConnection(userId: number, response: Response): void {
-    const client: ISSEClient = {
-      id: uuidv4(),
-      userId,
-      response,
-    };
-
-    if (!this.clients.has(userId)) {
-      this.clients.set(userId, []);
+  async createSSEConnection(
+    userId: number,
+  ): Promise<Observable<IServerSentEvent>> {
+    // Clean up any existing connection
+    const existingSubject = this.clients.get(userId);
+    if (existingSubject) {
+      existingSubject.complete();
+      this.clients.delete(userId);
     }
-    this.clients.get(userId).push(client);
 
-    this.setupSSEConnection(client);
-    this.logger.debug(`SSE connection established for user ${userId}`);
+    // Create new subject
+    const subject = new Subject<IServerSentEvent>();
+    this.clients.set(userId, subject);
+
+    // Send initial connection success
+    const connectionEvent = this.createMessageEvent({
+      type: NotificationTypeEnum.CONNECTION,
+      data: { message: "Connected to notification service" },
+      timestamp: new Date(),
+      userId,
+      read: true,
+    });
+
+    subject.next(connectionEvent);
+
+    // Fetch and send unread notifications
+    const unreadNotifications = await dbRepo(Notification).find({
+      where: {
+        userId,
+        read: false,
+      },
+      order: {
+        createdAt: "DESC",
+      },
+    });
+
+    this.logger.debug("Unread notifications", unreadNotifications);
+
+    for (const notification of unreadNotifications) {
+      const event: INotificationEvent = {
+        id: notification.id,
+        type: notification.type,
+        data: notification.data,
+        timestamp: notification.createdAt,
+        userId: notification.userId,
+        read: false,
+      };
+
+      const messageEvent = this.createMessageEvent(event);
+      subject.next(messageEvent);
+
+      // Mark as read
+      await dbRepo(Notification).update(
+        { id: notification.id },
+        { read: true },
+      );
+    }
+
+    this.logger.debug(
+      `SSE connection established for user ${userId} with ${unreadNotifications.length} unread notifications`,
+    );
+
+    return subject.asObservable().pipe(
+      finalize(() => {
+        this.logger.debug(`SSE connection closed for user ${userId}`);
+        this.clients.delete(userId);
+      }),
+    );
   }
 
   async notifyOrderAccepted(order: SendPackageOrder): Promise<void> {
     const event: INotificationEvent = {
-      id: uuidv4(),
       type: NotificationTypeEnum.ORDER_ACCEPTED,
       data: {
         orderId: order.id,
@@ -52,13 +99,12 @@ export class NotificationService {
       userId: order.customerId,
       read: false,
     };
-
+    this.logger.debug("Sending notification", event);
     await this.sendNotification(event);
   }
 
   async notifyOrderCancelled(order: SendPackageOrder): Promise<void> {
     const event: INotificationEvent = {
-      id: uuidv4(),
       type: NotificationTypeEnum.ORDER_CANCELLED,
       data: {
         orderId: order.id,
@@ -77,7 +123,6 @@ export class NotificationService {
 
   async notifyOrderCompleted(order: SendPackageOrder): Promise<void> {
     const event: INotificationEvent = {
-      id: uuidv4(),
       type: NotificationTypeEnum.ORDER_COMPLETED,
       data: {
         orderId: order.id,
@@ -92,66 +137,38 @@ export class NotificationService {
     await this.sendNotification(event);
   }
 
-  // Private methods last
-  private setupSSEConnection(client: ISSEClient): void {
-    const { response } = client;
-
-    response.writeHead(200, {
-      "Content-Type": "text/event-stream",
-      Connection: "keep-alive",
-      "Cache-Control": "no-cache",
-    });
-
-    // Send initial connection success
-    this.sendSSEEvent(client, {
-      id: uuidv4(),
-      type: NotificationTypeEnum.CONNECTION,
-      data: { message: "Connected to notification service" },
-      timestamp: new Date(),
-      userId: client.userId,
-      read: true,
-    });
-
-    // Handle client disconnect
-    response.on("close", () => {
-      this.removeClient(client);
-      this.logger.debug(`Client ${client.id} disconnected`);
-    });
-  }
-
-  private removeClient(client: ISSEClient): void {
-    const userClients = this.clients.get(client.userId) || [];
-    const updatedClients = userClients.filter((c) => c.id !== client.id);
-
-    if (updatedClients.length === 0) {
-      this.clients.delete(client.userId);
-    } else {
-      this.clients.set(client.userId, updatedClients);
-    }
-  }
-
   private async sendNotification(event: INotificationEvent): Promise<void> {
     // Store notification in database
     await this.persistNotification(event);
 
-    // Send through WebSocket
-    this.customerNotificationGateway.sendMessageToClient(
-      event.userId.toString(),
-      event.type,
-      event.data,
-    );
-
     // Send through SSE
-    const userClients = this.clients.get(event.userId) || [];
-    userClients.forEach((client) => this.sendSSEEvent(client, event));
+    const subject = this.clients.get(event.userId);
+    if (subject) {
+      const messageEvent = this.createMessageEvent(event);
+      subject.next(messageEvent);
+    }
   }
 
-  private sendSSEEvent(client: ISSEClient, event: INotificationEvent): void {
-    const sseData = `data: ${JSON.stringify(event)}\n\n`;
-    client.response.write(sseData);
+  private createMessageEvent(event: INotificationEvent): IServerSentEvent {
+    this.logger.debug("Creating message event", event);
+    return {
+      data: `data: ${JSON.stringify(event)}\n\n`,
+      lastEventId: event.id,
+      type: event.type,
+    };
   }
 
   private async persistNotification(event: INotificationEvent): Promise<void> {
+    // Check if user exists
+    const user = await dbRepo(User).findOne({
+      where: { id: event.userId },
+    });
+
+    if (!user) {
+      this.logger.error(`User with ID ${event.userId} not found`);
+      throw new NotFoundException(`User with ID ${event.userId} not found`);
+    }
+
     await dbRepo(Notification).save({
       userId: event.userId,
       type: event.type,

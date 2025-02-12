@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,9 @@ import {
   TextStyle,
   SafeAreaView,
 } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
-import PurpleCheck from "../../../assets/icons/purpleCheck.svg"
+import {colors} from '../../../theme/colors';
+import {typography} from '../../../theme/typography';
+import PurpleCheck from '../../../assets/icons/purpleCheck.svg';
 import Header from '../../../components/Header';
 
 interface BenefitItemProps {
@@ -18,7 +18,10 @@ interface BenefitItemProps {
   description: string;
 }
 
-export const BenefitItem: React.FC<BenefitItemProps> = ({ title, description }) => {
+export const BenefitItem: React.FC<BenefitItemProps> = ({
+  title,
+  description,
+}) => {
   return (
     <View style={styles.benifitContainer}>
       <PurpleCheck />
@@ -92,10 +95,11 @@ const SubscriptionPlansScreen: React.FC = () => {
   const activePlan = plansData[activeTab];
 
   return (
-    <SafeAreaView style={{
-      flex: 1,
-      backgroundColor: "#2a1d3d"
-    }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#2a1d3d',
+      }}>
       <Header isBack earningScreen />
       <View style={styles.container}>
         <Text style={styles.title}>Boost Earnings with</Text>
@@ -151,7 +155,8 @@ const SubscriptionPlansScreen: React.FC = () => {
             <Text style={styles.getStartedText}>Get Started</Text>
           </TouchableOpacity>
         </View>
-      </View></SafeAreaView>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -206,13 +211,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
+    shadowOffset: {width: 0, height: 5},
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
     width: '100%',
     borderWidth: 1,
-    borderColor: "#FC9BE5"
+    borderColor: '#FC9BE5',
   },
   cardTitle: {
     fontSize: typography.fontSize.large,

@@ -50,11 +50,11 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
   const handleChange = (value: string, index: number) => {
     // Allow only numbers
     if (!/^\d*$/.test(value)) return;
-  
+
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-  
+
     // Focus handling
     if (value && index < 5) {
       inputs.current[index + 1]?.focus();
@@ -62,7 +62,6 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
       inputs.current[index - 1]?.focus();
     }
   };
-  
 
   const handleVerify = async () => {
     const enteredOtp = otp.join('');
@@ -78,7 +77,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
         navigation.navigate(DeliverAPackage.Home);
       } else {
         // Dispatch verifyOtp thunk
-      123
+        123;
         navigation.navigate(AuthScreens.SelectService);
       }
     } catch (err: any) {

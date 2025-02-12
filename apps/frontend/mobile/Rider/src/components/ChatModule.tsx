@@ -14,7 +14,7 @@ import {
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import Header from './Header';
-import SendIcon from "../assets/icons/sendIcon.svg"
+import SendIcon from '../assets/icons/sendIcon.svg';
 
 interface Message {
   id: string;
@@ -191,8 +191,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
   },
-  sendButton: {
-  },
+  sendButton: {},
   sendIcon: {
     width: 20,
     height: 20,

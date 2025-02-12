@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,13 +7,16 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
-import { colors } from '../theme/colors';
-import { formStyles } from '../theme/form';
+import {colors} from '../theme/colors';
+import {formStyles} from '../theme/form';
 import TitleDescription from '../components/TitleDescription';
 import PhotoPickerModal from '../components/common/PhotoPickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { DeliverAPackage, DeliverAPackageParamList } from '../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {
+  DeliverAPackage,
+  DeliverAPackageParamList,
+} from '../navigation/ScreenNames';
 import Header from '../components/Header';
 
 interface DocumentReviewProps {
@@ -25,8 +28,8 @@ interface DocumentReviewProps {
   };
 }
 
-const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({ route }) => {
-  const { title, uploadedImage } = route.params;
+const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
+  const {title, uploadedImage} = route.params;
   const [image, setImage] = useState(uploadedImage);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
@@ -86,16 +89,24 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({ route }) => {
         />
         <View style={styles.imageContainer}>
           <Image
-            source={image ? { uri: image } : require("../assets/icons/placeHolderProfile.svg")}
+            source={
+              image
+                ? {uri: image}
+                : require('../assets/icons/placeHolderProfile.svg')
+            }
             style={styles.image}
           />
         </View>
         <View style={styles.footer}>
           <TouchableOpacity
-            style={[formStyles.button, styles.halfButton,{
-              borderWidth:1,
-              borderColor:colors.purple
-            }]}
+            style={[
+              formStyles.button,
+              styles.halfButton,
+              {
+                borderWidth: 1,
+                borderColor: colors.purple,
+              },
+            ]}
             onPress={handleRetry}>
             <Text style={formStyles.buttonText}>Retry</Text>
           </TouchableOpacity>

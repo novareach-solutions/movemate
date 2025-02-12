@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   FlatList,
   TextStyle,
 } from 'react-native';
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
+import {colors} from '../theme/colors';
+import {typography} from '../theme/typography';
 
 interface DropdownProps {
   label: string;
@@ -35,12 +35,13 @@ const Dropdown: React.FC<DropdownProps> = ({
   return (
     <View style={styles.wrapper}>
       <Text style={styles.label}>{label}</Text>
-      
+
       {/* Main Dropdown Selection */}
-      <TouchableOpacity
-        style={styles.input}
-        onPress={() => setIsOpen(!isOpen)}>
-        <Text style={{ color: selectedValue ? colors.text.primary : colors.text.subText }}>
+      <TouchableOpacity style={styles.input} onPress={() => setIsOpen(!isOpen)}>
+        <Text
+          style={{
+            color: selectedValue ? colors.text.primary : colors.text.subText,
+          }}>
           {selectedValue || placeholder}
         </Text>
       </TouchableOpacity>
@@ -51,7 +52,7 @@ const Dropdown: React.FC<DropdownProps> = ({
           <FlatList
             data={options}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
+            renderItem={({item}) => (
               <TouchableOpacity
                 style={styles.option}
                 onPress={() => handleSelect(item)}>
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     position: 'absolute',
-    top: '100%', 
+    top: '100%',
     left: 0,
     right: 0,
     borderWidth: 1,
@@ -94,9 +95,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 5,
     backgroundColor: colors.white,
-    maxHeight: 250, 
+    maxHeight: 250,
     zIndex: 999,
-    elevation: 5, 
+    elevation: 5,
   },
   option: {
     padding: 12,

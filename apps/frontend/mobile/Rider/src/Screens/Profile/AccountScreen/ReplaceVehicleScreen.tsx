@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,10 +10,10 @@ import {
   Image,
   SafeAreaView,
 } from 'react-native';
-import { formStyles } from '../../../theme/form';
-import { colors } from '../../../theme/colors';
+import {formStyles} from '../../../theme/form';
+import {colors} from '../../../theme/colors';
 import Header from '../../../components/Header';
-import FilledCar from "../../../assets/icons/filledCar.svg"
+import FilledCar from '../../../assets/icons/filledCar.svg';
 
 const ReplaceVehicleScreen: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -27,10 +27,11 @@ const ReplaceVehicleScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{
-      flex: 1
-    }}>
-      <Header isBack title='Replace Vehicle' />
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
+      <Header isBack title="Replace Vehicle" />
       <View style={styles.container}>
         <View style={styles.card}>
           <View>
@@ -130,7 +131,8 @@ const ReplaceVehicleScreen: React.FC = () => {
             </View>
           </TouchableWithoutFeedback>
         </Modal>
-      </View></SafeAreaView>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     elevation: 3,
     flexDirection: 'row',
     gap: 15,

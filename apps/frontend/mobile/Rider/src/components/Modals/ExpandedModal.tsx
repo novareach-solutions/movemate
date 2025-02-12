@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -11,19 +11,19 @@ import {
   Dimensions,
   TextStyle,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { formStyles } from '../../theme/form';
-import { typography } from '../../theme/typography';
+import {colors} from '../../theme/colors';
+import {formStyles} from '../../theme/form';
+import {typography} from '../../theme/typography';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AppScreens, AppScreensParamList } from '../../navigation/ScreenNames';
-import DeliverAPackage from "../../assets/icons/deliverAPackageIcon.svg"
-import GreenCircle from "../../assets/icons/greenCircle.svg"
-import PurplePhone from "../../assets/icons/purplePhone.svg"
-import PurpleMessage from "../../assets/icons/purpleMessage.svg"
-import PickupNotes from "../../assets/icons/pickupNotes.svg"
-import Cart from "../../assets/icons/cart.svg"
-import { InfoRow } from './OrderModal';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
+import DeliverAPackage from '../../assets/icons/deliverAPackageIcon.svg';
+import GreenCircle from '../../assets/icons/greenCircle.svg';
+import PurplePhone from '../../assets/icons/purplePhone.svg';
+import PurpleMessage from '../../assets/icons/purpleMessage.svg';
+import PickupNotes from '../../assets/icons/pickupNotes.svg';
+import Cart from '../../assets/icons/cart.svg';
+import {InfoRow} from './OrderModal';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -35,7 +35,6 @@ interface ExpandedModalProps {
   pickupNotes: string;
   items: string[];
 }
-
 
 const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   isVisible,
@@ -62,7 +61,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   const handleCollapse = () => {
     setIsExpanded(false);
     Animated.timing(height, {
-      toValue: SCREEN_HEIGHT * 0.23, 
+      toValue: SCREEN_HEIGHT * 0.23,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -89,7 +88,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
         <TouchableWithoutFeedback onPress={handleCollapse}>
           <View style={styles.overlay}>
             <TouchableWithoutFeedback>
-              <Animated.View style={[styles.modalContainer, { height }]}>
+              <Animated.View style={[styles.modalContainer, {height}]}>
                 {/* Drag Indicator */}
                 <TouchableOpacity onPress={handleExpand}>
                   <View style={styles.dragIndicator} />
@@ -101,7 +100,10 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                 {/* Content: Show only in collapsed state */}
                 <View style={styles.location}>
                   {!isExpanded && (
-                    <InfoRow iconSource={DeliverAPackage} text={pickupAddress} />
+                    <InfoRow
+                      iconSource={DeliverAPackage}
+                      text={pickupAddress}
+                    />
                   )}
                 </View>
 
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'flex-start',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,

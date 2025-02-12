@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,17 +8,17 @@ import {
   Image,
   TextStyle,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { formStyles } from '../../theme/form';
-import { typography } from '../../theme/typography';
+import {colors} from '../../theme/colors';
+import {formStyles} from '../../theme/form';
+import {typography} from '../../theme/typography';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AppScreens, AppScreensParamList } from '../../navigation/ScreenNames';
-import PurplePhone from "../../assets/icons/purplePhone.svg"
-import PurpleMessage from "../../assets/icons/purpleMessage.svg"
-import PurpleDoNotRing from "../../assets/icons/purpleDoNotRing.svg"
-import PurpleDoor from "../../assets/icons/purpleDoor.svg"
-import Camera from "../../assets/icons/camera.svg"
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
+import PurplePhone from '../../assets/icons/purplePhone.svg';
+import PurpleMessage from '../../assets/icons/purpleMessage.svg';
+import PurpleDoNotRing from '../../assets/icons/purpleDoNotRing.svg';
+import PurpleDoor from '../../assets/icons/purpleDoor.svg';
+import Camera from '../../assets/icons/camera.svg';
 
 interface DeliveryModalProps {
   isVisible: boolean;
@@ -38,7 +38,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
   itemsToDeliver,
 }) => {
   const [isTakingPhoto, setIsTakingPhoto] = useState(false);
-  const navigation = useNavigation<NavigationProp<AppScreensParamList>>()
+  const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
 
   const handleTakePhoto = () => {
     setIsTakingPhoto(true);
@@ -47,7 +47,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
 
   const handleOrderDelivered = () => {
     console.log('Order Delivered button clicked');
-    onClose(); 
+    onClose();
   };
 
   return (
@@ -61,9 +61,10 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
           <View style={styles.modalContainer}>
             {/* Header Section */}
             <View style={styles.header}>
-              <View style={{
-                width: "70%"
-              }}>
+              <View
+                style={{
+                  width: '70%',
+                }}>
                 <Text style={styles.driverName}>{driverName}</Text>
                 <Text style={styles.deliveryAddress}>{deliveryAddress}</Text>
               </View>
@@ -75,9 +76,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
                   onPress={() => {
                     navigation.navigate(AppScreens.Chat);
                   }}>
-                  <PurpleMessage
-                    style={styles.icon}
-                  />
+                  <PurpleMessage style={styles.icon} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -88,7 +87,11 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
               <View style={styles.instructionsContainer}>
                 {deliveryInstructions.map((instruction, index) => (
                   <View key={index} style={styles.instructionRow}>
-                    {instruction === 'Do not ring the bell' ? <PurpleDoNotRing style={styles.instructionIcon} /> : <PurpleDoor style={styles.instructionIcon} />}
+                    {instruction === 'Do not ring the bell' ? (
+                      <PurpleDoNotRing style={styles.instructionIcon} />
+                    ) : (
+                      <PurpleDoor style={styles.instructionIcon} />
+                    )}
                     <Text style={styles.instructionText}>{instruction}</Text>
                   </View>
                 ))}
@@ -112,11 +115,15 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
                 Take a photo to confirm delivery
               </Text>
               <TouchableOpacity
-                style={[formStyles.button, formStyles.buttonEnabled, {
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }]}
+                style={[
+                  formStyles.button,
+                  formStyles.buttonEnabled,
+                  {
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  },
+                ]}
                 onPress={handleTakePhoto}>
                 <Camera style={styles.cameraIcon} />
                 <Text
@@ -130,7 +137,8 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
             <TouchableOpacity
               style={[formStyles.button, formStyles.buttonSuccess]}
               onPress={handleOrderDelivered}>
-              <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
+              <Text
+                style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
                 Order Delivered
               </Text>
             </TouchableOpacity>
@@ -142,7 +150,8 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
         onClose={() => setIsTakingPhoto(false)}
         onRetry={() => setIsTakingPhoto(false)}
         onDone={() => setIsTakingPhoto(false)}
-      /></>
+      />
+    </>
   );
 };
 
@@ -159,20 +168,20 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
   },
   header: {
     marginBottom: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 14,
     paddingVertical: 20,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 12
+    backgroundColor: '#F6F6F6',
+    borderRadius: 12,
   },
   driverName: {
     fontSize: 20,
@@ -212,7 +221,7 @@ const styles = StyleSheet.create({
   instructionIcon: {
     width: 20,
     height: 20,
-    objectFit: "contain",
+    objectFit: 'contain',
     marginRight: 10,
   },
   instructionText: {
@@ -231,7 +240,8 @@ const styles = StyleSheet.create({
   },
   cameraIcon: {
     width: 20,
-    height: 20, objectFit: "contain",
+    height: 20,
+    objectFit: 'contain',
     tintColor: colors.white,
     marginRight: 10,
   },

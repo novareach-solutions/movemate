@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,13 @@ import {
   Modal,
   TextStyle,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import Alarm from "../../assets/icons/alarm.svg"
-import Cycle from "../../assets/icons/cycle.svg"
-import RedCircle from "../../assets/icons/redCircle.svg"
-import GreenCircle from "../../assets/icons/greenCircle.svg"
-import { SvgProps } from 'react-native-svg';
-import { typography } from '../../theme/typography';
+import {colors} from '../../theme/colors';
+import Alarm from '../../assets/icons/alarm.svg';
+import Cycle from '../../assets/icons/cycle.svg';
+import RedCircle from '../../assets/icons/redCircle.svg';
+import GreenCircle from '../../assets/icons/greenCircle.svg';
+import {SvgProps} from 'react-native-svg';
+import {typography} from '../../theme/typography';
 
 interface ModalComponentProps {
   isVisible: boolean;
@@ -31,19 +31,29 @@ interface ModalComponentProps {
 interface InfoRowProps {
   iconSource: React.FC<SvgProps>;
   text: string;
-  bold?: boolean
+  bold?: boolean;
 }
 
-export const InfoRow: React.FC<InfoRowProps> = ({ iconSource: Icon, text, bold }) => (
+export const InfoRow: React.FC<InfoRowProps> = ({
+  iconSource: Icon,
+  text,
+  bold,
+}) => (
   <View style={styles.infoRow}>
     <Icon width={15} height={15} style={styles.infoIcon} />
-    <Text style={[styles.infoText, bold && {
-      fontWeight: typography.fontWeight.bold as TextStyle['fontWeight']
-    }]}>{text}</Text>
+    <Text
+      style={[
+        styles.infoText,
+        bold && {
+          fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+        },
+      ]}>
+      {text}
+    </Text>
   </View>
 );
 
-const TipBadge: React.FC<{ tip: string }> = ({ tip }) => (
+const TipBadge: React.FC<{tip: string}> = ({tip}) => (
   <View style={styles.tipBadge}>
     <Text style={styles.tipBadgeText}>Tip: {tip}</Text>
   </View>
@@ -99,10 +109,7 @@ const OrderModal: React.FC<ModalComponentProps> = ({
           </View>
 
           <View style={styles.infoContainer}>
-            <InfoRow
-              iconSource={Alarm}
-              text={`${time} to deliver`}
-            />
+            <InfoRow iconSource={Alarm} text={`${time} to deliver`} />
             <InfoRow iconSource={Cycle} text={`${distance}`} />
           </View>
 
@@ -117,7 +124,7 @@ const OrderModal: React.FC<ModalComponentProps> = ({
             <Animated.View
               style={[
                 styles.timerButtonBackground,
-                { width: widthInterpolation },
+                {width: widthInterpolation},
               ]}
             />
             <TouchableOpacity

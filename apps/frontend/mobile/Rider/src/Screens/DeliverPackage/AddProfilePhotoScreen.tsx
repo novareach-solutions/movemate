@@ -13,10 +13,7 @@ import UploadPhoto from '../../components/UploadPhoto';
 import {colors} from '../../theme/colors';
 import {formStyles} from '../../theme/form';
 import {useAppDispatch, useAppSelector} from '../../redux/hook';
-import {
-  setSignupData,
-  uploadMedia,
-} from '../../redux/slices/authSlice';
+import {setSignupData, uploadMedia} from '../../redux/slices/authSlice';
 import ImagePicker from 'react-native-image-crop-picker';
 import PhotoPickerModal from '../../components/common/PhotoPickerModal';
 import Header from '../../components/Header';
@@ -91,8 +88,8 @@ const AddProfilePhotoScreen: React.FC = () => {
       .then(photo => {
         const formData = new FormData();
         formData.append('file', {
-          uri: photo.path, 
-          type: photo.mime, 
+          uri: photo.path,
+          type: photo.mime,
           name: photo.filename || `photo_${Date.now()}.jpg`,
         });
 

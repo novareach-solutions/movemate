@@ -156,9 +156,7 @@ export const login = createAsyncThunk(
       // Assuming the response contains tokens
       const {accessToken} = response.data.data;
       if (accessToken) {
-        console.log(
-          'saving access token',
-        );
+        console.log('saving access token');
         await saveToken('accessToken', accessToken);
       }
       SimpleToast('Login successful!');

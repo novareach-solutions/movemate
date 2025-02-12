@@ -26,9 +26,9 @@ export type AppScreensParamList = {
   ProfileScreen: undefined;
   ComingSoonScreen: undefined;
   DocumentReviewScreen: {
-    title: string,
-    uploadedImage: any
-  }
+    title: string;
+    uploadedImage: any;
+  };
 };
 
 export const AppScreens = {
@@ -45,7 +45,7 @@ export const AppScreens = {
 export type DeliverAPackageParamList = {
   CompleteProfileScreen: undefined;
   UploadDocumentDetails: {
-    title: string
+    title: string;
   };
   UploadDocumentsScreen: undefined;
   DashboardScreen: undefined;
@@ -86,7 +86,7 @@ export type ProfileScreensParamList = {
   SubscriptionPlansScreen: undefined;
   PayoutSummaryScreen: undefined;
   OrderDetailsScreen: {
-    orderId: number
+    orderId: number;
   };
 };
 

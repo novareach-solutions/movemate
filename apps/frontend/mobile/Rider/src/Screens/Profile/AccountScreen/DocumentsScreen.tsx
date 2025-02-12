@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,28 +7,23 @@ import {
   TextStyle,
   SafeAreaView,
 } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { typography } from '../../../theme/typography';
+import {colors} from '../../../theme/colors';
+import {typography} from '../../../theme/typography';
 import Header from '../../../components/Header';
-import LicenseIcon from "../../../assets/icons/licenseIcon.svg"
-import Camera from "../../../assets/icons/camera.svg"
+import LicenseIcon from '../../../assets/icons/licenseIcon.svg';
+import Camera from '../../../assets/icons/camera.svg';
 
 const DocumentsScreen: React.FC = () => {
   const [expandedDocument, setExpandedDocument] = useState<number | null>(null);
 
   // Array for icons
-  const iconsArray = [
-    LicenseIcon,
-    LicenseIcon,
-    LicenseIcon,
-    LicenseIcon,
-  ];
+  const iconsArray = [LicenseIcon, LicenseIcon, LicenseIcon, LicenseIcon];
 
   // Array for documents
   const documents = [
     {
       id: 1,
-      title: "Driver License",
+      title: 'Driver License',
       status: 'Approved',
       reUpload: true,
     },
@@ -85,7 +80,7 @@ const DocumentsScreen: React.FC = () => {
           <Text
             style={[
               styles.documentStatus,
-              { color: getStatusColor(document.status) },
+              {color: getStatusColor(document.status)},
             ]}>
             {document.status}
           </Text>
@@ -101,15 +96,17 @@ const DocumentsScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={{
-      flex: 1
-    }}>
-      <Header isBack title='Documents' />
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
+      <Header isBack title="Documents" />
       <View style={styles.container}>
         <View style={styles.documentList}>
           {documentsWithIcons.map(renderDocumentItem)}
         </View>
-      </View></SafeAreaView>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -133,8 +130,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    borderWidth:1,
-    borderColor:colors.border.lightGray
+    borderWidth: 1,
+    borderColor: colors.border.lightGray,
   },
   documentContent: {
     flexDirection: 'row',
@@ -174,7 +171,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingTop: 15,
     borderColor: colors.border.lightGray,
-    marginTop:15
+    marginTop: 15,
   },
   reUploadIcon: {
     tintColor: colors.primary,
@@ -183,7 +180,7 @@ const styles = StyleSheet.create({
   reUploadText: {
     fontSize: typography.fontSize.medium,
     color: colors.primary,
-    fontWeight: typography.fontWeight.semiBold as TextStyle["fontWeight"],
+    fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],
   },
 });
 

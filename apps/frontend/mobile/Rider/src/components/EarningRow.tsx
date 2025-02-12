@@ -1,7 +1,7 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { colors } from "../theme/colors";
-import { typography } from "../theme/typography";
+import React from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import {colors} from '../theme/colors';
+import {typography} from '../theme/typography';
 
 interface EarningRowProps {
   label: string;
@@ -22,10 +22,21 @@ const EarningRow: React.FC<EarningRowProps> = ({
 }) => {
   return (
     <View style={[styles.row, isDashed && styles.dashedBorder]}>
-      <Text style={[styles.label, isBold && styles.boldText, isGreen && styles.greenText]}>
+      <Text
+        style={[
+          styles.label,
+          isBold && styles.boldText,
+          isGreen && styles.greenText,
+        ]}>
         {label}
       </Text>
-      <Text style={[styles.value, isBold && styles.boldText, isGreen && styles.greenText, isRed && styles.redText]}>
+      <Text
+        style={[
+          styles.value,
+          isBold && styles.boldText,
+          isGreen && styles.greenText,
+          isRed && styles.redText,
+        ]}>
         {value}
       </Text>
     </View>
@@ -34,8 +45,8 @@ const EarningRow: React.FC<EarningRowProps> = ({
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingVertical: 4,
   },
   label: {
@@ -44,11 +55,11 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: typography.fontSize.small,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: colors.text.primary,
   },
   boldText: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   greenText: {
     color: colors.green,
@@ -58,8 +69,8 @@ const styles = StyleSheet.create({
   },
   dashedBorder: {
     borderTopWidth: 1,
-    borderTopColor: "#D3D3D3",
-    borderStyle: "dashed",
+    borderTopColor: '#D3D3D3',
+    borderStyle: 'dashed',
     paddingTop: 4,
     marginTop: 4,
   },

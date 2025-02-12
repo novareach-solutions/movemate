@@ -54,7 +54,7 @@ const Onboarding: React.FC = () => {
     // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
   const handleLogin = () => {
-    navigation.navigate(AuthScreens.Login)
+    navigation.navigate(AuthScreens.Login);
     // navigation.navigate(DeliverAPackage.Home);
     // navigation.navigate(DeliverAPackage.CompleteProfile);
     // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
@@ -73,7 +73,10 @@ const Onboarding: React.FC = () => {
         onMomentumScrollEnd={updateSlidePosition}
         renderItem={({item}) => (
           <View style={styles.slide}>
-            <Image source={require("../assets/images/womanHoldingPackage.png")} style={styles.image} />
+            <Image
+              source={require('../assets/images/womanHoldingPackage.png')}
+              style={styles.image}
+            />
             <Text style={styles.title}>
               {item.title}
               <Text style={styles.subtitle}>{item.subtitle}</Text>

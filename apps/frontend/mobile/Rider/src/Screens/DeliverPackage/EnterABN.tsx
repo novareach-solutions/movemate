@@ -14,16 +14,19 @@ import {
 import Header from '../../components/Header';
 import StepIndicator from '../../components/StepIndicator';
 import TitleDescription from '../../components/TitleDescription';
-import { formStyles } from '../../theme/form';
-import { colors } from '../../theme/colors';
-import { DeliverAPackage, DeliverAPackageParamList } from '../../navigation/ScreenNames';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { useAppDispatch, useAppSelector } from '../../redux/hook';
-import { setSignupData } from '../../redux/slices/authSlice';
-import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ZABNSchema } from '../../utils/zod/Registration';
+import {formStyles} from '../../theme/form';
+import {colors} from '../../theme/colors';
+import {
+  DeliverAPackage,
+  DeliverAPackageParamList,
+} from '../../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
+import {setSignupData} from '../../redux/slices/authSlice';
+import {z} from 'zod';
+import {useForm, Controller} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {ZABNSchema} from '../../utils/zod/Registration';
 
 type FormFields = z.infer<typeof ZABNSchema>;
 
@@ -34,11 +37,11 @@ const EnterABNScreen: React.FC = () => {
   const {
     control,
     handleSubmit,
-    formState: { isValid, errors },
+    formState: {isValid, errors},
   } = useForm<FormFields>({
     resolver: zodResolver(ZABNSchema),
     mode: 'onChange',
-    defaultValues: { abn: '' },
+    defaultValues: {abn: ''},
   });
 
   const onSubmit = async (data: FormFields) => {
@@ -57,7 +60,7 @@ const EnterABNScreen: React.FC = () => {
       <Header logo isBack />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{ flex: 1 }}>
+        style={{flex: 1}}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
             <StepIndicator current={3} total={5} />
@@ -71,11 +74,14 @@ const EnterABNScreen: React.FC = () => {
               <Controller
                 control={control}
                 name="abn"
-                render={({ field: { onChange, onBlur, value } }) => (
+                render={({field: {onChange, onBlur, value}}) => (
                   <View style={formStyles.inputWrapper}>
                     <Text style={formStyles.inputLabel}>ABN</Text>
                     <TextInput
-                      style={[formStyles.input, errors.abn && formStyles.errorInput]}
+                      style={[
+                        formStyles.input,
+                        errors.abn && formStyles.errorInput,
+                      ]}
                       placeholder="Enter your ABN"
                       placeholderTextColor={colors.text.subText}
                       keyboardType="numeric"
@@ -88,7 +94,9 @@ const EnterABNScreen: React.FC = () => {
                       maxLength={11}
                     />
                     {errors.abn && (
-                      <Text style={formStyles.errorText}>{errors.abn.message}</Text>
+                      <Text style={formStyles.errorText}>
+                        {errors.abn.message}
+                      </Text>
                     )}
                   </View>
                 )}
@@ -101,14 +109,18 @@ const EnterABNScreen: React.FC = () => {
                 style={[
                   formStyles.button,
                   styles.fullWidthButton,
-                  isValid ? formStyles.buttonEnabled : formStyles.buttonDisabled,
+                  isValid
+                    ? formStyles.buttonEnabled
+                    : formStyles.buttonDisabled,
                 ]}
                 onPress={handleSubmit(onSubmit)}
                 disabled={!isValid}>
                 <Text
                   style={[
                     formStyles.buttonText,
-                    isValid ? formStyles.buttonTextEnabled : formStyles.buttonTextDisabled,
+                    isValid
+                      ? formStyles.buttonTextEnabled
+                      : formStyles.buttonTextDisabled,
                   ]}>
                   Continue
                 </Text>

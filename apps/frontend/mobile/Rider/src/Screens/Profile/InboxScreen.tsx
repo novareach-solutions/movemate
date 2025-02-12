@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,8 @@ import {
   ScrollView,
   SafeAreaView,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
+import {colors} from '../../theme/colors';
+import {typography} from '../../theme/typography';
 import Header from '../../components/Header';
 
 const InboxScreen: React.FC = () => {
@@ -54,8 +54,7 @@ const InboxScreen: React.FC = () => {
     },
   ];
 
-
-  const renderNotification = ({ item }: { item: (typeof notifications)[0] }) => (
+  const renderNotification = ({item}: {item: (typeof notifications)[0]}) => (
     <View style={styles.notificationItem}>
       <View style={styles.notificationContent}>
         <Text style={styles.notificationMessage}>{item.message}</Text>
@@ -68,20 +67,18 @@ const InboxScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <Header  isBack title={"Notifications"} />
+      <Header isBack title={'Notifications'} />
       {/* Tabs */}
 
       {/* Content */}
-   
-          <View>
-            <FlatList
-              data={notifications}
-              renderItem={renderNotification}
-              keyExtractor={item => item.id}
-              contentContainerStyle={styles.notificationList}
-            />
-           
-       
+
+      <View>
+        <FlatList
+          data={notifications}
+          renderItem={renderNotification}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.notificationList}
+        />
       </View>
 
       {/* Footer Note */}

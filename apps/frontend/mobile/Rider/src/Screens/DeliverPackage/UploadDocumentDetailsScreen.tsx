@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import DocumentUpload from '../../components/DocumentUpload';
-import { NavigationProp, useNavigation, useRoute } from '@react-navigation/native';
-import { AppScreens, AppScreensParamList } from '../../navigation/ScreenNames';
-import { SafeAreaView } from 'react-native';
+import {
+  NavigationProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
+import {SafeAreaView} from 'react-native';
 import Header from '../../components/Header';
 import PhotoPickerModal from '../../components/common/PhotoPickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
 
 const DAPUploadDocumentDetailsScreen = () => {
   const route = useRoute();
-  const { title } = route.params as { title: string };
+  const {title} = route.params as {title: string};
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
   const [image, setImage] = useState('');
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
@@ -34,7 +38,7 @@ const DAPUploadDocumentDetailsScreen = () => {
         // Navigation will happen without uploading
         navigation.navigate(AppScreens.DocumentReview, {
           title,
-          uploadedImage: photo.path, 
+          uploadedImage: photo.path,
         });
 
         // Commented out the API call
@@ -65,7 +69,7 @@ const DAPUploadDocumentDetailsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{flex: 1}}>
       <Header logo isBack />
       <DocumentUpload
         title={title}

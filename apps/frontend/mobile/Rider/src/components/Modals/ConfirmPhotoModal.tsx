@@ -11,7 +11,7 @@ import {
 import {colors} from '../../theme/colors';
 import {typography} from '../../theme/typography';
 import {formStyles} from '../../theme/form';
-import PlaceHolderProfile from "../../assets/icons/placeHolderProfile.svg"
+import PlaceHolderProfile from '../../assets/icons/placeHolderProfile.svg';
 
 interface ConfirmPhotoModalProps {
   isVisible: boolean;

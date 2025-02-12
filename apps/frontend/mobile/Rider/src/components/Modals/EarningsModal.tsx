@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import {colors} from '../../theme/colors';
 import DetailRow from '../DetailRow';
-import SuccessGreenTick from "../../assets/icons/successGreenTick.svg"
-import PurpleTime from "../../assets/icons/purpleTime.svg"
-import PurpleDistance from "../../assets/icons/purpleDistance.svg"
-import PurpleCoin from "../../assets/icons/purpleCoin.svg"
-import PurpleTip from "../../assets/icons/purpleTip.svg"
+import SuccessGreenTick from '../../assets/icons/successGreenTick.svg';
+import PurpleTime from '../../assets/icons/purpleTime.svg';
+import PurpleDistance from '../../assets/icons/purpleDistance.svg';
+import PurpleCoin from '../../assets/icons/purpleCoin.svg';
+import PurpleTip from '../../assets/icons/purpleTip.svg';
 
 interface EarningsModalProps {
   isVisible: boolean;
@@ -51,11 +51,7 @@ const EarningsModal: React.FC<EarningsModalProps> = ({
 
           {/* Earnings Details Section */}
           <View style={styles.detailsContainer}>
-            <DetailRow
-              icon={PurpleTime}
-              label="Trip time"
-              value={tripTime}
-            />
+            <DetailRow icon={PurpleTime} label="Trip time" value={tripTime} />
             <DetailRow
               icon={PurpleDistance}
               label="Trip distance"
@@ -127,8 +123,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightButtonBackground,
     padding: 20,
     borderRadius: 30,
-    borderWidth:1,
-    borderColor:colors.border.lightGray
+    borderWidth: 1,
+    borderColor: colors.border.lightGray,
   },
   doneButton: {
     backgroundColor: colors.purple,

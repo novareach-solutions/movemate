@@ -13,7 +13,7 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({icon: Icon, value, label}) => {
   return (
     <View style={styles.container}>
-      <Icon  width={40} height={50} />
+      <Icon width={40} height={50} />
       <Text style={styles.value}>{value}</Text>
       <Text style={styles.label}>{label}</Text>
     </View>

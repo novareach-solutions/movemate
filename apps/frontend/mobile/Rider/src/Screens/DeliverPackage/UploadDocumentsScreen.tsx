@@ -1,7 +1,10 @@
 import React from 'react';
 import DocumentList from '../../components/DocumentList';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {DeliverAPackage, DeliverAPackageParamList} from '../../navigation/ScreenNames';
+import {
+  DeliverAPackage,
+  DeliverAPackageParamList,
+} from '../../navigation/ScreenNames';
 
 const DAPUploadDocumentsScreen = () => {
   const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();

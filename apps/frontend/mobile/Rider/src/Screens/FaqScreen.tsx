@@ -17,7 +17,7 @@ import FAQModal from '../components/Modals/FaqModal';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AppScreens, AppScreensParamList} from '../navigation/ScreenNames';
 import Header from '../components/Header';
-import BlackArrow from "../assets/icons/blackArrow.svg"
+import BlackArrow from '../assets/icons/blackArrow.svg';
 
 interface FAQ {
   question: string;
@@ -62,9 +62,11 @@ const FAQScreen: React.FC = () => {
       style={styles.faqItem}
       onPress={() => setSelectedFAQ(item)}>
       <Text style={styles.faqQuestion}>{item.question}</Text>
-      <BlackArrow style={{
-        transform:[{rotate:"180deg"}]
-      }} />
+      <BlackArrow
+        style={{
+          transform: [{rotate: '180deg'}],
+        }}
+      />
     </TouchableOpacity>
   );
 

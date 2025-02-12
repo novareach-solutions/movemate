@@ -13,6 +13,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { DatabaseModule } from "./modules/database/database.module";
 import { GatewayModule } from "./modules/gateway/gateway.module";
 import { MediaModule } from "./modules/media/media.module";
+import { NotificationModule } from "./modules/notification/notification.module";
 import { SendAPackageModule } from "./modules/order/sendPackage/sendPackage.module";
 import { RedisModule } from "./modules/redis/redis.module";
 import { StripeModule } from "./modules/stripe/stripe.module";
@@ -41,6 +42,7 @@ import { RoleGuard } from "./shared/guards/roles.guard";
     StripeModule,
     MediaModule,
     TrackingModule,
+    NotificationModule,
   ],
   providers: [RoleGuard, OnboardingGuard, AuthGuard, JwtService],
 })

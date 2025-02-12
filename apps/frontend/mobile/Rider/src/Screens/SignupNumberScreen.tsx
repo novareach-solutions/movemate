@@ -18,7 +18,7 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
 import {useAppDispatch} from '../redux/hook';
 import Header from '../components/Header';
-import Logo from "../assets/icons/logo.svg"
+import Logo from '../assets/icons/logo.svg';
 
 const {width} = Dimensions.get('window');
 
@@ -50,9 +50,10 @@ const SignupNumberScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{
-      flex:1
-    }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}>
       <Header isBack />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
