@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,33 +12,35 @@ import {
 } from 'react-native';
 import StatCard from '../../components/StatCard';
 import HelpButton from '../../components/HelpButton';
-import {AppScreens, DeliverAPackage} from '../../navigation/ScreenNames';
-import {useSelector, useDispatch} from 'react-redux';
+import { AppScreens, DeliverAPackage } from '../../navigation/ScreenNames';
+import { useSelector, useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   AgentStatusEnum,
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
-import Mapbox from '@rnmapbox/maps';
+// import Mapbox from '@rnmapbox/maps';
 import { MAPBOX_ACCESS_TOKEN } from "../../utils/constants";
-import {showOrderModal, fetchOngoingOrder} from '../../redux/slices/orderSlice';
-import {io} from 'socket.io-client';
+import { showOrderModal, fetchOngoingOrder } from '../../redux/slices/orderSlice';
+import { io } from 'socket.io-client';
 import apiClient from '../../api/apiClient';
 import apiEndPoints from '../../api/apiEndPoints';
-import {RootState} from '../../redux/store';
-import {OrderStatusEnum} from '../../redux/slices/types/enums';
-import {colors} from '../../theme/colors';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AppScreensParamList} from '../../navigation/ScreenNames';
+import { RootState } from '../../redux/store';
+import { OrderStatusEnum } from '../../redux/slices/types/enums';
+import { colors } from '../../theme/colors';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AppScreensParamList } from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
 import Money from '../../assets/icons/money.svg';
 import Order from '../../assets/icons/orders.svg';
 import Distance from '../../assets/icons/distance.svg';
-Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+// Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(
@@ -131,7 +133,7 @@ const HomeScreen: React.FC = () => {
     const socket = io(apiEndPoints.baseURL);
     socket.on('connect', () => {
       console.log('Connected to WebSocket server');
-      socket.emit('joinRoom', {agentId: numericAgentId});
+      socket.emit('joinRoom', { agentId: numericAgentId });
       console.log(`Joined room for agentId: ${numericAgentId}`);
     });
     socket.on('disconnect', () => {
@@ -198,12 +200,12 @@ const HomeScreen: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       <Header logo home help />
       {/* Map Image */}
-      <View style={styles.mapContainer}>
-      <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
-                    <Mapbox.Camera zoomLevel={14} centerCoordinate={ [151.209900, -33.865143]} />
+      {/* <View style={styles.mapContainer}>
+        <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+          <Mapbox.Camera zoomLevel={14} centerCoordinate={[151.209900, -33.865143]} />
 
-                  </Mapbox.MapView>
-      </View>
+        </Mapbox.MapView>
+      </View> */}
 
       {/* Status Button */}
       <View style={styles.statusContainer}>
@@ -226,12 +228,27 @@ const HomeScreen: React.FC = () => {
         </Text>
       </View>
 
+      {/* Status Container */}
+      <View style={styles.statsContainer}>
+        <StatCard icon={Money} value="$50" label="EARNINGS" />
+        <StatCard icon={Order} value="7" label="ORDERS" />
+        <StatCard icon={Distance} value="30 Km" label="DISTANCE" />
+      </View>
+
       {/* Sliding Drawer */}
-      <Animated.View style={[styles.drawer, {height: drawerHeight}]}>
-        <View style={styles.statsContainer}>
-          <StatCard icon={Money} value="$50" label="EARNINGS" />
-          <StatCard icon={Order} value="7" label="ORDERS" />
-          <StatCard icon={Distance} value="30 Km" label="DISTANCE" />
+      <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
+        <View style={styles.warningContainer}>
+          <Text style={styles.warningTitle}>Unable to go online</Text>
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>⚠️ Account Not Approved</Text>
+          </View>
+          <Text style={styles.helpText}>
+            Your account has not been Approved.
+          </Text>
+          <Text style={styles.contactText}>
+            To resolve this, please contact our <Text style={styles.linkText}>Support Team</Text>
+            and provide the necessary information for verification.
+          </Text>
         </View>
       </Animated.View>
     </SafeAreaView>
@@ -301,19 +318,60 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    shadowOffset: {width: 0, height: -2},
+    shadowOffset: { width: 0, height: -2 },
     paddingHorizontal: 20,
     paddingTop: 10,
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: colors.white,
+    backgroundColor: '#FBF4FF',
+    position: "absolute",
+    top: 25,
+    width: "100%",
+    borderRadius: 12
+
   },
   helpButtonContainer: {
     position: 'absolute',
     top: 12,
     right: 12,
+  },
+  warningContainer: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  warningTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.text.primary,
+    marginBottom: 10,
+  },
+  errorBanner: {
+    backgroundColor: colors.error,
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  errorText: {
+    color: colors.white,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  helpText: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: colors.text.secondary,
+    marginBottom: 5,
+  },
+  contactText: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: colors.text.secondary,
+  },
+  linkText: {
+    color: colors.purple,
+    fontWeight: 'bold',
   },
 });
 

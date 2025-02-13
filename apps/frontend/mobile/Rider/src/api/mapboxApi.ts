@@ -1,11 +1,11 @@
 import axios from "axios";
 import { Platform } from "react-native";
-import MapboxGL from '@rnmapbox/maps';
+// import MapboxGL from '@rnmapbox/maps';
 const MAPBOX_API_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
 const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw"; 
 
-MapboxGL.setWellKnownTileServer(Platform.OS === 'ios' ? 'mapbox' : 'Mapbox');
-MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
+// MapboxGL.setWellKnownTileServer(Platform.OS === 'ios' ? 'mapbox' : 'Mapbox');
+// MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 const MAPBOXURL = 'https://api.mapbox.com'; //baseurl
 

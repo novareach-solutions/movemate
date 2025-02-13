@@ -47,18 +47,15 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
   }, []);
 
   const handleChange = (value: string, index: number) => {
-    // Allow only numbers
     if (!/^\d*$/.test(value)) return;
 
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Focus handling: if a digit is entered, move focus to the next input
     if (value && index < otp.length - 1) {
       inputs.current[index + 1]?.focus();
     } else if (!value && index > 0) {
-      // Optionally, if value is deleted, move focus to the previous input
       inputs.current[index - 1]?.focus();
     }
   };
@@ -101,10 +98,14 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
       <Header logo isBack />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <TitleDescription
-            title="Enter verification code"
-            description={`Enter the 4-digit verification code sent to your phone: ${phoneNumber}`}
-          />
+          <View style={styles.titleDesccontainer}>
+            <Text style={styles.header}>Enter verification code</Text>
+            <Text style={styles.subtext}>Enter the 4-digit verification code sent to your phone:{phoneNumber}
+              <TouchableOpacity onPress={() => navigation.goBack()} >
+                <Text style={styles.changeHighlight}>Change</Text>
+              </TouchableOpacity>
+              </Text>
+          </View>
 
           <View style={{ marginBottom: 30 }}>
             <View style={styles.otpContainer}>
@@ -117,8 +118,8 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
                     error
                       ? { borderColor: colors.error }
                       : digit
-                      ? { borderColor: colors.purple }
-                      : { borderColor: colors.border.primary },
+                        ? { borderColor: colors.purple }
+                        : { borderColor: colors.border.primary },
                   ]}
                   keyboardType="numeric"
                   maxLength={1}
@@ -163,11 +164,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
           </Text>
 
           {/* "Change phone number" clickable text */}
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.changeContainer}>
-            <Text style={styles.changeText}>
-              Change <Text style={styles.changeHighlight}>phone number</Text>
-            </Text>
-          </TouchableOpacity>
+
         </View>
       </TouchableWithoutFeedback>
     </SafeAreaView>
@@ -232,6 +229,22 @@ const styles = StyleSheet.create({
   changeHighlight: {
     color: colors.purple,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+  },
+  titleDesccontainer: {
+    marginBottom: 20,
+  },
+  header: {
+    fontSize: typography.fontSize.large,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    color: colors.purple,
+    fontFamily: typography.fontFamily.regular,
+    textAlign: 'left',
+    marginBottom: 10,
+  },
+  subtext: {
+    fontSize: typography.fontSize.medium,
+    color: colors.text.subText,
+    textAlign: 'left',
   },
 });
 

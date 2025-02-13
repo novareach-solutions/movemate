@@ -6,14 +6,14 @@ import { useRoute } from '@react-navigation/native';
 import { SendPackageOrder } from '../redux/slices/types/sendAPackage';
 import { colors } from '../theme/colors';
 import OrderExpandedModal from '../components/Modals/ExpandedModal';
-import Mapbox from '@rnmapbox/maps';
+// import Mapbox from '@rnmapbox/maps';
 import { MAPBOX_ACCESS_TOKEN,MAPBOX_DRIVING_URL } from "../utils/constants";
 import { useAppSelector } from '../redux/hook';
 const routeLineStyle = {
   lineColor: colors.purple,
   lineWidth: 3,
 };
-Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+// Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 const PickUpOrderDetailsScreen: React.FC = () => {
   const currentLocationData = useAppSelector(state => state.auth.currentLocation);
   const [routeCoords, setRouteCoords] = useState<[number, number][]>([]);
@@ -53,24 +53,21 @@ const PickUpOrderDetailsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-       <View style={styles.mapContainer}>
+       {/* <View style={styles.mapContainer}>
            <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
                          <Mapbox.Camera zoomLevel={14} centerCoordinate={ [currentLocationData.longitude,currentLocationData.latitude]} />
-                         {/* Pickup Marker */}
             <Mapbox.PointAnnotation id="currentLocation" coordinate={[currentLocationData.longitude,currentLocationData.latitude]}>
               <View style={styles.markerContainer}>
                 <View style={[styles.marker, { borderColor: "green" }]} />
               </View>
             </Mapbox.PointAnnotation>
 
-            {/* Drop Marker */}
             <Mapbox.PointAnnotation id="drop" coordinate={[order?.pickupLocation?.longitude || -122.416797,order?.pickupLocation?.latitude ||37.773609 ]}>
               <View style={styles.markerContainer}>
                 <View style={[styles.marker, { borderColor: "red" }]} />
               </View>
             </Mapbox.PointAnnotation>
 
-            {/* Route Line */}
             {routeCoords.length > 0 && (
               <Mapbox.ShapeSource
                 id="routeSource"
@@ -88,7 +85,7 @@ const PickUpOrderDetailsScreen: React.FC = () => {
 
             )}
                        </Mapbox.MapView>
-           </View>
+           </View> */}
       {/* Render the expanded order details component */}
       <OrderExpandedModal order={order} disableClose={true} />
     </View>

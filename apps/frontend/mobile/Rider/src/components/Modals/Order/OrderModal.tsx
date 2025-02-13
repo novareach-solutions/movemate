@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,18 +10,18 @@ import {
   Alert,
   TextStyle,
 } from 'react-native';
-import {useDispatch} from 'react-redux';
-import {acceptOrder, hideOrderModal} from '../../../redux/slices/orderSlice';
-import {colors} from '../../../theme/colors';
-import {SendPackageOrder} from '../../../redux/slices/types/sendAPackage';
-import {useNavigation} from '@react-navigation/native';
-import {DeliverAPackage} from '../../../navigation/ScreenNames';
+import { useDispatch } from 'react-redux';
+import { acceptOrder, hideOrderModal } from '../../../redux/slices/orderSlice';
+import { colors } from '../../../theme/colors';
+import { SendPackageOrder } from '../../../redux/slices/types/sendAPackage';
+import { useNavigation } from '@react-navigation/native';
+import { DeliverAPackage } from '../../../navigation/ScreenNames';
 import Alarm from '../../../assets/icons/alarm.svg';
 import Cycle from '../../../assets/icons/cycle.svg';
 import RedCircle from '../../../assets/icons/redCircle.svg';
 import GreenCircle from '../../../assets/icons/greenCircle.svg';
-import {SvgProps} from 'react-native-svg';
-import {typography} from '../../../theme/typography';
+import { SvgProps } from 'react-native-svg';
+import { typography } from '../../../theme/typography';
 
 interface ModalComponentProps {
   isVisible: boolean;
@@ -58,12 +58,6 @@ export const InfoRow: React.FC<InfoRowProps> = ({
       ]}>
       {text}
     </Text>
-  </View>
-);
-
-const TipBadge: React.FC<{tip: string}> = ({tip}) => (
-  <View style={styles.tipBadge}>
-    <Text style={styles.tipBadgeText}>Tip: {tip}</Text>
   </View>
 );
 
@@ -110,7 +104,7 @@ const OrderModal: React.FC<ModalComponentProps> = ({
     }
 
     try {
-      const acceptedOrder = await dispatch(acceptOrder({orderId})).unwrap();
+      const acceptedOrder = await dispatch(acceptOrder({ orderId })).unwrap();
       onAcceptOrderSuccess(acceptedOrder);
       navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
         order: acceptedOrder,
@@ -122,6 +116,10 @@ const OrderModal: React.FC<ModalComponentProps> = ({
     }
   };
 
+  const handleCancelOrder = () =>{
+    console.log("cancel order")
+  }
+
   return (
     <Modal
       visible={isVisible}
@@ -130,7 +128,15 @@ const OrderModal: React.FC<ModalComponentProps> = ({
       onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.totalEarningsLabel}>Total Earning</Text>
+          <View style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}><Text style={styles.totalEarningsLabel}>Total Earning</Text>
+            <View style={styles.deliveryType}>
+              <Text style={styles.deliveryTypeText}>Tip: 4$</Text>
+            </View>
+          </View>
           <View style={styles.earning}>
             <Text style={styles.totalEarnings}>24$</Text>
             <View style={styles.tipBadge}>
@@ -149,19 +155,35 @@ const OrderModal: React.FC<ModalComponentProps> = ({
           </View>
 
           {/* Accept Order Button */}
-          <View style={styles.timerButtonContainer}>
-            <View style={styles.darkBackground} />
-            <Animated.View
-              style={[
-                styles.timerButtonBackground,
-                {width: widthInterpolation},
-              ]}
-            />
-            <TouchableOpacity
-              style={styles.acceptOrderButton}
-              onPress={handleAcceptOrder}>
-              <Text style={styles.acceptOrderText}>Accept Order</Text>
-            </TouchableOpacity>
+          <View>
+            <View style={styles.timerButtonContainer}>
+              <View style={styles.darkBackground} />
+              <Animated.View
+                style={[
+                  styles.timerButtonBackground,
+                  { width: widthInterpolation },
+                ]}
+              />
+              <TouchableOpacity
+                style={styles.acceptOrderButton}
+                onPress={handleAcceptOrder}>
+                <Text style={styles.acceptOrderText}>Accept Order</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.cancelButtonContainer}>
+              <View style={styles.darkBackground} />
+              <Animated.View
+                style={[
+                  styles.timerButtonBackground,
+                  { width: widthInterpolation },
+                ]}
+              />
+              <TouchableOpacity
+                style={styles.acceptOrderButton}
+                onPress={handleCancelOrder}>
+                <Text style={styles.cancelOrderText}>X</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -179,9 +201,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    borderWidth: 3,
+    borderWidth: 1,
     borderColor: colors.purple,
-    padding: 20,
+    padding: 25,
+    position: "relative"
   },
   tipBadge: {
     backgroundColor: colors.lightPurple,
@@ -189,8 +212,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
+  deliveryType: {
+    backgroundColor: colors.purple,
+    color: colors.white,
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
   tipBadgeText: {
     color: colors.purple,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  deliveryTypeText: {
+    color: colors.white,
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -235,13 +270,26 @@ const styles = StyleSheet.create({
   timerButtonContainer: {
     position: 'relative',
     height: 50,
-    borderRadius: 8,
+    borderRadius: 12,
     overflow: 'hidden',
     marginTop: 20,
+    flexDirection: "row",
+    gap: 15
+  },
+  cancelButtonContainer: {
+    position: 'relative',
+    height: 50,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginTop: 20,
+    flexDirection: "row",
+    gap: 15
   },
   darkBackground: {
     position: 'absolute',
-    backgroundColor: colors.darkGreen,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.error,
     borderRadius: 8,
     width: '100%',
     height: '100%',
