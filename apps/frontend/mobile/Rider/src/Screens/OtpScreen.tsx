@@ -21,7 +21,7 @@ import {
   DeliverAPackage,
 } from '../navigation/ScreenNames';
 import { useAppDispatch } from '../redux/hook';
-import { verifyOtp, login } from '../redux/slices/authSlice';
+import { verifyOtp, login, requestOtp } from '../redux/slices/authSlice';
 import Header from '../components/Header';
 
 interface OtpScreenProps {
@@ -85,13 +85,20 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setTimer(60);
     setOtp(['', '', '', '', '', '']);
     setError(false);
     inputs.current[0]?.focus();
-    // Optionally, you can dispatch requestOtp again here
+  
+    try {
+      await dispatch(requestOtp({ phone: phoneNumber })).unwrap();
+      console.log("OTP Resent Successfully!");
+    } catch (error) {
+      console.log("OTP Resend Failed", error);
+    }
   };
+  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
@@ -101,7 +108,11 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
           <View style={styles.titleDesccontainer}>
             <Text style={styles.header}>Enter verification code</Text>
             <Text style={styles.subtext}>Enter the 4-digit verification code sent to your phone:{phoneNumber}
-              <TouchableOpacity onPress={() => navigation.goBack()} >
+              <TouchableOpacity style={{
+                flexDirection:"row",
+                justifyContent:"center",
+                alignItems:"center",
+              }} onPress={() => navigation.goBack()} >
                 <Text style={styles.changeHighlight}>Change</Text>
               </TouchableOpacity>
               </Text>
@@ -156,9 +167,9 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
               </>
             ) : (
               <TouchableOpacity onPress={handleResend}>
-                <Text>
-                  Resend code <Text style={styles.timer}>again</Text>
-                </Text>
+                
+                 <Text style={styles.timer}>Resend</Text>
+                
               </TouchableOpacity>
             )}
           </Text>
@@ -229,6 +240,7 @@ const styles = StyleSheet.create({
   changeHighlight: {
     color: colors.purple,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    marginLeft:5
   },
   titleDesccontainer: {
     marginBottom: 20,
