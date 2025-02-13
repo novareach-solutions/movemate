@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 
@@ -8,6 +8,7 @@ import { UnauthorizedError } from "../errors/authErrors";
 
 @Injectable()
 export class OnboardingGuard implements CanActivate {
+    private readonly logger = new Logger(OnboardingGuard.name);
   constructor(
     private authService: AuthService,
     private jwtService: JwtService,
@@ -42,6 +43,7 @@ export class OnboardingGuard implements CanActivate {
   }
 
   private extractTokenFromHeaders(request: any): string | null {
+    this.logger.debug(request.headers)
     const token = request.headers["onboarding_token"];
     if (token) {
       logger.debug(

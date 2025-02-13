@@ -42,7 +42,7 @@ async function bootstrap(): Promise<void> {
     origin: configService.get<string>("app.corsOrigin"),
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With","onboarding_token","role"],
   });
   app.use(cookieParser());
   // Configure WebSocket adapter
