@@ -17,7 +17,7 @@ const DAPUploadDocumentsScreen = () => {
     {id: '5', title: 'Vehicle Registration', value: 'VEHICLE_REGISTRATION'},
   ]);
 
-  const handleCardPress = (title: string) => {
+  const handleCardPress = (title: string,value:string) => {
     navigation.navigate(DeliverAPackage.UploadDocumentDetails, {
       title,
       value,

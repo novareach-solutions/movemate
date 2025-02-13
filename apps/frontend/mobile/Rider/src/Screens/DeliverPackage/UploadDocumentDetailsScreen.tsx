@@ -24,6 +24,15 @@ const DAPUploadDocumentDetailsScreen = () => {
   };
 
   const handleTakePhoto = () => {
+    // setIsPhotoOptionVisible(false);
+    console.log('isPhotoOptionVisible', isPhotoOptionVisible)
+    setImage('https://picsum.photos/200/300');
+    setIsPhotoOptionVisible(false)
+    navigation.navigate(AppScreens.DocumentReview, {
+      title,
+      value,
+      uploadedImage: 'https://picsum.photos/200/300',
+    });
     // Placeholder for camera functionality
   };
 
@@ -89,12 +98,15 @@ const DAPUploadDocumentDetailsScreen = () => {
         onUpload={handleUpload}
       />
       {/* Photo Options Modal */}
-      <PhotoPickerModal
+      {
+        isPhotoOptionVisible && <PhotoPickerModal
         isVisible={isPhotoOptionVisible}
         onClose={() => setIsPhotoOptionVisible(false)}
         onTakePhoto={handleTakePhoto}
         onChooseFromGallery={handleChooseFromGallery}
       />
+      }
+      
     </SafeAreaView>
   );
 };

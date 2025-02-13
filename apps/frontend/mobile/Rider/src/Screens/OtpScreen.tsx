@@ -47,18 +47,31 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
   }, []);
 
   const handleChange = (value: string, index: number) => {
-    if (!/^\d*$/.test(value)) return;
+    if (!/^\d*$/.test(value)) return; // Allow only digits
 
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    if (value && index < otp.length - 1) {
-      inputs.current[index + 1]?.focus();
-    } else if (!value && index > 0) {
+    if (value) {
+      // Move to next input if current input is filled
+      if (index < otp.length - 1) {
+        inputs.current[index + 1]?.focus();
+      }
+    } else {
+      // Move to previous input if the input is empty
+      if (index > 0) {
+        inputs.current[index - 1]?.focus();
+      }
+    }
+  };
+
+  const handleKeyPress = (event: any, index: number) => {
+    if (event.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
       inputs.current[index - 1]?.focus();
     }
   };
+
 
   const handleVerify = async () => {
     const enteredOtp = otp.join('');
@@ -90,7 +103,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
     setOtp(['', '', '', '', '', '']);
     setError(false);
     inputs.current[0]?.focus();
-  
+
     try {
       await dispatch(requestOtp({ phone: phoneNumber })).unwrap();
       console.log("OTP Resent Successfully!");
@@ -98,7 +111,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
       console.log("OTP Resend Failed", error);
     }
   };
-  
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
@@ -109,13 +122,13 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
             <Text style={styles.header}>Enter verification code</Text>
             <Text style={styles.subtext}>Enter the 4-digit verification code sent to your phone:{phoneNumber}
               <TouchableOpacity style={{
-                flexDirection:"row",
-                justifyContent:"center",
-                alignItems:"center",
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
               }} onPress={() => navigation.goBack()} >
                 <Text style={styles.changeHighlight}>Change</Text>
               </TouchableOpacity>
-              </Text>
+            </Text>
           </View>
 
           <View style={{ marginBottom: 30 }}>
@@ -135,10 +148,11 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
                   keyboardType="numeric"
                   maxLength={1}
                   value={digit}
-                  // Automatically select the text on focus so that any new input replaces it
                   selectTextOnFocus
                   onChangeText={(value) => handleChange(value, index)}
+                  onKeyPress={(event) => handleKeyPress(event, index)} // Add this line
                 />
+
               ))}
             </View>
 
@@ -167,9 +181,9 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
               </>
             ) : (
               <TouchableOpacity onPress={handleResend}>
-                
-                 <Text style={styles.timer}>Resend</Text>
-                
+
+                <Text style={styles.timer}>Resend</Text>
+
               </TouchableOpacity>
             )}
           </Text>
@@ -240,7 +254,7 @@ const styles = StyleSheet.create({
   changeHighlight: {
     color: colors.purple,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
-    marginLeft:5
+    marginLeft: 5
   },
   titleDesccontainer: {
     marginBottom: 20,
