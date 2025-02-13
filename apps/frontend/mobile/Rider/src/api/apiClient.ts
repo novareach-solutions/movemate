@@ -83,7 +83,7 @@ apiClient.interceptors.response.use(
       error.response?.data?.message ||
       error.message ||
       'An unexpected error occurred. Please try again.';
-    Alert.alert('Error', errorMessage);
+    console.log('Error', errorMessage);
 
     return Promise.reject(error);
   },

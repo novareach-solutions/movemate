@@ -116,8 +116,8 @@ const OrderModal: React.FC<ModalComponentProps> = ({
     }
   };
 
-  const handleCancelOrder = () =>{
-    console.log("cancel order")
+  const handleCancelOrder = () => {
+    dispatch(hideOrderModal());
   }
 
   return (
@@ -155,8 +155,9 @@ const OrderModal: React.FC<ModalComponentProps> = ({
           </View>
 
           {/* Accept Order Button */}
-          <View>
-            <View style={styles.timerButtonContainer}>
+          <View style={styles.buttonContainer}>
+            {/* Accept Order Button - 80% Width */}
+            <View style={styles.acceptButtonContainer}>
               <View style={styles.darkBackground} />
               <Animated.View
                 style={[
@@ -170,21 +171,13 @@ const OrderModal: React.FC<ModalComponentProps> = ({
                 <Text style={styles.acceptOrderText}>Accept Order</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.cancelButtonContainer}>
-              <View style={styles.darkBackground} />
-              <Animated.View
-                style={[
-                  styles.timerButtonBackground,
-                  { width: widthInterpolation },
-                ]}
-              />
-              <TouchableOpacity
-                style={styles.acceptOrderButton}
-                onPress={handleCancelOrder}>
-                <Text style={styles.cancelOrderText}>X</Text>
-              </TouchableOpacity>
-            </View>
+
+            {/* Cancel Order Button - 20% Width */}
+            <TouchableOpacity style={styles.cancelButton} onPress={handleCancelOrder}>
+              <Text style={styles.cancelButtonText}>X</Text>
+            </TouchableOpacity>
           </View>
+
         </View>
       </View>
     </Modal>
@@ -311,6 +304,36 @@ const styles = StyleSheet.create({
   acceptOrderText: {
     color: colors.white,
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    gap:10
+  },
+
+  acceptButtonContainer: {
+    flex: 0.8,
+    position: 'relative',
+    height: 50,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+
+  cancelButton: {
+    flex: 0.2,
+    height: 50,
+    borderRadius: 8,
+    backgroundColor: colors.error,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  cancelButtonText: {
+    color: colors.white,
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });

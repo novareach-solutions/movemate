@@ -1,26 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Image,
   Animated,
   ActivityIndicator,
   Alert,
 } from 'react-native';
 import StatCard from '../../components/StatCard';
 import HelpButton from '../../components/HelpButton';
-import { AppScreens, DeliverAPackage } from '../../navigation/ScreenNames';
+import { AppScreens, DeliverAPackage, ProfileScreens } from '../../navigation/ScreenNames';
 import { useSelector, useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   AgentStatusEnum,
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
-// import Mapbox from '@rnmapbox/maps';
 import { MAPBOX_ACCESS_TOKEN } from "../../utils/constants";
+import Mapbox from "@rmapbox/maps"
 import { showOrderModal, fetchOngoingOrder } from '../../redux/slices/orderSlice';
 import { io } from 'socket.io-client';
 import apiClient from '../../api/apiClient';
@@ -34,26 +33,41 @@ import Header from '../../components/Header';
 import Money from '../../assets/icons/money.svg';
 import Order from '../../assets/icons/orders.svg';
 import Distance from '../../assets/icons/distance.svg';
-// Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+import Warning from '../../assets/icons/warningWhite.svg';
+import BlackArrow from '../../assets/icons/blackArrow.svg';
+
+Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
   const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+  // Flag to control error rendering
+  const [hasError, setHasError] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
+  // Measured height of error content
+  const [measuredErrorHeight, setMeasuredErrorHeight] = useState(0);
 
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated,
   );
-  const currentLocation = useSelector(
-    (state: RootState) => state.auth.currentLocation,
-  );
   const ongoingOrder = useSelector(
     (state: RootState) => state.order.ongoingOrder,
   );
   const [hasNavigated, setHasNavigated] = useState(false);
-  const [agentId, setAgentId] = useState<string | null>(null);
+
+  // Define your error items
+  const errorItemsData = [
+    {
+      id: 'accountNotApproved',
+      heading: 'Account Not Approved',
+      text: 'Your account is not approved yet. Please Contact Admin',
+      target: AppScreens.FAQScreen,
+    }
+    
+  ];
 
   const updateLocationAPI = async (latitude: number, longitude: number) => {
     try {
@@ -68,12 +82,12 @@ const HomeScreen: React.FC = () => {
       console.error('Error updating location:', error);
     }
   };
-console.log('currentLocation', currentLocation)
+
   useEffect(() => {
     let locationInterval: NodeJS.Timeout | null = null;
     if (isOnline) {
       locationInterval = setInterval(() => {
-        updateLocationAPI(currentLocation?.latitude, currentLocation?.longitude);
+        updateLocationAPI(40.712579, -74.218993);
       }, 15000);
     } else if (locationInterval) {
       clearInterval(locationInterval);
@@ -88,35 +102,43 @@ console.log('currentLocation', currentLocation)
       Alert.alert('Not Authenticated', 'Please log in to perform this action.');
       return;
     }
+
     const newStatus = !isOnline;
-    setIsOnline(newStatus);
     setIsLoading(true);
-    Animated.timing(drawerHeight, {
-      toValue: newStatus ? 120 : 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-    const currentAccessToken = await AsyncStorage.getItem('accessToken');
-    console.log('🔍 Current Access Token:', currentAccessToken);
+    // Clear previous error state
+    setHasError(false);
+
     try {
-      const statusEnum = newStatus
-        ? AgentStatusEnum.ONLINE
-        : AgentStatusEnum.OFFLINE;
+      const statusEnum = newStatus ? AgentStatusEnum.ONLINE : AgentStatusEnum.OFFLINE;
       await updateAgentStatus(statusEnum);
       console.log(`✅ Agent status set to ${statusEnum}`);
-    } catch (error) {
-      console.log('Error', error);
-      setIsOnline(!newStatus);
+      setIsOnline(newStatus);
+
+      // Close drawer if no error
       Animated.timing(drawerHeight, {
-        toValue: !newStatus ? 120 : 0,
+        toValue: 0,
         duration: 300,
         useNativeDriver: false,
       }).start();
+    } catch (error) {
       console.error('❌ Failed to update status:', error);
+      // Set error flag so that the error drawer is shown.
+      setHasError(true);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Animate the drawer when the measured error height changes
+  useEffect(() => {
+    if (hasError && measuredErrorHeight > 0) {
+      Animated.timing(drawerHeight, {
+        toValue: measuredErrorHeight,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [hasError, measuredErrorHeight, drawerHeight]);
 
   useEffect(() => {
     const fetchAgentId = async () => {
@@ -168,7 +190,7 @@ console.log('currentLocation', currentLocation)
   }, [agentId, dispatch]);
 
   useEffect(() => {
-    console.log('Ongoingon order value', ongoingOrder);
+    console.log('Ongoing order value', ongoingOrder);
     if (ongoingOrder && !hasNavigated) {
       setHasNavigated(true);
       if (ongoingOrder.status === OrderStatusEnum.PICKEDUP_ORDER) {
@@ -176,10 +198,7 @@ console.log('currentLocation', currentLocation)
           order: ongoingOrder,
         });
       }
-      if (
-        ongoingOrder.status === OrderStatusEnum.ACCEPTED ||
-        ongoingOrder.status === OrderStatusEnum.PENDING || OrderStatusEnum.IN_PROGRESS
-      ) {
+      else {
         navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
           order: ongoingOrder,
         });
@@ -187,73 +206,103 @@ console.log('currentLocation', currentLocation)
     }
   }, [ongoingOrder, hasNavigated, navigation]);
 
-  const handleTakePhoto = () => {
-    console.log('Taking a photo for proof...');
-  };
+  const renderErrorContent = useCallback(() => (
+    <View>
+      <View style={styles.errorTitleContainer}>
+        <View style={styles.errorTitle}><Warning width={25} height={25} /><Text style={{
+          fontSize: 16,
+          fontWeight: 'bold',
+          color: colors.white
+        }}> Actions Required</Text></View>
+      </View>
+      <View style={styles.errorContainer}>
+        {errorItemsData.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            style={styles.errorItem}
+            onPress={() => navigation.navigate(item.target)}>
+            <View style={styles.errorItemContent}>
+              <View style={styles.errorTextContainer}>
+                <Text style={styles.errorHeading}>{item.heading}</Text>
+                <Text style={styles.errorText}>{item.text}</Text>
+              </View>
+              <BlackArrow
+                style={{
+                  transform: [{ rotate: '180deg' }]
+                }}
+              />
 
-  const handleOrderDelivered = () => {
-    console.log('Order marked as delivered.');
-  };
-
-  const handleAcceptOrder = () => {
-    // Additional logic can be added here
-  };
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  ), [navigation]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <Header logo home help />
       {/* Map Image */}
-      {/* <View style={styles.mapContainer}>
+      <View style={styles.mapContainer}>
         <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
           <Mapbox.Camera zoomLevel={14} centerCoordinate={[151.209900, -33.865143]} />
-
         </Mapbox.MapView>
-      </View> */}
-
-      {/* Status Button */}
-      <View style={styles.statusContainer}>
-        <TouchableOpacity
-          onPress={toggleStatus}
-          style={[
-            styles.statusButton,
-            isOnline ? styles.stopButton : styles.goButton,
-          ]}>
-          <Text
-            style={[
-              styles.statusButtonText,
-              isOnline ? styles.stopText : styles.goText,
-            ]}>
-            {isOnline ? 'Stop' : 'GO'}
-          </Text>
-        </TouchableOpacity>
-        <Text style={styles.statusText}>
-          {isOnline ? "You're Online" : "You're Offline"}
-        </Text>
       </View>
 
-      {/* Status Container */}
       <View style={styles.statsContainer}>
         <StatCard icon={Money} value="$50" label="EARNINGS" />
         <StatCard icon={Order} value="7" label="ORDERS" />
         <StatCard icon={Distance} value="30 Km" label="DISTANCE" />
       </View>
 
+      {/* Status Button */}
+      <View style={styles.statusContainer}>
+        <TouchableOpacity
+          disabled={isLoading}
+          onPress={toggleStatus}
+          style={[
+            styles.statusButton,
+            isOnline ? styles.stopButton : styles.goButton,
+          ]}>
+          {isLoading ? (
+            <ActivityIndicator
+              size="small"
+              color={isOnline ? colors.white : colors.purple}
+            />
+          ) : (
+            <Text
+              style={[
+                styles.statusButtonText,
+                isOnline ? styles.stopText : styles.goText,
+              ]}>
+              {isOnline ? 'Stop' : 'GO'}
+            </Text>
+          )}
+        </TouchableOpacity>
+        <Text style={styles.statusText}>
+          {isOnline ? "You're Online" : "You're Offline"}
+        </Text>
+      </View>
+
       {/* Sliding Drawer */}
       <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
-        <View style={styles.warningContainer}>
-          <Text style={styles.warningTitle}>Unable to go online</Text>
-          <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>⚠️ Account Not Approved</Text>
-          </View>
-          <Text style={styles.helpText}>
-            Your account has not been Approved.
-          </Text>
-          <Text style={styles.contactText}>
-            To resolve this, please contact our <Text style={styles.linkText}>Support Team</Text>
-            and provide the necessary information for verification.
-          </Text>
-        </View>
+        {hasError && renderErrorContent()}
       </Animated.View>
+
+      {/* Hidden container to measure error content */}
+      {hasError && (
+        <View
+          style={styles.hiddenContainer}
+          onLayout={(event) => {
+            const { height } = event.nativeEvent.layout;
+            // Only update if height has changed and is greater than zero
+            if (height > 0 && measuredErrorHeight !== height) {
+              setMeasuredErrorHeight(height);
+            }
+          }}>
+          {renderErrorContent()}
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -313,6 +362,25 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.text.primary,
   },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: "#FBF4FF",
+    position: "absolute",
+    top: 80,
+    width: "95%",
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 25,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border.lightGray,
+  },
+  helpButtonContainer: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+  },
   drawer: {
     backgroundColor: colors.white,
     overflow: 'hidden',
@@ -322,59 +390,61 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     shadowOffset: { width: 0, height: -2 },
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
     paddingTop: 10,
   },
-  statsContainer: {
+  errorTitleContainer: {
+    backgroundColor: "#D81A00",
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+  },
+  errorTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
+  },
+  errorContainer: {
+    backgroundColor: "#FFF3F3",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+  },
+  errorItem: {
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 5,
+  },
+  errorItemContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#FBF4FF',
-    position: "absolute",
-    top: 25,
-    width: "100%",
-    borderRadius: 12
-
-  },
-  helpButtonContainer: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-  },
-  warningContainer: {
-    padding: 16,
     alignItems: 'center',
   },
-  warningTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: 10,
+  errorTextContainer: {
+    flex: 1,
+    gap:10
   },
-  errorBanner: {
-    backgroundColor: colors.error,
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
+  errorHeading: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.black,
   },
   errorText: {
-    color: colors.white,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  helpText: {
-    textAlign: 'center',
     fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: 5,
+    color: colors.black,
   },
-  contactText: {
-    textAlign: 'center',
-    fontSize: 14,
-    color: colors.text.secondary,
+  arrow: {
+    fontSize: 18,
+    color: '#D32F2F',
+    marginLeft: 10,
   },
-  linkText: {
-    color: colors.purple,
-    fontWeight: 'bold',
+  // Hidden container for measurement (placed off-screen)
+  hiddenContainer: {
+    position: 'absolute',
+    top: -1000,
+    left: 0,
+    right: 0,
+    opacity: 0,
   },
 });
 

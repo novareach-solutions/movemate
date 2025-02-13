@@ -5,7 +5,9 @@ import { View, Image, StyleSheet } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { SendPackageOrder } from '../redux/slices/types/sendAPackage';
 import { colors } from '../theme/colors';
+import Mapbox from "@rmapbox/maps"
 import OrderExpandedModal from '../components/Modals/ExpandedModal';
+
 // import Mapbox from '@rnmapbox/maps';
 import { MAPBOX_ACCESS_TOKEN,MAPBOX_DRIVING_URL } from "../utils/constants";
 import { useAppSelector } from '../redux/hook';
@@ -56,7 +58,7 @@ const PickUpOrderDetailsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-       {/* <View style={styles.mapContainer}>
+       <View style={styles.mapContainer}>
            <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
                          <Mapbox.Camera zoomLevel={14} centerCoordinate={ [currentLocationData.longitude,currentLocationData.latitude]} />
             <Mapbox.PointAnnotation id="currentLocation" coordinate={[currentLocationData.longitude,currentLocationData.latitude]}>
@@ -88,7 +90,7 @@ const PickUpOrderDetailsScreen: React.FC = () => {
 
             )}
                        </Mapbox.MapView>
-           </View> */}
+           </View>
       {/* Render the expanded order details component */}
       <OrderExpandedModal order={order} disableClose={true} />
     </View>

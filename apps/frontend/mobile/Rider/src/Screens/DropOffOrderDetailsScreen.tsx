@@ -6,10 +6,10 @@ import { useRoute } from '@react-navigation/native';
 import { SendPackageOrder } from '../redux/slices/types/sendAPackage';
 import { colors } from '../theme/colors';
 import DeliveryModal from '../components/Modals/DeliveryModal';
-// import Mapbox from '@rnmapbox/maps';
+import Mapbox from '@rnmapbox/maps';
 import { MAPBOX_ACCESS_TOKEN ,MAPBOX_DRIVING_URL} from "../utils/constants";
 import { useAppSelector } from '../redux/hook';
-// Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 const routeLineStyle = {
   lineColor: colors.purple,
   lineWidth: 3,
@@ -54,7 +54,7 @@ const DropOffOrderDetailsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-       {/* <View style={styles.mapContainer}>
+       <View style={styles.mapContainer}>
                <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
                              <Mapbox.Camera zoomLevel={14} centerCoordinate={[currentLocationData?.longitude || 151.209900,currentLocationData?.latitude ||-33.865143]} />
                 <Mapbox.PointAnnotation id="currentLocation" coordinate={[currentLocationData?.longitude || 151.209900,currentLocationData?.latitude ||-33.865143]}>
@@ -86,7 +86,7 @@ const DropOffOrderDetailsScreen: React.FC = () => {
     
                 )}
                            </Mapbox.MapView>
-               </View> */}
+               </View>
       {/* Render the delivery details component (no button, no modal) */}
       <DeliveryModal order={order} />
     </View>

@@ -40,6 +40,10 @@ import {
 } from '../../navigation/ScreenNames';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
 import { InfoRow } from './Order/OrderModal';
+import OrderInfoCard from '../OrderInfoCard';
+import RedCircle from "../../assets/icons/redCircle.svg"
+import PickuplocationAvatar from "../../assets/icons/pickuplocationAvatar.svg"
+import DropOfflocationAvatar from "../../assets/icons/droplocationAvatar.svg"
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -65,7 +69,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
   const handleExpand = () => {
     setIsExpanded(true);
     Animated.timing(height, {
-      toValue: SCREEN_HEIGHT * 0.75,
+      toValue: SCREEN_HEIGHT * 0.88,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -213,86 +217,111 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
         {/* When collapsed, show a summary via InfoRow */}
         <View style={styles.location}>
           {!isExpanded && (
-         <View>   
-      
-            </View>
+            <InfoRow
+              iconSource={RedCircle}
+              text={`${order?.senderName} (${order.dropLocation?.addressLine1})`}
+            />
           )}
         </View>
 
-        {/* Header Section */}
-        <View style={styles.header}>
-          <View style={{ width: '70%' }}>
-            <Text style={styles.driverName}>{order.customer?.firstName}</Text>
-            <Text style={styles.deliveryAddress}>{order.dropLocation?.addressLine1}</Text>
-          </View>
-          <View style={styles.headerIcons}>
-            <TouchableOpacity>
-              <PurplePhone style={styles.icon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={navigateChatScreen}>
-              <PurpleMessage style={styles.icon} />
-            </TouchableOpacity>
-          </View>
-        </View>
 
-        {/* Delivery Instructions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Delivery Instructions</Text>
-          <View style={styles.instructionsContainer}>
-            <View style={styles.instructionRow}>
-              {order.deliveryInstructions === 'Do not ring the bell' ? (
-                <PurpleDoNotRing style={styles.instructionIcon} />
-              ) : (
-                <PurpleDoor style={styles.instructionIcon} />
-              )}
-              <Text style={styles.instructionText}>{order.deliveryInstructions}</Text>
+        {isExpanded &&
+          <>
+            <InfoRow
+              iconSource={DropOfflocationAvatar}
+              text={`Drop-off Contact`}
+            />
+            <OrderInfoCard
+              title={order.receiverName || 'N/A'}
+              subtitle={order.dropLocation?.addressLine1 || 'N/A'}
+              onPressLeftIcon={() => Alert.alert('Call Customer')}
+              onPressRightIcon={navigateChatScreen}
+              LeftIcon={PurplePhone}
+              RightIcon={PurpleMessage}
+            />
+            <View style={{
+              marginTop: 10
+            }} />
+
+            <InfoRow
+              iconSource={PickuplocationAvatar}
+              text={`Pickup Contact`}
+            />
+            <OrderInfoCard
+              title={order.senderName || 'N/A'}
+              subtitle={order.pickupLocation?.addressLine1 || 'N/A'}
+              onPressLeftIcon={() => Alert.alert('Call Customer')}
+              onPressRightIcon={navigateChatScreen}
+              LeftIcon={PurplePhone}
+              RightIcon={PurpleMessage}
+            />
+
+            {/* Delivery Instructions */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Delivery Instructions</Text>
+              <View style={styles.instructionsContainer}>
+                <View style={styles.instructionRow}>
+                  {order.deliveryInstructions === 'Do not ring the bell' ? (
+                    <PurpleDoNotRing style={styles.instructionIcon} />
+                  ) : (
+                    <PurpleDoor style={styles.instructionIcon} />
+                  )}
+                  <Text style={styles.instructionText}>{order.deliveryInstructions}</Text>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
 
-        {/* Items to Deliver */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Items to Deliver</Text>
-          <Text style={styles.itemText}>• {order.packageType}</Text>
-        </View>
+            {/* Items to Deliver */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Items to Deliver</Text>
+              <Text style={styles.itemText}>• {order.packageType}</Text>
+            </View>
 
-        {/* Proof of Delivery */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Proof of Delivery</Text>
-          <Text style={styles.proofText}>Take a photo to confirm delivery</Text>
+            {/* Proof of Delivery */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Proof of Delivery</Text>
+              <Text style={styles.proofText}>Take a photo to confirm delivery</Text>
+              <TouchableOpacity
+                style={
+                  hasPhoto
+                    ? styles.viewPhotoButton
+                    : [formStyles.button, formStyles.buttonEnabled]
+                }
+                onPress={hasPhoto ? handleViewPhoto : openPhotoPickerModal}
+              >
+                {!hasPhoto && <Camera />}
+                <Text
+                  style={
+                    hasPhoto
+                      ? styles.viewPhotoText
+                      : [formStyles.buttonText, formStyles.buttonTextEnabled]
+                  }
+                >
+                  {hasPhoto ? 'View Photo' : 'Take Photo'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        }
+        {/* Header Section */}
+
+
+        {/* Order Delivered Button */}
+        <View style={styles.footer}>
           <TouchableOpacity
-            style={
-              hasPhoto
-                ? styles.viewPhotoButton
-                : [formStyles.button, formStyles.buttonEnabled]
-            }
-            onPress={hasPhoto ? handleViewPhoto : openPhotoPickerModal}
+            style={[
+              formStyles.button,
+              formStyles.buttonSuccess,
+              { opacity: hasPhoto ? 1 : 0.5 },
+            ]}
+            onPress={handleOrderDelivered}
+            disabled={!hasPhoto}
           >
-            {!hasPhoto && <Camera />}
-            <Text
-              style={
-                hasPhoto
-                  ? styles.viewPhotoText
-                  : [formStyles.buttonText, formStyles.buttonTextEnabled]
-              }
-            >
-              {hasPhoto ? 'View Photo' : 'Take Photo'}
-            </Text>
+            <Text style={formStyles.buttonText}>Order Delivered</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Order Delivered Button */}
-        <TouchableOpacity
-          style={[
-            formStyles.button,
-            formStyles.buttonSuccess,
-            { opacity: hasPhoto ? 1 : 0.5 },
-          ]}
-          onPress={handleOrderDelivered}
-          disabled={!hasPhoto}
-        >
-          <Text style={formStyles.buttonText}>Order Delivered</Text>
-        </TouchableOpacity>
+
       </Animated.View>
 
       {/* Confirm Photo Modal */}
@@ -320,7 +349,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    borderRadius:12
+    borderRadius: 12
   },
   modalContainer: {
     width: '100%',
@@ -377,7 +406,8 @@ const styles = StyleSheet.create({
     tintColor: colors.text.primary,
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 15,
+    marginTop: 15
   },
   sectionTitle: {
     fontSize: typography.fontSize.medium,
@@ -445,6 +475,13 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     fontFamily: typography.fontFamily.regular,
   },
+  footer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+  },
+
 });
 
 export default DeliveryModal;

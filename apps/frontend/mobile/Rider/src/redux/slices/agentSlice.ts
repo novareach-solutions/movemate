@@ -25,7 +25,7 @@ export const updateAgentStatus = async (
       console.log('✅ Agent status updated successfully.');
     } else {
       const errorMessage = response.data?.message || 'Failed to update status.';
-      Alert.alert('Error', errorMessage);
+      // Alert.alert('Error', errorMessage);
       throw new Error(errorMessage);
     }
   } catch (error: any) {
@@ -37,10 +37,12 @@ export const updateAgentStatus = async (
       error.response.data &&
       typeof error.response.data.message === 'string'
     ) {
-      Alert.alert('Error', error.response.data.message);
+      console.log(error)
+      // Alert.alert('Error', error.response.data.message);
     } else {
+      console.log("An error occured while updating status")
       // Fallback for unexpected errors
-      Alert.alert('Error', 'An error occurred while updating status.');
+      // Alert.alert('Error', 'An error occurred while updating status.');
     }
 
     throw error; // Optionally re-throw the error if you want to handle it further up
