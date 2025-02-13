@@ -32,19 +32,19 @@ const DeliveryTrackingScreen = () => {
 
   const [routeCoords, setRouteCoords] = useState<[number, number][]>([]);
   const [pickupLocation, setPickupLocation] = useState<[number, number]>([77.5946, 12.9716]);
-const [dropLocation, setDropLocation] = useState<[number, number]>([80.2707, 13.0827]);
+  const [dropLocation, setDropLocation] = useState<[number, number]>([80.2707, 13.0827]);
 
-useEffect(() => {
-  if (pickupLocationData?.latitude !== undefined && pickupLocationData?.longitude !== undefined) {
-    setPickupLocation([pickupLocationData.longitude, pickupLocationData.latitude]);
-  }
-}, [pickupLocationData]);
+  useEffect(() => {
+    if (pickupLocationData?.latitude !== undefined && pickupLocationData?.longitude !== undefined) {
+      setPickupLocation([pickupLocationData.longitude, pickupLocationData.latitude]);
+    }
+  }, [pickupLocationData]);
 
-useEffect(() => {
-  if (dropLocationData?.latitude !== undefined && dropLocationData?.longitude !== undefined) {
-    setDropLocation([dropLocationData.longitude, dropLocationData.latitude]);
-  }
-}, [dropLocationData]);
+  useEffect(() => {
+    if (dropLocationData?.latitude !== undefined && dropLocationData?.longitude !== undefined) {
+      setDropLocation([dropLocationData.longitude, dropLocationData.latitude]);
+    }
+  }, [dropLocationData]);
 
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const navigation = useNavigation()
@@ -65,18 +65,18 @@ useEffect(() => {
   useEffect(() => {
     setTimeout(() => {
       // if (pickupLocationData?.latitude && pickupLocationData?.longitude && dropLocationData?.latitude && dropLocationData?.longitude) {
-        fetchRoute();
-        console.log('executedRoute')
+      fetchRoute();
+      console.log('executedRoute')
       // }
     }, 4500);
-    
-  }, [pickupLocation,dropLocation]);
 
-  useEffect(()=>{
-    setTimeout(()=>{
+  }, [pickupLocation, dropLocation]);
+
+  useEffect(() => {
+    setTimeout(() => {
       navigation.navigate(CustomerScreens.AcceptOrder)
-    },15000)
-  },[])
+    }, 15000)
+  }, [])
 
 
   useEffect(() => {
@@ -91,12 +91,12 @@ useEffect(() => {
     }
 
     try {
-      // await dispatch(assignOrder({
-      //     pickupLatitude: pickupLocation.pickupLattitude ?? 0,
-      //     pickupLongitude: pickupLocation.pickupLongitude ?? 0, 
-      //     orderId:orderId ?? ""
-      // }));
-      Alert.alert("We've Assigned a Delivery Agent for your order.")
+      await dispatch(assignOrder({
+        pickupLatitude: pickupLocation.pickupLattitude ?? 0,
+        pickupLongitude: pickupLocation.pickupLongitude ?? 0,
+        orderId: orderId ?? ""
+      }));
+      // Alert.alert("We've Assigned a Delivery Agent for your order.")
     } catch (error) {
       console.log('Error assigning rider:', error);
     }
@@ -113,7 +113,7 @@ useEffect(() => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header isBack help/>
+      <Header isBack help />
       {/* Map Section */}
       <View style={styles.mapContainer}>
         <View>
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
     padding: 16,
-    bottom:25,
+    bottom: 25,
     // shadowColor: "#000",
     // shadowOpacity: 0.1,
     // shadowRadius: 8,

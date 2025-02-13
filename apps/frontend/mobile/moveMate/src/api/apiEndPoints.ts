@@ -8,7 +8,7 @@ const apiEndpoints = {
     requestOtp:createEndpoint('/auth/otp/request'),
     veryfyOtp:createEndpoint('/auth/otp/verify'),
     login: createEndpoint('/auth/login?role=CUSTOMER'),
-    refreshToken: createEndpoint('/auth/refresh_token'),
+    refreshToken: createEndpoint('/auth/refresh-token'),
     userSignup:createEndpoint('/user/signup'),
     fetchProfile: '/profile',
     fetchVehicles: '/vehicles',

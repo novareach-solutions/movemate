@@ -1,4 +1,5 @@
 import ProfileScreen from '../Screens/AccountScreen';
+import ChatScreen from '../Screens/Customer/ChatScreen';
 import CancelSuccessScreen from '../Screens/Customer/SendAPackage/CancelSuccessScreen';
 import DeliveryScreen from '../Screens/Customer/SendAPackage/DeliveryScreen';
 import PaymentSuccessScreen from '../Screens/Customer/SendAPackage/PaymentSuccessScreen';
@@ -57,7 +58,8 @@ export const CustomerScreens = {
   OrderCompletedScreen:'OrderCompleted',
   ReportAnIssue:'Report an issue ',
   HelpSupportScreen:'HelpSupportScreen',
-  AcceptOrder:'accept order'
+  AcceptOrder:'accept order',
+  ChatScreen:'Chat screen'
 }
 
 export const ProfileScreens = {

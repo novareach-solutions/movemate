@@ -96,14 +96,7 @@ export const verifyOtp = createAsyncThunk(
   apiEndpoints.veryfyOtp,
   async ({ phone,otp }: { phone: string;otp: string }) => {
     try {
-      const response = await apiClient.post(apiEndpoints.veryfyOtp, { phoneNumber:phone,otp });
-       // Store onboarding token if present in the response headers
-       const onboardingToken = response.headers['onboarding_token'];
-       if (onboardingToken) {
-         await saveToken('onboardingToken', onboardingToken);
-         console.log('Onboarding Token Stored:', onboardingToken);
-       }
- 
+      const response = await apiClient.post(apiEndpoints.veryfyOtp, { phoneNumber:phone,otp }); 
        return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -129,16 +122,20 @@ export const Login = createAsyncThunk(
         },
       },);
        // Store onboarding token if present in the response headers
-       const onboardingToken = response.headers['onboarding_token'];
-       const accessToken = response.headers['access_token'];
-       if (onboardingToken) {
-         await saveToken('onboardingToken', onboardingToken);
-         console.log('Onboarding Token Stored:', onboardingToken);
-       }
+       const accessToken = response?.data?.data?.accessToken;
+       const userId =  String(response?.data?.data?.userId);
+
        if (accessToken) {
          await saveToken('accessToken', accessToken);
          console.log('accessToken Stored:', accessToken);
        }
+       if(userId){
+        await saveToken('userId', userId);
+       }
+
+       console.log('response.header', response.headers);
+       console.log('response####', response)
+      //  765462
  
        return response.data;
     } catch (error) {
@@ -162,7 +159,20 @@ export const userSignup = createAsyncThunk(
     console.log('payload', payload)
     try {
       const response = await apiClient.post(apiEndpoints.userSignup, payload);
-      await AsyncStorage.setItem('accessToken', response?.data?.accessToken);
+      // Store onboarding token if present in the response headers
+      const accessToken = response?.data?.data?.accessToken;
+      const userId =  String(response?.data?.data?.userId);
+
+      if (accessToken) {
+        await saveToken('accessToken', accessToken);
+        console.log('accessToken Stored:', accessToken);
+      }
+      if(userId){
+       await saveToken('userId', userId);
+      }
+
+      console.log('response.header', response.headers);
+      console.log('response####', response)
       // await AsyncStorage.setItem('refreshToken', response.data.
       return response.data;
     } catch (error) {

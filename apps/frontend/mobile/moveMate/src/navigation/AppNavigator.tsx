@@ -33,6 +33,7 @@ import OrderCompletedScreen from '../Screens/Customer/SendAPackage/OrderComplete
 import ReportAnIssue from '../Screens/Customer/SendAPackage/ReportAnIssue';
 import HelpSupportScreen from '../Screens/Customer/HelpSupportScreen';
 import OrderAcceptScreen from '../Screens/Customer/SendAPackage/OrderAcceptScreen';
+import ChatScreen from '../Screens/Customer/ChatScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -128,6 +129,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name={CustomerScreens.OrderDetails}
           component={OrderDetails}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={CustomerScreens.ChatScreen}
+          component={ChatScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

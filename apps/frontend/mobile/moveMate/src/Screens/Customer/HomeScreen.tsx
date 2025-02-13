@@ -7,27 +7,81 @@ import {
     StyleSheet,
     SafeAreaView,
     FlatList,
+    Alert,
 } from 'react-native';
 import { images } from '../../assets/images/images';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { CustomerScreens, ProfileScreens } from '../../navigation/ScreenNames';
 import SearchIcon from "../../assets/images/searchWithLightPurple.svg";
+import DeliveryBoy from "../../assets/images/delivery-boy.svg";
 import WhiteArrow from "../../assets/images/whiteArrow.svg";
 import LocationIcon from "../../assets/images/Location.svg";
 import AccountIcon from "../../assets/images/Account.svg";
 import { useNavigation } from '@react-navigation/native';
 import { SvgProps } from 'react-native-svg';
 import { gridButtons } from '../../constants/staticData';
-import { useAppSelector } from '../../redux/hook';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import { getOrderStatus, updateDropLoaction, updatePickupLoaction, updatePkgId } from '../../redux/slices/deliverAPackageSlice';
 // Mock Data
 // const address = '123 Main Street, Springfield, USA';
 type SvgComponent = React.FC<SvgProps>;
 
 const CustomerHomeScreen = () => {
     const navigation = useNavigation();
-    const [isOngoingOrderModal, setIsOngoingOrderModal] = useState(true)
+    const [isOngoingOrderModal, setIsOngoingOrderModal] = useState(true);
+    const [orderDetails, setOrderDetails] = useState(null);
+    const [orderStatus, setOrderstatus] = useState(null);
     const currentLocationData = useAppSelector(state => state.auth.currentLocation);
+
+    const dispatch = useAppDispatch();
+
+    const fetchOrderStatus = async () => {
+        const response = await dispatch(getOrderStatus()).unwrap();
+        setOrderDetails(response);
+        const orderStatus = response?.data?.order?.status;
+        setOrderstatus(orderStatus);
+        dispatch(updatePkgId(response?.data?.order?.id));
+        console.log('response?.data?.order?.pickupLocation', response?.data?.order?.pickupLocation)
+        dispatch(updatePickupLoaction(response?.data?.order?.pickupLocation));
+        dispatch(updateDropLoaction(response?.data?.order?.dropLocation));
+
+        if (orderStatus) {
+            setIsOngoingOrderModal(true);
+        }
+        console.log('Order-response', response?.data?.order)
+    };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchOrderStatus();
+        }, 20000);
+
+        return () => clearInterval(interval);
+    }, [])
+
+    const handleOngoingNavigation = () => {
+        console.log('orderStatus', orderStatus)
+
+        if (orderStatus === "PENDING") {
+            navigation.navigate(CustomerScreens.DeliveryScreen)
+        } else if (orderStatus === "ACCEPTED" || orderStatus === "IN_PROGRESS" || orderStatus === "PICKEDUP_ORDER") {
+            navigation.navigate(CustomerScreens.AcceptOrder)
+        } else {
+            navigation.navigate(CustomerScreens.OrderCompletedScreen);
+        }
+    }
+
+    const handleServiceNavigation = () => {
+        if (orderStatus === "PENDING" || orderStatus === "IN_PROGRESS" || orderStatus === "ACCEPTED" || orderStatus === "PICKEDUP_ORDER") {
+            Alert.alert("Order In-progress")
+        } else {
+
+            navigation.navigate(CustomerScreens.SAPDetailsScreen);
+
+        }
+    }
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.header}>
@@ -78,9 +132,11 @@ const CustomerHomeScreen = () => {
                         const SvgImage: SvgComponent = item.image;
                         return (
                             <TouchableOpacity
-                                onPress={() => {
-                                    navigation.navigate(CustomerScreens.SAPDetailsScreen);
-                                }}
+                                onPress={handleServiceNavigation
+                                    //     () => {
+                                    //     navigation.navigate(CustomerScreens.SAPDetailsScreen);
+                                    // }
+                                }
                                 style={styles.gridButton}
                             >
                                 <Text style={styles.gridButtonText}>{item.title}</Text>
@@ -92,17 +148,27 @@ const CustomerHomeScreen = () => {
                 />
             </View>
 
-            {/* {isOngoingOrderModal && (
-    <View style={styles.ongoingOrderBanner}>
-        <TouchableOpacity style={styles.ongoingOrderButton}>
-            <SearchIcon />
-            <Text style={styles.ongoingOrderText}>
-                Looking for a delivery partner near you...
-            </Text>
-            <WhiteArrow/>
-        </TouchableOpacity>
-    </View>
-)} */}
+            {(isOngoingOrderModal && orderStatus !== "CANCELED") && (
+                <View style={styles.ongoingOrderBanner}>
+                    <TouchableOpacity style={styles.ongoingOrderButton} onPress={handleOngoingNavigation}>
+                        {
+                            orderStatus === "PENDING" && <><SearchIcon />
+                                <Text style={styles.ongoingOrderText}>
+                                    Looking for a delivery partner near you...
+                                </Text></>
+                        }
+                        {
+                            (orderStatus !== "PENDING" && orderStatus !== "CANCELED") && <>
+                                <DeliveryBoy />
+                                <Text style={styles.ongoingOrderText}>
+                                    Delivery partner assigned! On the way..
+                                </Text></>
+                        }
+
+                        <WhiteArrow />
+                    </TouchableOpacity>
+                </View>
+            )}
 
 
 
