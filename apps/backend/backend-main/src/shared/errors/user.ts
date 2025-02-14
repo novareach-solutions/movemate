@@ -119,3 +119,11 @@ export class UserHasRunningOrderError extends UserFacingError {
     this.statusCode = 409;
   }
 }
+
+export class UserLicensePlateAlreadyExistsError extends UserFacingError {
+  constructor(message?: string) {
+    super(message || "License plate number already exists");
+    this.name = "UserLicensePlateAlreadyExistsError";
+    this.statusCode = 409;
+  }
+}

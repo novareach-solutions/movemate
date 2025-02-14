@@ -32,6 +32,7 @@ import { MediaService } from "../media/media.service";
 import { RedisService } from "../redis/redis.service";
 import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
 import { radii } from "./agents.constants";
+import { AgentVehicle } from "../../entity/AgentVehicle";
 
 @Injectable()
 export class AgentService {
@@ -47,67 +48,53 @@ export class AgentService {
   async createAgent(
     agent: TAgent,
   ): Promise<{ agent: Agent; accessToken: string; refreshToken: string }> {
-    const { abnNumber, user } = agent;
-    const queryRunner: QueryRunner =
-      dbRepo(Agent).manager.connection.createQueryRunner();
+    const { abnNumber, user, vehicles } = agent;
+    const queryRunner: QueryRunner = dbRepo(Agent).manager.connection.createQueryRunner();
     await queryRunner.startTransaction();
 
     try {
-      this.logger.debug(
-        `AgentService.createAgent: Checking if agent with ABN ${abnNumber} exists.`,
-      );
-      const existingAgent = await queryRunner.manager.findOne(Agent, {
-        where: { abnNumber },
-      });
+      this.logger.debug(`AgentService.createAgent: Checking if agent with ABN ${abnNumber} exists.`);
+      const existingAgent = await queryRunner.manager.findOne(Agent, { where: { abnNumber } });
       if (existingAgent) {
-        this.logger.error(
-          `AgentService.createAgent: Agent with ABN ${abnNumber} already exists.`,
-        );
-        throw new UserAlreadyExistsError(
-          `Agent with ABN number ${abnNumber} already exists.`,
-        );
+        this.logger.error(`AgentService.createAgent: Agent with ABN ${abnNumber} already exists.`);
+        throw new UserAlreadyExistsError(`Agent with ABN number ${abnNumber} already exists.`);
       }
 
-      this.logger.debug(
-        `AgentService.createAgent: Checking if user with phone ${user.phoneNumber} or email ${user.email} exists.`,
-      );
-      const existingUserByPhone = await queryRunner.manager.findOne(User, {
-        where: { phoneNumber: user.phoneNumber },
-      });
-      const existingUserByEmail = await queryRunner.manager.findOne(User, {
-        where: { email: user.email },
-      });
-
+      this.logger.debug(`AgentService.createAgent: Checking if user with phone ${user.phoneNumber} or email ${user.email} exists.`);
+      const existingUserByPhone = await queryRunner.manager.findOne(User, { where: { phoneNumber: user.phoneNumber } });
+      const existingUserByEmail = await queryRunner.manager.findOne(User, { where: { email: user.email } });
       if (existingUserByPhone || existingUserByEmail) {
-        this.logger.error(
-          `AgentService.createAgent: User with phone ${user.phoneNumber} or email ${user.email} already exists.`,
-        );
-        throw new UserAlreadyExistsError(
-          `User with phone number or email already exists.`,
-        );
+        this.logger.error(`AgentService.createAgent: User with phone ${user.phoneNumber} or email ${user.email} already exists.`);
+        throw new UserAlreadyExistsError(`User with phone number or email already exists.`);
       }
 
-      this.logger.debug(
-        `AgentService.createAgent: Creating user and agent records.`,
-      );
+      this.logger.debug(`AgentService.createAgent: Creating user record.`);
       const newUser = queryRunner.manager.create(User, user);
       const savedUser = await queryRunner.manager.save(User, newUser);
 
+      this.logger.debug(`AgentService.createAgent: Creating agent record.`);
       const newAgent = queryRunner.manager.create(Agent, {
         agentType: agent.agentType,
         abnNumber: agent.abnNumber,
-        vehicleMake: agent.vehicleMake,
-        vehicleModel: agent.vehicleModel,
-        vehicleYear: agent.vehicleYear,
         profilePhoto: agent.profilePhoto,
         status: AgentStatusEnum.OFFLINE,
         approvalStatus: ApprovalStatusEnum.PENDING,
         userId: savedUser.id,
       });
-
       const savedAgent = await queryRunner.manager.save(Agent, newAgent);
 
-      // Generate tokens
+      // If vehicles are provided, create each vehicle record.
+      if (vehicles && vehicles.length > 0) {
+        for (const vehicle of vehicles) {
+          const newVehicle = queryRunner.manager.create(AgentVehicle, {
+            ...vehicle,
+            agentId: savedAgent.id,
+          });
+          await queryRunner.manager.save(AgentVehicle, newVehicle);
+        }
+      }
+
+      // Generate tokens for the user.
       const accessToken = this.tokenService.generateAccessToken(
         savedUser.id,
         savedUser.phoneNumber,
@@ -115,18 +102,14 @@ export class AgentService {
       );
       const refreshToken = this.tokenService.generateRefreshToken(savedUser.id);
 
-      this.logger.debug(
-        `AgentService.createAgent: Agent with ID ${savedAgent.id} created successfully.`,
-      );
+      this.logger.debug(`AgentService.createAgent: Agent with ID ${savedAgent.id} created successfully.`);
       await queryRunner.commitTransaction();
 
       return { agent: savedAgent, accessToken, refreshToken };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(`AgentService.createAgent: Error occurred - ${error}`);
-      throw new InternalServerErrorException(
-        `Failed to create agent: ${error}`,
-      );
+      throw new InternalServerErrorException(`Failed to create agent: ${error}`);
     } finally {
       await queryRunner.release();
     }
