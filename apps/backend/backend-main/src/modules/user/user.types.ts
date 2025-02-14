@@ -30,6 +30,18 @@ export type TUpdateUser = {
   postalCode?: number;
 };
 
+export type TCreateSavedAddress = {
+  title: string;
+  addressLine1: string;
+  addressLine2?: string;
+  landmark?: string;
+  latitude: number;
+  longitude: number;
+};
+
+export type TUpdateSavedAddress = Partial<TCreateSavedAddress>;
+
+
 /**
  * Data Transfer Object for retrieving user profile based on specific criteria.
  */
