@@ -19,7 +19,7 @@ import {
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
 import { MAPBOX_ACCESS_TOKEN } from "../../utils/constants";
-import Mapbox from "@rmapbox/maps"
+import Mapbox from "@rnmapbox/maps"
 import { showOrderModal, fetchOngoingOrder } from '../../redux/slices/orderSlice';
 import { io } from 'socket.io-client';
 import apiClient from '../../api/apiClient';
