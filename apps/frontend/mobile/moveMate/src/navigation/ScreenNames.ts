@@ -1,7 +1,8 @@
 import ProfileScreen from '../Screens/AccountScreen';
-import CancelSuccessScreen from '../Screens/Customer/SendAPackage/CancelSuccessScreen';
-import DeliveryScreen from '../Screens/Customer/SendAPackage/DeliveryScreen';
-import PaymentSuccessScreen from '../Screens/Customer/SendAPackage/PaymentSuccessScreen';
+import ChatScreen from '../Screens/Home/ChatScreen';
+import CancelSuccessScreen from '../Screens/Home/SendAPackage/CancelSuccessScreen';
+import DeliveryScreen from '../Screens/Home/SendAPackage/DeliveryScreen';
+import PaymentSuccessScreen from '../Screens/Home/SendAPackage/PaymentSuccessScreen';
 import {AuthStackParamList, AppStackParamList} from './type';
 
 export const AuthScreens: Record<
@@ -37,6 +38,7 @@ export type AppScreensParamList = {
   ChatScreen: undefined;
   ProfileScreen: undefined;
   CustomerScreens:undefined;
+  HomeScreens:undefined;
 };
 
 export const CustomerScreens = {
@@ -58,7 +60,30 @@ export const CustomerScreens = {
   OrderCompletedScreen:'OrderCompleted',
   ReportAnIssue:'Report an issue ',
   HelpSupportScreen:'HelpSupportScreen',
-  AcceptOrder:'accept order'
+  AcceptOrder:'accept order',
+  ChatScreen:'Chat screen'
+}
+export const HomeScreens = {
+  HomeScreen: 'HomeScreen',
+  OrderScreen: 'OrderScreen',
+  NotificationScreen: 'NotificationScreen',
+  CustomerAccountScreen: 'CustomerAccountScreen',
+  AppLayoutScreen: 'AppLayoutScreen',
+  SAPDetailsScreen: 'SAPDetailsScreen',
+  EnterLocationDetailsScreen: 'EnterLocationDetailsScreen',
+  CheckoutScreen: 'CheckoutScreen',
+  PaymentSelectionScreen: 'PaymentSelectionScreen',
+  PaymentSuccessScreen:'PaymentSuccessScreen',
+  AddCardScreen: 'AddCardScreen',
+  DeliveryScreen:'DeliveryScreen',
+  CancelOrderScreen:'CancelOrderScreen',
+  CancelSuccessScreen:'CancelSuccessScreen',
+  OrderDetails:'OrderDetails',
+  OrderCompletedScreen:'OrderCompleted',
+  ReportAnIssue:'Report an issue ',
+  HelpSupportScreen:'HelpSupportScreen',
+  AcceptOrder:'accept order',
+  ChatScreen:'Chat screen'
 }
 
 export const ProfileScreens = {

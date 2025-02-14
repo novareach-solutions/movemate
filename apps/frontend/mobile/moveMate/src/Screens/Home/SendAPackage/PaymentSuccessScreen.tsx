@@ -25,7 +25,6 @@ const PaymentSuccessScreen = () => {
                {/* Success Icon */}
                <View style={styles.iconContainer}>
                 <images.SuccessGreen width={200} height={200} />
-                 {/* <Image source={images.success} width={200} height={200}/> */}
                </View>
        
                {/* Title */}

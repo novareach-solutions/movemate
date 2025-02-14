@@ -10,6 +10,7 @@ import HomeScreen from './Home/HomeScreen';
 import ProfileScreen from './Profile/ProfileScreen';
 import NotificationScreen from './Notification/NotificationScreen';
 import { HomeStackNavigator } from '../navigation/HomeStackNavigator';
+import { AccountStackNavigator } from '../navigation/AccountStackNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -58,7 +59,7 @@ const AppLayoutScreen = () => {
       <Tab.Screen
         options={{tabBarLabel: 'Account'}}
         name={AppScreens.AccountScreen}
-        component={ProfileScreen}
+        component={AccountStackNavigator}
       />
     </Tab.Navigator>
   );

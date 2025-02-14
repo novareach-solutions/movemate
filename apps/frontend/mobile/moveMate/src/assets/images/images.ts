@@ -1,8 +1,4 @@
 import introImage1 from '../images/IntroImage1.png';
-import introImage2 from '../images/IntroImage2.png';
-import introImage3 from '../images/IntroImage3.png';
-import introImage4 from '../images/IntroImage4.png';
-import logo from '../images/Logo.png';
 import Location from '../images/Location.svg';
 import notificatons from './Notification.png';
 import orders from './Orders.png';
@@ -15,16 +11,13 @@ import store from './Store.png';
 import Store from './store.svg';
 import shoppingCart from './ShoppingCart.png';
 import ShoppingCart from './house-in-shopping-trolley.svg';
-import packageImg from './Package.png';
 import PackageImg from './package-box.svg';
 import banner from './Banner.png';
 import banner2 from './banner2.png';
 import sapbanner from "./SAPBanner.png";
-import locaionSteps from "./LocationSteps.png";
 import LocaionSteps from "./LocationSteps.svg";
 import gps from "./GPS.png";
 import locationBorder from "./LocationBorder.png";
-import masterCard from "./MasterCard.png";
 import applePay from "./ApplePay.png";
 import paypal from "./Paypal.png";
 import profileAccount from "./ProfileAccount.png";
@@ -37,8 +30,6 @@ import pickUpNotesIcon from "./PickUpNotesIcon.png";
 import phone from "./Phone.png";
 import visaIcon from "./VisaIcon.png";
 import cart from "./Cart.png";
-import map from "./Map.png";
-import paymentSuccess from "./paymentSuccess.png";
 import deliveryMan from "./delivery-man.png";
 import success from "./success.png";
 import profileInbox from "./ProfileInbox.png";
@@ -110,10 +101,6 @@ import helpIconPurple from "./helpIcon.svg"
 
 export const images = {
   introImage1,
-  introImage2,
-  introImage3,
-  introImage4,
-  logo,
   notificatons,
   orders,
   home,
@@ -121,17 +108,14 @@ export const images = {
   towTruck,
   store,
   shoppingCart,
-  package: packageImg,
   banner,
   banner2,
   sapbanner,
-  locaionSteps,
   gps,
   locationBorder,
-  masterCard,
   applePay,
   paypal,
-  profileAccount, arrow, doNotRing, doorDropOff, pickUpNotesIcon, phone, visaIcon, cart, map, paymentSuccess, deliveryMan, success, profileInbox, profileEarnings, profileReferFriend, profileWallet, profileEarningMode, profileRewards, profileLogout,phoneWhite,messageWhite,
+  profileAccount, arrow, doNotRing, doorDropOff, pickUpNotesIcon, phone, visaIcon, cart, deliveryMan, success, profileInbox, profileEarnings, profileReferFriend, profileWallet, profileEarningMode, profileRewards, profileLogout,phoneWhite,messageWhite,
   
   Account,
   Location,

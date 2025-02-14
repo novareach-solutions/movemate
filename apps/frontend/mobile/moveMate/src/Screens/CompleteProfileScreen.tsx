@@ -30,11 +30,17 @@ import { formSchema } from '../utils/zod/signupValidation';
 // import { fetchPlaceSuggestions } from '../api/mapboxAPI';
 import { formStyles } from '../theme/form';
 import { fetchPlaceSuggestions } from '../utils/fetchPlaceSuggestions';
+import { RootNavigationProp, RootRouteProp } from '../navigation/type';
 
 
 type FormFields = z.infer<typeof formSchema>;
+type CompleteProfileProps = {
+  route: RootRouteProp<'CompleteProfileScreen'>;
+  navigation?: RootNavigationProp<'CompleteProfileScreen'>;
+};
 
-const CompleteProfileScreen = () => {
+const CompleteProfileScreen: React.FC<CompleteProfileProps>  = ({route}) => {
+  const {phoneNumber} = route.params;
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -78,6 +84,8 @@ const [loading, setLoading] = useState(false);
     setShowSuggestions(false);
   };
 
+  console.log('phoneNumber', phoneNumber)
+
   const onSubmit = async() => {
 
     const payload = {
@@ -88,6 +96,7 @@ const [loading, setLoading] = useState(false);
       suburb: watch("suburb"),
       state: watch("state"),
       postalCode: Number(watch("postalCode")),
+      phoneNumber:phoneNumber
     };
 
     console.log('payload', payload)

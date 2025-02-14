@@ -11,7 +11,7 @@ import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { images } from '../../../assets/images/images';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CustomerScreens, ProfileScreens } from '../../../navigation/ScreenNames';
+import { CustomerScreens, HomeScreens, ProfileScreens } from '../../../navigation/ScreenNames';
 import { useNavigation } from '@react-navigation/native';
 import { beforeYouSendPoints } from '../../../constants/staticData';
 import { useAppSelector } from '../../../redux/hook';
@@ -38,9 +38,9 @@ const SAPDetailsScreen = () => {
                         <Text style={styles.homeText}>Home</Text>
                         <images.BackArrow width={15} height={15} style={styles.arrowStyle} />
                     </TouchableOpacity>
-                       <TouchableOpacity  style={{ marginLeft: "60%",}} onPress={()=>{navigation.navigate(ProfileScreens.ProfileScreen)}}>
+                       {/* <TouchableOpacity  style={{ marginLeft: "60%",}} onPress={()=>{navigation.navigate(ProfileScreens.ProfileScreen)}}>
                                           <images.Account width={30} height={30} />
-                                          </TouchableOpacity>
+                                          </TouchableOpacity> */}
                 </View>
                <Text style={styles.address}>
                                    {currentLocationData?.address
@@ -78,7 +78,7 @@ const SAPDetailsScreen = () => {
             {/* Footer Section */}
             <View style={styles.footer}>
                 <TouchableOpacity onPress={(()=>{
-                    navigation.navigate(CustomerScreens.EnterLocationDetailsScreen)
+                    navigation.navigate(HomeScreens.EnterLocationDetailsScreen)
                 })} style={styles.pickupButton}>
                     <View style={{flexDirection:'row',justifyContent:'space-around'}}>
                     <Text style={styles.pickupButtonText}>Add pick up & drop location</Text>
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
         marginBottom: 20, 
     },
     footer: {
-        paddingVertical:10,
+        // paddingVertical:10,
         backgroundColor: colors.white,
         justifyContent: 'flex-end',
     },

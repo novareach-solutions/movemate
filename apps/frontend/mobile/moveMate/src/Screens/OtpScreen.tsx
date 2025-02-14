@@ -62,7 +62,9 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
     const enteredOtp = otp.join('');
     try {
       if(isLogin){
-        // await dispatch(Login({ phone: phoneNumber,otp:enteredOtp })).unwrap();
+        console.log('LoginAPI called')
+        const response = await dispatch(Login({ phone: phoneNumber,otp:enteredOtp })).unwrap();
+        console.log('response', response)
         // Navigate to the otp screen
         // navigation.navigate(CustomerScreens.AcceptOrder);
         // navigation.reset(({
@@ -78,7 +80,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
         // await dispatch(verifyOtp({ phone: phoneNumber,otp:enteredOtp }))
         // .unwrap();
         // Navigate to the otp screen
-        navigation.navigate(AuthScreens.CompleteProfileScreen);
+        navigation.navigate(AuthScreens.CompleteProfileScreen,{phoneNumber});
       }
       
     } catch {

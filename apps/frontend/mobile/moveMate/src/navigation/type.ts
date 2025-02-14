@@ -7,7 +7,7 @@ export type AuthStackParamList = {
   LoginScreen: undefined;
   Login:undefined;
   OtpScreen: {phoneNumber: string};
-  CompleteProfileScreen: undefined;
+  CompleteProfileScreen: {phoneNumber: string};
   PrivacyPolicyScreen: undefined;
   CustomerScreens:undefined;
 };

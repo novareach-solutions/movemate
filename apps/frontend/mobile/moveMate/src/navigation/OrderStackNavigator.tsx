@@ -1,9 +1,9 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import OrderScreen from '../Screens/Customer/OrderScreen';
-import OrderDetails from '../Screens/Customer/SendAPackage/OrderDetails';
-import OrderCompletedScreen from '../Screens/Customer/SendAPackage/OrderCompletedScreen';
-import ReportAnIssue from '../Screens/Customer/SendAPackage/ReportAnIssue';
+import OrderScreen from '../Screens/Home/OrderScreen';
+import OrderDetails from '../Screens/Home/SendAPackage/OrderDetails';
+import OrderCompletedScreen from '../Screens/Home/SendAPackage/OrderCompletedScreen';
+import ReportAnIssue from '../Screens/Home/SendAPackage/ReportAnIssue';
 
 const Stack = createNativeStackNavigator();
 

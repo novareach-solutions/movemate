@@ -7,20 +7,80 @@ import {
     StyleSheet,
     SafeAreaView,
     FlatList,
+    Alert,
 } from 'react-native';
 import { images } from '../../assets/images/images';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
-import { CustomerScreens, ProfileScreens } from '../../navigation/ScreenNames';
+import { CustomerScreens, HomeScreens, ProfileScreens } from '../../navigation/ScreenNames';
+import SearchIcon from "../../assets/images/searchWithLightPurple.svg";
+import DeliveryBoy from "../../assets/images/delivery-boy.svg";
+import WhiteArrow from "../../assets/images/whiteArrow.svg";
+import LocationIcon from "../../assets/images/Location.svg";
+import AccountIcon from "../../assets/images/Account.svg";
 import { useNavigation } from '@react-navigation/native';
 import { SvgProps } from 'react-native-svg';
 import { gridButtons } from '../../constants/staticData';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import { getOrderStatus, updateDropLoaction, updatePickupLoaction, updatePkgId } from '../../redux/slices/deliverAPackageSlice';
 // Mock Data
-const address = '123 Main Street, Springfield, USA';
+// const address = '123 Main Street, Springfield, USA';
 type SvgComponent = React.FC<SvgProps>;
 
-const HomeScreen = () => {
-const navigation=useNavigation()
+const CustomerHomeScreen = () => {
+    const navigation = useNavigation();
+    const [isOngoingOrderModal, setIsOngoingOrderModal] = useState(true);
+    const [orderDetails, setOrderDetails] = useState(null);
+    const [orderStatus, setOrderstatus] = useState(null);
+    const currentLocationData = useAppSelector(state => state.auth.currentLocation);
+
+    const dispatch = useAppDispatch();
+
+    const fetchOrderStatus = async () => {
+        const response = await dispatch(getOrderStatus()).unwrap();
+        setOrderDetails(response);
+        const orderStatus = response?.data?.order?.status;
+        setOrderstatus(orderStatus);
+        dispatch(updatePkgId(response?.data?.order?.id));
+        console.log('response?.data?.order?.pickupLocation', response?.data?.order?.pickupLocation)
+        dispatch(updatePickupLoaction(response?.data?.order?.pickupLocation));
+        dispatch(updateDropLoaction(response?.data?.order?.dropLocation));
+
+        if (orderStatus) {
+            setIsOngoingOrderModal(true);
+        }
+        console.log('Order-response', response?.data?.order)
+    };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchOrderStatus();
+        }, 20000);
+
+        return () => clearInterval(interval);
+    }, [])
+
+    const handleOngoingNavigation = () => {
+        console.log('orderStatus', orderStatus)
+
+        if (orderStatus === "PENDING") {
+            navigation.navigate(HomeScreens.DeliveryScreen)
+        } else if (orderStatus === "ACCEPTED" || orderStatus === "IN_PROGRESS" || orderStatus === "PICKEDUP_ORDER") {
+            navigation.navigate(HomeScreens.AcceptOrder)
+        } else {
+            navigation.navigate(HomeScreens.OrderCompletedScreen);
+        }
+    }
+
+    const handleServiceNavigation = () => {
+        // if (orderStatus === "PENDING" || orderStatus === "IN_PROGRESS" || orderStatus === "ACCEPTED" || orderStatus === "PICKEDUP_ORDER") {
+        //     Alert.alert("Order In-progress")
+        // } else {
+
+            navigation.navigate(CustomerScreens.SAPDetailsScreen);
+
+        // }
+    }
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -33,8 +93,8 @@ const navigation=useNavigation()
                         <images.BackArrow width={15} height={15} style={styles.arrowStyle} />
 
                     </TouchableOpacity>
-                    {/* <TouchableOpacity  style={{ marginLeft: "60%",}} onPress={()=>{navigation.navigate(ProfileScreens.ProfileScreen)}}>
-                    <images.Account width={30} height={30} />
+                    {/* <TouchableOpacity style={{ marginLeft: "60%", }} onPress={() => { navigation.navigate(ProfileScreens.ProfileScreen) }}>
+                        <images.Account width={30} height={30} />
                     </TouchableOpacity> */}
                     {/* <Image
                         source={images.account}
@@ -42,7 +102,14 @@ const navigation=useNavigation()
                     /> */}
                 </View>
 
-                <Text style={styles.address}>{address}</Text>
+                <Text style={styles.address}>
+                    {currentLocationData?.address
+                        ? currentLocationData.address.length > 40
+                            ? `${currentLocationData.address.slice(0, 40)}...`
+                            : currentLocationData.address
+                        : ""}
+                </Text>
+
             </View>
 
             <View style={styles.bannerContainer}>
@@ -57,29 +124,54 @@ const navigation=useNavigation()
             </View>
 
             <View style={styles.gridContainer}>
-            <FlatList
-                data={gridButtons}
-                keyExtractor={item => item.id.toString()}
-                numColumns={2}
-                renderItem={({ item }) => {
-                    const SvgImage: SvgComponent = item.image;
-                    return (
-                        <TouchableOpacity 
-                            onPress={() => {
-                                navigation.navigate(CustomerScreens.SAPDetailsScreen);
-                            }} 
-                            style={styles.gridButton}
-                        >
-                            <Text style={styles.gridButtonText}>{item.title}</Text>
-                            <Text style={styles.gridButtonSubText}>{item.subTitle}</Text>
-                            <SvgImage width={91} height={91} style={styles.gridButtonImage} /> 
-                        </TouchableOpacity>
-                    );
-                }}
-            />
+                <FlatList
+                    data={gridButtons}
+                    keyExtractor={item => item.id.toString()}
+                    numColumns={2}
+                    renderItem={({ item }) => {
+                        const SvgImage: SvgComponent = item.image;
+                        return (
+                            <TouchableOpacity
+                                onPress={handleServiceNavigation
+                                    //     () => {
+                                    //     navigation.navigate(CustomerScreens.SAPDetailsScreen);
+                                    // }
+                                }
+                                style={styles.gridButton}
+                            >
+                                <Text style={styles.gridButtonText}>{item.title}</Text>
+                                <Text style={styles.gridButtonSubText}>{item.subTitle}</Text>
+                                <SvgImage width={91} height={91} style={styles.gridButtonImage} />
+                            </TouchableOpacity>
+                        );
+                    }}
+                />
             </View>
 
-           
+            {(isOngoingOrderModal && orderStatus !== "CANCELED") && (
+                <View style={styles.ongoingOrderBanner}>
+                    <TouchableOpacity style={styles.ongoingOrderButton} onPress={handleOngoingNavigation}>
+                        {
+                            orderStatus === "PENDING" && <><SearchIcon />
+                                <Text style={styles.ongoingOrderText}>
+                                    Looking for a delivery partner near you...
+                                </Text></>
+                        }
+                        {
+                            (orderStatus !== "PENDING" && orderStatus !== "CANCELED") && <>
+                                <DeliveryBoy />
+                                <Text style={styles.ongoingOrderText}>
+                                    Delivery partner assigned! On the way..
+                                </Text></>
+                        }
+
+                        <WhiteArrow />
+                    </TouchableOpacity>
+                </View>
+            )}
+
+
+
             {/* <View style={styles.bannerContainer}>
                 <Image
                     source={images.banner2} // Replace with a static banner image
@@ -92,16 +184,16 @@ const navigation=useNavigation()
     );
 };
 
-export default HomeScreen;
+export default CustomerHomeScreen;
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: colors.white,
+        backgroundColor: colors.lightGrey,
     },
     header: {
         padding: 16,
-        backgroundColor: colors.white,
+        backgroundColor: colors.lightGrey,
         // borderBottomWidth: 1,
         // borderBottomColor: '#ddd',
     },
@@ -113,6 +205,27 @@ const styles = StyleSheet.create({
     icon: {
         fontSize: 18,
         marginHorizontal: 4,
+    },
+    ongoingOrderBanner: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        borderTopRightRadius: 12,
+        borderTopLeftRadius: 12,
+        backgroundColor: colors.purple,
+        paddingVertical: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    ongoingOrderButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    ongoingOrderText: {
+        color: colors.white,
+        fontSize: typography.fontSize.medium,
+        fontWeight: typography.fontWeight.bold as any,
+        marginHorizontal: 5
     },
     homeText: {
         fontSize: typography.fontSize.medium + 2,
@@ -158,7 +271,7 @@ const styles = StyleSheet.create({
         flex: 1,
         margin: 8,
         padding: 16,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: colors.white,
         elevation: 5,
         borderRadius: 8,
     },
@@ -187,9 +300,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    arrowStyle:{
+    arrowStyle: {
         transform: [{ rotate: '270deg' }],
-        marginLeft:5
+        marginLeft: 5
     },
     loadingScreen: {
         flex: 1,

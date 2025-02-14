@@ -182,7 +182,11 @@ export const getOrderStatus = createAsyncThunk(
   async () => {
     try {
 
-      const response = await apiClient.get(apiEndpoints.currentStatus);
+      const response = await apiClient.get(apiEndpoints.currentStatus,{
+        headers: {
+          role: 'CUSTOMER',
+        },
+      });
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
