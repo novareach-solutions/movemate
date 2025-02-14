@@ -30,7 +30,7 @@ import { TokenService } from "../auth/utils/generateTokens";
 import { dbReadRepo, dbRepo } from "../database/database.service";
 import { MediaService } from "../media/media.service";
 import { RedisService } from "../redis/redis.service";
-import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
+import { DocumentError, TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
 import { radii } from "./agents.constants";
 
 @Injectable()
@@ -338,26 +338,27 @@ export class AgentService {
   async setAgentStatus(
     agentId: number,
     status: AgentStatusEnum,
-  ): Promise<UpdateResult> {
-    this.logger.debug(
-      `AgentService.setAgentStatus: Setting status for agent ID ${agentId} to ${status}.`,
-    );
-    const agent = await this.getAgentById(agentId);
-
-    if (agent.approvalStatus !== ApprovalStatusEnum.APPROVED) {
-      this.logger.error(
-        `AgentService.setAgentStatus: Cannot set status. Agent ID ${agentId} not approved.`,
+  ): Promise<UpdateResult | { errors: DocumentError[] }> {
+    this.logger.debug(`AgentService.setAgentStatus: Setting status for agent ID ${agentId} to ${status}.`);  
+    if (status === AgentStatusEnum.ONLINE) {
+      const documents = await this.getAgentDocuments(agentId);
+      const unapprovedDocs = documents.filter(
+        (doc) => doc.approvalStatus !== ApprovalStatusEnum.APPROVED,
       );
-      throw new UserAccessDeniedError(
-        "Cannot set status. Agent is not approved.",
-      );
+      if (unapprovedDocs.length > 0) {
+        const errors = unapprovedDocs.map((doc) => ({
+          id: "document",
+          heading: `${doc.name} Not ${doc.approvalStatus}`,
+          text: `Your ${doc.name} is ${doc.approvalStatus.toLowerCase()}. Please reupload.`,
+        }));
+        return { errors };
+      }
     }
-
-    this.logger.debug(
-      `AgentService.setAgentStatus: Updating status in database for agent ID ${agentId}.`,
-    );
+  
+    this.logger.debug(`AgentService.setAgentStatus: Updating status in database for agent ID ${agentId}.`);
     return await dbRepo(Agent).update(agentId, { status });
   }
+  
 
   async updateAgentLocation(
     agentId: number,
