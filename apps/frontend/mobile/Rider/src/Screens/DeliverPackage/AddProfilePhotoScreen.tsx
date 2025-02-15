@@ -13,7 +13,11 @@ import UploadPhoto from '../../components/UploadPhoto';
 import {colors} from '../../theme/colors';
 import {formStyles} from '../../theme/form';
 import {useAppDispatch, useAppSelector} from '../../redux/hook';
-import {setSignupData, uploadMedia} from '../../redux/slices/authSlice';
+import {
+  agentSignup,
+  setSignupData,
+  uploadMedia,
+} from '../../redux/slices/authSlice';
 import ImagePicker from 'react-native-image-crop-picker';
 import PhotoPickerModal from '../../components/common/PhotoPickerModal';
 import Header from '../../components/Header';
@@ -34,7 +38,6 @@ const AddProfilePhotoScreen: React.FC = () => {
   const handleUpload = () => {
     setIsPhotoOptionVisible(true);
 
-    console.log('Upload button pressed');
     const profilePhotoDetails = {
       profilePhoto: 'https://example.com/profile-photo1.jpg',
     };
@@ -119,7 +122,8 @@ const AddProfilePhotoScreen: React.FC = () => {
   const handleContinue = async () => {
     if (signupData) {
       try {
-        // await dispatch(agentSignup(signupData)).unwrap();
+        console.log('signup initiated');
+        await dispatch(agentSignup(signupData)).unwrap();
         // Navigate to DeliverPackage.home on success
         navigation.navigate(DeliverAPackage.UploadDocuments);
       } catch {
@@ -159,7 +163,7 @@ const AddProfilePhotoScreen: React.FC = () => {
       </View>
       {/* Photo Options Modal */}
       <PhotoPickerModal
-        visible={isPhotoOptionVisible}
+        isVisible={isPhotoOptionVisible}
         onClose={() => setIsPhotoOptionVisible(false)}
         onTakePhoto={handleTakePhoto}
         onChooseFromGallery={handleChooseFromGallery}

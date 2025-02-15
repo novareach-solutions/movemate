@@ -5,6 +5,7 @@ import {
   Logger,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   Req,
@@ -15,7 +16,7 @@ import { OrderReview } from "../../../entity/OrderReview";
 import { Report } from "../../../entity/Report";
 import { SendPackageOrder } from "../../../entity/SendPackageOrder";
 import { Roles } from "../../../shared/decorators/roles.decorator";
-import { UserRoleEnum } from "../../../shared/enums";
+import { OrderStatusEnum, UserRoleEnum } from "../../../shared/enums";
 import { AuthGuard } from "../../../shared/guards/auth.guard";
 import { RoleGuard } from "../../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../../shared/interface";
@@ -165,6 +166,50 @@ export class SendPackageController {
     };
   }
 
+  @Patch("agent/:orderId/verify-items-photo")
+  @Roles(UserRoleEnum.AGENT)
+  async updateItemVerifiedPhoto(
+    @Param("orderId", ParseIntPipe) orderId: number,
+    @Body("url") url: string,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<SendPackageOrder>> {
+    const agentId = request.user.agent.id;
+
+    const updatedOrder = await this.sendPackageService.updateItemVerifiedPhoto(
+      orderId,
+      agentId,
+      url,
+    );
+
+    return {
+      success: true,
+      message: "Item verification photo updated successfully.",
+      data: updatedOrder,
+    };
+  }
+
+  @Patch("agent/:orderId/proof-of-delivery")
+  @Roles(UserRoleEnum.AGENT)
+  async updateProofOfDelivery(
+    @Param("orderId", ParseIntPipe) orderId: number,
+    @Body("url") url: string,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<SendPackageOrder>> {
+    const agentId = request.user.agent.id;
+
+    const updatedOrder = await this.sendPackageService.updateProofOfDelivery(
+      orderId,
+      agentId,
+      url,
+    );
+
+    return {
+      success: true,
+      message: "Proof of delivery photo updated successfully.",
+      data: updatedOrder,
+    };
+  }
+
   @Post("agent/:orderId/start")
   @Roles(UserRoleEnum.AGENT)
   async startOrder(
@@ -251,7 +296,7 @@ export class SendPackageController {
   // ====== Admin APIs ======
 
   @Get("admin/orders")
-  @Roles(UserRoleEnum.ADMIN)
+  // @Roles(UserRoleEnum.ADMIN)
   async getAllOrders(
     @Query() query: any,
   ): Promise<IApiResponse<SendPackageOrder[]>> {
@@ -266,6 +311,24 @@ export class SendPackageController {
       success: true,
       message: "All orders retrieved successfully.",
       data,
+    };
+  }
+
+  // ====== Common APIs ======
+  @Patch(":orderId/status")
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.AGENT) // Adjust roles as necessary
+  async updateOrderStatus(
+    @Param("orderId", ParseIntPipe) orderId: number,
+    @Body("status") status: OrderStatusEnum,
+  ): Promise<IApiResponse<SendPackageOrder>> {
+    const updatedOrder = await this.sendPackageService.updateOrderStatus(
+      orderId,
+      status,
+    );
+    return {
+      success: true,
+      message: "Order status updated successfully.",
+      data: updatedOrder,
     };
   }
 }

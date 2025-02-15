@@ -57,13 +57,16 @@ export type DeliverAPackageParamList = {
 
 export const DeliverAPackage = {
   CompleteProfile: 'CompleteProfileScreen',
-  UploadDocumentDetails: 'UploadDocumentDetails',
+  UploadDocumentDetails: 'DAPUploadDocumentDetailsScreen',
   UploadDocuments: 'UploadDocumentsScreen',
   Dashboard: 'DashboardScreen',
   EnterVehicleDetails: 'EnterVehicleDetailsScreen',
   EnterABN: 'EnterABNScreen',
   AddProfilePhoto: 'AddProfilePhotoScreen',
   Home: 'HomeScreen',
+  PickUpOrderDetails: 'PickUpOrderDetailsScreen',
+  DropOffOrderDetails: 'DropOffOrderDetailsScreen',
+  EarningsDetails: 'EarningsDetailsScreen',
 } as const;
 
 export type BuyFromStoreParamList = {

@@ -125,6 +125,9 @@ export class SendPackageOrder extends BaseEntity {
   @Column({ type: "varchar", nullable: true })
   completionPhoto: string;
 
+  @Column({ type: "varchar", nullable: true })
+  itemVerifiedPhoto: string;
+
   @Column({ type: "timestamp", nullable: true })
   acceptedAt: Date;
 
@@ -164,13 +167,6 @@ export class SendPackageOrder extends BaseEntity {
   @Column({ type: "integer", nullable: true })
   orderReviewId: number;
 
-  // ---- Payment Specific Fields ----
-  @Column({
-    type: "varchar",
-    enum: PaymentStatusEnum,
-    default: PaymentStatusEnum.NOT_PAID,
-    nullable: false,
-  })
   @OneToMany(() => Payment, (payment) => payment.order)
   payments: Payment[];
 }

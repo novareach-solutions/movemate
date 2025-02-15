@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
@@ -9,11 +9,9 @@ import {
   ProfileScreens,
 } from './ScreenNames';
 import Onboarding from '../components/Onboarding';
-import Login from '../Screens/SignupNumberScreen';
 import OtpScreen from '../Screens/OtpScreen';
 import SelectServiceScreen from '../Screens/SelectServiceScreen';
 import DAPCompleteProfileScreen from '../Screens/DeliverPackage/CompleteProfileScreen';
-import DAPUploadDocumentDetailsScreen from '../Screens/DeliverPackage/UploadDocumentDetailsScreen';
 import DAPUploadDocumentsScreen from '../Screens/DeliverPackage/UploadDocumentsScreen';
 import DocumentReviewScreen from '../Screens/DocumentReviewScreen';
 import EnterVehicleDetailsScreen from '../Screens/DeliverPackage/EnterVehicleDetailsScreen';
@@ -43,8 +41,16 @@ import RatingsScreen from '../Screens/Profile/RatingScreen';
 import OrderDetailsScreen from '../Screens/Profile/OrderDetailsScreen';
 import HelpAndSupportScreen from '../Screens/Profile/HelpAndSupportScreen';
 import PayoutSummaryScreen from '../Screens/Profile/WalletScreen/PayoutSummaryScreen';
+import DAPUploadDocumentDetailsScreen from '../Screens/DeliverPackage/UploadDocumentDetailsScreen';
+import PickUpOrderDetailsScreen from '../Screens/PickUpOrderDetailsScreen';
+import DropOffOrderDetailsScreen from '../Screens/DropOffOrderDetailsScreen';
+import EarningsDetailsScreen from '../Screens/EarningDetailsScreen';
 
 const Stack = createNativeStackNavigator();
+
+interface AppNavigatorProps {
+  children?: ReactNode;
+}
 
 const RiderTheme = {
   ...DefaultTheme,
@@ -54,7 +60,7 @@ const RiderTheme = {
   },
 };
 
-const App = () => {
+const App: React.FC<AppNavigatorProps> = ({children}) => {
   return (
     <NavigationContainer theme={RiderTheme}>
       <Stack.Navigator initialRouteName={AuthScreens.Onboarding}>
@@ -118,6 +124,21 @@ const App = () => {
         <Stack.Screen
           name={DeliverAPackage.Home}
           component={HomeScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={DeliverAPackage.PickUpOrderDetails}
+          component={PickUpOrderDetailsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={DeliverAPackage.DropOffOrderDetails}
+          component={DropOffOrderDetailsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={DeliverAPackage.EarningsDetails}
+          component={EarningsDetailsScreen}
           options={{headerShown: false}}
         />
 
@@ -237,6 +258,7 @@ const App = () => {
           options={{headerShown: false}}
         />
       </Stack.Navigator>
+      {children}
     </NavigationContainer>
   );
 };

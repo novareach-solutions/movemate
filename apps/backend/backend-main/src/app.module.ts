@@ -15,6 +15,7 @@ import { GatewayModule } from "./modules/gateway/gateway.module";
 import { MediaModule } from "./modules/media/media.module";
 import { NotificationModule } from "./modules/notification/notification.module";
 import { SendAPackageModule } from "./modules/order/sendPackage/sendPackage.module";
+import { OrderChatModule } from "./modules/orderChat/orderChat.module";
 import { RedisModule } from "./modules/redis/redis.module";
 import { StripeModule } from "./modules/stripe/stripe.module";
 import { SupportModule } from "./modules/support/support.module";
@@ -41,6 +42,7 @@ import { RoleGuard } from "./shared/guards/roles.guard";
     SendAPackageModule,
     StripeModule,
     MediaModule,
+    OrderChatModule,
     TrackingModule,
     NotificationModule,
   ],

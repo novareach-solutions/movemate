@@ -5,6 +5,7 @@ import {
   Headers,
   Logger,
   Post,
+  Query,
   Req,
   Res,
 } from "@nestjs/common";
@@ -76,35 +77,34 @@ export class AuthController {
   @AuthPostLoginSwagger()
   async login(
     @Body() body: { phoneNumber: string; otp: string },
-    @Headers("role") role: UserRoleEnum,
+    @Query("role") role: UserRoleEnum,
     @Res() response: Response,
   ): Promise<void> {
     const { phoneNumber, otp } = body;
-    this.logger.debug(
-      `AuthController.login: Logging in with OTP for ${phoneNumber}`,
-    );
-    const { accessToken, refreshToken } = await this.authService.login(
-      phoneNumber,
-      otp,
-      role,
-    );
-
+    const { accessToken, refreshToken, userId, agentId } =
+      await this.authService.login(phoneNumber, otp, role);
+  
     response.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: this.configService.get<string>("ENVIRONMENT") === "production",
       sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
     });
-
+  
     this.logger.log(
       `AuthController.login: Login successful for ${phoneNumber}`,
     );
     response.json({
       success: true,
       message: "Login successful.",
-      data: { accessToken },
+      data: {
+        accessToken,
+        userId,
+        ...(agentId !== undefined && { agentId }),
+      },
     });
   }
+  
 
   @Post("refresh-token")
   @AuthPostRefreshTokenSwagger()
@@ -112,8 +112,6 @@ export class AuthController {
     @Res() response: Response,
     @Req() request: Request,
   ): Promise<void> {
-    this.logger.debug("AuthController.refreshToken: Refreshing tokens");
-
     const refreshToken = request.cookies["refresh_token"];
     if (!refreshToken) {
       throw new ForbiddenException("Refresh token not found.");

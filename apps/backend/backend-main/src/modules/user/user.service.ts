@@ -1,7 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { DeleteResult, UpdateResult } from "typeorm";
+import { DeleteResult, In, UpdateResult } from "typeorm";
 
+import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import { User } from "../../entity/User";
+import { OrderStatusEnum } from "../../shared/enums";
 import {
   UserAlreadyExistsError,
   UserNotFoundError,
@@ -24,7 +26,7 @@ export class UserService {
    */
   async createUser(
     createUserDto: TCreateUser,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string; userId: number }> {
     const { email, phoneNumber, role } = createUserDto;
 
     const existingUser = await dbReadRepo(User).findOne({
@@ -49,7 +51,7 @@ export class UserService {
     );
     const refreshToken = this.tokenService.generateRefreshToken(user.id);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, userId: user.id };
   }
 
   /**
@@ -116,5 +118,33 @@ export class UserService {
   async deleteUser(id: string): Promise<DeleteResult> {
     this.logger.debug(`UserService.deleteUser: Deleting user with ID ${id}`);
     return await dbRepo(User).softDelete(id);
+  }
+
+  async getCurrentOrder(userId: number): Promise<SendPackageOrder | null> {
+    this.logger.debug(
+      `UserService.getCurrentOrder: Fetching ongoing order for user ID: ${userId}`,
+    );
+
+    const ongoingOrder = await dbReadRepo(SendPackageOrder).findOne({
+      where: {
+        customer: { id: userId },
+        status: In([
+          OrderStatusEnum.PENDING,
+          OrderStatusEnum.ACCEPTED,
+          OrderStatusEnum.IN_PROGRESS,
+          OrderStatusEnum.PICKEDUP_ORDER,
+        ]), // Use In operator here
+      },
+      relations: [
+        "pickupLocation",
+        "dropLocation",
+        "customer",
+        "agent",
+        "report",
+        "review",
+      ],
+    });
+
+    return ongoingOrder;
   }
 }

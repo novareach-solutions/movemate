@@ -7,15 +7,21 @@ import {
   Animated,
   Image,
   Modal,
+  Alert,
   TextStyle,
 } from 'react-native';
-import {colors} from '../../theme/colors';
-import Alarm from '../../assets/icons/alarm.svg';
-import Cycle from '../../assets/icons/cycle.svg';
-import RedCircle from '../../assets/icons/redCircle.svg';
-import GreenCircle from '../../assets/icons/greenCircle.svg';
+import {useDispatch} from 'react-redux';
+import {acceptOrder, hideOrderModal} from '../../../redux/slices/orderSlice';
+import {colors} from '../../../theme/colors';
+import {SendPackageOrder} from '../../../redux/slices/types/sendAPackage';
+import {useNavigation} from '@react-navigation/native';
+import {DeliverAPackage} from '../../../navigation/ScreenNames';
+import Alarm from '../../../assets/icons/alarm.svg';
+import Cycle from '../../../assets/icons/cycle.svg';
+import RedCircle from '../../../assets/icons/redCircle.svg';
+import GreenCircle from '../../../assets/icons/greenCircle.svg';
 import {SvgProps} from 'react-native-svg';
-import {typography} from '../../theme/typography';
+import {typography} from '../../../theme/typography';
 
 interface ModalComponentProps {
   isVisible: boolean;
@@ -26,6 +32,8 @@ interface ModalComponentProps {
   distance: string;
   pickupAddress: string;
   dropoffAddress: string;
+  orderId: string;
+  onAcceptOrderSuccess: (order: SendPackageOrder) => void; // New Callback Prop
 }
 
 interface InfoRowProps {
@@ -68,13 +76,16 @@ const OrderModal: React.FC<ModalComponentProps> = ({
   distance,
   pickupAddress,
   dropoffAddress,
+  orderId,
+  onAcceptOrderSuccess, // Destructure the new prop
 }) => {
+  const dispatch = useDispatch();
   const [progress] = useState(new Animated.Value(0));
-  const timerDuration = 20000; // 20 seconds
+  const timerDuration = 40000; // 40 seconds
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (isVisible) {
-      // Start the timer animation
       Animated.timing(progress, {
         toValue: 1,
         duration: timerDuration,
@@ -83,15 +94,33 @@ const OrderModal: React.FC<ModalComponentProps> = ({
         onClose(); // Close modal when the timer ends
       });
     } else {
-      // Reset the progress bar when the modal is closed
       progress.setValue(0);
     }
-  }, [isVisible]);
+  }, [isVisible, progress, timerDuration, onClose]);
 
   const widthInterpolation = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: ['100%', '0%'], // Moves background from right to left
+    outputRange: ['100%', '0%'],
   });
+
+  const handleAcceptOrder = async () => {
+    if (!orderId) {
+      Alert.alert('Error', 'Order ID is missing.');
+      return;
+    }
+
+    try {
+      const acceptedOrder = await dispatch(acceptOrder({orderId})).unwrap();
+      onAcceptOrderSuccess(acceptedOrder);
+      navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
+        order: acceptedOrder,
+      });
+      dispatch(hideOrderModal());
+    } catch (error) {
+      console.error('Accept Order Error:', error);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+    }
+  };
 
   return (
     <Modal
@@ -101,11 +130,12 @@ const OrderModal: React.FC<ModalComponentProps> = ({
       onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          {/* Tip Badge */}
           <Text style={styles.totalEarningsLabel}>Total Earning</Text>
           <View style={styles.earning}>
-            <Text style={styles.totalEarnings}>{earnings}</Text>
-            <TipBadge tip={tip} />
+            <Text style={styles.totalEarnings}>24$</Text>
+            <View style={styles.tipBadge}>
+              <Text style={styles.tipBadgeText}>Tip: 4$</Text>
+            </View>
           </View>
 
           <View style={styles.infoContainer}>
@@ -118,7 +148,7 @@ const OrderModal: React.FC<ModalComponentProps> = ({
             <InfoRow iconSource={GreenCircle} text={dropoffAddress} />
           </View>
 
-          {/* Button at the Bottom */}
+          {/* Accept Order Button */}
           <View style={styles.timerButtonContainer}>
             <View style={styles.darkBackground} />
             <Animated.View
@@ -129,7 +159,7 @@ const OrderModal: React.FC<ModalComponentProps> = ({
             />
             <TouchableOpacity
               style={styles.acceptOrderButton}
-              onPress={onClose}>
+              onPress={handleAcceptOrder}>
               <Text style={styles.acceptOrderText}>Accept Order</Text>
             </TouchableOpacity>
           </View>
@@ -151,9 +181,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     borderWidth: 3,
     borderColor: colors.purple,
-    borderBottomWidth: 0,
     padding: 20,
-    justifyContent: 'space-between',
   },
   tipBadge: {
     backgroundColor: colors.lightPurple,
@@ -181,7 +209,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   infoContainer: {
-    flexDirection: 'column',
     marginVertical: 10,
   },
   infoRow: {
@@ -210,28 +237,28 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 8,
     overflow: 'hidden',
+    marginTop: 20,
   },
   darkBackground: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     backgroundColor: colors.darkGreen,
     borderRadius: 8,
+    width: '100%',
+    height: '100%',
   },
   timerButtonBackground: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
     backgroundColor: colors.green,
     borderRadius: 8,
+    width: '100%',
+    height: '100%',
   },
   acceptOrderButton: {
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    width: '100%',
   },
   acceptOrderText: {
     color: colors.white,

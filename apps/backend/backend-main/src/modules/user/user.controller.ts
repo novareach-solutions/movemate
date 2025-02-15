@@ -21,7 +21,6 @@ import { User } from "../../entity/User";
 import { Roles } from "../../shared/decorators/roles.decorator";
 import {
   UserDeleteProfileByIdSwagger,
-  UserGetAllSwagger,
   UserGetByIdSwagger,
   UserGetProfileByIdSwagger,
   UserPatchProfileByIdSwagger,
@@ -50,26 +49,12 @@ export class UserController {
    * POST /user/signup
    */
   @Post("signup")
-  @UseGuards(OnboardingGuard)
   @UserPostSignUpSwagger()
   async createUser(
     @Body() createUserDto: TCreateUser,
     @Req() request: ICustomRequest,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<IApiResponse<{ accessToken: string }>> {
-    const phoneNumberFromGuard = request.user.phoneNumber;
-    if (
-      createUserDto.phoneNumber &&
-      createUserDto.phoneNumber !== phoneNumberFromGuard
-    ) {
-      this.logger.warn(
-        `UserController.createUser: The provided phone number ${createUserDto.phoneNumber} does not match the authenticated user's phone number ${phoneNumberFromGuard}.`,
-      );
-      throw new UnauthorizedError(
-        "The provided phone number does not match the authenticated user's phone number.",
-      );
-    }
-    createUserDto.phoneNumber = phoneNumberFromGuard;
+  ): Promise<IApiResponse<{ accessToken: string; userId: number }>> {
     createUserDto.role = UserRoleEnum.CUSTOMER;
 
     this.logger.debug(
@@ -78,7 +63,7 @@ export class UserController {
       )}`,
     );
 
-    const { accessToken, refreshToken } =
+    const { accessToken, refreshToken, userId } =
       await this.userService.createUser(createUserDto);
 
     response.cookie("refresh_token", refreshToken, {
@@ -91,7 +76,7 @@ export class UserController {
     return {
       success: true,
       message: "User created successfully.",
-      data: { accessToken },
+      data: { accessToken, userId },
     };
   }
 
@@ -199,9 +184,8 @@ export class UserController {
    * GET /user/list
    */
   @Get("list")
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRoleEnum.ADMIN)
-  @UserGetAllSwagger()
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async getAllUsers(): Promise<IApiResponse<User[]>> {
     this.logger.debug(`UserController.getAllUsers: Retrieving all users.`);
     const users = await this.userService.getAllUsers();
@@ -264,5 +248,40 @@ export class UserController {
       message: "User deleted successfully.",
       data: result,
     };
+  }
+
+  @Get("currentstatus")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async getCurrentOrder(
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<{ order: any | null }>> {
+    const userId = request.user.id;
+
+    this.logger.debug(
+      `UserController.getCurrentOrder: Checking ongoing orders for user ID: ${userId}`,
+    );
+
+    const ongoingOrder = await this.userService.getCurrentOrder(userId);
+
+    if (ongoingOrder) {
+      this.logger.log(
+        `UserController.getCurrentOrder: Ongoing order found for user ID: ${userId}`,
+      );
+      return {
+        success: true,
+        message: "Ongoing order found.",
+        data: { order: ongoingOrder },
+      };
+    } else {
+      this.logger.log(
+        `UserController.getCurrentOrder: No ongoing order found for user ID: ${userId}`,
+      );
+      return {
+        success: true,
+        message: "No ongoing order found.",
+        data: { order: null },
+      };
+    }
   }
 }

@@ -38,6 +38,9 @@ export const formStyles = StyleSheet.create({
     paddingVertical: 12,
     marginTop: 20,
     alignItems: 'center',
+    flexDirection:"row",
+    justifyContent: 'center',
+    gap:10
   },
   buttonEnabled: {
     backgroundColor: colors.purple,
@@ -48,7 +51,7 @@ export const formStyles = StyleSheet.create({
     backgroundColor: colors.green,
   },
   buttonText: {
-    color: colors.text.primaryGrey,
+    color: colors.white,
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
     fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],

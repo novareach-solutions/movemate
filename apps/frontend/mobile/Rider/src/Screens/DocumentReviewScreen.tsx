@@ -12,32 +12,30 @@ import {formStyles} from '../theme/form';
 import TitleDescription from '../components/TitleDescription';
 import PhotoPickerModal from '../components/common/PhotoPickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {
-  DeliverAPackage,
-  DeliverAPackageParamList,
-} from '../navigation/ScreenNames';
+import {useNavigation} from '@react-navigation/native';
+import {DeliverAPackage} from '../navigation/ScreenNames';
 import Header from '../components/Header';
-
+import {SimpleToast} from '../utils/helpers';
+import {uploadAgentDoc} from '../redux/slices/authSlice';
+import {useAppDispatch} from '../redux/hook';
 interface DocumentReviewProps {
   route: {
     params: {
       title: string;
       uploadedImage: string;
+      onUploadSuccess: () => any;
     };
   };
 }
 
 const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
-  const {title, uploadedImage} = route.params;
+  const {title, uploadedImage, onUploadSuccess} = route.params;
   const [image, setImage] = useState(uploadedImage);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
-  const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
+  const dispatch = useAppDispatch();
+  const navigation = useNavigation();
 
   const handleSubmit = async () => {
-    console.log('Document submitted:', image);
-    // API call commented out
-    /*
     const payload = {
       name: title.replace(' ', '_').toUpperCase(),
       description: `${title} front and back`,
@@ -47,12 +45,16 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
     try {
       await dispatch(uploadAgentDoc(payload)).unwrap();
       SimpleToast('Document uploaded successfully!', true);
+
+      // Notify the parent screen of the success
+      onUploadSuccess && onUploadSuccess(title);
+
+      // Navigate to DeliverAPackage.UploadDocuments
       navigation.navigate(DeliverAPackage.UploadDocuments);
     } catch (error) {
       SimpleToast('Failed to upload the document. Please try again.', true);
       navigation.goBack();
     }
-    */
     navigation.navigate(DeliverAPackage.UploadDocuments);
   };
 
@@ -130,7 +132,7 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
       </View>
       {/* Photo Options Modal */}
       <PhotoPickerModal
-        visible={isPhotoOptionVisible}
+        isVisible={isPhotoOptionVisible}
         onClose={() => setIsPhotoOptionVisible(false)}
         onTakePhoto={handleTakePhoto}
         onChooseFromGallery={handleChooseFromGallery}

@@ -85,7 +85,7 @@ const FAQScreen: React.FC = () => {
         />
 
         {/* Cancel Order Button */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[formStyles.button, styles.cancelButton]}
           onPress={() => {
             navigation.navigate(AppScreens.CancellationReason);
@@ -93,7 +93,7 @@ const FAQScreen: React.FC = () => {
           <Text style={[formStyles.buttonText, styles.cancelButtonText]}>
             Cancel Order
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* FAQ Modal */}
         {selectedFAQ && (

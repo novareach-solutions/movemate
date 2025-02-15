@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from "@nestjs/common";
-import { DeleteResult, QueryRunner, UpdateResult } from "typeorm";
+import { DeleteResult, In, QueryRunner, UpdateResult } from "typeorm";
 
 import { Agent } from "../../entity/Agent";
 import { AgentDocument } from "../../entity/AgentDocument";
@@ -15,13 +15,12 @@ import {
   AgentStatusEnum,
   AgentTypeEnum,
   ApprovalStatusEnum,
+  OrderStatusEnum,
 } from "../../shared/enums";
 import { SendPackageAgentAcceptError } from "../../shared/errors/sendAPackage";
 import {
   UserAccessDeniedError,
   UserAlreadyExistsError,
-  UserDocumentAlreadyExistsError,
-  UserExpiryDateRequiredError,
   UserInvalidDocumentError,
   UserNotFoundError,
 } from "../../shared/errors/user";
@@ -133,6 +132,19 @@ export class AgentService {
     }
   }
 
+  async getOngoingOrder(agentId: number): Promise<SendPackageOrder | null> {
+    return await dbReadRepo(SendPackageOrder).findOne({
+      where: {
+        agentId,
+        status: In([
+          OrderStatusEnum.ACCEPTED,
+          OrderStatusEnum.IN_PROGRESS,
+          OrderStatusEnum.PICKEDUP_ORDER,
+        ]),
+      },
+      relations: ["pickupLocation", "dropLocation", "customer"],
+    });
+  }
   async getAgentById(agentId: number): Promise<Agent> {
     this.logger.debug(
       `AgentService.getAgentById: Fetching agent with ID ${agentId}.`,
@@ -206,42 +218,52 @@ export class AgentService {
     this.logger.debug(
       `AgentService.submitDocument: Submitting document for agent ID ${agentId}.`,
     );
-    const agent = await this.getAgentById(agentId);
-    const requiredDocs = await dbReadRepo(RequiredDocument).find({
-      where: { agentType: agent.agentType },
-    });
-    const requiredDoc = requiredDocs.find((doc) => doc.name === document.name);
 
-    if (!requiredDoc) {
-      this.logger.error(
-        `AgentService.submitDocument: Invalid document ${document.name}.`,
-      );
-      throw new UserInvalidDocumentError(
-        `${document.name} is not a valid document.`,
-      );
-    }
-
-    if (requiredDoc.isExpiry && !document.expiry) {
-      logger.error(
-        `AgentService.submitDocument: Expiry date is required for document ${document.name}.`,
-      );
-      throw new UserExpiryDateRequiredError("Expiry date is required");
-    }
-
+    // Check if a document already exists for the agentId
     const existingDoc = await dbReadRepo(AgentDocument).findOne({
-      where: { agentId, name: document.name },
+      where: { agentId },
     });
 
     if (existingDoc) {
-      this.logger.error(
-        `AgentService.submitDocument: Document ${document.name} already exists.`,
+      logger.debug(
+        `AgentService.submitDocument: Document already exists for agent ID ${agentId}. Replacing it.`,
       );
-      throw new UserDocumentAlreadyExistsError(
-        `Document ${document.name} already exists.`,
-      );
+
+      try {
+        // Update the existing document
+        existingDoc.name = document.name;
+        existingDoc.description = document.description;
+        existingDoc.url = document.url;
+        existingDoc.expiry = document.expiry || null;
+
+        const updatedDocument = await dbRepo(AgentDocument).save(existingDoc);
+
+        logger.debug(
+          `AgentService.submitDocument: Document ${document.name} updated successfully for agent ID ${agentId}.`,
+        );
+
+        return {
+          name: updatedDocument.name,
+          description: updatedDocument.description,
+          url: updatedDocument.url,
+        };
+      } catch (error) {
+        const key = this.extractKeyFromUrl(document.url);
+        if (key) {
+          await this.mediaService.deleteFile(key);
+        }
+        logger.error(
+          `AgentService.submitDocument: Failed to update document for agent ID ${agentId}. Error: ${error}`,
+        );
+        throw new InternalServerErrorException(
+          "An error occurred while updating the document.",
+          error,
+        );
+      }
     }
 
     try {
+      // If no document exists, insert a new document
       const newDocument = dbRepo(AgentDocument).create({
         name: document.name,
         description: document.description,
@@ -251,8 +273,9 @@ export class AgentService {
       });
 
       const savedDocument = await dbRepo(AgentDocument).save(newDocument);
+
       logger.debug(
-        `AgentService.submitDocument: Document ${document.name} saved for agent ID ${agentId}.`,
+        `AgentService.submitDocument: Document ${document.name} saved successfully for agent ID ${agentId}.`,
       );
 
       return {
@@ -261,12 +284,17 @@ export class AgentService {
         url: savedDocument.url,
       };
     } catch (error) {
-      // Delete the uploaded file on error
       const key = this.extractKeyFromUrl(document.url);
       if (key) {
         await this.mediaService.deleteFile(key);
       }
-      throw new InternalServerErrorException("An error Occured", error);
+      logger.error(
+        `AgentService.submitDocument: Failed to save document ${document.name} for agent ID ${agentId}. Error: ${error}`,
+      );
+      throw new InternalServerErrorException(
+        "An error occurred while saving the document.",
+        error,
+      );
     }
   }
 
@@ -348,10 +376,19 @@ export class AgentService {
       );
     }
 
-    const member = `agent:${agentId}`;
+    if (!longitude || !latitude || isNaN(latitude) || isNaN(longitude)) {
+      throw new InternalServerErrorException(
+        "Invalid latitude or longitude values.",
+      );
+    }
+
+    if (!agentId || isNaN(agentId)) {
+      throw new InternalServerErrorException("Invalid agentId.");
+    }
+
     await this.redisService
       .getGeneralClient()
-      .geoadd("agents:locations", longitude, latitude, member);
+      .geoadd("agents:locations", longitude, latitude, `agent:${agentId}`);
     await this.redisService.set(
       `agent:${agentId}:status`,
       AgentStatusEnum.ONLINE,
@@ -394,149 +431,155 @@ export class AgentService {
     pickupLongitude: number,
     orderId: string,
   ): Promise<number | null> {
-    this.logger.debug(
-      `AgentService.assignRider: Assigning rider for order ID ${orderId} at location (${pickupLatitude}, ${pickupLongitude}).`,
-    );
-
-    const orderIdNum = parseInt(orderId, 10);
-    if (isNaN(orderIdNum)) {
-      logger.error(`AgentService.assignRider: Invalid orderId ${orderId}.`);
-      throw new InternalServerErrorException("Invalid order ID provided.");
-    }
-
-    const order = await dbReadRepo(SendPackageOrder).findOne({
-      where: { id: orderIdNum },
-      relations: ["pickupLocation", "dropLocation"],
-    });
-
-    if (!order) {
-      logger.error(`AgentService.assignRider: Order ID ${orderId} not found.`);
-      throw new UserNotFoundError(`Order with ID ${orderId} not found.`);
-    }
-
-    if (order.agentId) {
-      throw new SendPackageAgentAcceptError(
-        `This Order cannot be assigned as it is already accepted`,
+    try {
+      logger.debug(
+        `Assigning rider for order ID ${orderId} at location (${pickupLatitude}, ${pickupLongitude})`,
       );
-    }
 
-    const pickupAddress = order.pickupLocation?.addressLine1 || "N/A";
-    const dropAddress = order.dropLocation?.addressLine1 || "N/A";
-    const estimatedDistance = order.estimatedDistance || 0;
-    const estimatedTime = order.estimatedTime || "00:00:00";
+      const orderIdNum = parseInt(orderId, 10);
+      if (isNaN(orderIdNum)) {
+        logger.error(`Invalid orderId received: ${orderId}`);
+        throw new InternalServerErrorException("Invalid order ID provided.");
+      }
 
-    const notifiedAgents = new Set<number>();
-
-    for (const { km, limit } of radii) {
-      const currentOrder = await dbReadRepo(SendPackageOrder).findOne({
+      const order = await dbReadRepo(SendPackageOrder).findOne({
         where: { id: orderIdNum },
+        relations: ["pickupLocation", "dropLocation"],
       });
 
-      if (currentOrder.agentId) {
-        logger.debug(
-          `AgentService.assignRider: Order ID ${orderId} has been accepted by Agent ID ${currentOrder.agentId}. Stopping assignment process.`,
-        );
-        return;
+      if (!order) {
+        logger.error(`Order not found for order ID ${orderId}`);
+        throw new UserNotFoundError(`Order with ID ${orderId} not found.`);
       }
 
-      logger.debug(
-        `AgentService.assignRider: Searching within ${km} km with a limit of ${limit} agents.`,
-      );
-      const nearbyAgents = await this.getNearbyAgents(
-        pickupLatitude,
-        pickupLongitude,
-        km,
-      );
+      if (order.agentId) {
+        logger.warn(
+          `Order ${orderId} already assigned to agent ${order.agentId}`,
+        );
+        throw new SendPackageAgentAcceptError(
+          `This Order cannot be assigned as it is already accepted`,
+        );
+      }
 
-      logger.debug(
-        `AgentService.assignRider: Nearby agents: ${JSON.stringify(nearbyAgents)}`,
-      );
+      const pickupAddress = order.pickupLocation?.addressLine1 || "N/A";
+      const dropAddress = order.dropLocation?.addressLine1 || "N/A";
+      const estimatedDistance = order.estimatedDistance || 0;
+      const estimatedTime = order.estimatedTime || "00:00:00";
 
-      const availableAgents = await Promise.all(
-        nearbyAgents.map(async (agent) => {
-          if (notifiedAgents.has(agent.agentId)) {
-            this.logger.debug(
-              `AgentService.assignRider: Agent ID ${agent.agentId} already notified.`,
-            );
-            return null;
-          }
-          const status = await this.redisService.get(
-            `agent:${agent.agentId}:status`,
-          );
-          if (status === AgentStatusEnum.ONLINE) {
-            this.logger.debug(
-              `AgentService.assignRider: Agent ID ${agent.agentId} is ONLINE.`,
-            );
-            return agent;
-          } else {
-            this.logger.debug(
-              `AgentService.assignRider: Agent ID ${agent.agentId} is not ONLINE.`,
-            );
-            return null;
-          }
-        }),
-      ).then((results) => results.filter((agent) => agent !== null));
+      const notifiedAgents = new Set<number>();
 
-      logger.debug(
-        `AgentService.assignRider: Available agents within ${km} km: ${JSON.stringify(
-          availableAgents,
-        )}`,
-      );
+      for (const { km, limit } of radii) {
+        logger.debug(
+          `Searching for agents within ${km} km for order ID ${orderId}`,
+        );
 
-      const selectedAgents = availableAgents.slice(0, limit);
-      this.logger.debug(
-        `AgentService.assignRider: Selecting ${selectedAgents.length} agents to notify.`,
-      );
-
-      if (selectedAgents.length > 0) {
-        selectedAgents.forEach((agent) => notifiedAgents.add(agent.agentId));
-
-        selectedAgents.forEach((agent) => {
-          logger.debug(
-            `AgentService.assignRider: Notifying agent ID ${agent.agentId} about order ID ${orderId}.`,
-          );
-          this.agentNotificationGateway.sendMessageToAgent(
-            agent.agentId,
-            "newRequest",
-            {
-              orderId,
-              pickupAddress,
-              dropAddress,
-              estimatedDistance,
-              estimatedTime,
-            },
-          );
+        const currentOrder = await dbReadRepo(SendPackageOrder).findOne({
+          where: { id: orderIdNum },
         });
-      } else {
-        logger.debug(
-          `AgentService.assignRider: No agents available to notify within ${km} km.`,
+
+        if (currentOrder?.agentId) {
+          logger.info(
+            `Order ${orderId} already accepted by agent ${currentOrder.agentId}`,
+          );
+          return currentOrder.agentId;
+        }
+
+        const nearbyAgents = await this.getNearbyAgents(
+          pickupLatitude,
+          pickupLongitude,
+          km,
         );
+
+        logger.debug(
+          `Found ${nearbyAgents.length} nearby agents within ${km} km for order ${orderId}`,
+        );
+
+        const availableAgents = await Promise.all(
+          nearbyAgents.map(async (agent) => {
+            if (notifiedAgents.has(agent.agentId)) {
+              logger.info(
+                `Agent ${agent.agentId} already notified for order ${orderId}`,
+              );
+              return null;
+            }
+
+            const status = await this.redisService.get(
+              `agent:${agent.agentId}:status`,
+            );
+
+            if (status === AgentStatusEnum.ONLINE) {
+              logger.debug(
+                `Agent ${agent.agentId} is ONLINE and eligible for order ${orderId}`,
+              );
+              return agent;
+            } else {
+              logger.debug(
+                `Agent ${agent.agentId} is NOT ONLINE for order ${orderId}`,
+              );
+              return null;
+            }
+          }),
+        ).then((results) => results.filter((agent) => agent !== null));
+
+        logger.debug(
+          `Available agents for order ${orderId}: ${JSON.stringify(
+            availableAgents,
+          )}`,
+        );
+
+        const selectedAgents = availableAgents.slice(0, limit);
+        logger.info(
+          `Notifying ${selectedAgents.length} agents for order ${orderId}`,
+        );
+
+        if (selectedAgents.length > 0) {
+          selectedAgents.forEach((agent) => notifiedAgents.add(agent.agentId));
+
+          selectedAgents.forEach((agent) => {
+            logger.debug(
+              `Notifying agent ${agent.agentId} for order ${orderId}`,
+            );
+            this.agentNotificationGateway.sendMessageToAgent(
+              agent.agentId,
+              "newRequest",
+              {
+                orderId,
+                pickupAddress,
+                dropAddress,
+                estimatedDistance,
+                estimatedTime,
+              },
+            );
+          });
+        } else {
+          logger.warn(
+            `No agents available to notify within ${km} km for order ${orderId}`,
+          );
+        }
+
+        logger.debug(
+          `Waiting for acceptance for order ${orderId} after notifying agents within ${km} km`,
+        );
+        const assignedAgentId = await this.waitForAcceptance(orderId, 40000);
+
+        if (assignedAgentId) {
+          logger.info(`Order ${orderId} accepted by agent ${assignedAgentId}`);
+          return assignedAgentId;
+        } else {
+          logger.warn(
+            `No agent accepted order ${orderId} within ${km} km radius`,
+          );
+        }
       }
 
-      logger.debug(
-        `AgentService.assignRider: Initiating wait for acceptance for order ID ${orderId} after processing ${km} km radius.`,
+      logger.warn(
+        `No agents accepted order ${orderId} after checking all radii`,
       );
-      const assignedAgentId = await this.waitForAcceptance(orderId, 40000); // Wait for 40 seconds
-      logger.debug(
-        `AgentService.assignRider: waitForAcceptance completed for order ID ${orderId}.`,
-      );
-
-      if (assignedAgentId) {
-        this.logger.debug(
-          `AgentService.assignRider: Order ID ${orderId} accepted by agent ID ${assignedAgentId}.`,
-        );
-        return assignedAgentId;
-      } else {
-        logger.debug(
-          `AgentService.assignRider: No agent accepted order ID ${orderId} within the timeout of ${km} km.`,
-        );
-      }
+      return null;
+    } catch (error) {
+      logger.error(`Error in assignRider for order ${orderId}:`, error);
+      throw error; // Re-throw the error to be handled by the caller
     }
-
-    this.logger.debug(
-      `AgentService.assignRider: No agents accepted order ID ${orderId} after all radii.`,
-    );
-    return null;
   }
 
   async acceptOrder(orderId: string, agentId: number): Promise<void> {
