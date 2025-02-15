@@ -5,7 +5,7 @@ import { View, Image, StyleSheet } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { SendPackageOrder } from '../redux/slices/types/sendAPackage';
 import { colors } from '../theme/colors';
-import Mapbox from "@rmapbox/maps"
+// import Mapbox from "@rmapbox/maps"
 import OrderExpandedModal from '../components/Modals/ExpandedModal';
 
 // import Mapbox from '@rnmapbox/maps';
@@ -27,39 +27,39 @@ const PickUpOrderDetailsScreen: React.FC = () => {
   //     latitude:37.773609,
   //   }
   // }
-  const fetchRoute = async () => {
-    try {
-      const response = await fetch(
-        `${MAPBOX_DRIVING_URL}${currentLocationData.longitude},${currentLocationData.latitude};${order?.pickupLocation?.longitude},${order?.pickupLocation?.latitude}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`
-      );
-      console.log('order?.pickupLocation?.latitude', order?.pickupLocation?.latitude);
-      console.log('currentLocationData.latitude', currentLocationData.latitude)
-      const data = await response.json();
-      console.log('data', data)
-      if (data?.routes?.length) {
-        setRouteCoords(data.routes[0].geometry.coordinates);
-      }
-    } catch (error) {
-      console.error("Error fetching route:", error);
-    }
-  };
+  // const fetchRoute = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `${MAPBOX_DRIVING_URL}${currentLocationData.longitude},${currentLocationData.latitude};${order?.pickupLocation?.longitude},${order?.pickupLocation?.latitude}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`
+  //     );
+  //     console.log('order?.pickupLocation?.latitude', order?.pickupLocation?.latitude);
+  //     console.log('currentLocationData.latitude', currentLocationData.latitude)
+  //     const data = await response.json();
+  //     console.log('data', data)
+  //     if (data?.routes?.length) {
+  //       setRouteCoords(data.routes[0].geometry.coordinates);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching route:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    setTimeout(() => {
-      // if (pickupLocationData?.latitude && pickupLocationData?.longitude && dropLocationData?.latitude && dropLocationData?.longitude) {
-        fetchRoute();
-        console.log('executedRoute')
-      // }
-    }, 4500);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     // if (pickupLocationData?.latitude && pickupLocationData?.longitude && dropLocationData?.latitude && dropLocationData?.longitude) {
+  //       fetchRoute();
+  //       console.log('executedRoute')
+  //     // }
+  //   }, 4500);
     
-  }, []);
-  console.log('currentLocationData', currentLocationData)
+  // }, []);
+  // console.log('currentLocationData', currentLocationData)
 
 
   return (
     <View style={styles.container}>
        <View style={styles.mapContainer}>
-           <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+           {/* <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
                          <Mapbox.Camera zoomLevel={14} centerCoordinate={ [currentLocationData.longitude,currentLocationData.latitude]} />
             <Mapbox.PointAnnotation id="currentLocation" coordinate={[currentLocationData.longitude,currentLocationData.latitude]}>
               <View style={styles.markerContainer}>
@@ -89,7 +89,7 @@ const PickUpOrderDetailsScreen: React.FC = () => {
               </Mapbox.ShapeSource>
 
             )}
-                       </Mapbox.MapView>
+                       </Mapbox.MapView> */}
            </View>
       {/* Render the expanded order details component */}
       <OrderExpandedModal order={order} disableClose={true} />

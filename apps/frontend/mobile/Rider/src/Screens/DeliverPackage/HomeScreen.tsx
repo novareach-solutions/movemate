@@ -19,7 +19,7 @@ import {
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
 import { MAPBOX_ACCESS_TOKEN } from "../../utils/constants";
-import Mapbox from "@rmapbox/maps"
+// import Mapbox from "@rmapbox/maps"
 import { showOrderModal, fetchOngoingOrder } from '../../redux/slices/orderSlice';
 import { io } from 'socket.io-client';
 import apiClient from '../../api/apiClient';
@@ -36,7 +36,7 @@ import Distance from '../../assets/icons/distance.svg';
 import Warning from '../../assets/icons/warningWhite.svg';
 import BlackArrow from '../../assets/icons/blackArrow.svg';
 
-Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+// Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
@@ -244,9 +244,9 @@ const HomeScreen: React.FC = () => {
       <Header logo home help />
       {/* Map Image */}
       <View style={styles.mapContainer}>
-        <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+        {/* <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
           <Mapbox.Camera zoomLevel={14} centerCoordinate={[151.209900, -33.865143]} />
-        </Mapbox.MapView>
+        </Mapbox.MapView> */}
       </View>
 
       <View style={styles.statsContainer}>
