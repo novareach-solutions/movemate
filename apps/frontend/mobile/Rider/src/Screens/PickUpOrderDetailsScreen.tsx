@@ -5,7 +5,7 @@ import { View, Image, StyleSheet } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { SendPackageOrder } from '../redux/slices/types/sendAPackage';
 import { colors } from '../theme/colors';
-// import Mapbox from "@rmapbox/maps"
+import Mapbox from "@rnmapbox/maps"
 import OrderExpandedModal from '../components/Modals/ExpandedModal';
 
 // import Mapbox from '@rnmapbox/maps';
