@@ -1,7 +1,6 @@
 // pages/contact.tsx
 import React from "react";
 import Image from "next/image";
-import mail from "../../public/icons/mail.svg";
 import twitter from "../../public/icons/twitter2.svg";
 import instagram from "../../public/icons/instagram2.svg";
 import linkedIn from "../../public/icons/linkedIn2.svg";

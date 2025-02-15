@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
 
 export default function MissionVisionValues() {
   const [activeAccordion, setActiveAccordion] = useState<number | null>(0);

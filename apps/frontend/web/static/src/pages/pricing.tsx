@@ -1,6 +1,5 @@
-import { FAQs } from "@/components/sections/FAQs";
 import TryUsNow from "@/components/TryUsNow";
-import { Sparkles, CheckCircle, XCircle } from "lucide-react";
+import { Sparkles, CheckCircle } from "lucide-react";
 
 export default function PricingPage() {
   const pricingPlans = [
@@ -33,29 +32,29 @@ export default function PricingPage() {
       ],
     },
   ];
-  const faqData = {
-    title: "Rider FAQs",
-    faqs: [
-      {
-        question: "How much can I earn?",
-        answer:
-          "Riders typically earn between $15-$30 per hour depending on time and location",
-      },
-      {
-        question: "What are the vehicle requirements?",
-        answer:
-          "Any reliable vehicle in good condition - car, bike, or scooter",
-      },
-      {
-        question: "How do I get paid?",
-        answer: "Weekly direct deposit or instant cashout to your bank account",
-      },
-      {
-        question: "Is there rider support?",
-        answer: "24/7 support through in-app chat and phone support",
-      },
-    ],
-  };
+  // const faqData = {
+  //   title: "Rider FAQs",
+  //   faqs: [
+  //     {
+  //       question: "How much can I earn?",
+  //       answer:
+  //         "Riders typically earn between $15-$30 per hour depending on time and location",
+  //     },
+  //     {
+  //       question: "What are the vehicle requirements?",
+  //       answer:
+  //         "Any reliable vehicle in good condition - car, bike, or scooter",
+  //     },
+  //     {
+  //       question: "How do I get paid?",
+  //       answer: "Weekly direct deposit or instant cashout to your bank account",
+  //     },
+  //     {
+  //       question: "Is there rider support?",
+  //       answer: "24/7 support through in-app chat and phone support",
+  //     },
+  //   ],
+  // };
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
