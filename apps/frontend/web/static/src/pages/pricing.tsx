@@ -1,3 +1,4 @@
+import { FAQs } from "@/components/sections/FAQs";
 import TryUsNow from "@/components/TryUsNow";
 import { Sparkles, CheckCircle } from "lucide-react";
 
@@ -32,29 +33,71 @@ export default function PricingPage() {
       ],
     },
   ];
-  // const faqData = {
-  //   title: "Rider FAQs",
-  //   faqs: [
-  //     {
-  //       question: "How much can I earn?",
-  //       answer:
-  //         "Riders typically earn between $15-$30 per hour depending on time and location",
-  //     },
-  //     {
-  //       question: "What are the vehicle requirements?",
-  //       answer:
-  //         "Any reliable vehicle in good condition - car, bike, or scooter",
-  //     },
-  //     {
-  //       question: "How do I get paid?",
-  //       answer: "Weekly direct deposit or instant cashout to your bank account",
-  //     },
-  //     {
-  //       question: "Is there rider support?",
-  //       answer: "24/7 support through in-app chat and phone support",
-  //     },
-  //   ],
-  // };
+  // Sample data for FAQs (remains unchanged)
+  const faqsData = [
+    // Profile Category
+    {
+      question: "How do I become a Vamoose rider?",
+      answer:
+        "You can sign up via the Vamoose app by providing your personal details, uploading required documents (e.g., driver’s license, ID, and vehicle registration), and completing the verification process.",
+      category: "Profile",
+    },
+    {
+      question: "What if I want to work part-time or only on weekends?",
+      answer:
+        "You’re free to choose your own schedule. Simply go online whenever you want to take deliveries or rides, and sign out when you’re done.",
+      category: "Profile",
+    },
+
+    // Subscription Category
+    {
+      question: "What are the subscription options, and how do they work?",
+      answer:
+        "Vamoose offers different subscription tiers—Basic, Pro, and Premium. Each tier provides varying levels of benefits, such as reduced service fees, priority requests, and higher incentive bonuses. Once you choose a subscription, your subscription fee is automatically deducted from your Vamoose account at the start of each billing cycle.",
+      category: "Subscription",
+    },
+
+    // Payment Category
+    {
+      question: "How do I get paid?",
+      answer:
+        "Payments are deposited directly to your registered bank account or digital wallet on a weekly or bi-weekly schedule. You can view your earnings summary in the Vamoose app at any time.",
+      category: "Payment",
+    },
+    {
+      question: "Do riders get any bonuses or incentives?",
+      answer:
+        "Yes! We regularly run bonus programs or referral incentives for riders who complete a certain number of rides or deliveries, or who refer new riders to the platform.",
+      category: "Payment",
+    },
+
+    // Support Category
+    {
+      question:
+        "What happens if I encounter an issue during a delivery or ride?",
+      answer:
+        "If you experience any issue—such as a flat tire, an unresponsive customer, or an in-app error—contact Vamoose Support through the app. We have 24/7 support to assist you with any emergencies or technical problems.",
+      category: "Support",
+    },
+    {
+      question: "What benefits do riders get with Vamoose?",
+      answer:
+        "Apart from flexible working hours and competitive pay, our riders enjoy features like in-app route optimization, real-time earnings tracking, and exclusive partner discounts on vehicle maintenance.",
+      category: "Support",
+    },
+  ];
+
+  // Categories (if you're using tabs, filters, etc.)
+  const categories = [
+    "Profile",
+    "Subscription",
+    "Payment",
+    "Support",
+    "Profile",
+    ,
+    "Profile",
+  ];
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -142,7 +185,11 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
-      {/* <FAQs {...faqData} /> */}
+      <FAQs
+        title="Frequently Asked Questions"
+        faqs={faqsData}
+        categories={categories}
+      />
       <TryUsNow />
     </div>
   );

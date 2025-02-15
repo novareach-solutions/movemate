@@ -4,186 +4,164 @@ import Image from "next/image";
 import twitter from "../../public/icons/twitter2.svg";
 import instagram from "../../public/icons/instagram2.svg";
 import linkedIn from "../../public/icons/linkedIn2.svg";
+
 const ContactUs = () => {
   const [formData, setFormData] = React.useState({
-    firstName: "",
-    lastName: "",
+    name: "",
     email: "",
     phone: "",
     message: "",
-    agreed: false,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
+    // Handle form submission
     console.log(formData);
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value, type } = e.target;
-    const checked =
-      type === "checkbox" ? (e.target as HTMLInputElement).checked : null;
-
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
+
   const socialLinks = [
-    { icon: twitter, alt: "twitter" },
-    { icon: instagram, alt: "instagram" },
-    { icon: linkedIn, alt: "linkedIn" },
+    { icon: twitter, alt: "X" },
+    { icon: instagram, alt: "Instagram" },
+    { icon: linkedIn, alt: "LinkedIn" },
   ];
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* Left Column - Contact Information */}
-        <div className="space-y-8">
+        {/* Left Column: Contact Info */}
+        <div className="space-y-10">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+            Customer Support
+          </h2>
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">
-              Customer Support
-            </h2>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <p className="font-gilroy font-bold">Email:</p>{" "}
-              <span className="text-gray-600">support@vamoose.com</span>
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="font-bold">Email:</span>
+              <span className="text-gray-600">Support@vamoose.in</span>
             </div>
-          </div>
-
-          <div className="flex flex-col gap-[min(4.095vw,16px)] md:gap-[min(1.355vw,26px)]">
-            <div className="font-bold text-[min(5.625vw,22px)] md:text-[min(1.405vw,27px)]">
-              Find us on{" "}
-            </div>
-            <div className="flex gap-[min(5.375vw,21px)] md:gap-[min(1.095vw,21px)]">
+            <div className="font-bold text-lg mb-2">Find us on</div>
+            <div className="flex gap-4">
               {socialLinks.map(({ icon, alt }) => (
-                <Image
-                  key={alt}
-                  src={icon}
-                  alt={alt}
-                  className="w-[min(10.235vw,40px)] md:w-[min(2.085vw,40px)]"
-                />
+                <Image key={alt} src={icon} alt={alt} className="w-8 h-8" />
               ))}
             </div>
           </div>
         </div>
 
-        {/* Right Column - Contact Form */}
-        <div className="bg-[#FCF5FF] lg:w-[648px] lg:h-[781px] bg-opacity-[80%] p-8 border-[2px] border-[#8123AD] rounded-lg">
+        {/* Right Column: Contact Form */}
+        <div className="bg-[#FCF5FF] bg-opacity-80 border-2 border-[#8123AD] rounded-lg p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Name and Email in one row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-6">
+              {/* Name Field */}
               <div>
                 <label
-                  htmlFor="firstName"
-                  className="block text-sm font-medium text-gray-700"
+                  htmlFor="name"
+                  className="block text-sm font-bold text-gray-700 mb-2"
                 >
-                  First Name
+                  Name
                 </label>
                 <input
+                  id="name"
+                  name="name"
                   type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
+                  placeholder="John Carter"
+                  value={formData.name}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 -sm focus:border-purple-500 focus:ring-purple-500"
+                  className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-purple-500 focus:ring-purple-500"
                 />
               </div>
+              {/* Email Field */}
               <div>
                 <label
-                  htmlFor="lastName"
-                  className="block text-sm font-medium text-gray-700"
+                  htmlFor="email"
+                  className="block text-sm font-bold text-gray-700 mb-2"
                 >
-                  Last Name
+                  Email
                 </label>
                 <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="example@email.com"
+                  value={formData.email}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 -sm focus:border-purple-500 focus:ring-purple-500"
+                  className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-purple-500 focus:ring-purple-500"
                 />
               </div>
             </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 -sm focus:border-purple-500 focus:ring-purple-500"
-              />
-            </div>
-
+            {/* Phone Field */}
             <div>
               <label
                 htmlFor="phone"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-bold text-gray-700 mb-2"
               >
                 Phone Number
               </label>
               <input
-                type="tel"
                 id="phone"
                 name="phone"
+                type="tel"
+                placeholder="+1 9876383078"
                 value={formData.phone}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 -sm focus:border-purple-500 focus:ring-purple-500"
+                className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-purple-500 focus:ring-purple-500"
               />
             </div>
 
+            {/* Message Field */}
             <div>
               <label
                 htmlFor="message"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-bold text-gray-700 mb-2"
               >
                 Message
               </label>
               <textarea
                 id="message"
                 name="message"
+                placeholder="Please type your message here..."
                 rows={4}
                 value={formData.message}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 -sm focus:border-purple-500 focus:ring-purple-500"
+                className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-purple-500 focus:ring-purple-500"
               />
             </div>
 
-            <div className="flex items-start">
-              <input
-                type="checkbox"
-                id="agreed"
-                name="agreed"
-                checked={formData.agreed}
-                onChange={handleChange}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-              />
-              <label
-                htmlFor="agreed"
-                className="ml-2 block text-sm text-gray-700"
+            {/* Terms & Privacy */}
+            <p className="text-sm text-gray-700">
+              By contacting us you agree to the{" "}
+              <a
+                href="#"
+                className="text-[#8123AD] underline hover:no-underline"
               >
-                I agree to receive emails from Vamoose and can unsubscribe at
-                any time.
-              </label>
-            </div>
+                Terms and Conditions
+              </a>{" "}
+              and{" "}
+              <a
+                href="#"
+                className="text-[#8123AD] underline hover:no-underline"
+              >
+                Privacy Policy
+              </a>
+            </p>
 
+            {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-purple-600 py-3 px-4 text-white rounded-lg hover:bg-purple-700 transition-colors duration-300"
+              className="w-full py-3 px-4 text-[#8123AD] text-base font-bold border border-[#8123AD] rounded-lg transition-colors duration-300 hover:bg-[#8123AD] hover:text-white"
             >
-              Send Message
+              Submit
             </button>
           </form>
         </div>

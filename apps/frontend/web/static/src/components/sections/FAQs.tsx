@@ -1,47 +1,51 @@
 import React from "react";
+
+import { cn } from "@/lib/utils";
 import {
   Accordion,
-  AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../primitives/accordian";
-import { cn } from "@/lib/utils";
+import { AccordionContent } from "@radix-ui/react-accordion";
 
 interface FAQ {
   question: string;
   answer: string;
-  category: string; // Each FAQ belongs to a category
+  category: string;
 }
 
 interface FAQsProps {
   title: string;
   faqs: FAQ[];
-  categories: string[]; // List of category names for the tabs
+  categories: string[];
 }
 
 export const FAQs = ({ title, faqs, categories }: FAQsProps) => {
-  // Initialize state with the first category as default
+  // Default to the first category
   const [activeCategory, setActiveCategory] = React.useState(categories[0]);
 
   // Filter FAQs based on the currently active category
   const filteredFAQs = faqs.filter((faq) => faq.category === activeCategory);
 
   return (
-    <section className="py-20">
-      <div className="w-full">
-        <h2 className="text-4xl font-bold text-center mb-12">{title}</h2>
+    <section className="py-10 sm:py-16">
+      <div className="mx-[150px] px-4 sm:px-6">
+        {/* Title */}
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">
+          {title}
+        </h2>
 
-        {/* Render category tabs */}
-        <div className="flex justify-center gap-4 mb-8">
+        {/* Category Tabs (mimicking “Profile” tabs in your screenshot) */}
+        <div className="flex justify-between space-x-6 mb-8 border-b border-gray-200">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
               className={cn(
-                "px-6 py-2 text-sm font-medium transition-colors",
+                "relative py-2 px-4 text-sm text-purple-600  font-medium text-gray-700 transition-colors",
                 activeCategory === category
-                  ? "border-b text-purple-600"
-                  : "text-gray-700"
+                  ? "border-b-2 border-purple-600"
+                  : "hover:text-purple-600"
               )}
             >
               {category}
@@ -49,8 +53,12 @@ export const FAQs = ({ title, faqs, categories }: FAQsProps) => {
           ))}
         </div>
 
-        {/* Render FAQs in an Accordion */}
-        <Accordion type="single" collapsible className="max-w-3xl mx-auto">
+        {/* Accordion with filtered FAQs */}
+        <Accordion
+          type="single"
+          collapsible
+          className="divide-y divide-gray-200 border-gray-200"
+        >
           {filteredFAQs.map((faq, index) => (
             <AccordionItem key={index} value={`item-${index}`}>
               <AccordionTrigger>{faq.question}</AccordionTrigger>

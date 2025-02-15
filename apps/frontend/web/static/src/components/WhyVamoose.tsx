@@ -2,6 +2,7 @@ import Image, { StaticImageData } from "next/image";
 import React from "react";
 import playStore from "../../public/icons/googlePlay.svg";
 import appStore from "../../public/icons/appStore.svg";
+
 interface SimpleCard {
   icon: React.ReactNode;
   heading: string;
@@ -21,7 +22,7 @@ interface WhyVamooseProps {
   mainHeading: string;
   highlight: string;
   firstRowCards: SimpleCard[];
-  secondRowFirstCard: SimpleCard; // New prop for second row's first card
+  secondRowFirstCard: SimpleCard;
   secondRowCard: TwoColumnCard;
   firstRowBg?: string;
   secondRowFirstBg?: string;
@@ -31,10 +32,11 @@ const WhyVamoose: React.FC<WhyVamooseProps> = ({
   mainHeading = "Why Choose",
   highlight = "Vamoose",
   firstRowCards,
-  secondRowFirstCard, // New prop
+  secondRowFirstCard,
   secondRowCard,
   secondRowFirstBg = "bg-gray-100",
 }) => {
+  // Simple Card UI
   const SimpleCard = ({ icon, heading, description, bgColor }: SimpleCard) => (
     <div
       className={`${bgColor} p-8 rounded-xl shadow-lg shadow-purple-100 h-full flex flex-col`}
@@ -80,20 +82,18 @@ const WhyVamoose: React.FC<WhyVamooseProps> = ({
 
           {/* Second Row - Two Column Card */}
           <div
-            className={`md:col-span-2 ${secondRowCard.bgColor} px-8 pt-8 rounded-xl shadow-lg shadow-purple-100 h-full`}
+            className={`md:col-span-2 ${secondRowCard.bgColor} text-white px-8 pt-8 rounded-xl shadow-lg shadow-purple-100 h-full`}
           >
-            <div className="flex flex-col md:flex-row items-center gap-8 h-full">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8 h-full">
               {/* Text Content */}
-              <div className="md:w-1/2 flex flex-col items-start gap-4 h-full ">
+              <div className="md:w-1/2 flex flex-col items-start gap-4 h-full">
                 <div>
                   <h3 className="text-2xl font-bold">
                     {secondRowCard.heading}
                   </h3>
-                  <p className="text-gray-600 mt-4">
-                    {secondRowCard.description}
-                  </p>
+                  <p className=" mt-4">{secondRowCard.description}</p>
                 </div>
-                <div className=" pt-[min(2.05vw,8px)] md:pt-[min(2.705vw,52px)] flex gap-[min(3.325vw,13px)] md:gap-[min(2.085vw,40px)] ">
+                <div className="pt-[min(2.05vw,8px)] md:pt-[min(2.705vw,52px)] flex gap-[min(3.325vw,13px)] md:gap-[min(2.085vw,40px)]">
                   <Image
                     src={playStore}
                     alt={"button"}
