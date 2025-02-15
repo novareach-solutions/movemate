@@ -1,6 +1,7 @@
 import Image, { StaticImageData } from "next/image";
 import React from "react";
-
+import playStore from "../../public/icons/googlePlay.svg";
+import appStore from "../../public/icons/appStore.svg";
 interface SimpleCard {
   icon: React.ReactNode;
   heading: string;
@@ -84,7 +85,7 @@ const WhyVamoose: React.FC<WhyVamooseProps> = ({
           >
             <div className="flex flex-col md:flex-row items-center gap-8 h-full">
               {/* Text Content */}
-              <div className="md:w-1/2 flex flex-col items-start gap-4 h-full justify-between">
+              <div className="md:w-1/2 flex flex-col items-start gap-4 h-full ">
                 <div>
                   <h3 className="text-2xl font-bold">
                     {secondRowCard.heading}
@@ -93,12 +94,22 @@ const WhyVamoose: React.FC<WhyVamooseProps> = ({
                     {secondRowCard.description}
                   </p>
                 </div>
-                <button
-                  className="bg-purple-600 mb-2 text-white px-6 py-2 rounded-lg 
-                  hover:bg-purple-700 transition-colors duration-300 mt-4"
-                >
-                  {secondRowCard.buttonText}
-                </button>
+                <div className=" pt-[min(2.05vw,8px)] md:pt-[min(2.705vw,52px)] flex gap-[min(3.325vw,13px)] md:gap-[min(2.085vw,40px)] ">
+                  <Image
+                    src={playStore}
+                    alt={"button"}
+                    className={
+                      "w-[min(15.345vw,60px)] md:w-[min(8.85vw,170px)]"
+                    }
+                  />
+                  <Image
+                    src={appStore}
+                    alt={"button"}
+                    className={
+                      "w-[min(15.345vw,60px)] md:w-[min(8.85vw,170px)]"
+                    }
+                  />
+                </div>
               </div>
 
               {/* Image */}

@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <main className="w-full h-full flex justify-center items-center z-50">
+    <main className="w-full h-[10%] flex justify-center items-center z-50">
       <nav className="w-full h-full flex justify-center items-center py-[min(10.25vw,40px)] md:py-[min(1.045vw,20px)] max-w-[90%] md:max-w-[85%]">
         <div className="w-full flex justify-between items-center">
           <Link href="/">

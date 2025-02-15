@@ -45,7 +45,7 @@ export default function HeroSection() {
     <section className="relative  py-12 lg:px-[100px] px-4 bg-transparent">
       <DottedPatternSvg className="absolute  top-0  hidden md:block left-0 z-[1]" />
       <DottedPatternSvg className="absolute bottom-0  hidden md:block right-0 z-[1] rotate-180" />
-      <PurpleCircleSvg className="absolute top-[-150px] hidden md:block right-[-200px] z-[1] w-[1000px] h-auto" />
+      {/* <PurpleCircleSvg className="absolute top-[-150px] hidden md:block right-[-200px] z-[1] w-[1000px] h-auto" /> */}
 
       <div className="relative z-[2] mx-auto flex   flex-wrap items-center justify-between gap-8">
         {/* Left Content */}
