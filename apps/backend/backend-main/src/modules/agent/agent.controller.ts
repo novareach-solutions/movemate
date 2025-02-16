@@ -42,12 +42,8 @@ import { OnboardingGuard } from "../../shared/guards/onboarding.guard";
 import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { AgentService } from "./agent.service";
-<<<<<<< Updated upstream
-import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
-=======
 import { DocumentError, TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
 import { AgentDocument } from "../../entity/AgentDocument";
->>>>>>> Stashed changes
 
 @ApiTags("Agent")
 @Controller("agent")
