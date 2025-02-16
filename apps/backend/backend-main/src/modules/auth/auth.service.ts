@@ -79,6 +79,56 @@ export class AuthService {
     return onboardingToken;
   }
 
+  async verifyOtpAndLogin(
+    phoneNumber: string,
+    otp: string,
+  ): Promise<{
+    status: "existing_user" | "new_user";
+    user?: User;
+    accessToken?: string;
+    refreshToken?: string;
+    agentId?: number;
+  }> {
+    this.logger.debug(`AuthService.verifyOtpAndLogin: Validating OTP for ${phoneNumber}`);
+
+    await this.validateOtp(phoneNumber, otp);
+    const user = await dbRepo(User).findOne({ where: { phoneNumber } });
+
+    if (user) {
+      const { accessToken, refreshToken } = await this.generateTokens(
+        user.id,
+        user.phoneNumber,
+        user.role,
+      );
+
+      let agentId: number | undefined = undefined;
+      if (user.role === UserRoleEnum.AGENT) {
+        const agent = await dbRepo(Agent).findOne({ where: { userId: user.id } });
+        if (agent) {
+          agentId = agent.id;
+        }
+      }
+
+      return {
+        status: "existing_user",
+        user: user,
+        accessToken,
+        refreshToken,
+        ...(agentId !== undefined && { agentId }),
+      };
+    } else {
+      return {
+        status: "new_user",
+      };
+    }
+  }
+
+  async generateTokens(userId: number, phoneNumber: string, role: UserRoleEnum): Promise<{ accessToken: string; refreshToken: string }> {
+    const accessToken = this.tokenService.generateAccessToken(userId, phoneNumber, role);
+    const refreshToken = this.tokenService.generateRefreshToken(userId);
+    return { accessToken, refreshToken };
+  }
+
   async login(
     phoneNumber: string,
     otp: string,

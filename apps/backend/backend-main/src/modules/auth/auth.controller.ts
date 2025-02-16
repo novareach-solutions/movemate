@@ -30,7 +30,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @Post("otp/request")
   @AuthPostOtpRequestSwagger()
@@ -53,24 +53,50 @@ export class AuthController {
   async verifyOtp(
     @Body() body: { phoneNumber: string; otp: string },
     @Res({ passthrough: true }) response: Response,
-  ): Promise<IApiResponse<null>> {
+  ): Promise<void> {
     const { phoneNumber, otp } = body;
+    this.logger.debug(`Verifying OTP for ${phoneNumber}`);
 
-    this.logger.debug(
-      `AuthController.verifyOtp: Verifying OTP for ${phoneNumber}`,
-    );
+    const { status, accessToken, refreshToken, agentId, user } =
+      await this.authService.verifyOtpAndLogin(phoneNumber, otp);
 
-    const onboardingToken = await this.authService.signupInitiate(
-      phoneNumber,
-      otp,
-    );
+    if (user) {
+      const responseData: {
+        status: "existing_user" | "new_user";
+        userId: number;
+        accessToken: string;
+        refreshToken: string;
+        agentId?: number;
+      } = {
+        status,
+        userId: user.id,
+        accessToken,
+        refreshToken,
+      };
 
-    response.setHeader("onboarding_token", onboardingToken);
+      if (agentId !== undefined) {
+        responseData.agentId = agentId;
+      }
 
-    this.logger.log(
-      `AuthController.verifyOtp: OTP verified successfully for ${phoneNumber}`,
-    );
-    return { success: true, message: "OTP verified successfully.", data: null };
+      response.cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: this.configService.get<string>("ENVIRONMENT") === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7 * 1000,
+      });
+
+      response.json({
+        success: true,
+        message: "Login successful.",
+        data: responseData
+      });
+    } else {
+      response.json({
+        success: true,
+        message: "New user detected.",
+        data: { status },
+      });
+    }
   }
 
   @Post("login")
