@@ -16,6 +16,8 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   signupData: AgentSignupPayload | null;
+  phoneNumber:string | null;
+  currentLocation:any;
 }
 
 const initialState: AuthState = {
@@ -23,6 +25,8 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   signupData: null,
+  phoneNumber:null,
+  currentLocation:null
 };
 
 interface AgentSignupPayload {
@@ -35,6 +39,7 @@ interface AgentSignupPayload {
     suburb: string;
     state: string;
     postalCode: number;
+    phoneNumber:string;
   };
   agentType: string;
   abnNumber: string;
@@ -115,14 +120,6 @@ export const verifyOtp = createAsyncThunk(
         phoneNumber: phone,
         otp,
       });
-      console.log(response.headers)
-      // Store onboarding token if present in the response headers
-      const onboardingToken = response.headers['onboarding_token'];
-      if (onboardingToken) {
-        await saveToken('onboardingToken', onboardingToken);
-        console.log('Onboarding Token Stored:', onboardingToken);
-      }
-
       return response.data;
     } catch (error: any) {
       let errorMessage = 'An unexpected error occurred.';
@@ -275,6 +272,15 @@ const authSlice = createSlice({
         state.signupData = action.payload as AgentSignupPayload;
       }
     },
+    updatePhoneNumber: (state, action) => {
+    
+        state.phoneNumber = action.payload;
+
+    },
+
+    updateCurrentLocation:(state,action)=>{
+      state.currentLocation = action.payload
+    }
   },
   extraReducers: builder => {
     // Handle agentSignup
@@ -381,5 +387,5 @@ const authSlice = createSlice({
 });
 
 // Export the actions and reducer
-export const {logout, setSignupData} = authSlice.actions;
+export const {logout, setSignupData,updatePhoneNumber,updateCurrentLocation} = authSlice.actions;
 export default authSlice.reducer;

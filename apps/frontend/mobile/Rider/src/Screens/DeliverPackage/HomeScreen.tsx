@@ -1,44 +1,53 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Image,
   Animated,
   ActivityIndicator,
   Alert,
 } from 'react-native';
 import StatCard from '../../components/StatCard';
 import HelpButton from '../../components/HelpButton';
-import {AppScreens, DeliverAPackage} from '../../navigation/ScreenNames';
-import {useSelector, useDispatch} from 'react-redux';
+import { AppScreens, DeliverAPackage, ProfileScreens } from '../../navigation/ScreenNames';
+import { useSelector, useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   AgentStatusEnum,
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
-import Mapbox from '@rnmapbox/maps';
 import { MAPBOX_ACCESS_TOKEN } from "../../utils/constants";
-import {showOrderModal, fetchOngoingOrder} from '../../redux/slices/orderSlice';
-import {io} from 'socket.io-client';
+import Mapbox from "@rnmapbox/maps"
+import { showOrderModal, fetchOngoingOrder } from '../../redux/slices/orderSlice';
+import { io } from 'socket.io-client';
 import apiClient from '../../api/apiClient';
 import apiEndPoints from '../../api/apiEndPoints';
-import {RootState} from '../../redux/store';
-import {OrderStatusEnum} from '../../redux/slices/types/enums';
-import {colors} from '../../theme/colors';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AppScreensParamList} from '../../navigation/ScreenNames';
+import { RootState } from '../../redux/store';
+import { OrderStatusEnum } from '../../redux/slices/types/enums';
+import { colors } from '../../theme/colors';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AppScreensParamList } from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
 import Money from '../../assets/icons/money.svg';
 import Order from '../../assets/icons/orders.svg';
 import Distance from '../../assets/icons/distance.svg';
-Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+import Warning from '../../assets/icons/warningWhite.svg';
+import BlackArrow from '../../assets/icons/blackArrow.svg';
+
+// Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
   const [isLoading, setIsLoading] = useState(false);
+  // Flag to control error rendering
+  const [hasError, setHasError] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
+  // Measured height of error content
+  const [measuredErrorHeight, setMeasuredErrorHeight] = useState(0);
+
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(
@@ -48,7 +57,17 @@ const HomeScreen: React.FC = () => {
     (state: RootState) => state.order.ongoingOrder,
   );
   const [hasNavigated, setHasNavigated] = useState(false);
-  const [agentId, setAgentId] = useState<string | null>(null);
+
+  // Define your error items
+  const errorItemsData = [
+    {
+      id: 'accountNotApproved',
+      heading: 'Account Not Approved',
+      text: 'Your account is not approved yet. Please Contact Admin',
+      target: AppScreens.FAQScreen,
+    }
+    
+  ];
 
   const updateLocationAPI = async (latitude: number, longitude: number) => {
     try {
@@ -83,35 +102,43 @@ const HomeScreen: React.FC = () => {
       Alert.alert('Not Authenticated', 'Please log in to perform this action.');
       return;
     }
+
     const newStatus = !isOnline;
-    setIsOnline(newStatus);
     setIsLoading(true);
-    Animated.timing(drawerHeight, {
-      toValue: newStatus ? 120 : 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-    const currentAccessToken = await AsyncStorage.getItem('accessToken');
-    console.log('🔍 Current Access Token:', currentAccessToken);
+    // Clear previous error state
+    setHasError(false);
+
     try {
-      const statusEnum = newStatus
-        ? AgentStatusEnum.ONLINE
-        : AgentStatusEnum.OFFLINE;
+      const statusEnum = newStatus ? AgentStatusEnum.ONLINE : AgentStatusEnum.OFFLINE;
       await updateAgentStatus(statusEnum);
       console.log(`✅ Agent status set to ${statusEnum}`);
-    } catch (error) {
-      console.log('Error', error);
-      setIsOnline(!newStatus);
+      setIsOnline(newStatus);
+
+      // Close drawer if no error
       Animated.timing(drawerHeight, {
-        toValue: !newStatus ? 120 : 0,
+        toValue: 0,
         duration: 300,
         useNativeDriver: false,
       }).start();
+    } catch (error) {
       console.error('❌ Failed to update status:', error);
+      // Set error flag so that the error drawer is shown.
+      setHasError(true);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Animate the drawer when the measured error height changes
+  useEffect(() => {
+    if (hasError && measuredErrorHeight > 0) {
+      Animated.timing(drawerHeight, {
+        toValue: measuredErrorHeight,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [hasError, measuredErrorHeight, drawerHeight]);
 
   useEffect(() => {
     const fetchAgentId = async () => {
@@ -131,7 +158,7 @@ const HomeScreen: React.FC = () => {
     const socket = io(apiEndPoints.baseURL);
     socket.on('connect', () => {
       console.log('Connected to WebSocket server');
-      socket.emit('joinRoom', {agentId: numericAgentId});
+      socket.emit('joinRoom', { agentId: numericAgentId });
       console.log(`Joined room for agentId: ${numericAgentId}`);
     });
     socket.on('disconnect', () => {
@@ -163,7 +190,7 @@ const HomeScreen: React.FC = () => {
   }, [agentId, dispatch]);
 
   useEffect(() => {
-    console.log('Ongoingon order value', ongoingOrder);
+    console.log('Ongoing order value', ongoingOrder);
     if (ongoingOrder && !hasNavigated) {
       setHasNavigated(true);
       if (ongoingOrder.status === OrderStatusEnum.PICKEDUP_ORDER) {
@@ -171,10 +198,7 @@ const HomeScreen: React.FC = () => {
           order: ongoingOrder,
         });
       }
-      if (
-        ongoingOrder.status === OrderStatusEnum.ACCEPTED ||
-        ongoingOrder.status === OrderStatusEnum.PENDING || OrderStatusEnum.IN_PROGRESS
-      ) {
+      else {
         navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
           order: ongoingOrder,
         });
@@ -182,44 +206,78 @@ const HomeScreen: React.FC = () => {
     }
   }, [ongoingOrder, hasNavigated, navigation]);
 
-  const handleTakePhoto = () => {
-    console.log('Taking a photo for proof...');
-  };
+  const renderErrorContent = useCallback(() => (
+    <View>
+      <View style={styles.errorTitleContainer}>
+        <View style={styles.errorTitle}><Warning width={25} height={25} /><Text style={{
+          fontSize: 16,
+          fontWeight: 'bold',
+          color: colors.white
+        }}> Actions Required</Text></View>
+      </View>
+      <View style={styles.errorContainer}>
+        {errorItemsData.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            style={styles.errorItem}
+            onPress={() => navigation.navigate(item.target)}>
+            <View style={styles.errorItemContent}>
+              <View style={styles.errorTextContainer}>
+                <Text style={styles.errorHeading}>{item.heading}</Text>
+                <Text style={styles.errorText}>{item.text}</Text>
+              </View>
+              <BlackArrow
+                style={{
+                  transform: [{ rotate: '180deg' }]
+                }}
+              />
 
-  const handleOrderDelivered = () => {
-    console.log('Order marked as delivered.');
-  };
-
-  const handleAcceptOrder = () => {
-    // Additional logic can be added here
-  };
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  ), [navigation]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <Header logo home help />
       {/* Map Image */}
       <View style={styles.mapContainer}>
-      <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
-                    <Mapbox.Camera zoomLevel={14} centerCoordinate={ [151.209900, -33.865143]} />
+        {/* <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+          <Mapbox.Camera zoomLevel={14} centerCoordinate={[151.209900, -33.865143]} />
+        </Mapbox.MapView> */}
+      </View>
 
-                  </Mapbox.MapView>
+      <View style={styles.statsContainer}>
+        <StatCard icon={Money} value="$50" label="EARNINGS" />
+        <StatCard icon={Order} value="7" label="ORDERS" />
+        <StatCard icon={Distance} value="30 Km" label="DISTANCE" />
       </View>
 
       {/* Status Button */}
       <View style={styles.statusContainer}>
         <TouchableOpacity
+          disabled={isLoading}
           onPress={toggleStatus}
           style={[
             styles.statusButton,
             isOnline ? styles.stopButton : styles.goButton,
           ]}>
-          <Text
-            style={[
-              styles.statusButtonText,
-              isOnline ? styles.stopText : styles.goText,
-            ]}>
-            {isOnline ? 'Stop' : 'GO'}
-          </Text>
+          {isLoading ? (
+            <ActivityIndicator
+              size="small"
+              color={isOnline ? colors.white : colors.purple}
+            />
+          ) : (
+            <Text
+              style={[
+                styles.statusButtonText,
+                isOnline ? styles.stopText : styles.goText,
+              ]}>
+              {isOnline ? 'Stop' : 'GO'}
+            </Text>
+          )}
         </TouchableOpacity>
         <Text style={styles.statusText}>
           {isOnline ? "You're Online" : "You're Offline"}
@@ -227,13 +285,24 @@ const HomeScreen: React.FC = () => {
       </View>
 
       {/* Sliding Drawer */}
-      <Animated.View style={[styles.drawer, {height: drawerHeight}]}>
-        <View style={styles.statsContainer}>
-          <StatCard icon={Money} value="$50" label="EARNINGS" />
-          <StatCard icon={Order} value="7" label="ORDERS" />
-          <StatCard icon={Distance} value="30 Km" label="DISTANCE" />
-        </View>
+      <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
+        {hasError && renderErrorContent()}
       </Animated.View>
+
+      {/* Hidden container to measure error content */}
+      {hasError && (
+        <View
+          style={styles.hiddenContainer}
+          onLayout={(event) => {
+            const { height } = event.nativeEvent.layout;
+            // Only update if height has changed and is greater than zero
+            if (height > 0 && measuredErrorHeight !== height) {
+              setMeasuredErrorHeight(height);
+            }
+          }}>
+          {renderErrorContent()}
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -293,6 +362,25 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.text.primary,
   },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: "#FBF4FF",
+    position: "absolute",
+    top: 80,
+    width: "95%",
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 25,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border.lightGray,
+  },
+  helpButtonContainer: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+  },
   drawer: {
     backgroundColor: colors.white,
     overflow: 'hidden',
@@ -301,19 +389,62 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    shadowOffset: {width: 0, height: -2},
-    paddingHorizontal: 20,
+    shadowOffset: { width: 0, height: -2 },
+    paddingHorizontal: 0,
     paddingTop: 10,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: colors.white,
+  errorTitleContainer: {
+    backgroundColor: "#D81A00",
+    paddingVertical: 20,
+    paddingHorizontal: 10,
   },
-  helpButtonContainer: {
+  errorTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
+  },
+  errorContainer: {
+    backgroundColor: "#FFF3F3",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+  },
+  errorItem: {
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 5,
+  },
+  errorItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  errorTextContainer: {
+    flex: 1,
+    gap:10
+  },
+  errorHeading: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.black,
+  },
+  errorText: {
+    fontSize: 14,
+    color: colors.black,
+  },
+  arrow: {
+    fontSize: 18,
+    color: '#D32F2F',
+    marginLeft: 10,
+  },
+  // Hidden container for measurement (placed off-screen)
+  hiddenContainer: {
     position: 'absolute',
-    top: 12,
-    right: 12,
+    top: -1000,
+    left: 0,
+    right: 0,
+    opacity: 0,
   },
 });
 

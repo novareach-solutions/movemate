@@ -1,6 +1,6 @@
 // OtpScreen.tsx
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -12,27 +12,26 @@ import {
   SafeAreaView,
   TextStyle,
 } from 'react-native';
-import {colors} from '../theme/colors';
-import {typography} from '../theme/typography';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
 import TitleDescription from '../components/TitleDescription';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import {
   AuthScreens,
-  AuthScreensParamList,
   DeliverAPackage,
 } from '../navigation/ScreenNames';
-import {useAppDispatch} from '../redux/hook';
-import {verifyOtp, login} from '../redux/slices/authSlice';
+import { useAppDispatch } from '../redux/hook';
+import { verifyOtp, login, requestOtp } from '../redux/slices/authSlice';
 import Header from '../components/Header';
 
 interface OtpScreenProps {
   route: {
-    params: {phoneNumber: string; login: boolean};
+    params: { phoneNumber: string; login: boolean };
   };
 }
 
-const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
-  const {phoneNumber, login: isLogin} = route.params;
+const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
+  const { phoneNumber, login: isLogin } = route.params;
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [error, setError] = useState(false);
@@ -42,26 +41,37 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer(prev => (prev > 0 ? prev - 1 : 0));
+      setTimer((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
   const handleChange = (value: string, index: number) => {
-    // Allow only numbers
-    if (!/^\d*$/.test(value)) return;
+    if (!/^\d*$/.test(value)) return; // Allow only digits
 
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Focus handling
-    if (value && index < 5) {
-      inputs.current[index + 1]?.focus();
-    } else if (!value && index > 0) {
+    if (value) {
+      // Move to next input if current input is filled
+      if (index < otp.length - 1) {
+        inputs.current[index + 1]?.focus();
+      }
+    } else {
+      // Move to previous input if the input is empty
+      if (index > 0) {
+        inputs.current[index - 1]?.focus();
+      }
+    }
+  };
+
+  const handleKeyPress = (event: any, index: number) => {
+    if (event.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
       inputs.current[index - 1]?.focus();
     }
   };
+
 
   const handleVerify = async () => {
     const enteredOtp = otp.join('');
@@ -70,16 +80,16 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
       if (isLogin) {
         // Dispatch login thunk
         const response = await dispatch(
-          login({phone: phoneNumber, otp: enteredOtp}),
+          login({ phone: phoneNumber, otp: enteredOtp })
         ).unwrap();
         console.log('Login Successful!', response);
         // Navigate to the main app screen or dashboard
         navigation.navigate(DeliverAPackage.Home);
       } else {
         const response = await dispatch(
-          verifyOtp({phone: phoneNumber, otp: enteredOtp}),
+          verifyOtp({ phone: phoneNumber, otp: enteredOtp })
         ).unwrap();
-        console.log('Login Successful!', response);
+        console.log('OTP Verification Successful!', response);
         navigation.navigate(AuthScreens.SelectService);
       }
     } catch (err: any) {
@@ -88,65 +98,78 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setTimer(60);
     setOtp(['', '', '', '', '', '']);
     setError(false);
     inputs.current[0]?.focus();
-    // Optionally, you can dispatch requestOtp again here
+
+    try {
+      await dispatch(requestOtp({ phone: phoneNumber })).unwrap();
+      console.log("OTP Resent Successfully!");
+    } catch (error) {
+      console.log("OTP Resend Failed", error);
+    }
   };
 
+
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
       <Header logo isBack />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <TitleDescription
-            title="Enter verification code"
-            description={`Enter the code sent to: ${phoneNumber}`}
-          />
+          <View style={styles.titleDesccontainer}>
+            <Text style={styles.header}>Enter verification code</Text>
+            <Text style={styles.subtext}>Enter the 4-digit verification code sent to your phone:{phoneNumber}
+              <TouchableOpacity style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+              }} onPress={() => navigation.goBack()} >
+                <Text style={styles.changeHighlight}>Change</Text>
+              </TouchableOpacity>
+            </Text>
+          </View>
 
-          <View style={{marginBottom: 30}}>
+          <View style={{ marginBottom: 30 }}>
             <View style={styles.otpContainer}>
               {otp.map((digit, index) => (
                 <TextInput
                   key={index}
-                  ref={ref => (inputs.current[index] = ref!)}
+                  ref={(ref) => (inputs.current[index] = ref!)}
                   style={[
                     styles.input,
                     error
-                      ? {borderColor: colors.error}
+                      ? { borderColor: colors.error }
                       : digit
-                        ? {borderColor: colors.purple}
-                        : {borderColor: colors.border.primary},
+                        ? { borderColor: colors.purple }
+                        : { borderColor: colors.border.primary },
                   ]}
                   keyboardType="numeric"
                   maxLength={1}
                   value={digit}
-                  onChangeText={value => handleChange(value, index)}
+                  selectTextOnFocus
+                  onChangeText={(value) => handleChange(value, index)}
+                  onKeyPress={(event) => handleKeyPress(event, index)} // Add this line
                 />
+
               ))}
             </View>
 
             {error && (
-              <Text
-                style={{fontSize: 14, color: colors.error, marginVertical: 10}}>
+              <Text style={{ fontSize: 14, color: colors.error, marginVertical: 10 }}>
                 An error, please try again
               </Text>
             )}
           </View>
 
           <TouchableOpacity
-            style={[
-              styles.button,
-              otp.every(digit => digit) && styles.buttonFilled,
-            ]}
-            onPress={handleVerify}>
+            style={[styles.button, otp.every((digit) => digit) && styles.buttonFilled]}
+            onPress={handleVerify}
+          >
             <Text
-              style={[
-                styles.buttonText,
-                otp.every(digit => digit) && styles.buttonTextFilled,
-              ]}>
+              style={[styles.buttonText, otp.every((digit) => digit) && styles.buttonTextFilled]}
+            >
               {isLogin ? 'Login' : 'Verify Now'}
             </Text>
           </TouchableOpacity>
@@ -158,12 +181,15 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
               </>
             ) : (
               <TouchableOpacity onPress={handleResend}>
-                <Text>
-                  Resend code <Text style={styles.timer}>again</Text>
-                </Text>
+
+                <Text style={styles.timer}>Resend</Text>
+
               </TouchableOpacity>
             )}
           </Text>
+
+          {/* "Change phone number" clickable text */}
+
         </View>
       </TouchableWithoutFeedback>
     </SafeAreaView>
@@ -215,6 +241,36 @@ const styles = StyleSheet.create({
   },
   timer: {
     color: colors.purple,
+  },
+  changeContainer: {
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  changeText: {
+    textAlign: 'center',
+    fontSize: typography.fontSize.medium,
+    color: colors.text.primary,
+  },
+  changeHighlight: {
+    color: colors.purple,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    marginLeft: 5
+  },
+  titleDesccontainer: {
+    marginBottom: 20,
+  },
+  header: {
+    fontSize: typography.fontSize.large,
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    color: colors.purple,
+    fontFamily: typography.fontFamily.regular,
+    textAlign: 'left',
+    marginBottom: 10,
+  },
+  subtext: {
+    fontSize: typography.fontSize.medium,
+    color: colors.text.subText,
+    textAlign: 'left',
   },
 });
 

@@ -4,7 +4,9 @@ import EarningsModal from '../components/Modals/EarningsModal';
 import { colors } from '../theme/colors';
 import { useNavigation } from '@react-navigation/native';
 import { DeliverAPackage } from '../navigation/ScreenNames';
-
+// import Mapbox from '@rnmapbox/maps';
+import { MAPBOX_ACCESS_TOKEN } from "../utils/constants";
+// Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 const EarningsDetailsScreen: React.FC = () => {
   const [isEarningsModalVisible, setIsEarningsModalVisible] =
     useState<boolean>(true);
@@ -28,10 +30,10 @@ const EarningsDetailsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.mapContainer}>
-        <Image
-          source={require('../assets/images/Map.png')}
-          style={styles.mapImage}
-        />
+        {/* <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+          <Mapbox.Camera zoomLevel={14} centerCoordinate={[151.209900, -33.865143]} />
+
+        </Mapbox.MapView> */}
       </View>
 
       <EarningsModal
@@ -50,10 +52,10 @@ const EarningsDetailsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    // padding: 20,
     backgroundColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   openModalButton: {
     backgroundColor: colors.primary,

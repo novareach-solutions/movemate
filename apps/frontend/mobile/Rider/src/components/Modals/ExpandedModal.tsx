@@ -40,6 +40,7 @@ import PurplePhone from '../../assets/icons/purplePhone.svg';
 import PurpleMessage from '../../assets/icons/purpleMessage.svg';
 import PickUpNotes from "../../assets/icons/pickupNotes.svg";
 import Cart from "../../assets/icons/cart.svg";
+import OrderInfoCard from '../OrderInfoCard';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -54,8 +55,8 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
 }) => {
   // The component is always rendered. Its height animates between 22% (collapsed)
   // and 75–80% (expanded) of the screen.
-  const [height] = useState(new Animated.Value(SCREEN_HEIGHT * 0.2));
   const [isExpanded, setIsExpanded] = useState(true);
+  const [height] = useState(new Animated.Value(isExpanded ? SCREEN_HEIGHT * 0.75 : SCREEN_HEIGHT * 0.2));
   const [isConfirmPhotoVisible, setIsConfirmPhotoVisible] = useState(false);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -73,7 +74,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   const handleExpand = () => {
     setIsExpanded(true);
     Animated.timing(height, {
-      toValue: SCREEN_HEIGHT * 0.75,
+      toValue: SCREEN_HEIGHT * 0.80,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -270,28 +271,19 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
           <>
             <View style={styles.sectionContainer}>
               <InfoRow iconSource={GreenCircle} text="PickUp Details" bold />
-              <View style={styles.pickUpDetails}>
-                <View style={styles.pickUpDetailsTextContainer}>
-                  <Text style={styles.infoBoldText}>{currentOrder?.senderName}</Text>
-                  <Text style={styles.infoText}>
-                    {`${currentOrder.pickupLocation?.addressLine1} ${currentOrder.pickupLocation?.addressLine2}` ||
-                      'N/A'}
-                  </Text>
-                </View>
-                <View style={styles.pickupIcons}>
-                  <TouchableOpacity onPress={() => Alert.alert('Call Driver')}>
-                    <PurplePhone />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={navigateChatScreen}>
-                    <PurpleMessage />
-                  </TouchableOpacity>
-                </View>
-              </View>
+              <OrderInfoCard
+                title={currentOrder?.senderName || 'N/A'}
+                subtitle={`${currentOrder.pickupLocation?.addressLine1} ${currentOrder.pickupLocation?.addressLine2}` || 'N/A'}
+                onPressLeftIcon={() => Alert.alert('Call Driver')}
+                onPressRightIcon={navigateChatScreen}
+                LeftIcon={PurplePhone}
+                RightIcon={PurpleMessage}
+              />
             </View>
 
             <View style={styles.sectionContainer}>
               <InfoRow iconSource={PickUpNotes} text="Pickup Notes" bold />
-              <View style={styles.pickUpDetails}>
+              <View style={styles.pickupNotesContainer}>
                 <Text style={styles.infoText}>{order.deliveryInstructions}</Text>
               </View>
             </View>
@@ -434,7 +426,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    backgroundColor: "#F6F6F6",
+    borderRadius: 12
   },
   pickUpDetailsTextContainer: {
     flexDirection: 'column',
@@ -505,6 +500,9 @@ const styles = StyleSheet.create({
   collapsedSummary: {
     marginVertical: 10,
   },
+  pickupNotesContainer:{
+    paddingVertical:15
+  }
 });
 
 export default OrderExpandedModal;

@@ -114,8 +114,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.primary,
+    // borderBottomWidth: 1,
+    // borderBottomColor: colors.border.primary,
     position: 'relative',
   },
   backButton: {

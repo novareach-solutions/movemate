@@ -28,6 +28,7 @@ export type AppScreensParamList = {
   DocumentReviewScreen: {
     title: string;
     uploadedImage: any;
+    value:string
   };
 };
 

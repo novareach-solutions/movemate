@@ -8,7 +8,7 @@ import {
   DeliverAPackage,
   DeliverAPackageParamList,
 } from '../../navigation/ScreenNames';
-import {useAppDispatch} from '../../redux/hook';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
 import {setSignupData} from '../../redux/slices/authSlice';
 import Header from '../../components/Header';
 
@@ -26,6 +26,7 @@ type FormFields = {
 const DAPCompleteProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
   const dispatch = useAppDispatch();
+   const phoneNumber = useAppSelector(state => state.auth.phoneNumber);
   const handleFormSubmit = async (formData: FormFields) => {
     console.log('Form submitted:', formData);
     const user = {
@@ -37,6 +38,7 @@ const DAPCompleteProfileScreen = () => {
       suburb: formData.suburb,
       state: formData.state,
       postalCode: Number(formData.postalCode),
+      phoneNumber:phoneNumber
     };
 
     console.log('user', user);
@@ -46,13 +48,13 @@ const DAPCompleteProfileScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1,backgroundColor: colors.white}}>
       <Header logo isBack />
       <View style={styles.container}>
         <StepIndicator current={1} total={5} />
         <ProfileForm
           title="Complete your Profile"
-          description="Add your details to get started"
+          description="Let’s get to know you. Provide your details to kick-start your journey!"
           onSubmit={handleFormSubmit}
         />
       </View>

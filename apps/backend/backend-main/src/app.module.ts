@@ -40,7 +40,7 @@ import { RoleGuard } from "./shared/guards/roles.guard";
     GatewayModule,
     UserModule,
     SendAPackageModule,
-    StripeModule,
+    // StripeModule,
     MediaModule,
     OrderChatModule,
     TrackingModule,

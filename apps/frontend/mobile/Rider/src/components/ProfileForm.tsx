@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -49,11 +49,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       suburb: '',
       state: '',
       postalCode: '',
-      role: 'AGENT', // Added default value for role so it passes validation
+      role: 'AGENT', // Default value to pass validation
     },
   });
 
-  // Log errors and validity whenever they change
+  // Log errors and form validity
   useEffect(() => {
     console.log('Form errors:', errors);
     console.log('Form is valid:', isValid);
@@ -101,9 +101,17 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     setValue('suburb', place.suburb, { shouldValidate: true });
     setValue('state', place.state, { shouldValidate: true });
     setValue('postalCode', place.postalCode, { shouldValidate: true });
-
     setShowSuggestions(false);
   };
+
+  // Create refs for each TextInput to handle the "next" functionality
+  const firstNameRef = useRef<TextInput>(null);
+  const lastNameRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null);
+  const addressRef = useRef<TextInput>(null);
+  const suburbRef = useRef<TextInput>(null);
+  const stateRef = useRef<TextInput>(null);
+  const postalCodeRef = useRef<TextInput>(null);
 
   return (
     <KeyboardAvoidingView
@@ -122,12 +130,15 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             <View style={formStyles.inputWrapper}>
               <Text style={formStyles.inputLabel}>First Name</Text>
               <TextInput
+                ref={firstNameRef}
                 placeholder="Enter your first name"
                 placeholderTextColor={colors.text.subText}
                 style={[
                   formStyles.input,
                   errors.firstName && formStyles.errorInput,
                 ]}
+                returnKeyType="next"
+                onSubmitEditing={() => lastNameRef.current?.focus()}
                 onChangeText={(text) =>
                   setValue('firstName', text, {
                     shouldValidate: true,
@@ -146,12 +157,15 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             <View style={formStyles.inputWrapper}>
               <Text style={formStyles.inputLabel}>Last Name</Text>
               <TextInput
+                ref={lastNameRef}
                 placeholder="Enter your last name"
                 placeholderTextColor={colors.text.subText}
                 style={[
                   formStyles.input,
                   errors.lastName && formStyles.errorInput,
                 ]}
+                returnKeyType="next"
+                onSubmitEditing={() => emailRef.current?.focus()}
                 onChangeText={(text) =>
                   setValue('lastName', text, {
                     shouldValidate: true,
@@ -170,13 +184,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             <View style={formStyles.inputWrapper}>
               <Text style={formStyles.inputLabel}>Email Address</Text>
               <TextInput
+                ref={emailRef}
                 placeholder="Enter your email"
                 placeholderTextColor={colors.text.subText}
                 keyboardType="email-address"
-                style={[
-                  formStyles.input,
-                  errors.email && formStyles.errorInput,
-                ]}
+                style={[formStyles.input, errors.email && formStyles.errorInput]}
+                returnKeyType="next"
+                onSubmitEditing={() => addressRef.current?.focus()}
                 onChangeText={(text) =>
                   setValue('email', text, {
                     shouldValidate: true,
@@ -195,12 +209,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             <View style={formStyles.inputWrapper}>
               <Text style={formStyles.inputLabel}>Street Address</Text>
               <TextInput
+                ref={addressRef}
                 placeholder="Enter your address"
                 placeholderTextColor={colors.text.subText}
-                style={[
-                  formStyles.input,
-                  errors.address && formStyles.errorInput,
-                ]}
+                style={[formStyles.input, errors.address && formStyles.errorInput]}
+                returnKeyType="next"
+                onSubmitEditing={() => suburbRef.current?.focus()}
                 onChangeText={handleAddressChange}
                 value={address}
               />
@@ -235,13 +249,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             <View style={formStyles.inputWrapper}>
               <Text style={formStyles.inputLabel}>Suburb</Text>
               <TextInput
+                ref={suburbRef}
                 placeholder="Enter your suburb"
                 placeholderTextColor={colors.text.subText}
-                style={[
-                  formStyles.input,
-                  errors.suburb && formStyles.errorInput,
-                ]}
+                style={[formStyles.input, errors.suburb && formStyles.errorInput]}
                 value={suburb}
+                returnKeyType="next"
+                onSubmitEditing={() => stateRef.current?.focus()}
                 onChangeText={(text) =>
                   setValue('suburb', text, {
                     shouldValidate: true,
@@ -254,13 +268,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             <View style={formStyles.inputWrapper}>
               <Text style={formStyles.inputLabel}>State</Text>
               <TextInput
+                ref={stateRef}
                 placeholder="Enter your state"
                 placeholderTextColor={colors.text.subText}
-                style={[
-                  formStyles.input,
-                  errors.state && formStyles.errorInput,
-                ]}
+                style={[formStyles.input, errors.state && formStyles.errorInput]}
                 value={state}
+                returnKeyType="next"
+                onSubmitEditing={() => postalCodeRef.current?.focus()}
                 onChangeText={(text) =>
                   setValue('state', text, {
                     shouldValidate: true,
@@ -273,6 +287,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             <View style={formStyles.inputWrapper}>
               <Text style={formStyles.inputLabel}>Postal Code</Text>
               <TextInput
+                ref={postalCodeRef}
                 placeholder="Enter your postal code"
                 placeholderTextColor={colors.text.subText}
                 keyboardType="numeric"
@@ -281,6 +296,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                   errors.postalCode && formStyles.errorInput,
                 ]}
                 value={postalCode}
+                returnKeyType="done"
+                blurOnSubmit
                 onChangeText={(text) =>
                   setValue('postalCode', text.replace(/[^0-9]/g, ''), {
                     shouldValidate: true,

@@ -16,11 +16,12 @@ export const formStyles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: colors.border.primary,
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: 12,
+    padding: 14,
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
     color: colors.text.primary,
+    backgroundColor:'#FDFDFD'
   },
   focusedInput: {
     borderColor: colors.purple,
