@@ -30,7 +30,12 @@ import { TokenService } from "../auth/utils/generateTokens";
 import { dbReadRepo, dbRepo } from "../database/database.service";
 import { MediaService } from "../media/media.service";
 import { RedisService } from "../redis/redis.service";
-import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
+import {
+  DocumentError,
+  TAgent,
+  TAgentDocument,
+  TAgentPartial,
+} from "./agent.types";
 import { radii } from "./agents.constants";
 
 @Injectable()
@@ -42,7 +47,7 @@ export class AgentService {
     private readonly agentNotificationGateway: AgentNotificationGateway,
     private readonly tokenService: TokenService,
     private readonly mediaService: MediaService,
-  ) { }
+  ) {}
 
   async createAgent(
     agent: TAgent,
@@ -322,23 +327,26 @@ export class AgentService {
     return documents;
   }
 
-
   async setAgentStatus(
     agentId: number,
     status: AgentStatusEnum,
-  ): Promise<UpdateResult> {
+  ): Promise<UpdateResult | { errors: DocumentError[] }> {
     this.logger.debug(
       `AgentService.setAgentStatus: Setting status for agent ID ${agentId} to ${status}.`,
     );
-    const agent = await this.getAgentById(agentId);
-
-    if (agent.approvalStatus !== ApprovalStatusEnum.APPROVED) {
-      this.logger.error(
-        `AgentService.setAgentStatus: Cannot set status. Agent ID ${agentId} not approved.`,
+    if (status === AgentStatusEnum.ONLINE) {
+      const documents = await this.getAgentDocuments(agentId);
+      const unapprovedDocs = documents.filter(
+        (doc) => doc.approvalStatus !== ApprovalStatusEnum.APPROVED,
       );
-      throw new UserAccessDeniedError(
-        "Cannot set status. Agent is not approved.",
-      );
+      if (unapprovedDocs.length > 0) {
+        const errors = unapprovedDocs.map((doc) => ({
+          id: "document",
+          heading: `${doc.name} Not ${doc.approvalStatus}`,
+          text: `Your ${doc.name} is ${doc.approvalStatus.toLowerCase()}. Please reupload.`,
+        }));
+        return { errors };
+      }
     }
 
     this.logger.debug(
@@ -667,7 +675,7 @@ export class AgentService {
 
   private extractKeyFromUrl(fileUrl: string): string {
     const urlParts = fileUrl.split("/");
-    return urlParts[urlParts.length - 1]; 
+    return urlParts[urlParts.length - 1];
   }
 
   private waitForAcceptance(
@@ -689,7 +697,7 @@ export class AgentService {
             logger.debug(
               `waitForAcceptance: Received acceptance from agent ID ${data.agentId} for order ID ${orderId}.`,
             );
-            clearTimeout(timeoutHandle); 
+            clearTimeout(timeoutHandle);
             subscriber.removeListener("message", onMessage);
             void subscriber.unsubscribe(channel).catch((err) => {
               logger.error(

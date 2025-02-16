@@ -30,7 +30,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   @Post("otp/request")
   @AuthPostOtpRequestSwagger()
@@ -88,7 +88,7 @@ export class AuthController {
       response.json({
         success: true,
         message: "Login successful.",
-        data: responseData
+        data: responseData,
       });
     } else {
       response.json({
@@ -109,14 +109,14 @@ export class AuthController {
     const { phoneNumber, otp } = body;
     const { accessToken, refreshToken, userId, agentId } =
       await this.authService.login(phoneNumber, otp, role);
-  
+
     response.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: this.configService.get<string>("ENVIRONMENT") === "production",
       sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
     });
-  
+
     this.logger.log(
       `AuthController.login: Login successful for ${phoneNumber}`,
     );
@@ -130,7 +130,6 @@ export class AuthController {
       },
     });
   }
-  
 
   @Post("refresh-token")
   @AuthPostRefreshTokenSwagger()

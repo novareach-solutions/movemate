@@ -30,3 +30,9 @@ export type TAgentDocument = {
   agentId?: number;
   expiry?: Date;
 };
+
+export type DocumentError = {
+  id: string;
+  heading: string;
+  text: string;
+};

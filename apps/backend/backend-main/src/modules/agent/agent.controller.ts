@@ -42,8 +42,12 @@ import { OnboardingGuard } from "../../shared/guards/onboarding.guard";
 import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { AgentService } from "./agent.service";
+<<<<<<< Updated upstream
 import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
+=======
+import { DocumentError, TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
 import { AgentDocument } from "../../entity/AgentDocument";
+>>>>>>> Stashed changes
 
 @ApiTags("Agent")
 @Controller("agent")
@@ -53,7 +57,7 @@ export class AgentController {
   constructor(
     private readonly agentService: AgentService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   // *** Agent Sign Up, Status and List Specific Controllers ***
   @Post("signup")
@@ -214,23 +218,27 @@ export class AgentController {
   async setOwnAgentStatus(
     @Body() body: { status: AgentStatusEnum },
     @Req() request: ICustomRequest,
-  ): Promise<IApiResponse<UpdateResult>> {
+  ): Promise<IApiResponse<UpdateResult | DocumentError[]>> {
     const { status } = body;
     const agentId = request.user.agent.id;
-    this.logger.debug(
-      `AgentController.setOwnAgentStatus: Setting status for agent ${agentId} to ${status}`,
-    );
-    const data = await this.agentService.setAgentStatus(agentId, status);
-    this.logger.log(
-      `AgentController.setOwnAgentStatus: Status for agent ${agentId} set to ${status}.`,
-      data,
-    );
+    this.logger.debug(`AgentController.setOwnAgentStatus: Setting status for agent ${agentId} to ${status}`);
+    const result = await this.agentService.setAgentStatus(agentId, status);
+    if ("errors" in result) {
+      return {
+        success: false,
+        message: "Some documents are not approved.",
+        data: result.errors,
+      };
+    }
+    this.logger.log(`AgentController.setOwnAgentStatus: Status for agent ${agentId} set to ${status}.`, result);
     return {
       success: true,
       message: `Agent status updated to ${status}.`,
-      data,
+      data: result,
     };
   }
+
+
 
   @Get("profile/:id")
   // @UseGuards(AuthGuard, RoleGuard)
