@@ -19,7 +19,7 @@ import {
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
 import { MAPBOX_ACCESS_TOKEN } from "../../utils/constants";
-import Mapbox from "@rnmapbox/maps"
+// import Mapbox from "@rnmapbox/maps"
 import { showOrderModal, fetchOngoingOrder } from '../../redux/slices/orderSlice';
 import { io } from 'socket.io-client';
 import apiClient from '../../api/apiClient';
@@ -27,7 +27,7 @@ import apiEndPoints from '../../api/apiEndPoints';
 import { RootState } from '../../redux/store';
 import { OrderStatusEnum } from '../../redux/slices/types/enums';
 import { colors } from '../../theme/colors';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, useIsFocused, useNavigation } from '@react-navigation/native';
 import { AppScreensParamList } from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
 import Money from '../../assets/icons/money.svg';
@@ -38,7 +38,15 @@ import BlackArrow from '../../assets/icons/blackArrow.svg';
 
 // Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
-const HomeScreen: React.FC = () => {
+interface HomeScreenProps {
+  route: {
+    params: { orderComplete: boolean };
+  };
+}
+
+
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
   const [isLoading, setIsLoading] = useState(false);
@@ -47,6 +55,7 @@ const HomeScreen: React.FC = () => {
   const [agentId, setAgentId] = useState<string | null>(null);
   // Measured height of error content
   const [measuredErrorHeight, setMeasuredErrorHeight] = useState(0);
+  const { orderComplete = false } = route.params || {};
 
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
   const dispatch = useDispatch();
@@ -56,7 +65,6 @@ const HomeScreen: React.FC = () => {
   const ongoingOrder = useSelector(
     (state: RootState) => state.order.ongoingOrder,
   );
-  const [hasNavigated, setHasNavigated] = useState(false);
 
   // Define your error items
   const errorItemsData = [
@@ -66,7 +74,7 @@ const HomeScreen: React.FC = () => {
       text: 'Your account is not approved yet. Please Contact Admin',
       target: AppScreens.FAQScreen,
     }
-    
+
   ];
 
   const updateLocationAPI = async (latitude: number, longitude: number) => {
@@ -183,28 +191,36 @@ const HomeScreen: React.FC = () => {
     };
   }, [agentId, dispatch]);
 
-  useEffect(() => {
-    if (agentId) {
-      dispatch(fetchOngoingOrder());
-    }
-  }, [agentId, dispatch]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    console.log('Ongoing order value', ongoingOrder);
-    if (ongoingOrder && !hasNavigated) {
-      setHasNavigated(true);
-      if (ongoingOrder.status === OrderStatusEnum.PICKEDUP_ORDER) {
-        navigation.navigate(DeliverAPackage.DropOffOrderDetails, {
-          order: ongoingOrder,
-        });
+    const fetchOrder = async () => {
+      if (agentId && isFocused) {
+        await dispatch(fetchOngoingOrder());
       }
-      else {
-        navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
-          order: ongoingOrder,
-        });
+    };
+  
+    fetchOrder();
+  }, [agentId, dispatch, isFocused]);
+  
+
+  useEffect(() => {
+    if (isFocused) {
+      console.log("Home Screen", ongoingOrder, orderComplete);
+      if (ongoingOrder && !orderComplete) {
+        if (ongoingOrder.status === OrderStatusEnum.PICKEDUP_ORDER) {
+          navigation.navigate(DeliverAPackage.DropOffOrderDetails, {
+            order: ongoingOrder,
+          });
+        } else {
+          console.log("Navigating", ongoingOrder);
+          navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
+            order: ongoingOrder,
+          });
+        }
       }
     }
-  }, [ongoingOrder, hasNavigated, navigation]);
+  }, [isFocused, ongoingOrder, orderComplete, navigation]);
 
   const renderErrorContent = useCallback(() => (
     <View>
@@ -250,10 +266,17 @@ const HomeScreen: React.FC = () => {
       </View>
 
       <View style={styles.statsContainer}>
-        <StatCard icon={Money} value="$50" label="EARNINGS" />
-        <StatCard icon={Order} value="7" label="ORDERS" />
-        <StatCard icon={Distance} value="30 Km" label="DISTANCE" />
+        <View style={[styles.statCardWrapper, styles.borderRight]}>
+          <StatCard icon={Money} value="$50" label="EARNINGS" />
+        </View>
+        <View style={[styles.statCardWrapper, styles.borderRight]}>
+          <StatCard icon={Order} value="7" label="ORDERS" />
+        </View>
+        <View style={styles.statCardWrapper}>
+          <StatCard icon={Distance} value="1.5 hr" label="TIME" />
+        </View>
       </View>
+
 
       {/* Status Button */}
       <View style={styles.statusContainer}>
@@ -318,6 +341,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     position: 'relative',
+    backgroundColor: colors.darkGreen
   },
   mapImage: {
     width: '100%',
@@ -328,6 +352,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: -100,
     backgroundColor: colors.white,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25
   },
   statusButton: {
     width: 80,
@@ -370,7 +396,7 @@ const styles = StyleSheet.create({
     top: 80,
     width: "95%",
     alignSelf: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 25,
     borderRadius: 20,
     borderWidth: 1,
@@ -422,7 +448,7 @@ const styles = StyleSheet.create({
   },
   errorTextContainer: {
     flex: 1,
-    gap:10
+    gap: 10
   },
   errorHeading: {
     fontSize: 16,
@@ -438,13 +464,22 @@ const styles = StyleSheet.create({
     color: '#D32F2F',
     marginLeft: 10,
   },
-  // Hidden container for measurement (placed off-screen)
   hiddenContainer: {
     position: 'absolute',
     top: -1000,
     left: 0,
     right: 0,
     opacity: 0,
+  },
+
+  statCardWrapper: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  borderRight: {
+    borderRightWidth: 1,
+    borderColor: '#A8A6A6',
   },
 });
 

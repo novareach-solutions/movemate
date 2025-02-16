@@ -1,62 +1,74 @@
-import React, {useState} from 'react';
+// components/AutoCompleteInput.tsx
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  TextInput,
+  FlatList,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
   TextStyle,
 } from 'react-native';
-import {colors} from '../theme/colors';
-import {typography} from '../theme/typography';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
 
-interface DropdownProps {
+interface AutoCompleteInputProps {
   label: string;
   placeholder: string;
-  options: string[];
-  selectedValue: string;
+  suggestions: string[];
+  value: string;
   onValueChange: (value: string) => void;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({
+const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   label,
   placeholder,
-  options,
-  selectedValue,
+  suggestions,
+  value,
   onValueChange,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const handleSelect = (value: string) => {
-    onValueChange(value);
-    setIsOpen(false);
+  useEffect(() => {
+    if (value) {
+      const filtered = suggestions.filter((sugg) =>
+        sugg.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredSuggestions(filtered);
+    } else {
+      setFilteredSuggestions(suggestions);
+    }
+  }, [value, suggestions]);
+
+  const handleSelect = (selection: string) => {
+    onValueChange(selection);
+    setShowSuggestions(false);
   };
 
   return (
     <View style={styles.wrapper}>
       <Text style={styles.label}>{label}</Text>
-
-      {/* Main Dropdown Selection */}
-      <TouchableOpacity style={styles.input} onPress={() => setIsOpen(!isOpen)}>
-        <Text
-          style={{
-            color: selectedValue ? colors.text.primary : colors.text.subText,
-          }}>
-          {selectedValue || placeholder}
-        </Text>
-      </TouchableOpacity>
-
-      {/* Overlapping Dropdown Options */}
-      {isOpen && (
-        <View style={styles.dropdown}>
+      <TextInput
+        style={styles.input}
+        placeholder={placeholder}
+        value={value}
+        onChangeText={(text) => {
+          onValueChange(text);
+          setShowSuggestions(true);
+        }}
+        placeholderTextColor={colors.text.subText}
+      />
+      {showSuggestions && filteredSuggestions.length > 0 && (
+        <View style={styles.suggestionsContainer}>
           <FlatList
-            data={options}
+            data={filteredSuggestions}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({item}) => (
+            renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.option}
+                style={styles.suggestionItem}
                 onPress={() => handleSelect(item)}>
-                <Text style={styles.optionText}>{item}</Text>
+                <Text style={styles.suggestionText}>{item}</Text>
               </TouchableOpacity>
             )}
           />
@@ -85,7 +97,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
   },
-  dropdown: {
+  suggestionsContainer: {
     position: 'absolute',
     top: '100%',
     left: 0,
@@ -95,19 +107,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 5,
     backgroundColor: colors.white,
-    maxHeight: 250,
+    maxHeight: 150,
     zIndex: 999,
-    elevation: 5,
   },
-  option: {
+  suggestionItem: {
     padding: 12,
     borderBottomWidth: 1,
     borderColor: colors.border.primary,
   },
-  optionText: {
+  suggestionText: {
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
   },
 });
 
-export default Dropdown;
+export default AutoCompleteInput;

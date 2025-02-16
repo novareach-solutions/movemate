@@ -8,7 +8,10 @@ export type TAgent = {
   profilePhoto?: string;
   status: AgentStatusEnum;
   vehicles?: TAgentVehicle[];
+  driverLicenseNumber?: string;
+  driverLicenseExpiryDate?: Date;
 };
+
 
 export type TAgentPartial = {
   user?: TUpdateUser;

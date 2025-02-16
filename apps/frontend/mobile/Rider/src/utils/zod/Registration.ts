@@ -15,9 +15,20 @@ export const ZCreateAccountSchema = z.object({
 });
 
 export const ZVehicleSchema = z.object({
-  make: z.string().nonempty({message: 'Vehicle make is required'}),
-  model: z.string().nonempty({message: 'Vehicle model is required'}),
-  year: z.string().regex(/^\d{4}$/, {message: 'Enter a valid 4-digit year'}),
+  make: z.string().nonempty({ message: 'Vehicle make is required' }),
+  model: z.string().nonempty({ message: 'Vehicle model is required' }),
+  year: z
+    .string()
+    .regex(/^\d{4}$/, { message: 'Enter a valid 4-digit year' }),
+  licensePlate: z
+    .string()
+    .nonempty({ message: 'License plate number is required' }),
+  registrationExpiry: z
+    .string()
+    .nonempty({ message: 'Registration expiry date is required' })
+    .regex(/^(0[1-9]|1[0-2])\/\d{4}$/, {
+      message: 'Enter a valid expiry date in MM/YYYY format',
+    }),
 });
 
 export const ZABNSchema = z.object({

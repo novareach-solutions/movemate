@@ -6,18 +6,28 @@ import { useNavigation } from '@react-navigation/native';
 import { DeliverAPackage } from '../navigation/ScreenNames';
 // import Mapbox from '@rnmapbox/maps';
 import { MAPBOX_ACCESS_TOKEN } from "../utils/constants";
+import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../redux/hook';
+import { fetchOngoingOrder } from '../redux/slices/orderSlice';
 // Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 const EarningsDetailsScreen: React.FC = () => {
   const [isEarningsModalVisible, setIsEarningsModalVisible] =
     useState<boolean>(true);
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
 
   const handleOpenEarningsModal = () => {
     setIsEarningsModalVisible(true);
   };
 
-  const handleCloseEarningsModal = () => {
-    navigation.navigate(DeliverAPackage.Home);
+  const handleCloseEarningsModal = async () => {
+    await dispatch(fetchOngoingOrder()).unwrap();
+    console.log("navigate to earning details screen")
+    navigation.reset({
+      index: 0,
+      routes: [{ name: DeliverAPackage.Home, params: { orderComplete: true } }],
+    });
+    
     setIsEarningsModalVisible(false);
   };
 

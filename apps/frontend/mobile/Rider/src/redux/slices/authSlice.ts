@@ -105,7 +105,7 @@ export const uploadMedia = createAsyncThunk(
       } else {
         errorMessage = 'An unexpected error occurred.';
       }
-      Alert.alert('Upload Media Error', errorMessage); // Display an alert for the error
+      // Alert.alert('Upload Media Error', errorMessage); // Display an alert for the error
       return rejectWithValue(errorMessage);
     }
   },
@@ -114,12 +114,31 @@ export const uploadMedia = createAsyncThunk(
 // Verify OTP
 export const verifyOtp = createAsyncThunk(
   'auth/verifyOtp',
-  async ({phone, otp}: {phone: string; otp: string}, {rejectWithValue}) => {
+  async (
+    { phone, otp }: { phone: string; otp: string },
+    { rejectWithValue },
+  ) => {
     try {
       const response = await apiClient.post(apiEndPoints.verifyOtp, {
         phoneNumber: phone,
         otp,
       });
+
+          const data = response.data.data;
+console.log("login response",data)
+
+      if (data.status === 'existing_user' && data.accessToken) {
+        const { accessToken, agentId, userId } = data;
+        await saveToken('accessToken', accessToken);
+        await saveToken('userId', String(userId));
+        if (agentId !== undefined) {
+          await saveToken('agentId', String(agentId));
+        }
+        SimpleToast('Login successful.');
+      } else if (data.status === 'new_user') {
+        SimpleToast('New user detected.');
+      }
+
       return response.data;
     } catch (error: any) {
       let errorMessage = 'An unexpected error occurred.';
@@ -130,11 +149,12 @@ export const verifyOtp = createAsyncThunk(
       } else {
         console.error('Unexpected Error:', error);
       }
-      Alert.alert('Verify OTP Error', errorMessage); // Display an alert for the error
+      Alert.alert('Verify OTP Error', errorMessage);
       return rejectWithValue(errorMessage);
     }
   },
 );
+
 
 // Login
 export const login = createAsyncThunk(
@@ -325,6 +345,7 @@ const authSlice = createSlice({
       })
       .addCase(verifyOtp.fulfilled, state => {
         state.loading = false;
+        state.isAuthenticated = true;
       })
       .addCase(verifyOtp.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;

@@ -153,9 +153,9 @@ const Onboarding: React.FC = () => {
               : 'Continue >'}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogin} style={styles.secondaryButton}>
+        {/* <TouchableOpacity onPress={handleLogin} style={styles.secondaryButton}>
           <Text style={styles.secondaryButtonText}>Login</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );

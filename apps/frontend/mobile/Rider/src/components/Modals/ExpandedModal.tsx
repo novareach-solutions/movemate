@@ -41,6 +41,7 @@ import PurpleMessage from '../../assets/icons/purpleMessage.svg';
 import PickUpNotes from "../../assets/icons/pickupNotes.svg";
 import Cart from "../../assets/icons/cart.svg";
 import OrderInfoCard from '../OrderInfoCard';
+import PickUpIcon from "../../assets/icons/pickuplocationAvatar.svg"
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -65,10 +66,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   const dispatch = useDispatch();
   const currentOrder = useSelector((state: RootState) => state.order.ongoingOrder);
 
-  // Optionally, perform any effect when the order changes.
-  useEffect(() => {
-    // ...
-  }, [order]);
+ 
 
   // Expand to 75% of screen height
   const handleExpand = () => {
@@ -214,7 +212,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
       }
     } catch (error: any) {
       console.error('Upload failed:', error);
-      Alert.alert('Upload Failed', error.message || 'Please try again.');
+      // Alert.alert('Upload Failed', error.message || 'Please try again.');
     }
   };
 
@@ -270,7 +268,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
         {isExpanded && (
           <>
             <View style={styles.sectionContainer}>
-              <InfoRow iconSource={GreenCircle} text="PickUp Details" bold />
+              <InfoRow iconSource={PickUpIcon} text="PickUp Details" bold />
               <OrderInfoCard
                 title={currentOrder?.senderName || 'N/A'}
                 subtitle={`${currentOrder.pickupLocation?.addressLine1} ${currentOrder.pickupLocation?.addressLine2}` || 'N/A'}

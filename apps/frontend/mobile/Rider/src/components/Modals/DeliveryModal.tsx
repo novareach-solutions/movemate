@@ -179,7 +179,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
   const handleOrderDelivered = async () => {
     try {
       await dispatch(completeOrder({ orderId: currentOrder.id })).unwrap();
-      await dispatch(fetchOngoingOrder()).unwrap();
+      console.log("navigate to earning details screen")
       navigation.navigate(DeliverAPackage.EarningsDetails);
     } catch (error) {
       console.error('Error completing order:', error);

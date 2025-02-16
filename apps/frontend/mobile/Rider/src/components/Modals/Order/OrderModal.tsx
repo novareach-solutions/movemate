@@ -22,6 +22,8 @@ import RedCircle from '../../../assets/icons/redCircle.svg';
 import GreenCircle from '../../../assets/icons/greenCircle.svg';
 import { SvgProps } from 'react-native-svg';
 import { typography } from '../../../theme/typography';
+import DashedFullWidth from "../../../assets/border/dashedFullWidth.svg"
+import CancelOrderModal from '../CancelOrderModal';
 
 interface ModalComponentProps {
   isVisible: boolean;
@@ -73,9 +75,10 @@ const OrderModal: React.FC<ModalComponentProps> = ({
   orderId,
   onAcceptOrderSuccess, // Destructure the new prop
 }) => {
+  const [isCancelModalVisible, setCancelModalVisible] = useState(false);
   const dispatch = useDispatch();
   const [progress] = useState(new Animated.Value(0));
-  const timerDuration = 40000; // 40 seconds
+  const timerDuration = 100000; // 40 seconds
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -117,71 +120,86 @@ const OrderModal: React.FC<ModalComponentProps> = ({
   };
 
   const handleCancelOrder = () => {
-    dispatch(hideOrderModal());
-  }
+    setCancelModalVisible(true);
+  };
 
   return (
-    <Modal
-      visible={isVisible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          <View style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between"
-          }}><Text style={styles.totalEarningsLabel}>Total Earning</Text>
-            <View style={styles.deliveryType}>
-              <Text style={styles.deliveryTypeText}>Tip: 4$</Text>
+    <>
+      <Modal
+        visible={isVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={onClose}>
+        <View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between"
+            }}><Text style={styles.totalEarningsLabel}>Total Earning</Text>
+              <View style={styles.deliveryType}>
+                <Text style={styles.deliveryTypeText}>Delivery A Package</Text>
+              </View>
             </View>
-          </View>
-          <View style={styles.earning}>
-            <Text style={styles.totalEarnings}>24$</Text>
-            <View style={styles.tipBadge}>
-              <Text style={styles.tipBadgeText}>Tip: 4$</Text>
+            <View style={styles.earning}>
+              <Text style={styles.totalEarnings}>24$</Text>
+              <View style={styles.tipBadge}>
+                <Text style={styles.tipBadgeText}>Tip: 4$</Text>
+              </View>
             </View>
-          </View>
 
-          <View style={styles.infoContainer}>
-            <InfoRow iconSource={Alarm} text={`${time} to deliver`} />
-            <InfoRow iconSource={Cycle} text={`${distance}`} />
-          </View>
 
-          <View style={styles.addressContainer}>
-            <InfoRow iconSource={RedCircle} text={pickupAddress} />
-            <InfoRow iconSource={GreenCircle} text={dropoffAddress} />
-          </View>
 
-          {/* Accept Order Button */}
-          <View style={styles.buttonContainer}>
-            {/* Accept Order Button - 80% Width */}
-            <View style={styles.acceptButtonContainer}>
-              <View style={styles.darkBackground} />
-              <Animated.View
-                style={[
-                  styles.timerButtonBackground,
-                  { width: widthInterpolation },
-                ]}
-              />
-              <TouchableOpacity
-                style={styles.acceptOrderButton}
-                onPress={handleAcceptOrder}>
-                <Text style={styles.acceptOrderText}>Accept Order</Text>
+            <View style={styles.infoContainer}>
+              <InfoRow iconSource={Alarm} text={`${time} to deliver`} />
+              <InfoRow iconSource={Cycle} text={`${distance}`} />
+            </View>
+            <View style={{
+              paddingTop: 10
+            }}>
+              <DashedFullWidth />
+            </View>
+            <View style={styles.addressContainer}>
+              <InfoRow iconSource={RedCircle} text={pickupAddress} />
+              <InfoRow iconSource={GreenCircle} text={dropoffAddress} />
+            </View>
+
+            {/* Accept Order Button */}
+            <View style={styles.buttonContainer}>
+              {/* Accept Order Button - 80% Width */}
+              <View style={styles.acceptButtonContainer}>
+                <View style={styles.darkBackground} />
+                <Animated.View
+                  style={[
+                    styles.timerButtonBackground,
+                    { width: widthInterpolation },
+                  ]}
+                />
+                <TouchableOpacity
+                  style={styles.acceptOrderButton}
+                  onPress={handleAcceptOrder}>
+                  <Text style={styles.acceptOrderText}>Accept Order</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Cancel Order Button - 20% Width */}
+              <TouchableOpacity style={styles.cancelButton} onPress={handleCancelOrder}>
+                <Text style={styles.cancelButtonText}>X</Text>
               </TouchableOpacity>
             </View>
 
-            {/* Cancel Order Button - 20% Width */}
-            <TouchableOpacity style={styles.cancelButton} onPress={handleCancelOrder}>
-              <Text style={styles.cancelButtonText}>X</Text>
-            </TouchableOpacity>
           </View>
-
         </View>
-      </View>
-    </Modal>
-  );
+      </Modal>
+      <CancelOrderModal
+        isVisible={isCancelModalVisible}
+        onClose={() => setCancelModalVisible(false)}
+        onRejectOrder={() => {
+          setCancelModalVisible(false);
+          dispatch(hideOrderModal()); 
+        }}
+      />
+    </>);
 };
 
 const styles = StyleSheet.create({
@@ -196,7 +214,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     borderWidth: 1,
     borderColor: colors.purple,
-    padding: 25,
+    paddingHorizontal: 25,
+    paddingTop: 30,
+    paddingBottom: 25,
     position: "relative"
   },
   tipBadge: {
@@ -255,8 +275,6 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   addressContainer: {
-    borderTopWidth: 1,
-    borderTopColor: colors.border.primary,
     marginTop: 10,
     paddingVertical: 20,
   },
@@ -311,7 +329,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 20,
-    gap:10
+    gap: 10
   },
 
   acceptButtonContainer: {
@@ -326,13 +344,14 @@ const styles = StyleSheet.create({
     flex: 0.2,
     height: 50,
     borderRadius: 8,
-    backgroundColor: colors.error,
+    borderWidth: 1,
+    borderColor: colors.error,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   cancelButtonText: {
-    color: colors.white,
+    color: colors.error,
     fontSize: 18,
     fontWeight: 'bold',
   },

@@ -56,7 +56,7 @@ export class AgentService {
     const { abnNumber, user, vehicles } = agent;
     const queryRunner: QueryRunner = dbRepo(Agent).manager.connection.createQueryRunner();
     await queryRunner.startTransaction();
-
+  
     try {
       this.logger.debug(`AgentService.createAgent: Checking if agent with ABN ${abnNumber} exists.`);
       const existingAgent = await queryRunner.manager.findOne(Agent, { where: { abnNumber } });
@@ -64,7 +64,7 @@ export class AgentService {
         this.logger.error(`AgentService.createAgent: Agent with ABN ${abnNumber} already exists.`);
         throw new UserAlreadyExistsError(`Agent with ABN number ${abnNumber} already exists.`);
       }
-
+  
       this.logger.debug(`AgentService.createAgent: Checking if user with phone ${user.phoneNumber} or email ${user.email} exists.`);
       const existingUserByPhone = await queryRunner.manager.findOne(User, { where: { phoneNumber: user.phoneNumber } });
       const existingUserByEmail = await queryRunner.manager.findOne(User, { where: { email: user.email } });
@@ -72,11 +72,11 @@ export class AgentService {
         this.logger.error(`AgentService.createAgent: User with phone ${user.phoneNumber} or email ${user.email} already exists.`);
         throw new UserAlreadyExistsError(`User with phone number or email already exists.`);
       }
-
+  
       this.logger.debug(`AgentService.createAgent: Creating user record.`);
       const newUser = queryRunner.manager.create(User, user);
       const savedUser = await queryRunner.manager.save(User, newUser);
-
+  
       this.logger.debug(`AgentService.createAgent: Creating agent record.`);
       const newAgent = queryRunner.manager.create(Agent, {
         agentType: agent.agentType,
@@ -85,9 +85,11 @@ export class AgentService {
         status: AgentStatusEnum.OFFLINE,
         approvalStatus: ApprovalStatusEnum.PENDING,
         userId: savedUser.id,
+        driverLicenseNumber: agent.driverLicenseNumber,
+        driverLicenseExpiryDate: agent.driverLicenseExpiryDate,
       });
       const savedAgent = await queryRunner.manager.save(Agent, newAgent);
-
+  
       // If vehicles are provided, create each vehicle record.
       if (vehicles && vehicles.length > 0) {
         for (const vehicle of vehicles) {
@@ -98,7 +100,7 @@ export class AgentService {
           await queryRunner.manager.save(AgentVehicle, newVehicle);
         }
       }
-
+  
       // Generate tokens for the user.
       const accessToken = this.tokenService.generateAccessToken(
         savedUser.id,
@@ -106,10 +108,10 @@ export class AgentService {
         savedUser.role,
       );
       const refreshToken = this.tokenService.generateRefreshToken(savedUser.id);
-
+  
       this.logger.debug(`AgentService.createAgent: Agent with ID ${savedAgent.id} created successfully.`);
       await queryRunner.commitTransaction();
-
+  
       return { agent: savedAgent, accessToken, refreshToken };
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -119,6 +121,7 @@ export class AgentService {
       await queryRunner.release();
     }
   }
+  
 
   async getOngoingOrder(agentId: number): Promise<SendPackageOrder | null> {
     return await dbReadRepo(SendPackageOrder).findOne({

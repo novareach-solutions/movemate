@@ -1,3 +1,4 @@
+// screens/EnterVehicleDetailsScreen.tsx
 import React from 'react';
 import {
   View,
@@ -9,10 +10,11 @@ import {
   TouchableOpacity,
   TextInput,
   Platform,
+  ScrollView,
+  KeyboardAvoidingView,
 } from 'react-native';
 import Header from '../../components/Header';
 import StepIndicator from '../../components/StepIndicator';
-import Dropdown from '../../components/Dropdown';
 import { colors } from '../../theme/colors';
 import { formStyles } from '../../theme/form';
 import {
@@ -24,11 +26,19 @@ import { useAppDispatch } from '../../redux/hook';
 import { setSignupData } from '../../redux/slices/authSlice';
 import { australianCarData } from '../../utils/australianCarData';
 import { useForm, Controller } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ZVehicleSchema } from '../../utils/zod/Registration';
+import TitleDescription from '../../components/TitleDescription';
+// Note: AutoCompleteInput is imported from the file for dropdown autocomplete
+import AutoCompleteInput from '../../components/Dropdown';
 
-type FormFields = z.infer<typeof ZVehicleSchema>;
+type FormFields = {
+  make: string;
+  model: string;
+  year: string;
+  licensePlate: string;
+  registrationExpiry: string;
+};
 
 const EnterVehicleDetailsScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -46,6 +56,8 @@ const EnterVehicleDetailsScreen: React.FC = () => {
       make: '',
       model: '',
       year: '',
+      licensePlate: '',
+      registrationExpiry: '',
     },
   });
 
@@ -53,6 +65,7 @@ const EnterVehicleDetailsScreen: React.FC = () => {
 
   const vehicleMakes = australianCarData.map(item => item.make);
 
+  // Get the models for the selected make
   const vehicleModels =
     selectedMake && australianCarData.find(item => item.make === selectedMake)
       ? australianCarData.find(item => item.make === selectedMake)!.models
@@ -65,6 +78,8 @@ const EnterVehicleDetailsScreen: React.FC = () => {
       vehicleMake: data.make,
       vehicleModel: data.model,
       vehicleYear: Number(data.year),
+      licensePlate: data.licensePlate,
+      registrationExpiry: data.registrationExpiry,
       agentType: 'DELIVERY',
     };
 
@@ -76,25 +91,32 @@ const EnterVehicleDetailsScreen: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       <Header logo isBack />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.container}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
           <StepIndicator current={2} total={5} />
-          {/* Replace ScrollView with a plain View so the whole screen isn’t scrollable */}
-          <View style={styles.content}>
-            <Text style={styles.title}>Enter your vehicle details</Text>
+          {/* Wrap fields in a ScrollView to allow scrolling */}
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.contentContainer}
+            keyboardShouldPersistTaps="handled">
+            <TitleDescription
+              title="Enter your vehicle details"
+              description="Add your details to get started"
+            />
 
-            {/* Make Dropdown */}
+            {/* Make AutoComplete Input */}
             <Controller
               control={control}
               name="make"
               render={({ field: { onChange, value } }) => (
-                <Dropdown
+                <AutoCompleteInput
                   label="Make"
-                  placeholder="Select the make of your vehicle"
-                  options={vehicleMakes}
-                  selectedValue={value}
-                  onValueChange={(val) => {
-                    onChange(val);
-                  }}
+                  placeholder="Type to search for your vehicle make"
+                  suggestions={vehicleMakes}
+                  value={value}
+                  onValueChange={(val) => onChange(val)}
                 />
               )}
             />
@@ -102,16 +124,16 @@ const EnterVehicleDetailsScreen: React.FC = () => {
               <Text style={formStyles.errorText}>{errors.make.message}</Text>
             )}
 
-            {/* Model Dropdown */}
+            {/* Model AutoComplete Input */}
             <Controller
               control={control}
               name="model"
               render={({ field: { onChange, value } }) => (
-                <Dropdown
+                <AutoCompleteInput
                   label="Model"
-                  placeholder="Select the model of your vehicle"
-                  options={vehicleModels}
-                  selectedValue={value}
+                  placeholder="Type to search for your vehicle model"
+                  suggestions={vehicleModels}
+                  value={value}
                   onValueChange={onChange}
                 />
               )}
@@ -145,9 +167,64 @@ const EnterVehicleDetailsScreen: React.FC = () => {
             {errors.year && (
               <Text style={formStyles.errorText}>{errors.year.message}</Text>
             )}
-          </View>
 
-          {/* Fixed Footer with full-width Continue button */}
+            {/* License Plate Number Input */}
+            <Controller
+              control={control}
+              name="licensePlate"
+              render={({ field: { onChange, value } }) => (
+                <View style={formStyles.inputWrapper}>
+                  <Text style={formStyles.inputLabel}>License Plate Number</Text>
+                  <TextInput
+                    style={formStyles.input}
+                    placeholder="Enter your license plate number"
+                    value={value}
+                    onChangeText={onChange}
+                    placeholderTextColor={colors.text.subText}
+                    returnKeyType="done"
+                    onSubmitEditing={Keyboard.dismiss}
+                  />
+                </View>
+              )}
+            />
+            {errors.licensePlate && (
+              <Text style={formStyles.errorText}>
+                {errors.licensePlate.message}
+              </Text>
+            )}
+
+            {/* Registration Expiry Date Input */}
+            <Controller
+              control={control}
+              name="registrationExpiry"
+              render={({ field: { onChange, value } }) => (
+                <View style={formStyles.inputWrapper}>
+                  <Text style={formStyles.inputLabel}>
+                    Registration Expiry Date
+                  </Text>
+                  <TextInput
+                    style={formStyles.input}
+                    placeholder="MM/YYYY"
+                    value={value}
+                    onChangeText={onChange}
+                    placeholderTextColor={colors.text.subText}
+                    returnKeyType="done"
+                    onSubmitEditing={Keyboard.dismiss}
+                  />
+                </View>
+              )}
+            />
+            {errors.registrationExpiry && (
+              <Text style={formStyles.errorText}>
+                {errors.registrationExpiry.message}
+              </Text>
+            )}
+
+            {/* Extra bottom padding so content doesn't get hidden */}
+            <View style={{ height: 100 }} />
+          </ScrollView>
+
+          {/* Footer with Continue button */}
           <View style={styles.footer}>
             <TouchableOpacity
               style={[
@@ -173,7 +250,7 @@ const EnterVehicleDetailsScreen: React.FC = () => {
               <Text style={formStyles.link}>Privacy Policy</Text>
             </Text>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </SafeAreaView>
   );
@@ -186,17 +263,14 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: colors.white,
   },
-  content: {
+  scrollView: {
     flex: 1,
+    paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: colors.text.primary,
+  contentContainer: {
+    paddingVertical: 20,
   },
   footer: {
     borderTopWidth: 1,
@@ -204,6 +278,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingVertical: 15,
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   fullWidthButton: {
     width: '100%',

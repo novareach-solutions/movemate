@@ -8,8 +8,6 @@ import {
   RelationId,
   Unique,
 } from "typeorm";
-
-import { TAgent } from "../modules/agent/agent.types";
 import {
   AgentStatusEnum,
   AgentTypeEnum,
@@ -52,6 +50,14 @@ export class Agent extends BaseEntity {
 
   @Column({ type: "varchar", nullable: true })
   profilePhoto: string;
+
+  // New field for driver license number
+  @Column({ type: "varchar", nullable: true })
+  driverLicenseNumber: string;
+
+  // New field for driver license expiry date
+  @Column({ type: "timestamp", nullable: true })
+  driverLicenseExpiryDate: Date;
 
   @Column({
     type: "varchar",

@@ -1,6 +1,6 @@
 // src/api/apiEndPoints.ts
 
-const baseURL = 'https://backend.vamoose.com.au'; 
+const baseURL = 'http://192.168.29.63:3000'; 
 
 const createEndpoint = (path: string) => `${baseURL}${path}`;
 
