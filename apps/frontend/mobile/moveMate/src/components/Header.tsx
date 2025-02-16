@@ -1,12 +1,19 @@
 // Header.tsx
 
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Image, Text, TextStyle } from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { colors } from '../theme/colors';
-import { images } from '../assets/images/images';
-import { AppScreens, AuthScreensParamList } from '../navigation/ScreenNames';
-import { typography } from '../theme/typography';
+import React from "react";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Text,
+  TextStyle,
+} from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { colors } from "../theme/colors";
+import { images } from "../assets/images/images";
+import { AppScreens, AuthScreensParamList } from "../navigation/ScreenNames";
+import { typography } from "../theme/typography";
 
 interface HeaderProps {
   isBack?: boolean;
@@ -14,11 +21,19 @@ interface HeaderProps {
   home?: boolean;
   title?: string;
   earningScreen?: boolean;
-  bgColor?:string;
+  bgColor?: string;
   onClickButton?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScreen, bgColor = 'white',onClickButton }) => {
+const Header: React.FC<HeaderProps> = ({
+  isBack,
+  logo,
+  home,
+  title,
+  earningScreen,
+  bgColor = "white",
+  onClickButton,
+}) => {
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
 
   const handleHomePress = () => {
@@ -26,21 +41,28 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScree
   };
 
   return (
-    <View style={!earningScreen ? [styles.container,{backgroundColor:bgColor}] : {
-      backgroundColor: '#2a1d3d',
-      height: 60,
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      // borderBottomWidth: 1,
-      position: 'relative',
-    }}>
+    <View
+      style={
+        !earningScreen
+          ? [styles.container, { backgroundColor: bgColor }]
+          : {
+              backgroundColor: "#2a1d3d",
+              height: 60,
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 20,
+              // borderBottomWidth: 1,
+              position: "relative",
+            }
+      }
+    >
       {/* Back Button */}
       {isBack && (
         <TouchableOpacity
           style={styles.backButton}
-          onPress={onClickButton ? onClickButton : () => navigation.goBack()}>
-             <images.BackArrow />
+          onPress={onClickButton ? onClickButton : () => navigation.goBack()}
+        >
+          <images.BackArrow />
           {/* <Image source={images.arrow} style={styles.arrow} /> */}
         </TouchableOpacity>
       )}
@@ -48,7 +70,7 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScree
       {/* Logo */}
       {logo && (
         <View style={styles.logoContainer}>
-          <images.Logo width={100} height={40}/>
+          <images.Logo width={100} height={40} />
           {/* <Image source={images.logo} style={styles.logo} /> */}
         </View>
       )}
@@ -60,9 +82,7 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScree
         </TouchableOpacity>
       )}
 
-      {title && (
-        <Text style={styles.title}>{title}</Text>
-      )}
+      {title && <Text style={styles.title}>{title}</Text>}
     </View>
   );
 };
@@ -70,50 +90,50 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScree
 const styles = StyleSheet.create({
   container: {
     height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
     // backgroundColor: colors.white,
     // borderBottomWidth: 1,
     borderBottomColor: colors.border.primary,
-    position: 'relative',
+    position: "relative",
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     left: 20,
   },
   arrow: {
-    transform: [{ rotate: '180deg' }],
-    resizeMode: 'contain',
+    transform: [{ rotate: "180deg" }],
+    resizeMode: "contain",
   },
   logoContainer: {
-    position: 'absolute',
-    alignSelf: 'center',
+    position: "absolute",
+    alignSelf: "center",
     left: 0,
     right: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   logo: {
     width: 100,
     height: 40,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   homeButton: {
     // No additional styling as per requirement
     // Position it to the right side
-    position: 'absolute',
+    position: "absolute",
     left: 20,
   },
   profileIcon: {
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   title: {
     fontSize: typography.fontSize.semiMedium,
     marginLeft: 30,
     fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
-    color: colors.black
-  }
+    color: colors.black,
+  },
 });
 
 export default Header;

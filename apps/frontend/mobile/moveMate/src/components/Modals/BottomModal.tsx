@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,18 +6,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-} from 'react-native';
-import {colors} from '../../theme/colors';
-import {typography} from '../../theme/typography';
+} from "react-native";
+import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
 
 interface BottomModalProps {
   isVisible: boolean;
   onClose: () => void;
 }
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 
-const BottomModal: React.FC<BottomModalProps> = ({isVisible, onClose}) => {
+const BottomModal: React.FC<BottomModalProps> = ({ isVisible, onClose }) => {
   const [showQuantitySelector, setShowQuantitySelector] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
@@ -29,7 +29,8 @@ const BottomModal: React.FC<BottomModalProps> = ({isVisible, onClose}) => {
       visible={isVisible}
       transparent
       animationType="slide"
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           {/* Drag Indicator */}
@@ -46,12 +47,14 @@ const BottomModal: React.FC<BottomModalProps> = ({isVisible, onClose}) => {
               </Text>
               <TouchableOpacity
                 style={styles.unavailableButton}
-                onPress={onClose}>
+                onPress={onClose}
+              >
                 <Text style={styles.unavailableText}>Item Unavailable</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.missingButton}
-                onPress={() => setShowQuantitySelector(true)}>
+                onPress={() => setShowQuantitySelector(true)}
+              >
                 <Text style={styles.missingText}>Quantity Missing</Text>
               </TouchableOpacity>
             </>
@@ -68,13 +71,15 @@ const BottomModal: React.FC<BottomModalProps> = ({isVisible, onClose}) => {
                 <View style={styles.quantitySelector}>
                   <TouchableOpacity
                     style={styles.quantityButton}
-                    onPress={decrementQuantity}>
+                    onPress={decrementQuantity}
+                  >
                     <Text style={styles.quantityText}>−</Text>
                   </TouchableOpacity>
                   <Text style={styles.quantity}>{quantity}</Text>
                   <TouchableOpacity
                     style={styles.quantityButton}
-                    onPress={incrementQuantity}>
+                    onPress={incrementQuantity}
+                  >
                     <Text style={styles.quantityText}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -84,7 +89,8 @@ const BottomModal: React.FC<BottomModalProps> = ({isVisible, onClose}) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.cancelButton}
-                onPress={() => setShowQuantitySelector(false)}>
+                onPress={() => setShowQuantitySelector(false)}
+              >
                 <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
             </>
@@ -98,8 +104,8 @@ const BottomModal: React.FC<BottomModalProps> = ({isVisible, onClose}) => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
     backgroundColor: colors.white,
@@ -115,57 +121,57 @@ const styles = StyleSheet.create({
     height: 5,
     backgroundColor: colors.text.primaryGrey,
     borderRadius: 3,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginBottom: 10,
   },
   title: {
     fontSize: typography.fontSize.large,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     color: colors.text.primary,
     marginBottom: 10,
   },
   description: {
     fontSize: typography.fontSize.medium,
     color: colors.text.primaryGrey,
-    textAlign: 'center',
+    textAlign: "center",
     marginVertical: 15,
   },
   unavailableButton: {
     backgroundColor: colors.error,
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
   },
   unavailableText: {
     color: colors.white,
     fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   missingButton: {
     backgroundColor: colors.white,
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 1,
     borderColor: colors.error,
   },
   missingText: {
     color: colors.error,
     fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   itemRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginVertical: 20,
   },
-  itemDetails: {flex: 2},
+  itemDetails: { flex: 2 },
   itemName: {
     fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.text.primary,
   },
   itemOrdered: {
@@ -173,48 +179,48 @@ const styles = StyleSheet.create({
     color: colors.text.primaryGrey,
   },
   quantitySelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.lightButtonBackground,
     borderRadius: 10,
     paddingHorizontal: 10,
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
-  quantityButton: {padding: 5},
+  quantityButton: { padding: 5 },
   quantityText: {
     fontSize: typography.fontSize.large,
     color: colors.text.primary,
   },
   quantity: {
     fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.text.primary,
   },
   confirmButton: {
     backgroundColor: colors.green,
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
   },
   confirmText: {
     color: colors.white,
     fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   cancelButton: {
     backgroundColor: colors.white,
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 1,
     borderColor: colors.error,
   },
   cancelText: {
     color: colors.error,
     fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

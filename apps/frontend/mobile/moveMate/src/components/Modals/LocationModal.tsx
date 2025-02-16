@@ -20,20 +20,25 @@ import { images } from "../../assets/images/images";
 import Header from "../Header";
 import { colors } from "../../theme/colors";
 import { fetchPlaceSuggestions } from "../../api/mapboxAPI";
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
-import Mapbox from '@rnmapbox/maps';
+import Mapbox from "@rnmapbox/maps";
 import { getCurrentLocation, requestLocation } from "../../utils/helpers";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
-import { updateDropLoaction, updatePickupLoaction } from "../../redux/slices/deliverAPackageSlice";
+import {
+  updateDropLoaction,
+  updatePickupLoaction,
+} from "../../redux/slices/deliverAPackageSlice";
 
-Mapbox.setAccessToken('pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw');
+Mapbox.setAccessToken(
+  "pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw",
+);
 
 export type ILocation = {
   addressLine1: string;
   addressLine2?: string;
-  suburb: string;       // Added
-  postalCode: string;   // Added
+  suburb: string; // Added
+  postalCode: string; // Added
   landmark?: string;
   latitude: number;
   longitude: number;
@@ -62,12 +67,14 @@ const LocationModal: React.FC<LocationModalProps> = ({
   placeholder,
   type,
 }) => {
-  const locationStatus = useAppSelector(state => state.common.locationStatus);
+  const locationStatus = useAppSelector((state) => state.common.locationStatus);
   const [query, setQuery] = useState("");
   const insets = useSafeAreaInsets();
   const [results, setResults] = useState<LocationItem[]>([]);
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<LocationItem | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<LocationItem | null>(
+    null,
+  );
 
   const [isSaved, setIsSaved] = useState(false);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -76,25 +83,22 @@ const LocationModal: React.FC<LocationModalProps> = ({
   const [addressDetails, setAddressDetails] = useState({
     addressLine1: "",
     addressLine2: "",
-    suburb: "",        // Added
-    postalCode: "",    // Added
+    suburb: "", // Added
+    postalCode: "", // Added
     landmark: "",
   });
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     setTimeout(() => {
-
       requestLocationpermission();
     }, 1000);
-  }, [])
+  }, []);
 
   const responseCallback = (placenameData: any) => {
     let getPlacename = placenameData?.data?.features[0]?.place_name;
-    console.log('placenameData', placenameData)
+    console.log("placenameData", placenameData);
   };
-
-
 
   const requestLocationpermission = () => {
     // if (locationStatus) {
@@ -112,7 +116,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
   };
 
   const callback = async (data: any) => {
-    console.log('-----callback------', data);
+    console.log("-----callback------", data);
     if (data?.coords) {
       const latitude = await data?.coords?.latitude;
       const longitude = await data?.coords?.longitude;
@@ -123,7 +127,6 @@ const LocationModal: React.FC<LocationModalProps> = ({
       const timestamp = await data?.timestamp;
       if (latitude && longitude) {
         const isAllowed = await requestLocation();
-
       }
     }
   };
@@ -131,9 +134,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
   // Example saved locations array
   const savedLocations: LocationItem[] = [
     {
-      name: 'Fed Square',
-      address: '120 Waldeck Street, Arlington, Texas..',
-      latitude: 19.0760,
+      name: "Fed Square",
+      address: "120 Waldeck Street, Arlington, Texas..",
+      latitude: 19.076,
       longitude: 72.8777,
     },
   ];
@@ -160,18 +163,17 @@ const LocationModal: React.FC<LocationModalProps> = ({
   };
 
   const onConfirmAddress = () => {
-
     const completeLocationData: ILocation = {
       addressLine1: addressDetails.addressLine1,
       addressLine2: addressDetails.addressLine2 || undefined,
-      suburb: addressDetails.suburb,         // Included
+      suburb: addressDetails.suburb, // Included
       postalCode: addressDetails.postalCode, // Included
       landmark: addressDetails.landmark || undefined,
       latitude: selectedLocation.latitude,
       longitude: selectedLocation.longitude,
     };
-    if (type === 'pickup') {
-      console.log('pickup')
+    if (type === "pickup") {
+      console.log("pickup");
       dispatch(updatePickupLoaction(selectedLocation));
     } else {
       dispatch(updateDropLoaction(selectedLocation));
@@ -185,16 +187,20 @@ const LocationModal: React.FC<LocationModalProps> = ({
     setAddressDetails({
       addressLine1: "",
       addressLine2: "",
-      suburb: "",        // Reset
-      postalCode: "",    // Reset
+      suburb: "", // Reset
+      postalCode: "", // Reset
       landmark: "",
     });
   };
 
-
   return (
     <Modal visible={isVisible} transparent animationType="slide">
-      <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+      <View
+        style={[
+          styles.container,
+          { paddingTop: insets.top, paddingBottom: insets.bottom },
+        ]}
+      >
         {/* Header */}
         <Header isBack onClickButton={() => onClose()} title={title} />
 
@@ -244,7 +250,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
             </TouchableOpacity>
           )}
           ListEmptyComponent={
-            query ? <Text style={styles.noResults}>No results found...</Text> : null
+            query ? (
+              <Text style={styles.noResults}>No results found...</Text>
+            ) : null
           }
         />
 
@@ -274,7 +282,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
             animationType="slide"
             onRequestClose={() => setIsMapModalVisible(false)}
           >
-            <View style={[styles.mapModalContainer, { paddingTop: insets.top }]}>
+            <View
+              style={[styles.mapModalContainer, { paddingTop: insets.top }]}
+            >
               <Header
                 isBack
                 onClickButton={() => setIsMapModalVisible(false)}
@@ -283,25 +293,37 @@ const LocationModal: React.FC<LocationModalProps> = ({
               <View style={styles.mapContainer}>
                 <View>
                   <Mapbox.MapView style={styles.mapImage}>
-                    <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [0, 0]} />
+                    <Mapbox.Camera
+                      zoomLevel={14}
+                      centerCoordinate={coordinates || [0, 0]}
+                    />
 
                     {coordinates && (
-                      <Mapbox.PointAnnotation id={`marker-${coordinates[0]}-${coordinates[1]}`} coordinate={coordinates}>
+                      <Mapbox.PointAnnotation
+                        id={`marker-${coordinates[0]}-${coordinates[1]}`}
+                        coordinate={coordinates}
+                      >
                         <View style={styles.markerContainer}>
                           <View style={styles.marker} />
                         </View>
                       </Mapbox.PointAnnotation>
                     )}
                   </Mapbox.MapView>
-
                 </View>
                 <View style={styles.addressContainer}>
                   {/* Address Section */}
                   <View style={styles.addressRow}>
-                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="purple">
+                    <Svg
+                      width={20}
+                      height={20}
+                      viewBox="0 0 24 24"
+                      fill="purple"
+                    >
                       <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
                     </Svg>
-                    <Text style={styles.addressTitle}>{selectedLocation?.name}</Text>
+                    <Text style={styles.addressTitle}>
+                      {selectedLocation?.name}
+                    </Text>
                     <TouchableOpacity>
                       <Text style={styles.editText1}>Edit</Text>
                     </TouchableOpacity>
@@ -320,7 +342,8 @@ const LocationModal: React.FC<LocationModalProps> = ({
                       }}
                     >
                       <Text style={styles.confirmButtonText}>Confirm</Text>
-                    </TouchableOpacity></View>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </View>
@@ -335,9 +358,14 @@ const LocationModal: React.FC<LocationModalProps> = ({
             animationType="slide"
             onRequestClose={() => setIsAddressDetailsVisible(false)}
           >
-            <View style={[styles.addressDetailsContainer, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+            <View
+              style={[
+                styles.addressDetailsContainer,
+                { paddingTop: insets.top, paddingBottom: insets.bottom },
+              ]}
+            >
               <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}
               >
                 <Header
@@ -350,31 +378,44 @@ const LocationModal: React.FC<LocationModalProps> = ({
                 <ScrollView contentContainerStyle={styles.addressForm}>
                   <View style={styles.addMapContainer}>
                     <Mapbox.MapView style={styles.detailAddressMapImage}>
-                      <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [0, 0]} />
+                      <Mapbox.Camera
+                        zoomLevel={14}
+                        centerCoordinate={coordinates || [0, 0]}
+                      />
 
                       {coordinates && (
-                        <Mapbox.PointAnnotation id={`marker-${coordinates[0]}-${coordinates[1]}`} coordinate={coordinates}>
+                        <Mapbox.PointAnnotation
+                          id={`marker-${coordinates[0]}-${coordinates[1]}`}
+                          coordinate={coordinates}
+                        >
                           <View style={styles.markerContainer}>
                             <View style={styles.marker} />
                           </View>
                         </Mapbox.PointAnnotation>
                       )}
                     </Mapbox.MapView>
-
                   </View>
                   <View style={styles.addessInMap}>
                     <View style={styles.addressRow}>
-                      <Svg width={20} height={20} viewBox="0 0 24 24" fill="purple">
+                      <Svg
+                        width={20}
+                        height={20}
+                        viewBox="0 0 24 24"
+                        fill="purple"
+                      >
                         <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
                       </Svg>
-                      <Text style={styles.addressTitle}>{selectedLocation?.name}</Text>
+                      <Text style={styles.addressTitle}>
+                        {selectedLocation?.name}
+                      </Text>
                       <TouchableOpacity>
                         <Text style={styles.editText1}>Edit</Text>
                       </TouchableOpacity>
                     </View>
                     <Text style={styles.addressSubtitle}>
                       {selectedLocation?.address}
-                    </Text></View>
+                    </Text>
+                  </View>
                   <Text style={styles.label}>Street Address</Text>
                   <TextInput
                     style={styles.input}
@@ -389,7 +430,10 @@ const LocationModal: React.FC<LocationModalProps> = ({
                     }
                   />
 
-                  <Text style={styles.label}>Address Line 2<Text style={styles.optional}>(optional)</Text></Text>
+                  <Text style={styles.label}>
+                    Address Line 2
+                    <Text style={styles.optional}>(optional)</Text>
+                  </Text>
                   <TextInput
                     style={styles.input}
                     placeholder="Address Line 2 (Optional)"
@@ -452,11 +496,13 @@ const LocationModal: React.FC<LocationModalProps> = ({
                     <CheckBox
                       value={isSaved}
                       onValueChange={setIsSaved}
-                      tintColors={{ true: "#6200EE", false: "#8A8A8A" }} 
+                      tintColors={{ true: "#6200EE", false: "#8A8A8A" }}
                       boxType="square"
                       style={styles.checkbox}
                     />
-                    <Text style={styles.checkboxText}>Add to saved addresses</Text>
+                    <Text style={styles.checkboxText}>
+                      Add to saved addresses
+                    </Text>
                   </View>
                   {/* Address Tags */}
                   <View style={styles.tagsContainer}>
@@ -485,8 +531,11 @@ const LocationModal: React.FC<LocationModalProps> = ({
                       style={styles.confirmButton}
                       onPress={onConfirmAddress}
                     >
-                      <Text style={styles.confirmButtonText}>Confirm Address</Text>
-                    </TouchableOpacity></View>
+                      <Text style={styles.confirmButtonText}>
+                        Confirm Address
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </ScrollView>
               </KeyboardAvoidingView>
             </View>
@@ -592,18 +641,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  mapContainer: {
-
-  },
+  mapContainer: {},
   markerContainer: { alignItems: "center", justifyContent: "center" },
-  marker: { width: 20, height: 20, borderRadius: 10, backgroundColor: colors.white, borderWidth: 5, borderColor: colors.purple },
+  marker: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: colors.white,
+    borderWidth: 5,
+    borderColor: colors.purple,
+  },
   mapImage: {
     width: "100%",
     height: 550,
     // marginBottom: 20,
   },
-  addMapContainer:{
-    borderRadius:12
+  addMapContainer: {
+    borderRadius: 12,
   },
   detailAddressMapImage: {
     width: "100%",
@@ -612,7 +666,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     elevation: 6,
     borderColor: colors.grey,
-    borderWidth: 0.25
+    borderWidth: 0.25,
   },
   addressContainer: {
     padding: 16,
@@ -641,7 +695,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   addessInMap: {
-    position: 'absolute',
+    position: "absolute",
     flex: 1,
     top: 100,
     left: 35,
@@ -649,8 +703,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 0.25,
     borderColor: colors.grey,
-    width: '90%',
-    borderRadius: 12
+    width: "90%",
+    borderRadius: 12,
   },
   input: {
     borderWidth: 1,
@@ -689,18 +743,18 @@ const styles = StyleSheet.create({
   footer: {
     padding: 10,
     backgroundColor: colors.white,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   cnfAddress: {
     paddingVertical: 20,
     backgroundColor: colors.lightGrey,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   addLocContainer: {
     marginTop: 20,
     paddingVertical: 10,
     backgroundColor: colors.white,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   label: {
     fontSize: 14,
@@ -730,8 +784,8 @@ const styles = StyleSheet.create({
   tag: {
     padding: 10,
     backgroundColor: "#EAEAEA",
-    borderWidth:1,
-    borderColor:'#D3D3D3',
+    borderWidth: 1,
+    borderColor: "#D3D3D3",
     borderRadius: 12,
     marginRight: 10,
   },
@@ -747,4 +801,3 @@ const styles = StyleSheet.create({
 });
 
 export default LocationModal;
-

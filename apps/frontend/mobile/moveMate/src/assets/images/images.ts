@@ -1,25 +1,25 @@
-import introImage1 from '../images/IntroImage1.png';
-import introImage2 from '../images/IntroImage2.png';
-import introImage3 from '../images/IntroImage3.png';
-import introImage4 from '../images/IntroImage4.png';
-import logo from '../images/Logo.png';
-import location from '../images/Location.png';
-import Location from '../images/Location.svg';
-import notificatons from './Notification.png';
-import orders from './Orders.png';
-import home from './Home.png';
-import account from './Account.png';
-import Account from './Account.svg';
-import towTruck from './TowTruck.png';
-import TowTruck from './tow-truck.svg';
-import store from './Store.png';
-import Store from './store.svg';
-import shoppingCart from './ShoppingCart.png';
-import ShoppingCart from './house-in-shopping-trolley.svg';
-import packageImg from './Package.png';
-import PackageImg from './package-box.svg';
-import banner from './Banner.png';
-import banner2 from './banner2.png';
+import introImage1 from "../images/IntroImage1.png";
+import introImage2 from "../images/IntroImage2.png";
+import introImage3 from "../images/IntroImage3.png";
+import introImage4 from "../images/IntroImage4.png";
+import logo from "../images/Logo.png";
+import location from "../images/Location.png";
+import Location from "../images/Location.svg";
+import notificatons from "./Notification.png";
+import orders from "./Orders.png";
+import home from "./Home.png";
+import account from "./Account.png";
+import Account from "./Account.svg";
+import towTruck from "./TowTruck.png";
+import TowTruck from "./tow-truck.svg";
+import store from "./Store.png";
+import Store from "./store.svg";
+import shoppingCart from "./ShoppingCart.png";
+import ShoppingCart from "./house-in-shopping-trolley.svg";
+import packageImg from "./Package.png";
+import PackageImg from "./package-box.svg";
+import banner from "./Banner.png";
+import banner2 from "./banner2.png";
 import sapbanner from "./SAPBanner.png";
 import locaionSteps from "./LocationSteps.png";
 import LocaionSteps from "./LocationSteps.svg";
@@ -64,7 +64,7 @@ import ManageAddress from "./address.svg";
 import InviteFriends from "./inviteFriends.svg";
 import HelpNSupport from "./helpNSupport.svg";
 import ReferFriendImage from "./ReferFriendImg.svg";
-import PackageArrived from './package-arrived 1.svg';
+import PackageArrived from "./package-arrived 1.svg";
 import HouseMoving from "./moving-house 1.svg";
 import CarTowing from "./car-towing-truck-service 1.svg";
 import Trolley from "./package-boxes-with-trolley 1.svg";
@@ -88,13 +88,13 @@ import outlineOrder from "./outlineOrder.png";
 import outlineAccount from "./outlineAccount.png";
 
 // package type
-import laundryIcon from './packagetype/laundry.svg';
-import documentIcon from './packagetype/document.svg';
-import electricIcon from './packagetype/electricItem.svg';
-import foodIcon from './packagetype/food.svg';
-import otherIcon from './packagetype/other.svg';
-import repairIcon from './packagetype/repair.svg';
-import pkgWeightIcon from './packagetype/pkgWeight.svg';
+import laundryIcon from "./packagetype/laundry.svg";
+import documentIcon from "./packagetype/document.svg";
+import electricIcon from "./packagetype/electricItem.svg";
+import foodIcon from "./packagetype/food.svg";
+import otherIcon from "./packagetype/other.svg";
+import repairIcon from "./packagetype/repair.svg";
+import pkgWeightIcon from "./packagetype/pkgWeight.svg";
 
 export const images = {
   introImage1,
@@ -120,10 +120,75 @@ export const images = {
   masterCard,
   applePay,
   paypal,
-  profileAccount, arrow, doNotRing, doorDropOff, pickUpNotesIcon, phone, visaIcon, cart, map, paymentSuccess, deliveryMan, success, profileInbox, profileEarnings, profileReferFriend, profileWallet, profileEarningMode, profileRewards, profileLogout,phoneWhite,messageWhite,
-  
+  profileAccount,
+  arrow,
+  doNotRing,
+  doorDropOff,
+  pickUpNotesIcon,
+  phone,
+  visaIcon,
+  cart,
+  map,
+  paymentSuccess,
+  deliveryMan,
+  success,
+  profileInbox,
+  profileEarnings,
+  profileReferFriend,
+  profileWallet,
+  profileEarningMode,
+  profileRewards,
+  profileLogout,
+  phoneWhite,
+  messageWhite,
+
   Account,
   Location,
-  PackageImg,ShoppingCart,Store,TowTruck,LocaionSteps,BackArrow,Logo,
-  OfficeIcon,HomeIcon,ForwardArrow,EmailIcon,PhoneIcon,ReferFriend,Refund,HelpNSupport,LegalNAbout,InviteFriends,ManageAddress,ReferFriendImage,PackageArrived,CarTowing,HouseMoving,Trolley,Logout,SuccessGreen,VisaIcon,Open,greenTick,DashedLine,ForwardWhiteArrow,PickupNotes,Marker,Gps,outlineHome,outlineAccount,outlineNotification,outlineOrder,PaypalIcon,AppleIcon,MasterCardIcon,laundryIcon,repairIcon,otherIcon,documentIcon,foodIcon,electricIcon,pkgWeightIcon
+  PackageImg,
+  ShoppingCart,
+  Store,
+  TowTruck,
+  LocaionSteps,
+  BackArrow,
+  Logo,
+  OfficeIcon,
+  HomeIcon,
+  ForwardArrow,
+  EmailIcon,
+  PhoneIcon,
+  ReferFriend,
+  Refund,
+  HelpNSupport,
+  LegalNAbout,
+  InviteFriends,
+  ManageAddress,
+  ReferFriendImage,
+  PackageArrived,
+  CarTowing,
+  HouseMoving,
+  Trolley,
+  Logout,
+  SuccessGreen,
+  VisaIcon,
+  Open,
+  greenTick,
+  DashedLine,
+  ForwardWhiteArrow,
+  PickupNotes,
+  Marker,
+  Gps,
+  outlineHome,
+  outlineAccount,
+  outlineNotification,
+  outlineOrder,
+  PaypalIcon,
+  AppleIcon,
+  MasterCardIcon,
+  laundryIcon,
+  repairIcon,
+  otherIcon,
+  documentIcon,
+  foodIcon,
+  electricIcon,
+  pkgWeightIcon,
 };

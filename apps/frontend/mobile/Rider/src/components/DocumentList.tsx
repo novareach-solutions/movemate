@@ -13,10 +13,13 @@ import TitleDescription from './TitleDescription';
 import {colors} from '../theme/colors';
 import {formStyles} from '../theme/form';
 import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
-import {DeliverAPackage} from '../navigation/ScreenNames';
-import {useNavigation} from '@react-navigation/native';
+import {
+  DeliverAPackage,
+  DeliverAPackageParamList,
+} from '../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Header from './Header';
+import PurpleArrow from '../assets/icons/purpleArrow.svg';
 
 interface Document {
   id: string;
@@ -38,18 +41,18 @@ const DocumentList: React.FC<DocumentListProps> = ({
   documents,
   onCardPress,
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
   const renderItem = ({item}: {item: Document}) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => onCardPress(item.title)}>
       <Text style={styles.cardText}>{item.title}</Text>
-      <Image source={images.arrow} />
+      <PurpleArrow />
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+    <SafeAreaView style={{flex: 1}}>
       <Header logo isBack />
       <View style={styles.container}>
         <StepIndicator
@@ -64,9 +67,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
           contentContainerStyle={styles.list}
         />
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate(DeliverAPackage.EnterVehicleDetails)
-          }
+          onPress={() => navigation.navigate(DeliverAPackage.Home)}
           style={[formStyles.button, formStyles.buttonEnabled]}>
           <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
             Continue

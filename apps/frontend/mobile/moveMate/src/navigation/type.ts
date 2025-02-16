@@ -1,14 +1,14 @@
-import {RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { RouteProp } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 // Auth Stack Param List
 export type AuthStackParamList = {
   OnboardingScreen: undefined;
   LoginScreen: undefined;
-  OtpScreen: {phoneNumber: string};
+  OtpScreen: { phoneNumber: string };
   CompleteProfileScreen: undefined;
   PrivacyPolicyScreen: undefined;
-  CustomerScreens:undefined;
+  CustomerScreens: undefined;
 };
 
 // App Stack Param List

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from "@nestjs/common";
 
@@ -23,9 +24,12 @@ import { TicketPriorityEnum, TicketStatusEnum } from "./types/support.types";
 
 @Injectable()
 export class SupportService {
+  private readonly logger = new Logger(SupportService.name);
+
   constructor(private readonly notificationService: NotificationService) {}
 
   async createTicket(input: CreateTicketDto): Promise<SupportTicket> {
+    this.logger.debug(`SupportService.createTicket: Creating support ticket`);
     const ticket = new SupportTicket();
     ticket.subject = input.subject;
     ticket.category = input.category;
@@ -35,6 +39,10 @@ export class SupportService {
     ticket.ticketNumber = await this.generateTicketNumber();
 
     const savedTicket = await dbRepo(SupportTicket).save(ticket);
+
+    this.logger.log(
+      `SupportService.createTicket: Support ticket created successfully`,
+    );
 
     // Create initial message
     if (input.initialMessage) {
@@ -53,12 +61,23 @@ export class SupportService {
   ): Promise<ChatMessage> {
     const ticket = await this.getTicketDetails(input.ticketId);
 
+    if (!ticket) {
+      this.logger.error(
+        `SupportService.addMessage: Ticket not found for ${input.ticketId}`,
+      );
+      throw new NotFoundException("Ticket not found");
+    }
+
     const message = new ChatMessage();
     message.ticket = ticket;
     message.content = input.content;
     message.type = input.type;
     message.sender = { id: input.senderId } as User;
     message.metadata = input.metadata;
+
+    this.logger.log(
+      `SupportService.addMessage: Adding message to ticket for ${input.ticketId}`,
+    );
 
     return await dbRepo(ChatMessage).save(message);
   }
@@ -70,6 +89,10 @@ export class SupportService {
     const rider = await dbRepo(User).findOneBy({ id: riderId });
 
     if (!rider || rider.role !== UserRoleEnum.AGENT) {
+      this.logger.error(
+        `SupportService.assignRider: Invalid rider assigned. Must be a rider for ${ticketId}`,
+        riderId,
+      );
       throw new BadRequestException("Invalid rider assigned. Must be a rider.");
     }
 
@@ -99,6 +122,10 @@ export class SupportService {
     const agent = await dbRepo(User).findOneBy({ id: agentId });
 
     if (!agent || agent.role !== UserRoleEnum.SUPPORT) {
+      this.logger.error(
+        `SupportService.assignSupportAgent: Invalid support agent assigned for ${ticketId}`,
+        agentId,
+      );
       throw new BadRequestException("Invalid support agent assigned.");
     }
 

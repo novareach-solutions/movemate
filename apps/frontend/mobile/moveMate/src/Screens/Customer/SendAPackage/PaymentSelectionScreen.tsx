@@ -13,15 +13,15 @@ import Header from "../../../components/Header";
 import { CustomerScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../../theme/colors";
-import { SvgProps } from 'react-native-svg';
+import { SvgProps } from "react-native-svg";
 import { cards, wallets } from "../../../constants/staticData";
 type SvgComponent = React.FC<SvgProps>;
 const PaymentSelectionScreen = () => {
   const [selectedMethod, setSelectedMethod] = useState(null);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const handlePayment = () => {
     navigation.navigate(CustomerScreens.PaymentSuccessScreen);
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -48,14 +48,19 @@ const PaymentSelectionScreen = () => {
                   <Text style={styles.cardText}>**** {card.last4}</Text>
                 </View>
                 <View style={styles.radioButton}>
-                  {selectedMethod === card.id && <View style={styles.radioInner} />}
+                  {selectedMethod === card.id && (
+                    <View style={styles.radioInner} />
+                  )}
                 </View>
               </TouchableOpacity>
-            )
+            );
           })}
-          <TouchableOpacity onPress={() => {
-            navigation.navigate(CustomerScreens.AddCardScreen)
-          }} style={styles.addNewCard}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(CustomerScreens.AddCardScreen);
+            }}
+            style={styles.addNewCard}
+          >
             <Text style={styles.addCardText}>+ Add new card</Text>
           </TouchableOpacity>
         </View>
@@ -77,19 +82,20 @@ const PaymentSelectionScreen = () => {
                 <SvgImage style={styles.icon} />
                 <Text style={styles.walletText}>{wallet.name}</Text>
                 <View style={styles.radioButton}>
-                  {selectedMethod === wallet.id && <View style={styles.radioInner} />}
+                  {selectedMethod === wallet.id && (
+                    <View style={styles.radioInner} />
+                  )}
                 </View>
               </TouchableOpacity>
-            )
+            );
           })}
         </View>
 
         <View style={styles.footer}>
-
           {/* Terms and Conditions */}
           <Text style={styles.termsText}>
-            By confirming, I agree that this order does not include illegal or restricted items.{" "}
-            <Text style={styles.termsLink}>View T&C</Text>
+            By confirming, I agree that this order does not include illegal or
+            restricted items. <Text style={styles.termsLink}>View T&C</Text>
           </Text>
 
           {/* Proceed to Pay Button */}
@@ -110,7 +116,7 @@ const styles = StyleSheet.create({
   footer: {
     flex: 1,
     paddingVertical: 10,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   contentContainer: {
     flex: 1,
@@ -197,7 +203,7 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 16,
     textAlign: "center",
-    marginHorizontal: 10
+    marginHorizontal: 10,
   },
   termsLink: {
     color: "#007BFF",
@@ -210,7 +216,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 16,
-    marginHorizontal: 10
+    marginHorizontal: 10,
   },
   payButtonText: {
     color: "#FFF",

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   Modal,
   Image,
   TextStyle,
-} from 'react-native';
-import {colors} from '../../theme/colors';
-import {typography} from '../../theme/typography';
-import {images} from '../../assets/images/images';
+} from "react-native";
+import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
+import { images } from "../../assets/images/images";
 
 interface FAQModalProps {
   isVisible: boolean;
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   },
   question: {
     fontSize: typography.fontSize.semiMedium,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     color: colors.text.primary,
     marginBottom: 20,
     lineHeight: 25,
@@ -74,36 +74,36 @@ const styles = StyleSheet.create({
   },
   supportHeader: {
     fontSize: typography.fontSize.medium,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     color: colors.text.primary,
     marginBottom: 20,
   },
   supportOptions: {
-    flexDirection: 'column',
+    flexDirection: "column",
     gap: 10,
   },
   supportButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: colors.white,
     borderRadius: 12,
     paddingVertical: 15,
     paddingHorizontal: 20,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: 'rgba(212, 212, 212, 1)',
+    borderColor: "rgba(212, 212, 212, 1)",
   },
 
   supportButtonText: {
     fontSize: typography.fontSize.medium,
-    fontWeight: typography.fontWeight.medium as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.medium as TextStyle["fontWeight"],
     color: colors.purple,
   },
   supportIcon: {
     width: 20,
     height: 20,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
 });
 

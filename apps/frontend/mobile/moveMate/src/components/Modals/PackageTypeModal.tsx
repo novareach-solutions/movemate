@@ -1,6 +1,6 @@
 // PackageTypeModal.tsx
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,11 +10,11 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   TextInput,
-} from 'react-native';
-import { colors } from '../../theme/colors';
-import { images } from '../../assets/images/images';
-import { SvgProps } from 'react-native-svg';
-import { packageOptions } from '../../constants/staticData';
+} from "react-native";
+import { colors } from "../../theme/colors";
+import { images } from "../../assets/images/images";
+import { SvgProps } from "react-native-svg";
+import { packageOptions } from "../../constants/staticData";
 type SvgComponent = React.FC<SvgProps>;
 interface PackageTypeModalProps {
   isVisible: boolean;
@@ -27,38 +27,39 @@ const PackageTypeModal: React.FC<PackageTypeModalProps> = ({
 }) => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isOtherSelected, setIsOtherSelected] = useState(false);
-  const [otherType, setOtherType] = useState('');
+  const [otherType, setOtherType] = useState("");
 
   const handleSelect = (type: string) => {
     setSelectedType(type);
-    if (type === 'Others') {
+    if (type === "Others") {
       setIsOtherSelected(true);
     } else {
       setIsOtherSelected(false);
-      setOtherType('');
+      setOtherType("");
     }
   };
 
   const handleDone = () => {
     if (selectedType) {
-      if (selectedType === 'Others' && !otherType.trim()) {
-        alert('Please specify the package type.');
+      if (selectedType === "Others" && !otherType.trim()) {
+        alert("Please specify the package type.");
         return;
       }
-      const finalType = selectedType === 'Others' ? otherType.trim() : selectedType;
+      const finalType =
+        selectedType === "Others" ? otherType.trim() : selectedType;
       onClose(finalType);
       setSelectedType(null);
-      setOtherType('');
+      setOtherType("");
       setIsOtherSelected(false);
     } else {
-      alert('Please select a package type.');
+      alert("Please select a package type.");
     }
   };
 
   const handleClose = () => {
     onClose();
     setSelectedType(null);
-    setOtherType('');
+    setOtherType("");
     setIsOtherSelected(false);
   };
 
@@ -95,13 +96,13 @@ const PackageTypeModal: React.FC<PackageTypeModalProps> = ({
                     <SvgImage style={styles.icon} />
                     <Text style={styles.optionText}>{item.title}</Text>
                     <View style={styles.radioCircle}>
-                      {selectedType === item.title && <View style={styles.selectedRb} />}
+                      {selectedType === item.title && (
+                        <View style={styles.selectedRb} />
+                      )}
                     </View>
                   </TouchableOpacity>
-                )
-              }
-
-              )}
+                );
+              })}
 
               {/* If "Others" is selected, show a TextInput */}
               {isOtherSelected && (
@@ -117,11 +118,9 @@ const PackageTypeModal: React.FC<PackageTypeModalProps> = ({
                   />
                   <View style={styles.weightInfo}>
                     <images.pkgWeightIcon style={styles.icon} />
-                    <Text >The package weight must be under 10 kg</Text>
+                    <Text>The package weight must be under 10 kg</Text>
                   </View>
-
                 </View>
-
               )}
 
               {/* Done Button */}
@@ -136,21 +135,21 @@ const PackageTypeModal: React.FC<PackageTypeModalProps> = ({
   );
 };
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   weightInfo: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingVertical: 10,
-    alignItems: 'center'
+    alignItems: "center",
   },
   icon: {
-    marginRight: 10
+    marginRight: 10,
   },
   modalContainer: {
     backgroundColor: colors.white,
@@ -162,36 +161,36 @@ const styles = StyleSheet.create({
   dragHandle: {
     width: 40,
     height: 5,
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
     borderRadius: 2.5,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginBottom: 10,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.black,
-    paddingVertical: 10
+    paddingVertical: 10,
   },
   closeButton: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.purple,
   },
   optionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between', // Space between text and radio button
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between", // Space between text and radio button
+    alignItems: "center",
     paddingVertical: 20,
   },
   optionText: {
     fontSize: 18,
-    color: '#333',
+    color: "#333",
     flex: 1, // Ensure text takes up available space
   },
   radioCircle: {
@@ -200,8 +199,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     borderColor: colors.purple,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   selectedRb: {
     width: 10,
@@ -214,26 +213,26 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#D4D4D4',
+    borderColor: "#D4D4D4",
     borderRadius: 8,
     padding: 12,
     minHeight: 120,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     fontSize: 16,
-    width: '100%',
+    width: "100%",
   },
   doneButton: {
     backgroundColor: colors.purple,
     borderRadius: 8,
     paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 20,
   },
   doneButtonText: {
     color: colors.white,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

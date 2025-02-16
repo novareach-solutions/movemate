@@ -7,69 +7,207 @@ import {
   SafeAreaView,
   Image,
   Animated,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import StatCard from '../../components/StatCard';
-import {images} from '../../assets/images/images';
-import {colors} from '../../theme/colors';
 import HelpButton from '../../components/HelpButton';
+import {AppScreens, DeliverAPackage} from '../../navigation/ScreenNames';
+import {useSelector, useDispatch} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  AgentStatusEnum,
+  updateAgentStatus,
+} from '../../redux/slices/agentSlice';
+import Mapbox from '@rnmapbox/maps';
+import {MAPBOX_ACCESS_TOKEN} from '../../utils/constants';
+import {showOrderModal, fetchOngoingOrder} from '../../redux/slices/orderSlice';
+import {io} from 'socket.io-client';
+import apiClient from '../../api/apiClient';
+import apiEndPoints from '../../api/apiEndPoints';
+import {RootState} from '../../redux/store';
+import {OrderStatusEnum} from '../../redux/slices/types/enums';
+import {colors} from '../../theme/colors';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
+import {AppScreensParamList} from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
-import DeliveryModal from '../../components/Modals/DeliveryModal';
-import ExpandedModal from '../../components/Modals/ExpandedModal';
-import EarningsModal from '../../components/Modals/EarningsModal';
-import OrderModal from '../../components/Modals/OrderModal';
-
+import Money from '../../assets/icons/money.svg';
+import Order from '../../assets/icons/orders.svg';
+import Distance from '../../assets/icons/distance.svg';
+Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 const HomeScreen: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
-  const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
-  const [isExpandedModalVisible, setIsExpandedModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
+  const ongoingOrder = useSelector(
+    (state: RootState) => state.order.ongoingOrder,
+  );
+  const [hasNavigated, setHasNavigated] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
 
-  const toggleStatus = () => {
-    setIsOnline(!isOnline);
+  const updateLocationAPI = async (latitude: number, longitude: number) => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      if (!accessToken) throw new Error('Access token not found.');
+      const response = await apiClient.patch(apiEndPoints.updateLocation, {
+        latitude,
+        longitude,
+      });
+      console.log('Location updated:', response.data);
+    } catch (error) {
+      console.error('Error updating location:', error);
+    }
+  };
+
+  useEffect(() => {
+    let locationInterval: NodeJS.Timeout | null = null;
+    if (isOnline) {
+      locationInterval = setInterval(() => {
+        updateLocationAPI(40.712579, -74.218993);
+      }, 15000);
+    } else if (locationInterval) {
+      clearInterval(locationInterval);
+    }
+    return () => {
+      if (locationInterval) clearInterval(locationInterval);
+    };
+  }, [isOnline]);
+
+  const toggleStatus = async () => {
+    if (!isAuthenticated) {
+      Alert.alert('Not Authenticated', 'Please log in to perform this action.');
+      return;
+    }
+    const newStatus = !isOnline;
+    setIsOnline(newStatus);
+    setIsLoading(true);
     Animated.timing(drawerHeight, {
-      toValue: isOnline ? 0 : 120,
+      toValue: newStatus ? 120 : 0,
       duration: 300,
       useNativeDriver: false,
     }).start();
+    const currentAccessToken = await AsyncStorage.getItem('accessToken');
+    console.log('🔍 Current Access Token:', currentAccessToken);
+    try {
+      const statusEnum = newStatus
+        ? AgentStatusEnum.ONLINE
+        : AgentStatusEnum.OFFLINE;
+      await updateAgentStatus(statusEnum);
+      console.log(`✅ Agent status set to ${statusEnum}`);
+    } catch (error) {
+      console.log('Error', error);
+      setIsOnline(!newStatus);
+      Animated.timing(drawerHeight, {
+        toValue: !newStatus ? 120 : 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+      console.error('❌ Failed to update status:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Show the `DeliveryModal` after 3 seconds
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsOrderModalVisible(true);
-    }, 8000);
-
-    return () => clearTimeout(timer);
+    const fetchAgentId = async () => {
+      const storedAgentId = await AsyncStorage.getItem('agentId');
+      setAgentId(storedAgentId);
+    };
+    fetchAgentId();
   }, []);
+
+  useEffect(() => {
+    if (!agentId) return;
+    const numericAgentId = parseInt(agentId, 10);
+    if (isNaN(numericAgentId)) {
+      console.error('Invalid agentId: Unable to convert to number.');
+      return;
+    }
+    const socket = io(apiEndPoints.baseURL);
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+      socket.emit('joinRoom', {agentId: numericAgentId});
+      console.log(`Joined room for agentId: ${numericAgentId}`);
+    });
+    socket.on('disconnect', () => {
+      console.log('Disconnected from WebSocket server');
+    });
+    socket.on('newRequest', (data: any) => {
+      console.log('Received newRequest:', data);
+      dispatch(
+        showOrderModal({
+          orderId: data.orderId,
+          earnings: `${data.earnings}$`,
+          tip: `${data.tip}$`,
+          time: data.estimatedTime,
+          distance: data.estimatedDistance,
+          pickupAddress: data.pickupAddress,
+          dropoffAddress: data.dropAddress,
+        }),
+      );
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [agentId, dispatch]);
+
+  useEffect(() => {
+    if (agentId) {
+      dispatch(fetchOngoingOrder());
+    }
+  }, [agentId, dispatch]);
+
+  useEffect(() => {
+    console.log('Ongoingon order value', ongoingOrder);
+    if (ongoingOrder && !hasNavigated) {
+      setHasNavigated(true);
+      if (ongoingOrder.status === OrderStatusEnum.PICKEDUP_ORDER) {
+        navigation.navigate(DeliverAPackage.DropOffOrderDetails, {
+          order: ongoingOrder,
+        });
+      }
+      if (
+        ongoingOrder.status === OrderStatusEnum.ACCEPTED ||
+        ongoingOrder.status === OrderStatusEnum.PENDING ||
+        OrderStatusEnum.IN_PROGRESS
+      ) {
+        navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
+          order: ongoingOrder,
+        });
+      }
+    }
+  }, [ongoingOrder, hasNavigated, navigation]);
 
   const handleTakePhoto = () => {
     console.log('Taking a photo for proof...');
-    // Add your camera logic here
   };
 
   const handleOrderDelivered = () => {
     console.log('Order marked as delivered.');
-    setIsOrderModalVisible(false);
   };
 
-  // Handle "Accept Order" button press
   const handleAcceptOrder = () => {
-    setIsOrderModalVisible(false);
-    setTimeout(() => {
-      setIsExpandedModalVisible(true);
-    }, 300);
+    // Additional logic can be added here
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Header logo home />
-
+      <Header logo home help />
       {/* Map Image */}
       <View style={styles.mapContainer}>
-        <Image source={images.map} style={styles.mapImage} />
+        <Mapbox.MapView
+          style={styles.mapImage}
+          styleURL="mapbox://styles/mapbox/light-v11">
+          <Mapbox.Camera
+            zoomLevel={14}
+            centerCoordinate={[151.2099, -33.865143]}
+          />
+        </Mapbox.MapView>
       </View>
 
       {/* Status Button */}
@@ -96,66 +234,11 @@ const HomeScreen: React.FC = () => {
       {/* Sliding Drawer */}
       <Animated.View style={[styles.drawer, {height: drawerHeight}]}>
         <View style={styles.statsContainer}>
-          <StatCard icon={images.money} value="$50" label="EARNINGS" />
-          <StatCard icon={images.cart} value="7" label="ORDERS" />
-          <StatCard
-            icon={images.directionIcon}
-            value="30 Km"
-            label="DISTANCE"
-          />
+          <StatCard icon={Money} value="$50" label="EARNINGS" />
+          <StatCard icon={Order} value="7" label="ORDERS" />
+          <StatCard icon={Distance} value="30 Km" label="DISTANCE" />
         </View>
       </Animated.View>
-
-      <View style={styles.helpButtonContainer}>
-        <HelpButton
-          onPress={() => {
-            navigation.navigate(AppScreens.FAQScreen);
-          }}
-        />
-      </View>
-
-      {/* Order Modal */}
-      <OrderModal
-        isVisible={isOrderModalVisible}
-        onClose={handleAcceptOrder} // Trigger handleAcceptOrder on close
-        earnings="$21.89"
-        tip="$11.89"
-        time="15 mins"
-        distance="7.6 Km"
-        pickupAddress="Yocha (Tom Roberts Parade)"
-        dropoffAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
-      />
-
-      {/* Earnings Modal */}
-      {/* <EarningsModal
-        isVisible={isOrderModalVisible}
-        onClose={() => setIsOrderModalVisible(false)}
-        tripTime="26 mins"
-        tripDistance="5.2 km"
-        tripPay={55}
-        tip={5}
-        totalEarnings={60}
-      /> */}
-
-      {/* Delivery Modal */}
-      {/* <DeliveryModal
-        isVisible={isOrderModalVisible}
-        onClose={() => setIsOrderModalVisible(false)}
-        driverName="Alexander V."
-        deliveryAddress="O’Neil Avenue & Sheahan Crescent, Hoppers Crossing"
-        deliveryInstructions={['Do not ring the bell', 'Drop-off at the door']}
-        itemsToDeliver={['Documents']}
-      /> */}
-
-      {/*Order Expanded Modal */}
-      <ExpandedModal
-        isVisible={isExpandedModalVisible}
-        onClose={() => setIsExpandedModalVisible(false)} // Close ExpandedModal
-        driverName="Alexander V."
-        pickupAddress="Yocha (Tom Roberts Parade)"
-        pickupNotes="Deliver to the back door, main gate is locked."
-        items={['Documents', 'Laptop', 'Bag']}
-      />
     </SafeAreaView>
   );
 };
@@ -163,7 +246,7 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.lightButtonBackground,
   },
   mapContainer: {
     flex: 2,
@@ -179,8 +262,8 @@ const styles = StyleSheet.create({
   },
   statusContainer: {
     alignItems: 'center',
-    marginTop: -60,
-    marginBottom: 20,
+    marginTop: -100,
+    backgroundColor: colors.white,
   },
   statusButton: {
     width: 80,
@@ -189,6 +272,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
+    marginTop: -40,
   },
   stopButton: {
     backgroundColor: colors.error,
@@ -229,6 +313,7 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    backgroundColor: colors.white,
   },
   helpButtonContainer: {
     position: 'absolute',

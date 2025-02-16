@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 interface commonState {
-    locationStatus: boolean | false;
+  locationStatus: boolean | false;
 }
 
 // Initial state
@@ -9,17 +9,14 @@ const initialState: commonState = {
   locationStatus: false,
 };
 
-
 const commonReducer = createSlice({
-  name: 'commonStore',
+  name: "commonStore",
   initialState,
   reducers: {
-    updateLocationState:(state,action)=>{
+    updateLocationState: (state, action) => {
       state.locationStatus = action.payload;
     },
-
-    
-  }
+  },
 });
 
 // Export the reducer

@@ -1,5 +1,13 @@
 import React from "react";
-import { View,Image, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
 import { images } from "../../assets/images/images";
 
 interface SuccessMessageProps {
@@ -9,13 +17,18 @@ interface SuccessMessageProps {
   onLinkPress?: () => void; // Optional function
 }
 
-const SuccessMessage: React.FC<SuccessMessageProps> = ({ title, description, linkText, onLinkPress }) => {
+const SuccessMessage: React.FC<SuccessMessageProps> = ({
+  title,
+  description,
+  linkText,
+  onLinkPress,
+}) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* Success Icon */}
         <View style={styles.iconContainer}>
-         <Image source={images.success} width={200} height={200}/>
+          <Image source={images.success} width={200} height={200} />
         </View>
 
         {/* Title */}

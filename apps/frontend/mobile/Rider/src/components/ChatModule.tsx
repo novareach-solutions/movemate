@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -13,13 +13,14 @@ import {
 } from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
 import Header from './Header';
+import SendIcon from '../assets/icons/sendIcon.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Message {
   id: string;
-  text: string;
-  sender: 'user' | 'receiver';
+  content: string;
+  senderId: number;
   time: string;
   senderImage?: string;
 }
@@ -33,6 +34,15 @@ interface ChatModuleProps {
 
 const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
   const [inputText, setInputText] = useState('');
+  const [senderId, setSenderId] = useState<string | null>(null); // Added state for senderId
+
+  useEffect(() => {
+    const fetchSenderId = async () => {
+      const id = await AsyncStorage.getItem('userId');
+      setSenderId(id);
+    };
+    fetchSenderId();
+  }, []);
 
   const handleSend = () => {
     if (inputText.trim()) {
@@ -42,7 +52,7 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
   };
 
   const renderMessageBubble = ({item}: {item: Message}) => {
-    const isUser = item.sender === 'user';
+    const isUser = item.senderId.toString() === senderId;
     return (
       <View style={styles.messageWrapper}>
         <View
@@ -63,7 +73,7 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
                 styles.messageText,
                 isUser ? styles.userText : styles.receiverText,
               ]}>
-              {item.text}
+              {item.content}
             </Text>
           </View>
         </View>
@@ -81,7 +91,6 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
   return (
     <SafeAreaView style={styles.container}>
       <Header logo isBack />
-      {/* Messages */}
       <FlatList
         data={messages}
         renderItem={renderMessageBubble}
@@ -89,8 +98,6 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
         contentContainerStyle={styles.messageList}
         inverted
       />
-
-      {/* Input Field */}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={80}>
@@ -103,7 +110,7 @@ const ChatModule: React.FC<ChatModuleProps> = ({messages, onSend}) => {
             onChangeText={setInputText}
           />
           <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-            <Image source={images.sendIcon} style={styles.sendIcon} />
+            <SendIcon style={styles.sendIcon} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -168,7 +175,7 @@ const styles = StyleSheet.create({
   },
   receiverTimeText: {
     alignSelf: 'flex-start',
-    marginLeft: 45, // Account for the sender image width
+    marginLeft: 45,
   },
   messageList: {
     paddingHorizontal: 15,
@@ -191,15 +198,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
   },
-  sendButton: {
-    marginLeft: 10,
-    backgroundColor: colors.purple,
-    width: 45,
-    height: 45,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  sendButton: {},
   sendIcon: {
     width: 20,
     height: 20,

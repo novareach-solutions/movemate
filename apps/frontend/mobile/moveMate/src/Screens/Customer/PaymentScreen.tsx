@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -7,11 +7,11 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-} from 'react-native';
+} from "react-native";
 
 interface PaymentMethod {
   id: string;
-  type: 'card' | 'wallet';
+  type: "card" | "wallet";
   name: string;
   icon: any;
   lastFour?: string;
@@ -19,45 +19,45 @@ interface PaymentMethod {
 }
 
 const PaymentScreen = () => {
-  const [selectedMethod, setSelectedMethod] = useState<string>('');
+  const [selectedMethod, setSelectedMethod] = useState<string>("");
 
   const cards: PaymentMethod[] = [
     {
-      id: 'visa_1',
-      type: 'card',
-      name: 'VISA',
-      icon: require('../assets/visa.png'),
-      lastFour: '1234',
-      bank: 'Bank of Melbourne',
+      id: "visa_1",
+      type: "card",
+      name: "VISA",
+      icon: require("../assets/visa.png"),
+      lastFour: "1234",
+      bank: "Bank of Melbourne",
     },
     {
-      id: 'mastercard_1',
-      type: 'card',
-      name: 'Mastercard',
-      icon: require('../assets/mastercard.png'),
-      lastFour: '1234',
-      bank: 'Bank of Melbourne',
+      id: "mastercard_1",
+      type: "card",
+      name: "Mastercard",
+      icon: require("../assets/mastercard.png"),
+      lastFour: "1234",
+      bank: "Bank of Melbourne",
     },
   ];
 
   const wallets: PaymentMethod[] = [
     {
-      id: 'paypal',
-      type: 'wallet',
-      name: 'PayPal',
-      icon: require('../assets/paypal.png'),
+      id: "paypal",
+      type: "wallet",
+      name: "PayPal",
+      icon: require("../assets/paypal.png"),
     },
     {
-      id: 'applepay',
-      type: 'wallet',
-      name: 'Apple Pay',
-      icon: require('../assets/applepay.png'),
+      id: "applepay",
+      type: "wallet",
+      name: "Apple Pay",
+      icon: require("../assets/applepay.png"),
     },
   ];
 
   const handlePayment = () => {
     // Implement payment logic
-    console.log('Processing payment with method:', selectedMethod);
+    console.log("Processing payment with method:", selectedMethod);
   };
 
   return (
@@ -65,9 +65,9 @@ const PaymentScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => {}}>
-          <Image 
-            source={require('../assets/back-arrow.png')} 
-            style={styles.backIcon} 
+          <Image
+            source={require("../assets/back-arrow.png")}
+            style={styles.backIcon}
           />
         </TouchableOpacity>
         <View>
@@ -95,11 +95,13 @@ const PaymentScreen = () => {
                 <Text style={styles.cardNumber}>**** {card.lastFour}</Text>
               </View>
               <View style={styles.radioButton}>
-                {selectedMethod === card.id && <View style={styles.radioInner} />}
+                {selectedMethod === card.id && (
+                  <View style={styles.radioInner} />
+                )}
               </View>
             </TouchableOpacity>
           ))}
-          
+
           <TouchableOpacity style={styles.addCardButton}>
             <Text style={styles.addCardText}>+ Add new card</Text>
           </TouchableOpacity>
@@ -120,7 +122,9 @@ const PaymentScreen = () => {
               <Image source={wallet.icon} style={styles.walletIcon} />
               <Text style={styles.walletName}>{wallet.name}</Text>
               <View style={styles.radioButton}>
-                {selectedMethod === wallet.id && <View style={styles.radioInner} />}
+                {selectedMethod === wallet.id && (
+                  <View style={styles.radioInner} />
+                )}
               </View>
             </TouchableOpacity>
           ))}
@@ -130,13 +134,10 @@ const PaymentScreen = () => {
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.termsText}>
-          By confirming, I agree that this order does not include illegal items.{' '}
+          By confirming, I agree that this order does not include illegal items.{" "}
           <Text style={styles.termsLink}>View T&C</Text>
         </Text>
-        <TouchableOpacity 
-          style={styles.payButton}
-          onPress={handlePayment}
-        >
+        <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
           <Text style={styles.payButtonText}>Proceed To Pay</Text>
         </TouchableOpacity>
       </View>
@@ -147,13 +148,13 @@ const PaymentScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: "#F8F9FA",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   backIcon: {
     width: 24,
@@ -162,11 +163,11 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   content: {
     flex: 1,
@@ -174,24 +175,24 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 12,
   },
   cardsContainer: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
   },
   cardItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
+    borderBottomColor: "#EEE",
   },
   selectedItem: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: "#F8F9FA",
   },
   cardIcon: {
     width: 40,
@@ -203,42 +204,42 @@ const styles = StyleSheet.create({
   },
   bankName: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   cardNumber: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   radioButton: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#666',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: "#666",
+    justifyContent: "center",
+    alignItems: "center",
   },
   radioInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
   },
   addCardButton: {
     paddingVertical: 12,
   },
   addCardText: {
-    color: '#6200EE',
+    color: "#6200EE",
     fontSize: 16,
   },
   walletsContainer: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
   },
   walletItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 12,
   },
   walletIcon: {
@@ -252,26 +253,26 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   termsText: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 16,
   },
   termsLink: {
-    color: '#6200EE',
+    color: "#6200EE",
   },
   payButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
     borderRadius: 8,
     padding: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   payButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 

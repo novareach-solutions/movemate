@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -11,17 +11,18 @@ import {
   KeyboardTypeOptions,
   SafeAreaView,
   TextStyle,
-  ActivityIndicator,Alert,
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
-  Platform
-} from 'react-native';
-import Header from '../components/Header';
-import {colors} from '../theme/colors';
-import {typography} from '../theme/typography';
-import { useNavigation } from '@react-navigation/native';
-import { useAppDispatch } from '../redux/hook';
-import { userSignup } from '../redux/slices/authSlice';
-import { CustomerScreens } from '../navigation/ScreenNames';
+  Platform,
+} from "react-native";
+import Header from "../components/Header";
+import { colors } from "../theme/colors";
+import { typography } from "../theme/typography";
+import { useNavigation } from "@react-navigation/native";
+import { useAppDispatch } from "../redux/hook";
+import { userSignup } from "../redux/slices/authSlice";
+import { CustomerScreens } from "../navigation/ScreenNames";
 type FormFields = {
   firstName: string;
   lastName: string;
@@ -36,16 +37,16 @@ type Errors = Partial<Record<keyof FormFields, string>>;
 
 const CompleteProfileScreen = () => {
   const navigation = useNavigation();
-const dispatch = useAppDispatch();
-const [loading, setLoading] = useState(false); 
+  const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<FormFields>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    address: '',
-    suburb: '',
-    state: '',
-    postalCode: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    address: "",
+    suburb: "",
+    state: "",
+    postalCode: "",
   });
 
   const [errors, setErrors] = useState<Errors>({});
@@ -70,8 +71,7 @@ const [loading, setLoading] = useState(false);
   //   return Object.keys(newErrors).length === 0;
   // };
 
-  const handleSubmit = async() => {
-
+  const handleSubmit = async () => {
     const payload = {
       firstName: form.firstName,
       lastName: form.lastName,
@@ -79,23 +79,23 @@ const [loading, setLoading] = useState(false);
       street: form.address,
       suburb: form.suburb,
       state: form.state,
-      postalCode: Number(form.postalCode)
+      postalCode: Number(form.postalCode),
+    };
+    setLoading(true);
+    try {
+      // await dispatch(userSignup(payload)).unwrap();
+      navigation.navigate(CustomerScreens.CustomerHomeScreen);
+      // Alert.alert('Session Expired', 'Please log in again.');
+    } catch {
+      console.log("Request OTP failed");
+    } finally {
+      setLoading(false);
     }
-     setLoading(true); 
-        try {
-          // await dispatch(userSignup(payload)).unwrap();
-          navigation.navigate(CustomerScreens.CustomerHomeScreen);
-          // Alert.alert('Session Expired', 'Please log in again.');
-        } catch {
-          console.log('Request OTP failed');
-        } finally {
-          setLoading(false);
-        }
   };
 
   const handleInputChange = (field: keyof FormFields, value: string) => {
-    setForm(prev => ({...prev, [field]: value}));
-    setErrors(prev => ({...prev, [field]: ''})); // Clear error for this field
+    setForm((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: "" })); // Clear error for this field
   };
 
   const inputFields: {
@@ -103,95 +103,102 @@ const [loading, setLoading] = useState(false);
     field: keyof FormFields;
     keyboardType?: KeyboardTypeOptions;
   }[] = [
-    {label: 'First Name', field: 'firstName'},
-    {label: 'Last Name', field: 'lastName'},
-    {label: 'Email Address', field: 'email', keyboardType: 'email-address'},
-    {label: 'Street Address', field: 'address'},
-    {label: 'Suburb', field: 'suburb'},
-    {label: 'State', field: 'state'},
-    {label: 'Postal Code', field: 'postalCode', keyboardType: 'numeric'},
+    { label: "First Name", field: "firstName" },
+    { label: "Last Name", field: "lastName" },
+    { label: "Email Address", field: "email", keyboardType: "email-address" },
+    { label: "Street Address", field: "address" },
+    { label: "Suburb", field: "suburb" },
+    { label: "State", field: "state" },
+    { label: "Postal Code", field: "postalCode", keyboardType: "numeric" },
   ];
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
-      <KeyboardAvoidingView 
-                  behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-                  style={styles.keyboardAvoid}
-                >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <Header logo />
-          
-          <ScrollView contentContainerStyle={styles.formContainer}>
-            <Text style={styles.title}>Complete your Profile</Text>
-            <Text style={styles.subTitle}>Add your details to get started</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoid}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
+            <Header logo />
 
-            {inputFields.map((input, index) => (
-              <View key={index} style={styles.inputWrapper}>
-                <Text style={styles.inputLabel}>{input.label}</Text>
-                <TextInput
-                  placeholder={`Enter your ${input.label.toLowerCase()}`}
-                  style={[
-                    styles.input,
-                    focusedField === input.field && {
-                      borderColor: colors.purple,
-                    },
-                    errors[input.field] && {borderColor: colors.error},
-                  ]}
-                  placeholderTextColor={colors.grey}
-                  onFocus={() => setFocusedField(input.field)}
-                  onBlur={() => setFocusedField(null)}
-                  keyboardType={input.keyboardType || 'default'}
-                  value={form[input.field]}
-                  onChangeText={text => handleInputChange(input.field, text)}
-                />
-                {errors[input.field] && (
-                  <Text style={styles.errorText}>{errors[input.field]}</Text>
-                )}
-              </View>
-            ))}
-
-<TouchableOpacity
-  style={[
-    styles.button,
-    Object.values(form).every(value => value) &&
-      styles.buttonEnabled,
-  ]}
-  onPress={handleSubmit}
-  disabled={!Object.values(form).every(value => value) || loading}>
-  {loading ? (
-    <ActivityIndicator color={colors.white} /> 
-  ) : (
-    <Text
-      style={[
-        styles.buttonText,
-        Object.values(form).every(value => value) &&
-          styles.buttonTextEnabled,
-      ]}>
-      Sign Up
-    </Text>
-  )}
-</TouchableOpacity>
-
-
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>
-                By continuing you accept our{' '}
-                <Text style={styles.link}>Terms of Service</Text> and{' '}
-                <Text
-                  style={styles.link}
-                  onPress={() =>
-                    navigation.navigate(AuthScreens.PrivacyPolicyScreen)
-                  }
-                >
-                  Privacy Policy
-                </Text>
+            <ScrollView contentContainerStyle={styles.formContainer}>
+              <Text style={styles.title}>Complete your Profile</Text>
+              <Text style={styles.subTitle}>
+                Add your details to get started
               </Text>
-            </View>
-          </ScrollView>
-     
-        </View>
-      </TouchableWithoutFeedback></KeyboardAvoidingView>
+
+              {inputFields.map((input, index) => (
+                <View key={index} style={styles.inputWrapper}>
+                  <Text style={styles.inputLabel}>{input.label}</Text>
+                  <TextInput
+                    placeholder={`Enter your ${input.label.toLowerCase()}`}
+                    style={[
+                      styles.input,
+                      focusedField === input.field && {
+                        borderColor: colors.purple,
+                      },
+                      errors[input.field] && { borderColor: colors.error },
+                    ]}
+                    placeholderTextColor={colors.grey}
+                    onFocus={() => setFocusedField(input.field)}
+                    onBlur={() => setFocusedField(null)}
+                    keyboardType={input.keyboardType || "default"}
+                    value={form[input.field]}
+                    onChangeText={(text) =>
+                      handleInputChange(input.field, text)
+                    }
+                  />
+                  {errors[input.field] && (
+                    <Text style={styles.errorText}>{errors[input.field]}</Text>
+                  )}
+                </View>
+              ))}
+
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  Object.values(form).every((value) => value) &&
+                    styles.buttonEnabled,
+                ]}
+                onPress={handleSubmit}
+                disabled={
+                  !Object.values(form).every((value) => value) || loading
+                }
+              >
+                {loading ? (
+                  <ActivityIndicator color={colors.white} />
+                ) : (
+                  <Text
+                    style={[
+                      styles.buttonText,
+                      Object.values(form).every((value) => value) &&
+                        styles.buttonTextEnabled,
+                    ]}
+                  >
+                    Sign Up
+                  </Text>
+                )}
+              </TouchableOpacity>
+
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>
+                  By continuing you accept our{" "}
+                  <Text style={styles.link}>Terms of Service</Text> and{" "}
+                  <Text
+                    style={styles.link}
+                    onPress={() =>
+                      navigation.navigate(AuthScreens.PrivacyPolicyScreen)
+                    }
+                  >
+                    Privacy Policy
+                  </Text>
+                </Text>
+              </View>
+            </ScrollView>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -203,14 +210,14 @@ const styles = StyleSheet.create({
   },
   keyboardAvoid: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: "#F8F8F8",
   },
   formContainer: {
     padding: 20,
   },
   inputLabel: {
     fontSize: typography.fontSize.medium,
-    fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.semiBold as TextStyle["fontWeight"],
     fontFamily: typography.fontFamily.regular,
     color: colors.text.primaryGrey,
     marginBottom: 7,
@@ -219,7 +226,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.large,
     color: colors.text.primaryGrey,
     fontFamily: typography.fontFamily.regular,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
   },
   subTitle: {
     fontSize: typography.fontSize.medium,
@@ -227,7 +234,7 @@ const styles = StyleSheet.create({
     color: colors.text.subText,
     marginBottom: 20,
     marginTop: 10,
-    fontWeight: typography.fontWeight.medium as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.medium as TextStyle["fontWeight"],
   },
   inputWrapper: {
     marginBottom: 15,
@@ -250,7 +257,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     marginTop: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonEnabled: {
     backgroundColor: colors.purple,
@@ -259,29 +266,29 @@ const styles = StyleSheet.create({
     color: colors.text.primaryGrey,
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
-    fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.semiBold as TextStyle["fontWeight"],
   },
   buttonTextEnabled: {
     color: colors.white,
     fontSize: typography.fontSize.medium,
-    fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.semiBold as TextStyle["fontWeight"],
     fontFamily: typography.fontFamily.regular,
   },
   footer: {
     marginTop: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   footerText: {
     fontSize: typography.fontSize.small,
     color: colors.text.primaryGrey,
     fontFamily: typography.fontFamily.regular,
-    fontWeight: typography.fontWeight.regular as TextStyle['fontWeight'],
-    textAlign: 'center',
+    fontWeight: typography.fontWeight.regular as TextStyle["fontWeight"],
+    textAlign: "center",
     marginHorizontal: 25,
   },
   link: {
-    color: 'purple',
-    textDecorationLine: 'underline',
+    color: "purple",
+    textDecorationLine: "underline",
   },
 });
 

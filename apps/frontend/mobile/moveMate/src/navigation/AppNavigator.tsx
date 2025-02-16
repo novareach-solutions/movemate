@@ -1,34 +1,39 @@
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {AuthScreens, AppScreens, CustomerScreens, ProfileScreens} from './ScreenNames';
-import Onboarding from '../components/Onboarding';
-import Login from '../Screens/LoginScreen';
-import OtpScreen from '../Screens/OtpScreen';
-import CompleteProfileScreen from '../Screens/CompleteProfileScreen';
-import PrivacyPolicyScreen from '../Screens/PrivacyPolicyScreen';
-import {RootStackParamList} from './type';
-import AppLayoutScreen from '../Screens/AppLayoutScreen';
-import AddCardScreen from '../Screens/Customer/SendAPackage/AddCardScreen';
-import PaymentSelectionScreen from '../Screens/Customer/SendAPackage/PaymentSelectionScreen';
-import CheckoutScreen from '../Screens/Customer/SendAPackage/CheckOutScreen';
-import EnterLocationDetailsScreen from '../Screens/Customer/SendAPackage/EnterLocationDetailsScreen';
-import SAPDetailsScreen from '../Screens/Customer/SendAPackage/DetailsScreen';
-import OrderScreen from '../Screens/Customer/OrderScreen';
-import NotificationScreen from '../Screens/Customer/NotificationScreen';
-import CustomerAccountScreen from '../Screens/Customer/AccountSceen';
-import CustomerHomeScreen from '../Screens/Customer/HomeScreen';
-import PaymentSuccessScreen from '../Screens/Customer/SendAPackage/PaymentSuccessScreen';
-import DeliveryScreen from '../Screens/Customer/SendAPackage/DeliveryScreen';
-import CancelOrderScreen from '../Screens/Customer/SendAPackage/CancelOrderScreen';
-import CancelSuccessScreen from '../Screens/Customer/SendAPackage/CancelSuccessScreen';
-import ProfileScreen from '../Screens/Profile/ProfileScreen';
-import SavedAddressesScreen from '../Screens/Profile/SavedAddressScreen';
-import LegalAboutScreen from '../Screens/Profile/LegalAndAbout';
-import FeedbackScreen from '../Screens/Profile/FeedbackScreen';
-import ReferFriendsScreen from '../Screens/Profile/ReferFriendScreen';
-import InboxScreen from '../Screens/Profile/InboxScreen';
-import OrderDetails from '../Screens/Customer/SendAPackage/OrderDetails';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import {
+  AuthScreens,
+  AppScreens,
+  CustomerScreens,
+  ProfileScreens,
+} from "./ScreenNames";
+import Onboarding from "../components/Onboarding";
+import Login from "../Screens/LoginScreen";
+import OtpScreen from "../Screens/OtpScreen";
+import CompleteProfileScreen from "../Screens/CompleteProfileScreen";
+import PrivacyPolicyScreen from "../Screens/PrivacyPolicyScreen";
+import { RootStackParamList } from "./type";
+import AppLayoutScreen from "../Screens/AppLayoutScreen";
+import AddCardScreen from "../Screens/Customer/SendAPackage/AddCardScreen";
+import PaymentSelectionScreen from "../Screens/Customer/SendAPackage/PaymentSelectionScreen";
+import CheckoutScreen from "../Screens/Customer/SendAPackage/CheckOutScreen";
+import EnterLocationDetailsScreen from "../Screens/Customer/SendAPackage/EnterLocationDetailsScreen";
+import SAPDetailsScreen from "../Screens/Customer/SendAPackage/DetailsScreen";
+import OrderScreen from "../Screens/Customer/OrderScreen";
+import NotificationScreen from "../Screens/Customer/NotificationScreen";
+import CustomerAccountScreen from "../Screens/Customer/AccountSceen";
+import CustomerHomeScreen from "../Screens/Customer/HomeScreen";
+import PaymentSuccessScreen from "../Screens/Customer/SendAPackage/PaymentSuccessScreen";
+import DeliveryScreen from "../Screens/Customer/SendAPackage/DeliveryScreen";
+import CancelOrderScreen from "../Screens/Customer/SendAPackage/CancelOrderScreen";
+import CancelSuccessScreen from "../Screens/Customer/SendAPackage/CancelSuccessScreen";
+import ProfileScreen from "../Screens/Profile/ProfileScreen";
+import SavedAddressesScreen from "../Screens/Profile/SavedAddressScreen";
+import LegalAboutScreen from "../Screens/Profile/LegalAndAbout";
+import FeedbackScreen from "../Screens/Profile/FeedbackScreen";
+import ReferFriendsScreen from "../Screens/Profile/ReferFriendScreen";
+import InboxScreen from "../Screens/Profile/InboxScreen";
+import OrderDetails from "../Screens/Customer/SendAPackage/OrderDetails";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -40,27 +45,27 @@ const AppNavigator = () => {
         <Stack.Screen
           name={AuthScreens.OnboardingScreen}
           component={Onboarding}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AuthScreens.LoginScreen}
           component={Login}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AuthScreens.OtpScreen}
           component={OtpScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AuthScreens.CompleteProfileScreen}
           component={CompleteProfileScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={AuthScreens.PrivacyPolicyScreen}
           component={PrivacyPolicyScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
 
         {/* App Screens */}
@@ -69,9 +74,8 @@ const AppNavigator = () => {
           component={AppLayoutScreen}
           options={{headerShown: false}}
         /> */}
-      
 
-      <Stack.Screen
+        <Stack.Screen
           name={CustomerScreens.CustomerHomeScreen}
           component={CustomerHomeScreen}
           options={{ headerShown: false }}
@@ -142,7 +146,7 @@ const AppNavigator = () => {
           options={{ headerShown: false }}
         />
 
-<Stack.Screen
+        <Stack.Screen
           name={ProfileScreens.ProfileScreen}
           component={ProfileScreen}
           options={{ headerShown: false }}
@@ -173,9 +177,12 @@ const AppNavigator = () => {
           options={{ headerShown: false }}
         />
 
-
-        <Stack.Screen name={CustomerScreens.AppLayoutScreen} component={AppLayoutScreen} options={{ headerShown: false }} />
-        </Stack.Navigator>
+        <Stack.Screen
+          name={CustomerScreens.AppLayoutScreen}
+          component={AppLayoutScreen}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };

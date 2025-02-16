@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -7,11 +7,11 @@ import {
   Modal,
   Image,
   TextStyle,
-} from 'react-native';
-import {colors} from '../../theme/colors';
-import {typography} from '../../theme/typography';
-import {formStyles} from '../../theme/form';
-import {images} from '../../assets/images/images';
+} from "react-native";
+import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
+import { formStyles } from "../../theme/form";
+import { images } from "../../assets/images/images";
 
 interface ConfirmPhotoModalProps {
   isVisible: boolean;
@@ -31,7 +31,8 @@ const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
       visible={isVisible}
       transparent
       animationType="slide"
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+    >
       <View style={styles.container}>
         <Text style={styles.title}>Confirm Photo</Text>
 
@@ -44,7 +45,8 @@ const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={onRetry}
-            style={[styles.retryButton, formStyles.button]}>
+            style={[styles.retryButton, formStyles.button]}
+          >
             <Text style={[formStyles.buttonText, styles.retryText]}>Retry</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -53,7 +55,8 @@ const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
               formStyles.button,
               formStyles.buttonEnabled,
               styles.doneButton,
-            ]}>
+            ]}
+          >
             <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
               Done
             </Text>
@@ -67,14 +70,14 @@ const ConfirmPhotoModal: React.FC<ConfirmPhotoModalProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: colors.white,
     paddingHorizontal: 20,
   },
   title: {
     fontSize: typography.fontSize.large,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     color: colors.text.primary,
     marginBottom: 20,
   },
@@ -82,22 +85,22 @@ const styles = StyleSheet.create({
     width: 300,
     height: 400,
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 40,
     backgroundColor: colors.lightButtonBackground,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   image: {
-    width: '87%',
-    height: '87%',
-    resizeMode: 'cover',
+    width: "87%",
+    height: "87%",
+    resizeMode: "cover",
     borderRadius: 10,
   },
   buttonContainer: {
-    flexDirection: 'column',
-    width: '100%',
+    flexDirection: "column",
+    width: "100%",
   },
   retryButton: {
     borderWidth: 2,
@@ -108,7 +111,7 @@ const styles = StyleSheet.create({
   },
   retryText: {
     color: colors.purple,
-    fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.semiBold as TextStyle["fontWeight"],
   },
   doneButton: {
     backgroundColor: colors.purple,

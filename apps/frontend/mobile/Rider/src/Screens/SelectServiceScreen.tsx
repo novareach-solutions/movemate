@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
 import TitleDescription from '../components/TitleDescription';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {
@@ -21,6 +20,10 @@ import {
   DeliverAPackageParamList,
 } from '../navigation/ScreenNames';
 import Header from '../components/Header';
+import DeliverAPackageIcon from '../assets/icons/deliverAPackageIcon.svg';
+import CarTowing from '../assets/icons/carTowingIcon.svg';
+import HomeMoving from '../assets/icons/homeMovingIcon.svg';
+import PurpleArrow from '../assets/icons/purpleArrow.svg';
 
 const services = [
   {
@@ -28,20 +31,20 @@ const services = [
     title: 'Deliver a Package',
     description:
       'Deliver parcels, ensuring they reach their destination on time.',
-    image: images.package,
+    image: DeliverAPackageIcon,
   },
   {
     id: '2',
     title: 'Car Towing',
     description:
       'Assist stranded drivers by towing their vehicles safely to their desired location.',
-    image: images.towing,
+    image: CarTowing,
   },
   {
     id: '3',
     title: 'Home Moving',
     description: 'Transport belongings securely for home moves.',
-    image: images.moving,
+    image: HomeMoving,
   },
 ];
 
@@ -54,14 +57,14 @@ const SelectServiceScreen: React.FC = () => {
       <View style={styles.textContainer}>
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text style={styles.cardDescription}>{item.description}</Text>
-        <Image source={images.arrow} style={styles.arrow} />
+        <PurpleArrow style={styles.arrow} />
       </View>
-      <Image source={item.image} style={styles.image} />
+      <item.image />
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+    <SafeAreaView style={{flex: 1}}>
       <Header logo />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
@@ -89,7 +92,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // padding: 20,
     backgroundColor: colors.white,
-    marginTop: 60,
+    paddingTop: 60,
   },
   serviceText: {
     paddingHorizontal: 20,

@@ -6,15 +6,25 @@ import {
   TouchableOpacity,
   Image,
   TextStyle,
+  SafeAreaView,
 } from 'react-native';
 import {colors} from '../../../theme/colors';
 import {typography} from '../../../theme/typography';
-import {images} from '../../../assets/images/images';
+import PurpleCheck from '../../../assets/icons/purpleCheck.svg';
+import Header from '../../../components/Header';
 
-const BenefitItem = ({title, description}) => {
+interface BenefitItemProps {
+  title: string;
+  description: string;
+}
+
+export const BenefitItem: React.FC<BenefitItemProps> = ({
+  title,
+  description,
+}) => {
   return (
     <View style={styles.benifitContainer}>
-      <Image source={images.benefitCheck} />
+      <PurpleCheck />
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
@@ -85,61 +95,68 @@ const SubscriptionPlansScreen: React.FC = () => {
   const activePlan = plansData[activeTab];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Boost Earnings with</Text>
-      <Text style={styles.subtitle}>0% Commission!</Text>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#2a1d3d',
+      }}>
+      <Header isBack earningScreen />
+      <View style={styles.container}>
+        <Text style={styles.title}>Boost Earnings with</Text>
+        <Text style={styles.subtitle}>0% Commission!</Text>
 
-      {/* Tabs */}
-      <View style={styles.tabContainer}>
-        {(['Weekend', 'Weekly', 'Monthly'] as const).map(tab => (
-          <TouchableOpacity
-            key={tab}
-            style={[styles.tab, activeTab === tab && styles.activeTab]}
-            onPress={() => setActiveTab(tab)}>
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === tab && styles.activeTabText,
-              ]}>
-              {tab}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <Text
-        style={{
-          color: colors.white,
-          textAlign: 'center',
-          marginVertical: 10,
-          fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
-          marginHorizontal: 15,
-        }}>
-        Select a plan that fits your schedule to maximize your earnings{' '}
-      </Text>
-
-      {/* Plan Card */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>{activePlan.title}</Text>
-        <Text style={styles.cardPrice}>{activePlan.price}</Text>
-        <Text style={styles.cardOldPrice}>{activePlan.oldPrice}</Text>
-
-        {/* Map benefits */}
-        <View style={styles.benefitsContainer}>
-          {activePlan.benefits.map((benefit, index) => (
-            <BenefitItem
-              key={index}
-              title={benefit.title}
-              description={benefit.description}
-            />
+        {/* Tabs */}
+        <View style={styles.tabContainer}>
+          {(['Weekend', 'Weekly', 'Monthly'] as const).map(tab => (
+            <TouchableOpacity
+              key={tab}
+              style={[styles.tab, activeTab === tab && styles.activeTab]}
+              onPress={() => setActiveTab(tab)}>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === tab && styles.activeTabText,
+                ]}>
+                {tab}
+              </Text>
+            </TouchableOpacity>
           ))}
         </View>
 
-        <TouchableOpacity style={styles.getStartedButton}>
-          <Text style={styles.getStartedText}>Get Started</Text>
-        </TouchableOpacity>
+        <Text
+          style={{
+            color: colors.white,
+            textAlign: 'center',
+            marginVertical: 10,
+            fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+            marginHorizontal: 15,
+          }}>
+          Select a plan that fits your schedule to maximize your earnings{' '}
+        </Text>
+
+        {/* Plan Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>{activePlan.title}</Text>
+          <Text style={styles.cardPrice}>{activePlan.price}</Text>
+          <Text style={styles.cardOldPrice}>{activePlan.oldPrice}</Text>
+
+          {/* Map benefits */}
+          <View style={styles.benefitsContainer}>
+            {activePlan.benefits.map((benefit, index) => (
+              <BenefitItem
+                key={index}
+                title={benefit.title}
+                description={benefit.description}
+              />
+            ))}
+          </View>
+
+          <TouchableOpacity style={styles.getStartedButton}>
+            <Text style={styles.getStartedText}>Get Started</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -199,6 +216,8 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
     width: '100%',
+    borderWidth: 1,
+    borderColor: '#FC9BE5',
   },
   cardTitle: {
     fontSize: typography.fontSize.large,
@@ -246,11 +265,6 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-  },
-  title: {
-    fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
-    color: colors.white,
   },
   description: {
     fontSize: typography.fontSize.small,

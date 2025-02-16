@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,16 +10,16 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
   TextStyle,
-} from 'react-native';
-import {colors} from '../../theme/colors';
-import {formStyles} from '../../theme/form';
-import {typography} from '../../theme/typography';
-import {images} from '../../assets/images/images';
-import ConfirmPhotoModal from './ConfirmPhotoModal';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AppScreens, AppScreensParamList} from '../../navigation/ScreenNames';
+} from "react-native";
+import { colors } from "../../theme/colors";
+import { formStyles } from "../../theme/form";
+import { typography } from "../../theme/typography";
+import { images } from "../../assets/images/images";
+import ConfirmPhotoModal from "./ConfirmPhotoModal";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { AppScreens, AppScreensParamList } from "../../navigation/ScreenNames";
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 interface ExpandedModalProps {
   isVisible: boolean;
@@ -30,7 +30,7 @@ interface ExpandedModalProps {
   items: string[];
 }
 
-const InfoRow: React.FC<{iconSource: any; text: string; bold?: boolean}> = ({
+const InfoRow: React.FC<{ iconSource: any; text: string; bold?: boolean }> = ({
   iconSource,
   text,
   bold,
@@ -41,9 +41,12 @@ const InfoRow: React.FC<{iconSource: any; text: string; bold?: boolean}> = ({
       style={[
         styles.infoText,
         bold
-          ? {fontWeight: typography.fontWeight.bold as TextStyle['fontWeight']}
+          ? {
+              fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
+            }
           : {},
-      ]}>
+      ]}
+    >
       {text}
     </Text>
   </View>
@@ -81,12 +84,12 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   };
 
   const handleRetry = () => {
-    console.log('Retry pressed: Open camera to retake photo');
+    console.log("Retry pressed: Open camera to retake photo");
     // Camera logic can be implemented here
   };
 
   const handleDone = () => {
-    console.log('Done pressed: Confirm photo and proceed');
+    console.log("Done pressed: Confirm photo and proceed");
     setIsConfirmPhotoVisible(false); // Close ConfirmPhotoModal
   };
 
@@ -97,11 +100,12 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
         visible={isVisible}
         transparent
         animationType="none"
-        onRequestClose={onClose}>
+        onRequestClose={onClose}
+      >
         <TouchableWithoutFeedback onPress={handleCollapse}>
           <View style={styles.overlay}>
             <TouchableWithoutFeedback>
-              <Animated.View style={[styles.modalContainer, {height}]}>
+              <Animated.View style={[styles.modalContainer, { height }]}>
                 {/* Drag Indicator */}
                 <TouchableOpacity onPress={handleExpand}>
                   <View style={styles.dragIndicator} />
@@ -123,7 +127,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                     <View style={styles.sectionContainer}>
                       <InfoRow
                         iconSource={images.greenCircle}
-                        text={'Pickup Details'}
+                        text={"Pickup Details"}
                         bold
                       />
                       <View style={styles.pickUpDetails}>
@@ -139,7 +143,8 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                           <TouchableOpacity
                             onPress={() => {
                               navigation.navigate(AppScreens.Chat);
-                            }}>
+                            }}
+                          >
                             <Image
                               source={images.message}
                               style={styles.pickupIcon}
@@ -152,7 +157,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                     <View style={styles.sectionContainer}>
                       <InfoRow
                         iconSource={images.pickUpNotesIcon}
-                        text={'Pickup Notes'}
+                        text={"Pickup Notes"}
                         bold
                       />
                       <View style={styles.pickUpDetails}>
@@ -163,14 +168,15 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                     <View style={styles.sectionContainer}>
                       <InfoRow
                         iconSource={images.cartItemsIcon}
-                        text={'Items to Pickup'}
+                        text={"Items to Pickup"}
                         bold
                       />
                       <View
                         style={[
                           styles.itemsContainer,
                           styles.pickUpDetailsTextContainer,
-                        ]}>
+                        ]}
+                      >
                         {items.map((item, index) => (
                           <Text key={index} style={styles.itemText}>
                             • {item}
@@ -178,12 +184,14 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                         ))}
                         <TouchableOpacity
                           style={[formStyles.button, formStyles.buttonEnabled]}
-                          onPress={() => setIsConfirmPhotoVisible(true)}>
+                          onPress={() => setIsConfirmPhotoVisible(true)}
+                        >
                           <Text
                             style={[
                               formStyles.buttonText,
                               formStyles.buttonTextEnabled,
-                            ]}>
+                            ]}
+                          >
                             Verify Items
                           </Text>
                         </TouchableOpacity>
@@ -195,12 +203,14 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                 {/* Button at the Bottom */}
                 <View style={styles.footer}>
                   <TouchableOpacity
-                    style={[formStyles.button, formStyles.buttonSuccess]}>
+                    style={[formStyles.button, formStyles.buttonSuccess]}
+                  >
                     <Text
                       style={[
                         formStyles.buttonText,
                         formStyles.buttonTextEnabled,
-                      ]}>
+                      ]}
+                    >
                       I Have Arrived
                     </Text>
                   </TouchableOpacity>
@@ -225,17 +235,17 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    justifyContent: "flex-end",
   },
   modalContainer: {
     backgroundColor: colors.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    justifyContent: 'flex-start',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    justifyContent: "flex-start",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
@@ -244,16 +254,16 @@ const styles = StyleSheet.create({
     width: 50,
     height: 5,
     backgroundColor: colors.text.subText,
-    alignSelf: 'center',
+    alignSelf: "center",
     borderRadius: 3,
     marginBottom: 10,
   },
   title: {
     fontSize: typography.fontSize.semiMedium,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     color: colors.text.primary,
     marginBottom: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   sectionContainer: {
     marginVertical: 10,
@@ -263,20 +273,20 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     fontSize: typography.fontSize.medium,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     color: colors.text.primary,
     marginBottom: 5,
   },
   infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 3,
   },
   infoIcon: {
     width: 20,
     height: 20,
     marginRight: 10,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   infoText: {
     fontSize: typography.fontSize.medium,
@@ -287,7 +297,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
     fontFamily: typography.fontFamily.regular,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
   },
   itemsContainer: {
     padding: 20,
@@ -299,27 +309,27 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
     marginBottom: 5,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
   },
   location: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
   },
   footer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
     left: 0,
     right: 0,
     paddingHorizontal: 20,
   },
   pickUpDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 10,
   },
   pickUpDetailsTextContainer: {
-    flexDirection: 'column',
+    flexDirection: "column",
     gap: 5,
   },
   pickupIcon: {
@@ -327,24 +337,24 @@ const styles = StyleSheet.create({
     height: 22,
   },
   pickupIcons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 40,
   },
   fullScreenOverlay: {
     flex: 1,
     backgroundColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   fullScreenContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   confirmPhotoTitle: {
     fontSize: typography.fontSize.large,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     color: colors.text.primary,
     marginBottom: 20,
   },
@@ -357,9 +367,9 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     paddingHorizontal: 20,
   },
   retryButton: {

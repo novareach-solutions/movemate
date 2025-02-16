@@ -1,8 +1,8 @@
-import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
-import apiClient from '../../api/apiClient';
-import apiEndpoints from '../../api/apiEndPoints';
-import axios from 'axios';
-import {SimpleToast} from '../../utils/helpers';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import apiClient from "../../api/apiClient";
+import apiEndpoints from "../../api/apiEndPoints";
+import axios from "axios";
+import { SimpleToast } from "../../utils/helpers";
 
 interface PaymentState {
   loading: boolean;
@@ -46,7 +46,7 @@ interface PaymentPayload {
 interface CreatePaymentIntentPayload {
   amount: number;
   currency: string;
-  orderDetails: PaymentState['orderDetails'];
+  orderDetails: PaymentState["orderDetails"];
 }
 
 interface ConfirmPaymentPayload {
@@ -57,7 +57,7 @@ interface ConfirmPaymentPayload {
 // Process payment
 export const processPayment = createAsyncThunk(
   apiEndpoints.processPayment,
-  async (payload: PaymentPayload, {rejectWithValue}) => {
+  async (payload: PaymentPayload, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(
         apiEndpoints.processPayment,
@@ -68,26 +68,26 @@ export const processPayment = createAsyncThunk(
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          console.error('API Error:', error.response.data);
+          console.error("API Error:", error.response.data);
           return rejectWithValue(
-            error.response.data?.message || 'Payment failed',
+            error.response.data?.message || "Payment failed",
           );
         } else if (error.request) {
-          console.error('No response received:', error.request);
+          console.error("No response received:", error.request);
           return rejectWithValue(
-            'No response from server. Please try again later.',
+            "No response from server. Please try again later.",
           );
         }
       }
-      console.error('Unexpected Error:', error);
-      return rejectWithValue('An unexpected error occurred. Please try again.');
+      console.error("Unexpected Error:", error);
+      return rejectWithValue("An unexpected error occurred. Please try again.");
     }
   },
 );
 
 export const createPaymentIntent = createAsyncThunk(
-  'payment/createPaymentIntent',
-  async (payload: CreatePaymentIntentPayload, {rejectWithValue}) => {
+  "payment/createPaymentIntent",
+  async (payload: CreatePaymentIntentPayload, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(apiEndpoints.createPaymentIntent, {
         amount: payload.amount,
@@ -104,8 +104,8 @@ export const createPaymentIntent = createAsyncThunk(
 );
 
 export const confirmPayment = createAsyncThunk(
-  'payment/confirmPayment',
-  async (payload: ConfirmPaymentPayload, {rejectWithValue, getState}) => {
+  "payment/confirmPayment",
+  async (payload: ConfirmPaymentPayload, { rejectWithValue, getState }) => {
     try {
       const response = await apiClient.post(apiEndpoints.confirmPayment, {
         paymentIntentId: getState().payment.paymentIntentId,
@@ -122,19 +122,19 @@ export const confirmPayment = createAsyncThunk(
 
 const handlePaymentError = (error: any, rejectWithValue: any) => {
   if (axios.isAxiosError(error)) {
-    const message = error.response?.data?.message || 'Payment failed';
+    const message = error.response?.data?.message || "Payment failed";
     SimpleToast(message);
     return rejectWithValue(message);
   }
-  SimpleToast('Payment processing failed');
-  return rejectWithValue('An unexpected error occurred');
+  SimpleToast("Payment processing failed");
+  return rejectWithValue("An unexpected error occurred");
 };
 
 const paymentSlice = createSlice({
-  name: 'payment',
+  name: "payment",
   initialState,
   reducers: {
-    resetPaymentState: state => {
+    resetPaymentState: (state) => {
       state.loading = false;
       state.error = null;
       state.paymentSuccess = false;
@@ -142,15 +142,15 @@ const paymentSlice = createSlice({
       state.orderDetails = null;
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     // Process Payment
     builder
-      .addCase(processPayment.pending, state => {
+      .addCase(processPayment.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.paymentSuccess = false;
       })
-      .addCase(processPayment.fulfilled, state => {
+      .addCase(processPayment.fulfilled, (state) => {
         state.loading = false;
         state.paymentSuccess = true;
       })
@@ -162,7 +162,7 @@ const paymentSlice = createSlice({
 
     // Create Payment Intent
     builder
-      .addCase(createPaymentIntent.pending, state => {
+      .addCase(createPaymentIntent.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -178,11 +178,11 @@ const paymentSlice = createSlice({
 
     // Confirm Payment
     builder
-      .addCase(confirmPayment.pending, state => {
+      .addCase(confirmPayment.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(confirmPayment.fulfilled, state => {
+      .addCase(confirmPayment.fulfilled, (state) => {
         state.loading = false;
         state.paymentSuccess = true;
       })
@@ -194,5 +194,5 @@ const paymentSlice = createSlice({
 });
 
 // Export the reducer
-export const {resetPaymentState} = paymentSlice.actions;
+export const { resetPaymentState } = paymentSlice.actions;
 export default paymentSlice.reducer;

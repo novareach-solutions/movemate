@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,9 +7,9 @@ import {
   Animated,
   Image,
   Modal,
-} from 'react-native';
-import {colors} from '../../theme/colors';
-import {images} from '../../assets/images/images';
+} from "react-native";
+import { colors } from "../../theme/colors";
+import { images } from "../../assets/images/images";
 
 interface ModalComponentProps {
   isVisible: boolean;
@@ -27,14 +27,14 @@ interface InfoRowProps {
   text: string;
 }
 
-const InfoRow: React.FC<InfoRowProps> = ({iconSource, text}) => (
+const InfoRow: React.FC<InfoRowProps> = ({ iconSource, text }) => (
   <View style={styles.infoRow}>
     <Image source={iconSource} style={styles.infoIcon} />
     <Text style={styles.infoText}>{text}</Text>
   </View>
 );
 
-const TipBadge: React.FC<{tip: string}> = ({tip}) => (
+const TipBadge: React.FC<{ tip: string }> = ({ tip }) => (
   <View style={styles.tipBadge}>
     <Text style={styles.tipBadgeText}>Tip: {tip}</Text>
   </View>
@@ -71,7 +71,7 @@ const OrderModal: React.FC<ModalComponentProps> = ({
 
   const widthInterpolation = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: ['100%', '0%'], // Moves background from right to left
+    outputRange: ["100%", "0%"], // Moves background from right to left
   });
 
   return (
@@ -79,7 +79,8 @@ const OrderModal: React.FC<ModalComponentProps> = ({
       visible={isVisible}
       transparent
       animationType="slide"
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           {/* Tip Badge */}
@@ -108,12 +109,13 @@ const OrderModal: React.FC<ModalComponentProps> = ({
             <Animated.View
               style={[
                 styles.timerButtonBackground,
-                {width: widthInterpolation},
+                { width: widthInterpolation },
               ]}
             />
             <TouchableOpacity
               style={styles.acceptOrderButton}
-              onPress={onClose}>
+              onPress={onClose}
+            >
               <Text style={styles.acceptOrderText}>Accept Order</Text>
             </TouchableOpacity>
           </View>
@@ -126,8 +128,8 @@ const OrderModal: React.FC<ModalComponentProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
   },
   modalContainer: {
     backgroundColor: colors.white,
@@ -137,7 +139,7 @@ const styles = StyleSheet.create({
     borderColor: colors.purple,
     borderBottomWidth: 0,
     padding: 20,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   tipBadge: {
     backgroundColor: colors.lightPurple,
@@ -148,12 +150,12 @@ const styles = StyleSheet.create({
   tipBadgeText: {
     color: colors.purple,
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   earning: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   totalEarningsLabel: {
     color: colors.text.subText,
@@ -162,22 +164,22 @@ const styles = StyleSheet.create({
   totalEarnings: {
     fontSize: 24,
     color: colors.purple,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   infoContainer: {
-    flexDirection: 'column',
+    flexDirection: "column",
     marginVertical: 10,
   },
   infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 5,
   },
   infoIcon: {
     width: 20,
     height: 20,
     marginRight: 8,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   infoText: {
     fontSize: 16,
@@ -190,13 +192,13 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   timerButtonContainer: {
-    position: 'relative',
+    position: "relative",
     height: 50,
     borderRadius: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   darkBackground: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   timerButtonBackground: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     bottom: 0,
@@ -213,14 +215,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   acceptOrderButton: {
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   acceptOrderText: {
     color: colors.white,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

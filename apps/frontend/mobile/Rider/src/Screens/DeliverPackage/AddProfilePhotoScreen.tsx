@@ -18,30 +18,31 @@ import {
   setSignupData,
   uploadMedia,
 } from '../../redux/slices/authSlice';
-// import {useNavigation} from '@react-navigation/native';
 import ImagePicker from 'react-native-image-crop-picker';
-import ConfirmPhotoModal from '../../components/Modals/ConfirmPhotoModal';
 import PhotoPickerModal from '../../components/common/PhotoPickerModal';
 import Header from '../../components/Header';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {
+  AuthScreens,
+  DeliverAPackage,
+  DeliverAPackageParamList,
+} from '../../navigation/ScreenNames';
 
 const AddProfilePhotoScreen: React.FC = () => {
-  // const navigation = useNavigation();
   const [image, setImage] = useState('');
-  const [imgToUpload, setImgToUpload] = useState('');
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const dispatch = useAppDispatch();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const signupData = useAppSelector(state => state.auth.signupData);
   const handleUpload = () => {
     setIsPhotoOptionVisible(true);
 
-    console.log('Upload button pressed');
     const profilePhotoDetails = {
       profilePhoto: 'https://example.com/profile-photo1.jpg',
     };
 
     dispatch(setSignupData(profilePhotoDetails));
-    // Logic for opening the file picker or camera
   };
 
   const handleTakePhoto = () => {
@@ -52,7 +53,6 @@ const AddProfilePhotoScreen: React.FC = () => {
       cropping: true,
     })
       .then(photo => {
-        // Construct FormData for upload
         const formData = new FormData();
         formData.append('file', {
           uri: photo.path,
@@ -60,7 +60,6 @@ const AddProfilePhotoScreen: React.FC = () => {
           name: photo.filename || `photo_${Date.now()}.jpg`,
         });
 
-        // Perform the upload via Redux or direct API call
         dispatch(uploadMedia(formData))
           .unwrap()
           .then(response => {
@@ -90,12 +89,11 @@ const AddProfilePhotoScreen: React.FC = () => {
       cropping: true,
     })
       .then(photo => {
-        // Construct FormData for upload
         const formData = new FormData();
         formData.append('file', {
-          uri: photo.path, // Use the file path
-          type: photo.mime, // File type (e.g., image/jpeg)
-          name: photo.filename || `photo_${Date.now()}.jpg`, // Use filename or fallback to a generated one
+          uri: photo.path,
+          type: photo.mime,
+          name: photo.filename || `photo_${Date.now()}.jpg`,
         });
 
         // Perform the upload via Redux or direct API call
@@ -124,10 +122,14 @@ const AddProfilePhotoScreen: React.FC = () => {
   const handleContinue = async () => {
     if (signupData) {
       try {
-        console.log('signup initatiated');
+        console.log('signup initiated');
         await dispatch(agentSignup(signupData)).unwrap();
+        // Navigate to DeliverPackage.home on success
+        navigation.navigate(DeliverAPackage.UploadDocuments);
       } catch {
         console.log('Signup failed');
+        // Navigate to Appscreen.onboarding on failure
+        navigation.navigate(AuthScreens.Onboarding);
       }
     }
     console.log('Continue button pressed');
@@ -161,7 +163,7 @@ const AddProfilePhotoScreen: React.FC = () => {
       </View>
       {/* Photo Options Modal */}
       <PhotoPickerModal
-        visible={isPhotoOptionVisible}
+        isVisible={isPhotoOptionVisible}
         onClose={() => setIsPhotoOptionVisible(false)}
         onTakePhoto={handleTakePhoto}
         onChooseFromGallery={handleChooseFromGallery}
@@ -173,7 +175,6 @@ const AddProfilePhotoScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.white,
   },
   container: {
     flex: 1,

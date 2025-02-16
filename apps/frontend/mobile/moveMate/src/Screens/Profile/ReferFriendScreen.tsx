@@ -1,171 +1,182 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Image,
-  ScrollView,Share
-} from 'react-native';
-import {colors} from '../../theme/colors';
-import {typography} from '../../theme/typography';
-import {images} from '../../assets/images/images';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../../components/Header';
+  ScrollView,
+  Share,
+} from "react-native";
+import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
+import { images } from "../../assets/images/images";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Header from "../../components/Header";
 
 const ReferFriendsScreen: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'Invite Friend' | 'Status'>(
-    'Invite Friend',
+  const [activeTab, setActiveTab] = useState<"Invite Friend" | "Status">(
+    "Invite Friend",
   );
 
   const shareInvite = async () => {
     try {
       const result = await Share.share({
-        message: 'Hey! Check this out: https://www.google.com',
+        message: "Hey! Check this out: https://www.google.com",
       });
 
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
-          console.log('Shared with activity type: ', result.activityType);
+          console.log("Shared with activity type: ", result.activityType);
         } else {
-          console.log('Shared successfully!');
+          console.log("Shared successfully!");
         }
       } else if (result.action === Share.dismissedAction) {
-        console.log('Share dismissed');
+        console.log("Share dismissed");
       }
     } catch (error) {
-      console.error('Error sharing invite: ', error);
+      console.error("Error sharing invite: ", error);
     }
   };
 
   return (
-    <SafeAreaView style={{flex:1,backgroundColor:colors.lightGrey}}>
-      <Header isBack title='Refer Friends' bgColor={colors.lightGrey} />
-    <View style={styles.container}>
-      {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'Invite Friend' && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab('Invite Friend')}>
-          <Text
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.lightGrey }}>
+      <Header isBack title="Refer Friends" bgColor={colors.lightGrey} />
+      <View style={styles.container}>
+        {/* Tabs */}
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity
             style={[
-              styles.tabText,
-              activeTab === 'Invite Friend' && styles.activeTabText,
-            ]}>
-            Refer Friend
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'Status' && styles.activeTab]}
-          onPress={() => setActiveTab('Status')}>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'Status' && styles.activeTabText,
-            ]}>
-            Status
-          </Text>
-        </TouchableOpacity>
+              styles.tab,
+              activeTab === "Invite Friend" && styles.activeTab,
+            ]}
+            onPress={() => setActiveTab("Invite Friend")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "Invite Friend" && styles.activeTabText,
+              ]}
+            >
+              Refer Friend
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === "Status" && styles.activeTab]}
+            onPress={() => setActiveTab("Status")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "Status" && styles.activeTabText,
+              ]}
+            >
+              Status
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {activeTab === "Invite Friend" && (
+          <View style={styles.content}>
+            {/* Friends Circle */}
+            <View style={styles.circleImageContainer}>
+              <images.ReferFriendImage />
+            </View>
+
+            <View
+              style={{
+                width: "100%",
+              }}
+            >
+              {/* Referral Card */}
+              <View style={styles.referralCard}>
+                <Image source={images.currencyCoin} style={styles.icon} />
+                <Text style={styles.referralText}>
+                  Refer your friends and earn $30 for every successful referral!
+                </Text>
+              </View>
+
+              {/* Footer Invite Button */}
+              <View style={styles.footer}>
+                <TouchableOpacity
+                  style={styles.inviteButton}
+                  onPress={shareInvite}
+                >
+                  <Text style={styles.inviteButtonText}>Refer Friends</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {activeTab === "Status" && (
+          <View style={{ flex: 1, paddingHorizontal: 20 }}>
+            {/* Summary Card */}
+            <View style={styles.summaryCard}>
+              <Image source={images.rewardCoin} style={styles.icon} />
+              <View>
+                <Text style={styles.summaryText}>
+                  ₹2,000 earned from 4 referrals
+                </Text>
+                <Text style={styles.subSummaryText}>
+                  Total rewards earned so far
+                </Text>
+              </View>
+            </View>
+
+            {/* Referral Status List */}
+            <Text style={styles.referralStatusHeading}>
+              Your Referral Status
+            </Text>
+            <View style={{ flex: 1 }}>
+              <View style={styles.statusItem}>
+                <View>
+                  <Text style={styles.amountText}>$30</Text>
+                  <Text style={styles.dateText}>1/11/2024</Text>
+                </View>
+                <View style={[styles.statusBadge, styles.pendingBadge]}>
+                  <Text style={[styles.statusText, styles.pendingText]}>
+                    Pending
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.statusItem}>
+                <View>
+                  <Text style={styles.amountText}>$30</Text>
+                  <Text style={styles.dateText}>1/11/2024</Text>
+                </View>
+                <View style={[styles.statusBadge, styles.earnedBadge]}>
+                  <Text style={[styles.statusText, styles.earnedText]}>
+                    Earned
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.statusItem}>
+                <View>
+                  <Text style={styles.amountText}>$30</Text>
+                  <Text style={styles.dateText}>1/11/2024</Text>
+                </View>
+                <View style={[styles.statusBadge, styles.pendingBadge]}>
+                  <Text style={[styles.statusText, styles.pendingText]}>
+                    Pending
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.statusItem}>
+                <View>
+                  <Text style={styles.amountText}>$30</Text>
+                  <Text style={styles.dateText}>1/11/2024</Text>
+                </View>
+                <View style={[styles.statusBadge, styles.earnedBadge]}>
+                  <Text style={[styles.statusText, styles.earnedText]}>
+                    Earned
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
       </View>
-
-      {activeTab === 'Invite Friend' && (
-        <View style={styles.content}>
-          {/* Friends Circle */}
-          <View style={styles.circleImageContainer}>
-            <images.ReferFriendImage />
-          </View>
-
-          <View
-            style={{
-              width: '100%',
-            }}>
-            {/* Referral Card */}
-            <View style={styles.referralCard}>
-              <Image source={images.currencyCoin} style={styles.icon} />
-              <Text style={styles.referralText}>
-                Refer your friends and earn $30 for every successful referral!
-              </Text>
-            </View>
-
-            {/* Footer Invite Button */}
-            <View style={styles.footer}>
-              <TouchableOpacity style={styles.inviteButton} onPress={shareInvite}>
-                <Text style={styles.inviteButtonText}>Refer Friends</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      )}
-
-      {activeTab === 'Status' && (
-        <View style={{flex: 1, paddingHorizontal: 20}}>
-          {/* Summary Card */}
-          <View style={styles.summaryCard}>
-            <Image source={images.rewardCoin} style={styles.icon} />
-            <View>
-              <Text style={styles.summaryText}>
-                ₹2,000 earned from 4 referrals
-              </Text>
-              <Text style={styles.subSummaryText}>
-                Total rewards earned so far
-              </Text>
-            </View>
-          </View>
-
-          {/* Referral Status List */}
-          <Text style={styles.referralStatusHeading}>Your Referral Status</Text>
-          <View style={{flex: 1}}>
-            <View style={styles.statusItem}>
-              <View>
-                <Text style={styles.amountText}>$30</Text>
-                <Text style={styles.dateText}>1/11/2024</Text>
-              </View>
-              <View style={[styles.statusBadge, styles.pendingBadge]}>
-                <Text style={[styles.statusText, styles.pendingText]}>
-                  Pending
-                </Text>
-              </View>
-            </View>
-            <View style={styles.statusItem}>
-              <View>
-                <Text style={styles.amountText}>$30</Text>
-                <Text style={styles.dateText}>1/11/2024</Text>
-              </View>
-              <View style={[styles.statusBadge, styles.earnedBadge]}>
-                <Text style={[styles.statusText, styles.earnedText]}>
-                  Earned
-                </Text>
-              </View>
-            </View>
-            <View style={styles.statusItem}>
-              <View>
-                <Text style={styles.amountText}>$30</Text>
-                <Text style={styles.dateText}>1/11/2024</Text>
-              </View>
-              <View style={[styles.statusBadge, styles.pendingBadge]}>
-                <Text style={[styles.statusText, styles.pendingText]}>
-                  Pending
-                </Text>
-              </View>
-            </View>
-            <View style={styles.statusItem}>
-              <View>
-                <Text style={styles.amountText}>$30</Text>
-                <Text style={styles.dateText}>1/11/2024</Text>
-              </View>
-              <View style={[styles.statusBadge, styles.earnedBadge]}>
-                <Text style={[styles.statusText, styles.earnedText]}>
-                  Earned
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      )}
-    </View>
     </SafeAreaView>
   );
 };
@@ -176,16 +187,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightGrey,
   },
   tabsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     borderBottomWidth: 1,
     borderBottomColor: colors.border.primary,
   },
   tab: {
     flex: 1,
     paddingVertical: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   activeTab: {
     borderBottomWidth: 2,
@@ -197,34 +208,34 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: colors.primary,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   circleImageContainer: {
-    flex:1,
-    alignItems:'center',
-    justifyContent:'center'
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
     // marginVertical: 40,
   },
   circleImage: {
     width: 300,
     height: 300,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   referralCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border.lightGray,
     padding: 15,
     borderRadius: 12,
-    width: '100%',
+    width: "100%",
   },
   icon: {
     width: 24,
@@ -237,7 +248,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   footer: {
-    width: '100%',
+    width: "100%",
     marginVertical: 10,
     backgroundColor: colors.white,
   },
@@ -245,27 +256,27 @@ const styles = StyleSheet.create({
     backgroundColor: colors.purple,
     paddingVertical: 15,
     borderRadius: 8,
-    alignItems: 'center',
-    width: '100%',
+    alignItems: "center",
+    width: "100%",
   },
   inviteButtonText: {
     fontSize: typography.fontSize.medium,
     color: colors.white,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   statusContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   statusText: {
     color: colors.text.primaryGrey,
     fontSize: typography.fontSize.small,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   summaryCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border.lightGray,
@@ -275,7 +286,7 @@ const styles = StyleSheet.create({
   },
   summaryText: {
     fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.text.primary,
   },
   subSummaryText: {
@@ -284,14 +295,14 @@ const styles = StyleSheet.create({
   },
   referralStatusHeading: {
     fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.text.primary,
     marginBottom: 10,
   },
   statusItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border.lightGray,
@@ -301,7 +312,7 @@ const styles = StyleSheet.create({
   },
   amountText: {
     fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.text.primary,
   },
   dateText: {

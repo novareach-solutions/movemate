@@ -16,11 +16,15 @@ import { deliveryInstructions } from "../../../constants/staticData";
 import { useAppSelector } from "../../../redux/hook";
 
 const CheckoutScreen = () => {
-    const pickupLocationData = useAppSelector(state => state.deliverAPackage.pickupLocation);
-    const dropLocationData = useAppSelector(state => state.deliverAPackage.dropLocation);
+  const pickupLocationData = useAppSelector(
+    (state) => state.deliverAPackage.pickupLocation,
+  );
+  const dropLocationData = useAppSelector(
+    (state) => state.deliverAPackage.dropLocation,
+  );
   const [tip, setTip] = useState(null);
   const [selectedInstruction, setSelectedInstruction] = useState(null);
-  const navigation=useNavigation()
+  const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -55,11 +59,14 @@ const CheckoutScreen = () => {
                 key={index}
                 style={[
                   styles.tag,
-                  selectedInstruction === instruction.label && styles.tagSelected,
+                  selectedInstruction === instruction.label &&
+                    styles.tagSelected,
                 ]}
                 onPress={() =>
                   setSelectedInstruction(
-                    selectedInstruction === instruction.label ? null : instruction.label
+                    selectedInstruction === instruction.label
+                      ? null
+                      : instruction.label,
                   )
                 }
               >
@@ -94,9 +101,7 @@ const CheckoutScreen = () => {
               >
                 <Text
                   style={
-                    tip === amount
-                      ? styles.tipTextSelected
-                      : styles.tipText
+                    tip === amount ? styles.tipTextSelected : styles.tipText
                   }
                 >
                   ${amount}
@@ -115,9 +120,12 @@ const CheckoutScreen = () => {
         </View>
 
         {/* Payment Button */}
-        <TouchableOpacity style={styles.paymentButton} onPress={()=>{
-            navigation.navigate(CustomerScreens.PaymentSelectionScreen)
-        }}>
+        <TouchableOpacity
+          style={styles.paymentButton}
+          onPress={() => {
+            navigation.navigate(CustomerScreens.PaymentSelectionScreen);
+          }}
+        >
           <Text style={styles.paymentButtonText}>Make Payment | $27</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -201,7 +209,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 20,
     height: 20,
-    objectFit:"contain"
+    objectFit: "contain",
   },
   tipContainer: {
     flexDirection: "row",

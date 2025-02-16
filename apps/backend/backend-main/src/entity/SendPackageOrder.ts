@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   RelationId,
 } from "typeorm";
@@ -17,6 +18,7 @@ import { Agent } from "./Agent";
 import { BaseEntity } from "./BaseEntity";
 import { DropLocation } from "./DropLocation";
 import { OrderReview } from "./OrderReview";
+import { Payment } from "./Payment";
 import { PickupLocation } from "./PickupLocation";
 import { Report } from "./Report";
 import { User } from "./User";
@@ -123,6 +125,9 @@ export class SendPackageOrder extends BaseEntity {
   @Column({ type: "varchar", nullable: true })
   completionPhoto: string;
 
+  @Column({ type: "varchar", nullable: true })
+  itemVerifiedPhoto: string;
+
   @Column({ type: "timestamp", nullable: true })
   acceptedAt: Date;
 
@@ -142,6 +147,7 @@ export class SendPackageOrder extends BaseEntity {
   @OneToOne(() => Report, (report) => report.sendPackageOrder, {
     nullable: true,
     onDelete: "SET NULL",
+    cascade: true,
   })
   @JoinColumn({ name: "reportId" })
   report: Report;
@@ -160,4 +166,7 @@ export class SendPackageOrder extends BaseEntity {
   @RelationId((order: SendPackageOrder) => order.review)
   @Column({ type: "integer", nullable: true })
   orderReviewId: number;
+
+  @OneToMany(() => Payment, (payment) => payment.order)
+  payments: Payment[];
 }

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,11 +7,11 @@ import {
   Modal,
   Image,
   TextStyle,
-} from 'react-native';
-import {colors} from '../../theme/colors';
-import {formStyles} from '../../theme/form';
-import {typography} from '../../theme/typography';
-import {images} from '../../assets/images/images';
+} from "react-native";
+import { colors } from "../../theme/colors";
+import { formStyles } from "../../theme/form";
+import { typography } from "../../theme/typography";
+import { images } from "../../assets/images/images";
 
 interface DeliveryModalProps {
   isVisible: boolean;
@@ -34,11 +34,11 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
 
   const handleTakePhoto = () => {
     setIsTakingPhoto(true);
-    console.log('Take Photo button clicked', isTakingPhoto); // Replace this with your camera logic
+    console.log("Take Photo button clicked", isTakingPhoto); // Replace this with your camera logic
   };
 
   const handleOrderDelivered = () => {
-    console.log('Order Delivered button clicked');
+    console.log("Order Delivered button clicked");
     onClose(); // Close the modal when delivered
   };
 
@@ -47,7 +47,8 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
       visible={isVisible}
       animationType="slide"
       onRequestClose={onClose}
-      transparent>
+      transparent
+    >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           {/* Header Section */}
@@ -72,7 +73,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
                 <View key={index} style={styles.instructionRow}>
                   <Image
                     source={
-                      instruction === 'Do not ring the bell'
+                      instruction === "Do not ring the bell"
                         ? images.doNotRing
                         : images.doorDropOff
                     }
@@ -102,10 +103,12 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
             </Text>
             <TouchableOpacity
               style={[formStyles.button, formStyles.buttonEnabled]}
-              onPress={handleTakePhoto}>
+              onPress={handleTakePhoto}
+            >
               <Image source={images.camera} style={styles.cameraIcon} />
               <Text
-                style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
+                style={[formStyles.buttonText, formStyles.buttonTextEnabled]}
+              >
                 Take Photo
               </Text>
             </TouchableOpacity>
@@ -114,7 +117,8 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
           {/* Order Delivered Button */}
           <TouchableOpacity
             style={[formStyles.button, formStyles.buttonSuccess]}
-            onPress={handleOrderDelivered}>
+            onPress={handleOrderDelivered}
+          >
             <Text style={[formStyles.buttonText, formStyles.buttonTextEnabled]}>
               Order Delivered
             </Text>
@@ -128,17 +132,17 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
   },
   modalContainer: {
-    width: '100%',
+    width: "100%",
     backgroundColor: colors.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
@@ -148,7 +152,7 @@ const styles = StyleSheet.create({
   },
   driverName: {
     fontSize: typography.fontSize.large,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     color: colors.text.primary,
   },
   deliveryAddress: {
@@ -157,8 +161,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   headerIcons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
     gap: 20,
   },
   icon: {
@@ -171,17 +175,17 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: typography.fontSize.medium,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     color: colors.text.primary,
     marginBottom: 10,
   },
   instructionsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 15,
   },
   instructionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   instructionIcon: {
     width: 20,

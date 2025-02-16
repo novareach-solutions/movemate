@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
 import { images } from "../../../assets/images/images";
 
 const CancelSuccessScreen = () => {
@@ -16,12 +23,16 @@ const CancelSuccessScreen = () => {
 
         {/* Description */}
         <Text style={styles.description}>
-          The order has been cancelled. Thank you for providing the necessary details. If further action is required, our
-          support team will reach out to you.
+          The order has been cancelled. Thank you for providing the necessary
+          details. If further action is required, our support team will reach
+          out to you.
         </Text>
 
         {/* Refund Status Button */}
-        <TouchableOpacity onPress={() => console.log("Check Refund Status")} style={styles.linkContainer}>
+        <TouchableOpacity
+          onPress={() => console.log("Check Refund Status")}
+          style={styles.linkContainer}
+        >
           <Text style={styles.linkText}>Check Refund Status</Text>
         </TouchableOpacity>
       </ScrollView>

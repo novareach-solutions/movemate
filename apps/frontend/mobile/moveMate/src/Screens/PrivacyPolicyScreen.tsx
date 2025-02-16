@@ -1,14 +1,14 @@
-import {SafeAreaView, StyleSheet, Text, TextStyle, View} from 'react-native';
-import React from 'react';
-import {colors} from '../theme/colors';
-import Header from '../components/Header';
-import {typography} from '../theme/typography';
+import { SafeAreaView, StyleSheet, Text, TextStyle, View } from "react-native";
+import React from "react";
+import { colors } from "../theme/colors";
+import Header from "../components/Header";
+import { typography } from "../theme/typography";
 
 const PrivacyPolicyScreen = () => {
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
       <Header />
-      <View style={{padding: 15}}>
+      <View style={{ padding: 15 }}>
         <Text style={styles.headerTitle}>Privacy Policy</Text>
         <Text style={styles.privacyHeader}>Information We Collect</Text>
         <Text style={styles.privacyPolicyText}>
@@ -29,14 +29,14 @@ export default PrivacyPolicyScreen;
 const styles = StyleSheet.create({
   headerTitle: {
     marginVertical: 10,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     fontFamily: typography.fontFamily.regular,
     fontSize: typography.fontSize.large,
   },
   privacyHeader: {
     marginVertical: 10,
     fontFamily: typography.fontFamily.regular,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     color: colors.text.primaryGrey,
     fontSize: typography.fontSize.medium + 2,
   },
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     color: colors.text.subText,
     fontSize: typography.fontSize.medium - 1,
     fontFamily: typography.fontFamily.regular,
-    fontWeight: typography.fontWeight.regular as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.regular as TextStyle["fontWeight"],
     lineHeight: 25,
   },
 });

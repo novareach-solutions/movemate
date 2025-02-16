@@ -14,9 +14,10 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { assignOrder } from "../../../redux/slices/deliverAPackageSlice";
 import { useNavigation } from "@react-navigation/native";
 import { CustomerScreens } from "../../../navigation/ScreenNames";
-import Mapbox from '@rnmapbox/maps';
-Mapbox.setAccessToken('pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw');
-
+import Mapbox from "@rnmapbox/maps";
+Mapbox.setAccessToken(
+  "pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw",
+);
 
 const routeLineStyle = {
   lineColor: colors.purple,
@@ -24,33 +25,50 @@ const routeLineStyle = {
 };
 
 const DeliveryTrackingScreen = () => {
-  const orderId = useAppSelector(state => state.deliverAPackage.id);
-  const pickupLocationData = useAppSelector(state => state.deliverAPackage.pickupLocation);
-  const dropLocationData = useAppSelector(state => state.deliverAPackage.dropLocation);
+  const orderId = useAppSelector((state) => state.deliverAPackage.id);
+  const pickupLocationData = useAppSelector(
+    (state) => state.deliverAPackage.pickupLocation,
+  );
+  const dropLocationData = useAppSelector(
+    (state) => state.deliverAPackage.dropLocation,
+  );
 
   const [routeCoords, setRouteCoords] = useState<[number, number][]>([]);
-  const [pickupLocation, setPickupLocation] = useState<[number, number]>([77.5946, 12.9716]);
-const [dropLocation, setDropLocation] = useState<[number, number]>([80.2707, 13.0827]);
+  const [pickupLocation, setPickupLocation] = useState<[number, number]>([
+    77.5946, 12.9716,
+  ]);
+  const [dropLocation, setDropLocation] = useState<[number, number]>([
+    80.2707, 13.0827,
+  ]);
 
-useEffect(() => {
-  if (pickupLocationData?.latitude !== undefined && pickupLocationData?.longitude !== undefined) {
-    setPickupLocation([pickupLocationData.longitude, pickupLocationData.latitude]);
-  }
-}, [pickupLocationData]);
+  useEffect(() => {
+    if (
+      pickupLocationData?.latitude !== undefined &&
+      pickupLocationData?.longitude !== undefined
+    ) {
+      setPickupLocation([
+        pickupLocationData.longitude,
+        pickupLocationData.latitude,
+      ]);
+    }
+  }, [pickupLocationData]);
 
-useEffect(() => {
-  if (dropLocationData?.latitude !== undefined && dropLocationData?.longitude !== undefined) {
-    setDropLocation([dropLocationData.longitude, dropLocationData.latitude]);
-  }
-}, [dropLocationData]);
+  useEffect(() => {
+    if (
+      dropLocationData?.latitude !== undefined &&
+      dropLocationData?.longitude !== undefined
+    ) {
+      setDropLocation([dropLocationData.longitude, dropLocationData.latitude]);
+    }
+  }, [dropLocationData]);
 
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const fetchRoute = async () => {
     try {
       const response = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${pickupLocation[0]},${pickupLocation[1]};${dropLocation[0]},${dropLocation[1]}?geometries=geojson&access_token=pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw`
+        `https://api.mapbox.com/directions/v5/mapbox/driving/${pickupLocation[0]},${pickupLocation[1]};${dropLocation[0]},${dropLocation[1]}?geometries=geojson&access_token=pk.eyJ1IjoidmFtb29zZSIsImEiOiJjbTVpc2V4d2cwcHNrMmpzZDJ3OHFveXRvIn0.4mZXHphedikVf0ctP0bsEw`,
       );
       const data = await response.json();
       if (data.routes.length) {
@@ -61,42 +79,50 @@ useEffect(() => {
     }
   };
   useEffect(() => {
-    if (pickupLocationData?.latitude && pickupLocationData?.longitude && dropLocationData?.latitude && dropLocationData?.longitude) {
+    if (
+      pickupLocationData?.latitude &&
+      pickupLocationData?.longitude &&
+      dropLocationData?.latitude &&
+      dropLocationData?.longitude
+    ) {
       fetchRoute();
     }
-  }, [pickupLocation,dropLocation]);
-
+  }, [pickupLocation, dropLocation]);
 
   useEffect(() => {
     if (orderId) {
       assignRider();
     }
-  }, [])
+  }, []);
   const assignRider = async () => {
-    if (!pickupLocation || pickupLocation.pickupLattitude === null || pickupLocation.pickupLongitude === null) {
-      Alert.alert('Pickup location data is missing.');
+    if (
+      !pickupLocation ||
+      pickupLocation.pickupLattitude === null ||
+      pickupLocation.pickupLongitude === null
+    ) {
+      Alert.alert("Pickup location data is missing.");
       return;
     }
 
     try {
       // await dispatch(assignOrder({
       //     pickupLatitude: pickupLocation.pickupLattitude ?? 0,
-      //     pickupLongitude: pickupLocation.pickupLongitude ?? 0, 
+      //     pickupLongitude: pickupLocation.pickupLongitude ?? 0,
       //     orderId:orderId ?? ""
       // }));
-      Alert.alert("We've Assigned a Delivery Agent for your order.")
+      Alert.alert("We've Assigned a Delivery Agent for your order.");
     } catch (error) {
-      console.log('Error assigning rider:', error);
+      console.log("Error assigning rider:", error);
     }
   };
 
   const CancelOrder = () => {
     navigation.navigate(CustomerScreens.CancelOrderScreen);
-  }
+  };
 
   const viewDetails = () => {
     navigation.navigate(CustomerScreens.OrderDetails);
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -135,10 +161,8 @@ useEffect(() => {
               >
                 <Mapbox.LineLayer id="routeLayer" style={routeLineStyle} />
               </Mapbox.ShapeSource>
-
             )}
           </Mapbox.MapView>
-
         </View>
         {/* <Image
           source={images.map}
@@ -149,7 +173,9 @@ useEffect(() => {
       {/* Details Section */}
       <View style={styles.detailsContainer}>
         <View style={styles.deliveryBox}>
-          <Text style={styles.headingText}>Looking for a delivery partner near you...</Text>
+          <Text style={styles.headingText}>
+            Looking for a delivery partner near you...
+          </Text>
           <Image source={images.deliveryMan} style={styles.deliveryImage} />
         </View>
         {/* Address Details */}
@@ -158,8 +184,12 @@ useEffect(() => {
           <View style={styles.addressRow}>
             <View style={[styles.dot, { backgroundColor: "green" }]} />
             <View style={styles.addressTextContainer}>
-              <Text style={styles.addressTitle}>{pickupLocationData?.name}</Text>
-              <Text style={styles.addressSubtitle}>{pickupLocationData?.address}</Text>
+              <Text style={styles.addressTitle}>
+                {pickupLocationData?.name}
+              </Text>
+              <Text style={styles.addressSubtitle}>
+                {pickupLocationData?.address}
+              </Text>
             </View>
             <TouchableOpacity style={styles.detailButton} onPress={viewDetails}>
               <Text style={styles.detailText}>View details</Text>
@@ -171,7 +201,9 @@ useEffect(() => {
             <View style={[styles.dot, { backgroundColor: "red" }]} />
             <View style={styles.addressTextContainer}>
               <Text style={styles.addressTitle}>{dropLocationData?.name}</Text>
-              <Text style={styles.addressSubtitle}>{dropLocationData?.address}</Text>
+              <Text style={styles.addressSubtitle}>
+                {dropLocationData?.address}
+              </Text>
             </View>
           </View>
         </View>
@@ -185,8 +217,6 @@ useEffect(() => {
             <Text style={styles.cancelText}>Cancel</Text>
           </TouchableOpacity>
         </View>
-
-
       </View>
     </SafeAreaView>
   );
@@ -221,19 +251,19 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   deliveryBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: colors.lightGrey,
     padding: 20,
     // paddingHorizontal:10,
     borderRadius: 10,
-    marginBottom: 10
+    marginBottom: 10,
   },
   deliveryImage: {
     width: 40,
     height: 40,
-    objectFit: 'contain'
+    objectFit: "contain",
   },
   headingText: {
     fontSize: 16,
@@ -241,7 +271,7 @@ const styles = StyleSheet.create({
     color: "#333333",
     marginBottom: 16,
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   addressContainer: {
     marginBottom: 16,
@@ -277,23 +307,23 @@ const styles = StyleSheet.create({
   },
 
   footerStyle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   textContainer: {
     flex: 1,
   },
   amountText: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
+    fontWeight: "bold",
+    color: "#000",
   },
   paymentInfo: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   cancelButton: {
     borderWidth: 1,
@@ -305,7 +335,7 @@ const styles = StyleSheet.create({
   cancelText: {
     color: colors.red,
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   detailButton: {
     borderWidth: 1,
@@ -317,12 +347,15 @@ const styles = StyleSheet.create({
   detailText: {
     color: colors.purple,
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   markerContainer: { alignItems: "center", justifyContent: "center" },
-  marker: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: "white" },
+  marker: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "white",
+  },
   // routeLine: { lineColor: "blue", lineWidth: 3 },
 });
-
-
-

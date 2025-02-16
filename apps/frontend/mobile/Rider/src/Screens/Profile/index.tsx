@@ -5,81 +5,93 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Image,
   SafeAreaView,
+  ScrollView,
+  Image,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {colors} from '../../theme/colors';
 import {typography} from '../../theme/typography';
-import {
-  AppScreens,
-  AuthScreens,
-  ProfileScreens,
-} from '../../navigation/ScreenNames';
-import {images} from '../../assets/images/images';
+import {AuthScreens, ProfileScreens} from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
+import Crown from '../../assets/icons/crown.svg';
+import Wallet from '../../assets/icons/wallet.svg';
+import Earnings from '../../assets/icons/earnings.svg';
+import Inbox from '../../assets/icons/inbox.svg';
+import Help from '../../assets/icons/blackHelp.svg';
+import Logout from '../../assets/icons/logout.svg';
+import Account from '../../assets/icons/account.svg';
+import Refer from '../../assets/icons/refer.svg';
+import BlackArrow from '../../assets/icons/blackArrow.svg';
 
 const profileData = [
   {
     id: '1',
-    title: 'Inbox',
-    icon: images.profileInbox,
-    screen: ProfileScreens.Inbox,
-    notificationCount: 3,
+    title: 'Earnings',
+    icon: Earnings,
+    screen: ProfileScreens.Earnings,
   },
   {
     id: '2',
-    title: 'Earnings',
-    icon: images.profileEarnings,
-    screen: AppScreens.ComingSoon,
-  },
-  {
-    id: '3',
     title: 'Wallet',
-    icon: images.profileWallet,
+    icon: Wallet,
     screen: ProfileScreens.Wallet,
   },
   {
-    id: '4',
+    id: '3',
     title: 'Earning Mode',
-    icon: images.profileEarningMode,
+    icon: Crown,
     screen: ProfileScreens.EarningMode,
   },
   {
-    id: '5',
-    title: 'Refer Friends',
-    icon: images.profileReferFriend,
+    id: '4',
+    title: 'Refer & Earn',
+    icon: Refer,
     screen: ProfileScreens.ReferFriends,
   },
   {
+    id: '5',
+    title: 'Notifications',
+    icon: Inbox,
+    screen: ProfileScreens.Inbox,
+  },
+  {
     id: '6',
-    title: 'Rewards',
-    icon: images.profileRewards,
-    screen: AppScreens.ComingSoon,
+    title: 'Ratings',
+    icon: Inbox,
+    screen: ProfileScreens.Ratings,
+    notificationCount: 3,
   },
   {
     id: '7',
-    title: 'Account',
-    icon: images.profileAccount,
-    screen: ProfileScreens.Account,
+    title: 'Help & Support',
+    icon: Help,
+    screen: ProfileScreens.HelpAndSupport,
+    notificationCount: 2,
   },
   {
     id: '8',
+    title: 'Account',
+    icon: Account,
+    screen: ProfileScreens.Account,
+  },
+  {
+    id: '9',
     title: 'Log Out',
-    icon: images.profileLogout,
+    icon: Logout,
     screen: AuthScreens.Onboarding,
     isLogout: true,
   },
 ];
 
 const ProfileScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const renderItem = ({item}: {item: (typeof profileData)[0]}) => (
     <TouchableOpacity
       style={[styles.listItem]}
-      onPress={() => navigation.navigate(item.screen as never)}>
-      <Image source={item.icon} />
+      onPress={() => navigation.navigate(item.screen)}>
+      <item.icon width={24} height={24} />
       <Text style={[styles.itemText]}>{item.title}</Text>
       {/* {item.notificationCount && (
                 <View style={styles.notificationBadge}>
@@ -87,16 +99,15 @@ const ProfileScreen: React.FC = () => {
                 </View>
             )} */}
       <View>
-        <Image source={images.arrow} />
+        <BlackArrow style={{transform: [{rotate: '180deg'}]}} />
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header logo isBack />
-
-      {/* Profile Header */}
+      {/* Fixed Profile Header */}
       <View style={styles.header}>
         <Image
           source={{uri: 'https://i.pravatar.cc/100'}}
@@ -111,26 +122,30 @@ const ProfileScreen: React.FC = () => {
         </View>
       </View>
 
-      {/* Subscription Plan */}
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate(ProfileScreens.EarningMode);
-        }}
-        style={styles.subscriptionPlan}>
-        <Text style={styles.subscriptionText}>Weekly subscription plan</Text>
-        <View style={styles.subscriptionBadge}>
-          <Text style={styles.subscriptionBadgeText}>ACTIVE</Text>
-        </View>
-      </TouchableOpacity>
+      {/* Scrollable Area */}
+      <ScrollView style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+        {/* Weekly Subscription Plan (Now Scrollable) */}
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(ProfileScreens.EarningMode);
+          }}
+          style={styles.subscriptionPlan}>
+          <Text style={styles.subscriptionText}>Weekly subscription plan</Text>
+          <View style={styles.subscriptionBadge}>
+            <Text style={styles.subscriptionBadgeText}>ACTIVE</Text>
+          </View>
+        </TouchableOpacity>
 
-      {/* Menu List */}
-      <FlatList
-        data={profileData}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContainer}
-      />
-    </View>
+        {/* Scrollable Menu List */}
+        <FlatList
+          data={profileData}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContainer}
+          scrollEnabled={false} // FlatList should not have its own scrolling
+        />
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -138,6 +153,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.lightButtonBackground,
+    paddingBottom: 30,
   },
   header: {
     flexDirection: 'row',
@@ -175,10 +191,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     borderRadius: 12,
     marginTop: 10,
+    borderWidth: 1,
+    borderColor: colors.border.lightGray,
   },
   subscriptionText: {
     fontSize: typography.fontSize.medium,
-    color: colors.text.primary,
+    color: colors.purple,
     fontWeight: 'bold',
   },
   subscriptionBadge: {

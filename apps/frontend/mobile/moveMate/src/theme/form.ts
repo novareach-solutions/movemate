@@ -1,11 +1,11 @@
-import {StyleSheet, TextStyle} from 'react-native';
-import {colors} from './colors';
-import {typography} from './typography';
+import { StyleSheet, TextStyle } from "react-native";
+import { colors } from "./colors";
+import { typography } from "./typography";
 
 export const formStyles = StyleSheet.create({
   inputLabel: {
     fontSize: typography.fontSize.medium,
-    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
     fontFamily: typography.fontFamily.regular,
     color: colors.text.primaryGrey,
     marginBottom: 7,
@@ -37,7 +37,7 @@ export const formStyles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 12,
     marginTop: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonEnabled: {
     backgroundColor: colors.purple,
@@ -51,26 +51,26 @@ export const formStyles = StyleSheet.create({
     color: colors.text.primaryGrey,
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
-    fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.semiBold as TextStyle["fontWeight"],
   },
   buttonTextEnabled: {
     color: colors.white,
   },
   footer: {
     marginTop: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   footerText: {
     fontSize: typography.fontSize.small,
     color: colors.text.primaryGrey,
     fontFamily: typography.fontFamily.regular,
-    fontWeight: typography.fontWeight.regular as TextStyle['fontWeight'],
-    textAlign: 'center',
+    fontWeight: typography.fontWeight.regular as TextStyle["fontWeight"],
+    textAlign: "center",
     marginHorizontal: 25,
     marginTop: 10,
   },
   link: {
     color: colors.purple,
-    textDecorationLine: 'underline',
+    textDecorationLine: "underline",
   },
 });

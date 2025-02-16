@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
-import {images} from '../assets/images/images';
+import PlaceHolderProfile from '../assets/icons/placeHolderProfile.svg';
 
 interface UploadPhotoProps {
   onUpload: () => void;
@@ -24,10 +24,7 @@ const UploadPhoto: React.FC<UploadPhotoProps> = ({onUpload, image}) => {
           <Image source={{uri: image}} style={styles.image} />
         ) : (
           <View style={styles.placeholder}>
-            <Image
-              source={images.placeholderprofile}
-              style={styles.placeholderImage}
-            />
+            <PlaceHolderProfile style={styles.placeholderImage} />
           </View>
         )}
       </View>

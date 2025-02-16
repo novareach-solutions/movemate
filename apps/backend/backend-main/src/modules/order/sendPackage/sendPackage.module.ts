@@ -11,6 +11,7 @@ import { TokenService } from "../../auth/utils/generateTokens";
 import { OtpService } from "../../auth/utils/otp";
 import { AwsModule } from "../../media/aws.module";
 import { MediaService } from "../../media/media.service";
+import { NotificationService } from "../../notification/notification.service";
 import { PricingService } from "../../pricing/pricing.service";
 import { RedisService } from "../../redis/redis.service";
 import { SendPackageController } from "./sendPackage.controller";
@@ -37,6 +38,7 @@ import { SendAPackageService } from "./sendPackage.service";
     MediaService,
     PricingService,
     CustomerNotificationGateway,
+    NotificationService,
   ],
 })
 export class SendAPackageModule {}

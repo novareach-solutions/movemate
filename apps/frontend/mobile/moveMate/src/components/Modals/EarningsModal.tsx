@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -6,10 +6,10 @@ import {
   StyleSheet,
   Modal,
   Image,
-} from 'react-native';
-import {colors} from '../../theme/colors';
-import {images} from '../../assets/images/images';
-import DetailRow from '../DetailRow';
+} from "react-native";
+import { colors } from "../../theme/colors";
+import { images } from "../../assets/images/images";
+import DetailRow from "../DetailRow";
 
 interface EarningsModalProps {
   isVisible: boolean;
@@ -35,7 +35,8 @@ const EarningsModal: React.FC<EarningsModalProps> = ({
       visible={isVisible}
       animationType="slide"
       onRequestClose={onClose}
-      transparent>
+      transparent
+    >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           {/* Header Section */}
@@ -82,8 +83,8 @@ const EarningsModal: React.FC<EarningsModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
   },
   modalContainer: {
     backgroundColor: colors.white,
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   headerContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   successIcon: {
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
   },
   earningsText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.purple,
   },
   detailsContainer: {
@@ -128,12 +129,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.purple,
     borderRadius: 8,
     paddingVertical: 15,
-    alignItems: 'center',
+    alignItems: "center",
   },
   doneButtonText: {
     color: colors.white,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

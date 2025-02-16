@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,56 +6,60 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
-} from 'react-native';
-import {colors} from '../../theme/colors';
-import {typography} from '../../theme/typography';
+} from "react-native";
+import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
 
 const InboxScreen: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'Notifications' | 'Messages'>(
-    'Notifications',
+  const [activeTab, setActiveTab] = useState<"Notifications" | "Messages">(
+    "Notifications",
   );
 
   const notifications = [
     {
-      id: '1',
+      id: "1",
       message:
-        'Payment for your completed trip has been processed and added to your wallet.',
-      date: '1/11/2024',
+        "Payment for your completed trip has been processed and added to your wallet.",
+      date: "1/11/2024",
       resolved: false,
     },
     {
-      id: '2',
+      id: "2",
       message:
-        'Refer a friend and both of you earn $20 when they complete their first trip!',
-      date: '1/11/2024',
+        "Refer a friend and both of you earn $20 when they complete their first trip!",
+      date: "1/11/2024",
       resolved: false,
     },
     {
-      id: '3',
-      message: 'Earn an extra $50 for completing 5 trips today.',
-      date: '1/11/2024',
+      id: "3",
+      message: "Earn an extra $50 for completing 5 trips today.",
+      date: "1/11/2024",
       resolved: false,
     },
     {
-      id: '4',
+      id: "4",
       message:
-        'Payment for your completed trip has been processed and added to your wallet.',
-      date: '1/11/2024',
+        "Payment for your completed trip has been processed and added to your wallet.",
+      date: "1/11/2024",
       resolved: true,
     },
     {
-      id: '5',
+      id: "5",
       message:
-        'Refer a friend and both of you earn $20 when they complete their first trip!',
-      date: '1/11/2024',
+        "Refer a friend and both of you earn $20 when they complete their first trip!",
+      date: "1/11/2024",
       resolved: true,
     },
   ];
 
-  const filteredNotifications = notifications.filter(item => !item.resolved);
-  const resolvedNotifications = notifications.filter(item => item.resolved);
+  const filteredNotifications = notifications.filter((item) => !item.resolved);
+  const resolvedNotifications = notifications.filter((item) => item.resolved);
 
-  const renderNotification = ({item}: {item: (typeof notifications)[0]}) => (
+  const renderNotification = ({
+    item,
+  }: {
+    item: (typeof notifications)[0];
+  }) => (
     <View style={styles.notificationItem}>
       <View style={styles.notificationContent}>
         <Text style={styles.notificationMessage}>{item.message}</Text>
@@ -74,25 +78,29 @@ const InboxScreen: React.FC = () => {
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'Notifications' && styles.activeTab,
+            activeTab === "Notifications" && styles.activeTab,
           ]}
-          onPress={() => setActiveTab('Notifications')}>
+          onPress={() => setActiveTab("Notifications")}
+        >
           <Text
             style={[
               styles.tabText,
-              activeTab === 'Notifications' && styles.activeTabText,
-            ]}>
+              activeTab === "Notifications" && styles.activeTabText,
+            ]}
+          >
             Notifications
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'Messages' && styles.activeTab]}
-          onPress={() => setActiveTab('Messages')}>
+          style={[styles.tab, activeTab === "Messages" && styles.activeTab]}
+          onPress={() => setActiveTab("Messages")}
+        >
           <Text
             style={[
               styles.tabText,
-              activeTab === 'Messages' && styles.activeTabText,
-            ]}>
+              activeTab === "Messages" && styles.activeTabText,
+            ]}
+          >
             Messages
           </Text>
         </TouchableOpacity>
@@ -100,24 +108,24 @@ const InboxScreen: React.FC = () => {
 
       {/* Content */}
       <ScrollView>
-        {activeTab === 'Notifications' && (
+        {activeTab === "Notifications" && (
           <View>
             <FlatList
               data={filteredNotifications}
               renderItem={renderNotification}
-              keyExtractor={item => item.id}
+              keyExtractor={(item) => item.id}
               contentContainerStyle={styles.notificationList}
             />
             <Text style={styles.resolvedText}>Resolved</Text>
             <FlatList
               data={resolvedNotifications}
               renderItem={renderNotification}
-              keyExtractor={item => item.id}
+              keyExtractor={(item) => item.id}
               contentContainerStyle={styles.notificationList}
             />
           </View>
         )}
-        {activeTab === 'Messages' && (
+        {activeTab === "Messages" && (
           <View style={styles.messagesContainer}>
             <Text style={styles.emptyMessage}>No messages available.</Text>
           </View>
@@ -138,8 +146,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: colors.border.primary,
@@ -151,20 +159,20 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: typography.fontSize.large,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.text.primary,
   },
   tabsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     borderBottomWidth: 1,
     borderBottomColor: colors.border.primary,
   },
   tab: {
     flex: 1,
     paddingVertical: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   activeTab: {
     borderBottomWidth: 2,
@@ -176,16 +184,16 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: colors.purple,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   notificationList: {
     paddingHorizontal: 20,
     paddingTop: 10,
   },
   notificationItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: colors.border.primary,
     paddingVertical: 15,
@@ -211,12 +219,12 @@ const styles = StyleSheet.create({
   resolvedText: {
     padding: 20,
     fontSize: typography.fontSize.medium,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.text.primary,
   },
   messagesContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     flex: 1,
     padding: 20,
   },
@@ -225,7 +233,7 @@ const styles = StyleSheet.create({
     color: colors.text.primaryGrey,
   },
   footerNote: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: typography.fontSize.small,
     color: colors.text.primaryGrey,
     marginVertical: 20,
