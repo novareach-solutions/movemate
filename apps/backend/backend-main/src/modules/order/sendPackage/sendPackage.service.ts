@@ -346,41 +346,49 @@ export class SendAPackageService {
     this.logger.debug(
       `SendPackageService.acceptOrder: Agent attempting to accept order ID ${orderId}`,
     );
-
+  
     const order = await dbRepo(SendPackageOrder).findOne({
       where: { id: orderId },
+      relations: ["pickupLocation", "dropLocation", "customer"] 
     });
-
+  
     if (!order) {
       throw new SendPackageNotFoundError(`Order ID ${orderId} not found`);
     }
-
+  
     if (order.status !== OrderStatusEnum.PENDING) {
       throw new SendPackageAgentAcceptError(
         `This Order cannot be accepted in its current status`,
       );
     }
-
+  
     if (order.agentId) {
       throw new SendPackageAgentAcceptError(
         `This Order cannot be accepted as it is already assigned`,
       );
     }
-
+  
     order.agentId = agentId;
     order.status = OrderStatusEnum.ACCEPTED;
     order.acceptedAt = new Date();
-
+  
     const updatedOrder = await dbRepo(SendPackageOrder).save(order);
     this.logger.debug(
       `SendPackageService.acceptOrder: Order ID ${orderId} accepted successfully`,
     );
-
+  
     // Notify customer about acceptance
-    await this.orderNotificationService.notifyOrderAccepted(updatedOrder);
-
-    return updatedOrder;
+    await this.notifyCustomerOrderAccepted(updatedOrder);
+  
+    // Refetching the updated order to include related entities
+    const finalOrder = await dbRepo(SendPackageOrder).findOne({
+      where: { id: updatedOrder.id },
+      relations: ["pickupLocation", "dropLocation", "customer"]
+    });
+  
+    return finalOrder;
   }
+  
 
   async updateItemVerifiedPhoto(
     orderId: number,
