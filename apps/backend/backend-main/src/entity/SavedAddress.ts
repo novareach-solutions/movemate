@@ -6,6 +6,9 @@ import { User } from "./User";
 @Index("IDX_saved_address_userId", ["userId"], { where: '"deletedAt" IS NULL' })
 @Entity()
 export class SavedAddress extends BaseEntity {
+  @Column()
+  userId: string;
+
   @ManyToOne(() => User, {
     deferrable: "INITIALLY IMMEDIATE",
     onDelete: "CASCADE",
