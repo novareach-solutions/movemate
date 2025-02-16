@@ -30,7 +30,12 @@ import { TokenService } from "../auth/utils/generateTokens";
 import { dbReadRepo, dbRepo } from "../database/database.service";
 import { MediaService } from "../media/media.service";
 import { RedisService } from "../redis/redis.service";
-import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
+import {
+  DocumentError,
+  TAgent,
+  TAgentDocument,
+  TAgentPartial,
+} from "./agent.types";
 import { radii } from "./agents.constants";
 import { AgentVehicle } from "../../entity/AgentVehicle";
 
@@ -202,7 +207,6 @@ export class AgentService {
       `AgentService.submitDocument: Submitting document for agent ID ${agentId}.`,
     );
 
-    // Check if a document already exists for the agentId
     const existingDoc = await dbReadRepo(AgentDocument).findOne({
       where: { agentId },
     });
@@ -213,7 +217,6 @@ export class AgentService {
       );
 
       try {
-        // Update the existing document
         existingDoc.name = document.name;
         existingDoc.description = document.description;
         existingDoc.url = document.url;
@@ -246,7 +249,6 @@ export class AgentService {
     }
 
     try {
-      // If no document exists, insert a new document
       const newDocument = dbRepo(AgentDocument).create({
         name: document.name,
         description: document.description,
@@ -302,38 +304,33 @@ export class AgentService {
     );
   }
 
-  async getAgentDocuments(agentId: number): Promise<TAgentDocument[]> {
-    this.logger.debug(
-      `AgentService.getAgentDocuments: Fetching documents for agent ID ${agentId}.`,
-    );
+  async getAgentDocuments(agentId: number): Promise<AgentDocument[]> {
     const documents = await dbReadRepo(AgentDocument).find({
       where: { agentId },
     });
-
-    return documents.map((doc) => ({
-      name: doc.name,
-      description: doc.description,
-      url: doc.url,
-      agentId: doc.agentId,
-    }));
+    return documents;
   }
 
   async setAgentStatus(
     agentId: number,
     status: AgentStatusEnum,
-  ): Promise<UpdateResult> {
+  ): Promise<UpdateResult | { errors: DocumentError[] }> {
     this.logger.debug(
       `AgentService.setAgentStatus: Setting status for agent ID ${agentId} to ${status}.`,
     );
-    const agent = await this.getAgentById(agentId);
-
-    if (agent.approvalStatus !== ApprovalStatusEnum.APPROVED) {
-      this.logger.error(
-        `AgentService.setAgentStatus: Cannot set status. Agent ID ${agentId} not approved.`,
+    if (status === AgentStatusEnum.ONLINE) {
+      const documents = await this.getAgentDocuments(agentId);
+      const unapprovedDocs = documents.filter(
+        (doc) => doc.approvalStatus !== ApprovalStatusEnum.APPROVED,
       );
-      throw new UserAccessDeniedError(
-        "Cannot set status. Agent is not approved.",
-      );
+      if (unapprovedDocs.length > 0) {
+        const errors = unapprovedDocs.map((doc) => ({
+          id: "document",
+          heading: `${doc.name} Not ${doc.approvalStatus}`,
+          text: `Your ${doc.name} is ${doc.approvalStatus.toLowerCase()}. Please reupload.`,
+        }));
+        return { errors };
+      }
     }
 
     this.logger.debug(
@@ -646,7 +643,6 @@ export class AgentService {
       throw new UserInvalidDocumentError("Invalid approval status provided.");
     }
 
-    // Fetch the document
     const document = await dbReadRepo(AgentDocument).findOne({
       where: { id: documentId, agentId },
     });
@@ -657,16 +653,13 @@ export class AgentService {
       );
     }
 
-    // Update the document's approval status
     document.approvalStatus = approvalStatus;
-
-    // Save the updated document to the database
     await dbRepo(AgentDocument).save(document);
   }
 
   private extractKeyFromUrl(fileUrl: string): string {
     const urlParts = fileUrl.split("/");
-    return urlParts[urlParts.length - 1]; // Extract the S3 object key
+    return urlParts[urlParts.length - 1];
   }
 
   private waitForAcceptance(
@@ -688,7 +681,7 @@ export class AgentService {
             logger.debug(
               `waitForAcceptance: Received acceptance from agent ID ${data.agentId} for order ID ${orderId}.`,
             );
-            clearTimeout(timeoutHandle); // Clear the timeout since acceptance is received
+            clearTimeout(timeoutHandle);
             subscriber.removeListener("message", onMessage);
             void subscriber.unsubscribe(channel).catch((err) => {
               logger.error(

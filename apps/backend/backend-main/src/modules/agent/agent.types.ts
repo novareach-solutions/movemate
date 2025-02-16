@@ -34,4 +34,10 @@ export type TAgentVehicle = {
   registrationExpiryDate?: Date;
   vehicleRegoImageUrl: string;
   approvalStatus: ApprovalStatusEnum;
+}
+
+export type DocumentError = {
+  id: string;
+  heading: string;
+  text: string;
 };
