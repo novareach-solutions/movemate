@@ -23,7 +23,7 @@ export enum ApprovalStatusEnum {
   APPROVED = "APPROVED",
   PENDING = "PENDING",
   REJECTED = "REJECTED",
-  REUPLOAD = 'REUPLOAD'
+  REUPLOAD = "REUPLOAD",
 }
 
 export enum SubscripionStatusEnum {

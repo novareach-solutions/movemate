@@ -35,4 +35,4 @@ export type DocumentError = {
   id: string;
   heading: string;
   text: string;
-}
+};

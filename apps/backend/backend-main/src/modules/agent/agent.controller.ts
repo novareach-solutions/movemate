@@ -175,6 +175,21 @@ export class AgentController {
     };
   }
 
+  @Get("docment/my")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.AGENT)
+  async getMyDocuments(
+    @Req() request: ICustomRequest
+  ): Promise<IApiResponse<AgentDocument[]>> {
+    const agentId = request.user.agent.id;
+    const documents = await this.agentService.getAgentDocuments(agentId);
+    return {
+      success: true,
+      message: "Documents retrieved successfully.",
+      data: documents,
+    };
+  }
+
   @Post("document")
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
@@ -325,7 +340,6 @@ export class AgentController {
     };
   }
 
-  // Seperate controller for updating document approval status for ADMIN role
   @Delete("document/:id/:documentId")
   // @UseGuards(AuthGuard, RoleGuard)
   // @Roles(UserRoleEnum.ADMIN)
@@ -341,7 +355,6 @@ export class AgentController {
     };
   }
 
-  // *** Other Controllers ***
   @Get("list")
   // @UseGuards(AuthGuard, RoleGuard)
   // @Roles(UserRoleEnum.ADMIN)
@@ -418,7 +431,6 @@ export class AgentController {
   ): Promise<IApiResponse<null>> {
     const { approvalStatus } = body;
 
-    // Call service method to update the document's approval status
     await this.agentService.updateDocumentApprovalStatus(
       agentId,
       documentId,
