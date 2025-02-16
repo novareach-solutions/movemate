@@ -13,6 +13,7 @@ export class User extends BaseEntity {
 
   @Column({
     type: "varchar",
+    default: UserRoleEnum.CUSTOMER,
   })
   role: UserRoleEnum;
 

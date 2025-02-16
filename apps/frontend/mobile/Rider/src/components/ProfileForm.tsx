@@ -37,7 +37,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isValid },
+    formState: {errors, isValid},
   } = useForm<FormFields>({
     resolver: zodResolver(ZCreateAccountSchema),
     mode: 'onChange',
@@ -216,7 +216,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                   <FlatList
                     data={suggestions}
                     keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => (
+                    renderItem={({item}) => (
                       <TouchableOpacity
                         style={formStyles.suggestionItem}
                         onPress={() => handleSelectAddress(item)}
