@@ -20,12 +20,13 @@ import { AgentSubscription } from "./AgentSubscription";
 import { BaseEntity } from "./BaseEntity";
 import { Payment } from "./Payment";
 import { User } from "./User";
+import { AgentVehicle } from "./AgentVehicle";
 
 @Index("IDX_agent_userId", ["userId"], { where: '"deletedAt" IS NULL' })
 @Index("IDX_agent_status", ["status"], { where: '"deletedAt" IS NULL' })
 @Unique("UQ_agent_abnNumber", ["abnNumber"])
 @Entity()
-export class Agent extends BaseEntity implements TAgent {
+export class Agent extends BaseEntity {
   @OneToOne(() => User, {
     deferrable: "INITIALLY IMMEDIATE",
     onDelete: "CASCADE",
@@ -46,14 +47,8 @@ export class Agent extends BaseEntity implements TAgent {
   @Column({ type: "varchar", nullable: false })
   abnNumber: string;
 
-  @Column({ type: "varchar", nullable: false })
-  vehicleMake: string;
-
-  @Column({ type: "varchar", nullable: false })
-  vehicleModel: string;
-
-  @Column({ type: "varchar", nullable: false })
-  vehicleYear: number;
+  @OneToMany(() => AgentVehicle, (vehicle) => vehicle.agent)
+  vehicles: AgentVehicle[];
 
   @Column({ type: "varchar", nullable: true })
   profilePhoto: string;
