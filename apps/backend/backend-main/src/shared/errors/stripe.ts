@@ -26,3 +26,12 @@ export class MissingStripeApiKeyException extends HttpException {
     super("Stripe API key is not configured", HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+
+/**
+ * Custom error for failed refund creation in Stripe.
+ */
+export class StripeRefundFailedException extends HttpException {
+  constructor(message: string) {
+    super(message, HttpStatus.BAD_REQUEST);
+  }
+}
