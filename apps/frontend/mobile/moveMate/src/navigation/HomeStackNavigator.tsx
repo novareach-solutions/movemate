@@ -15,6 +15,7 @@ import ChatScreen from '../Screens/Home/ChatScreen';
 import OrderCompletedScreen from '../Screens/Home/SendAPackage/OrderCompletedScreen';
 import OrderAcceptScreen from '../Screens/Home/SendAPackage/OrderAcceptScreen';
 import OrderDetails from '../Screens/Home/SendAPackage/OrderDetails';
+import HelpSupportScreen from '../Screens/Home/HelpSupportScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,7 @@ export const HomeStackNavigator = () => {
       <Stack.Screen name={HomeScreens.DeliveryScreen} component={DeliveryScreen} />
       <Stack.Screen name={HomeScreens.CancelOrderScreen} component={CancelOrderScreen} />
       <Stack.Screen name={HomeScreens.CancelSuccessScreen} component={CancelSuccessScreen} />
+      <Stack.Screen name={HomeScreens.HelpSupportScreen} component={HelpSupportScreen} />
       <Stack.Screen
           name={HomeScreens.ChatScreen}
           component={ChatScreen}

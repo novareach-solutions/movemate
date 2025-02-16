@@ -13,7 +13,7 @@ import { colors } from "../../../theme/colors";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { assignOrder } from "../../../redux/slices/deliverAPackageSlice";
 import { useNavigation } from "@react-navigation/native";
-import { CustomerScreens } from "../../../navigation/ScreenNames";
+import { CustomerScreens, HomeScreens } from "../../../navigation/ScreenNames";
 import Mapbox from '@rnmapbox/maps';
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_DRIVING_URL } from "../../../constants";
 import Header from "../../../components/Header";
@@ -74,7 +74,7 @@ const DeliveryTrackingScreen = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      navigation.navigate(CustomerScreens.AcceptOrder)
+      navigation.navigate(HomeScreens.AcceptOrder)
     }, 15000)
   }, [])
 
@@ -295,7 +295,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 10,
+    paddingHorizontal:10
+    // borderWidth:2,
+    // borderColor:'red'
     // backgroundColor: '#fff',
   },
   textContainer: {

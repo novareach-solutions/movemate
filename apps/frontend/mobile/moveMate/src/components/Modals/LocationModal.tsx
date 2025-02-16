@@ -329,8 +329,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
               />
               <View style={styles.mapContainer}>
                 <View>
-                  <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
-                    <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [151.209900, -33.865143]} />
+                  <Mapbox.MapView style={styles.mapImage} 
+                  styleURL="mapbox://styles/mapbox/light-v11">
+                    <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates?.length ? coordinates : [151.209900, -33.865143]}  />
 
                     {coordinates && (
                       <Mapbox.PointAnnotation id={`marker-${coordinates[0]}-${coordinates[1]}`} coordinate={coordinates}>

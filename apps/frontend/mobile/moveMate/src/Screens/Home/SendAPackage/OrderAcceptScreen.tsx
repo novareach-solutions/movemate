@@ -442,11 +442,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 4,
+    width:'100%',
   },
   pickupAddress: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
     color: "#333",
+   width:"50%"
   },
   detailsButton: {
     backgroundColor: "#F3E8FF",

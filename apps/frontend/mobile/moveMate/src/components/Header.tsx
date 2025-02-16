@@ -5,7 +5,7 @@ import { View, TouchableOpacity, StyleSheet, Image, Text, TextStyle } from 'reac
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import { images } from '../assets/images/images';
-import { AppScreens, AuthScreensParamList, CustomerScreens } from '../navigation/ScreenNames';
+import { AppScreens, AuthScreensParamList, HomeScreens } from '../navigation/ScreenNames';
 import { typography } from '../theme/typography';
 
 interface HeaderProps {
@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ isBack, logo, home, title, earningScree
     navigation.navigate(AppScreens.Profile);
   };
   const handleHelpPress = () => {
-    navigation.navigate(CustomerScreens.HelpSupportScreen);
+    navigation.navigate(HomeScreens.HelpSupportScreen);
   };
 
   return (

@@ -20,7 +20,7 @@ import Header from "../../../components/Header";
 import LocationModal, { ILocation } from "../../../components/Modals/LocationModal";
 import PackageTypeModal from "../../../components/Modals/PackageTypeModal"; // New import
 import SenderReceiverModal from "../../../components/Modals/SenderRecieverModal";
-import { AuthScreens, CustomerScreens } from "../../../navigation/ScreenNames";
+import { AuthScreens, CustomerScreens, HomeScreens } from "../../../navigation/ScreenNames";
 import { useNavigation } from "@react-navigation/native";
 import { useAppDispatch } from "../../../redux/hook";
 import { createOrder, updatePickupLoaction, updatePkgId } from "../../../redux/slices/deliverAPackageSlice";
@@ -176,7 +176,7 @@ const EnterLocationDetailsScreen = () => {
       // }
       // Alert.alert("Success", "Order confirmed!");
 
-      navigation.navigate(CustomerScreens.CheckoutScreen);
+      navigation.navigate(HomeScreens.CheckoutScreen);
       // Reset form (optional)
       resetForm();
     } catch {

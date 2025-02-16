@@ -22,7 +22,7 @@ import {typography} from '../theme/typography';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch } from '../redux/hook';
 import { userSignup } from '../redux/slices/authSlice';
-import { CustomerScreens } from '../navigation/ScreenNames';
+import { AuthScreens, CustomerScreens, HomeScreens } from '../navigation/ScreenNames';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -112,7 +112,7 @@ const [loading, setLoading] = useState(false);
                   Alert.alert("Success", "Your account has been created!", [
                     { text: "OK", onPress: () =>  navigation.reset(({
                       index: 0,
-                      routes: [{ name: CustomerScreens.CustomerHomeScreen }],
+                      routes: [{ name: 'MainApp'}],
                     }))}
                   ]);
                   
@@ -266,7 +266,7 @@ const [loading, setLoading] = useState(false);
             </TouchableOpacity>
 
             <Text style={formStyles.footerText}>
-              By continuing, you accept our <Text style={formStyles.link}>Terms of Service</Text> and <Text style={formStyles.link}>Privacy Policy</Text>
+              By continuing, you accept our <TouchableOpacity onPress={()=>navigation.navigate(AuthScreens.PrivacyPolicyScreen)}><Text style={formStyles.link}>Terms of Service</Text></TouchableOpacity> and <TouchableOpacity onPress={()=>navigation.navigate(AuthScreens.PrivacyPolicyScreen)}><Text style={formStyles.link}>Privacy Policy</Text></TouchableOpacity>
             </Text>
           </View>
        
@@ -365,6 +365,7 @@ const styles = StyleSheet.create({
   link: {
     color: 'purple',
     textDecorationLine: 'underline',
+    fontSize: typography.fontSize.small,
   },
 });
 

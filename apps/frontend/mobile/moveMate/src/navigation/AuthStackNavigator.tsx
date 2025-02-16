@@ -16,8 +16,8 @@ const AuthStackNavigator = () => {
       <Stack.Screen name={AuthScreens.OnboardingScreen} component={Onboarding} />
       <Stack.Screen name={AuthScreens.LoginScreen} component={Login} />
       <Stack.Screen name={AuthScreens.OtpScreen} component={OtpScreen} />
-      <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
-      <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+      <Stack.Screen name={AuthScreens.CompleteProfileScreen} component={CompleteProfileScreen} />
+      <Stack.Screen name={AuthScreens.PrivacyPolicyScreen} component={PrivacyPolicyScreen} />
       <Stack.Screen name="MainApp" component={AppLayoutScreen} />
     </Stack.Navigator>
   );

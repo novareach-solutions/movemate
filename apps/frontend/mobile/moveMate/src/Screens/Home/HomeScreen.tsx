@@ -73,13 +73,13 @@ const CustomerHomeScreen = () => {
     }
 
     const handleServiceNavigation = () => {
-        // if (orderStatus === "PENDING" || orderStatus === "IN_PROGRESS" || orderStatus === "ACCEPTED" || orderStatus === "PICKEDUP_ORDER") {
-        //     Alert.alert("Order In-progress")
-        // } else {
+        if (orderStatus === "PENDING" || orderStatus === "IN_PROGRESS" || orderStatus === "ACCEPTED" || orderStatus === "PICKEDUP_ORDER") {
+            Alert.alert("Order In-progress")
+        } else {
 
             navigation.navigate(CustomerScreens.SAPDetailsScreen);
 
-        // }
+        }
     }
 
     return (
@@ -147,7 +147,7 @@ const CustomerHomeScreen = () => {
                     }}
                 />
             </View>
-
+{/* 
             {(isOngoingOrderModal && orderStatus !== "CANCELED") && (
                 <View style={styles.ongoingOrderBanner}>
                     <TouchableOpacity style={styles.ongoingOrderButton} onPress={handleOngoingNavigation}>
@@ -168,7 +168,7 @@ const CustomerHomeScreen = () => {
                         <WhiteArrow />
                     </TouchableOpacity>
                 </View>
-            )}
+            )} */}
 
 
 
