@@ -33,7 +33,8 @@ import { OnboardingGuard } from "../../shared/guards/onboarding.guard";
 import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { UserService } from "./user.service";
-import { TCreateUser, TGetUserProfile, TUpdateUser } from "./user.types";
+import { TCreateSavedAddress, TCreateUser, TGetUserProfile, TUpdateSavedAddress, TUpdateUser } from "./user.types";
+import { SavedAddress } from "../../entity/SavedAddress";
 
 @ApiTags("User")
 @Controller("user")
@@ -284,4 +285,53 @@ export class UserController {
       };
     }
   }
+
+  @Post("address")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async createAddress(
+    @Body() createAddressDto: TCreateSavedAddress,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<SavedAddress>> {
+    const userId = request.user.id;
+    const address = await this.userService.createSavedAddress(userId, createAddressDto);
+    return { success: true, message: "Address created successfully.", data: address };
+  }
+
+  @Patch("address/:id")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async updateAddress(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() updateAddressDto: TUpdateSavedAddress,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<UpdateResult>> {
+    const userId = request.user.id;
+    const result = await this.userService.updateSavedAddress(userId, id, updateAddressDto);
+    return { success: true, message: "Address updated successfully.", data: result };
+  }
+
+  @Delete("address/:id")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async deleteAddress(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<DeleteResult>> {
+    const userId = request.user.id;
+    const result = await this.userService.deleteSavedAddress(userId, id);
+    return { success: true, message: "Address deleted successfully.", data: result };
+  }
+
+  @Get("address")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async getAddresses(
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<SavedAddress[]>> {
+    const userId = request.user.id;
+    const addresses = await this.userService.getSavedAddresses(userId);
+    return { success: true, message: "Addresses retrieved successfully.", data: addresses };
+  }
+
 }
