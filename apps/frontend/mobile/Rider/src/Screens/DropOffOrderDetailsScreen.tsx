@@ -1,15 +1,15 @@
 // src/screens/DropOffOrderDetailsScreen.tsx
 
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { SendPackageOrder } from '../redux/slices/types/sendAPackage';
-import { colors } from '../theme/colors';
+import {View, Image, StyleSheet} from 'react-native';
+import {useRoute} from '@react-navigation/native';
+import {SendPackageOrder} from '../redux/slices/types/sendAPackage';
+import {colors} from '../theme/colors';
 import DeliveryModal from '../components/Modals/DeliveryModal';
 
 const DropOffOrderDetailsScreen: React.FC = () => {
   const route = useRoute();
-  const { order } = route.params as { order: SendPackageOrder };
+  const {order} = route.params as {order: SendPackageOrder};
 
   return (
     <View style={styles.container}>

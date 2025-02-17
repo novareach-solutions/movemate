@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   ForbiddenException,
-  Headers,
   Logger,
   Post,
   Query,

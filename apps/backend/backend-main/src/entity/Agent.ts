@@ -9,7 +9,6 @@ import {
   Unique,
 } from "typeorm";
 
-import { TAgent } from "../modules/agent/agent.types";
 import {
   AgentStatusEnum,
   AgentTypeEnum,
@@ -17,10 +16,10 @@ import {
   SubscripionStatusEnum,
 } from "../shared/enums";
 import { AgentSubscription } from "./AgentSubscription";
+import { AgentVehicle } from "./AgentVehicle";
 import { BaseEntity } from "./BaseEntity";
 import { Payment } from "./Payment";
 import { User } from "./User";
-import { AgentVehicle } from "./AgentVehicle";
 
 @Index("IDX_agent_userId", ["userId"], { where: '"deletedAt" IS NULL' })
 @Index("IDX_agent_status", ["status"], { where: '"deletedAt" IS NULL' })

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import EarningsModal from '../components/Modals/EarningsModal';
-import { colors } from '../theme/colors';
-import { useNavigation } from '@react-navigation/native';
-import { DeliverAPackage } from '../navigation/ScreenNames';
+import {colors} from '../theme/colors';
+import {useNavigation} from '@react-navigation/native';
+import {DeliverAPackage} from '../navigation/ScreenNames';
 
 const EarningsDetailsScreen: React.FC = () => {
   const [isEarningsModalVisible, setIsEarningsModalVisible] =

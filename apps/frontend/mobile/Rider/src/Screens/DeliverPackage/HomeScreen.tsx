@@ -20,7 +20,7 @@ import {
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
 import Mapbox from '@rnmapbox/maps';
-import { MAPBOX_ACCESS_TOKEN } from "../../utils/constants";
+import {MAPBOX_ACCESS_TOKEN} from '../../utils/constants';
 import {showOrderModal, fetchOngoingOrder} from '../../redux/slices/orderSlice';
 import {io} from 'socket.io-client';
 import apiClient from '../../api/apiClient';
@@ -173,7 +173,8 @@ const HomeScreen: React.FC = () => {
       }
       if (
         ongoingOrder.status === OrderStatusEnum.ACCEPTED ||
-        ongoingOrder.status === OrderStatusEnum.PENDING || OrderStatusEnum.IN_PROGRESS
+        ongoingOrder.status === OrderStatusEnum.PENDING ||
+        OrderStatusEnum.IN_PROGRESS
       ) {
         navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
           order: ongoingOrder,
@@ -199,10 +200,14 @@ const HomeScreen: React.FC = () => {
       <Header logo home help />
       {/* Map Image */}
       <View style={styles.mapContainer}>
-      <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
-                    <Mapbox.Camera zoomLevel={14} centerCoordinate={ [151.209900, -33.865143]} />
-
-                  </Mapbox.MapView>
+        <Mapbox.MapView
+          style={styles.mapImage}
+          styleURL="mapbox://styles/mapbox/light-v11">
+          <Mapbox.Camera
+            zoomLevel={14}
+            centerCoordinate={[151.2099, -33.865143]}
+          />
+        </Mapbox.MapView>
       </View>
 
       {/* Status Button */}

@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { DeleteResult, In, UpdateResult } from "typeorm";
 
+import { SavedAddress } from "../../entity/SavedAddress";
 import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import { User } from "../../entity/User";
 import { OrderStatusEnum } from "../../shared/enums";
@@ -11,8 +12,13 @@ import {
 import { filterEmptyValues } from "../../utils/filter";
 import { TokenService } from "../auth/utils/generateTokens";
 import { dbReadRepo, dbRepo } from "../database/database.service";
-import { TCreateSavedAddress, TCreateUser, TGetUserProfile, TUpdateSavedAddress, TUpdateUser } from "./user.types";
-import { SavedAddress } from "../../entity/SavedAddress";
+import {
+  TCreateSavedAddress,
+  TCreateUser,
+  TGetUserProfile,
+  TUpdateSavedAddress,
+  TUpdateUser,
+} from "./user.types";
 
 @Injectable()
 export class UserService {
@@ -149,30 +155,59 @@ export class UserService {
     return ongoingOrder;
   }
 
-  async createSavedAddress(userId: number, createAddressDto: TCreateSavedAddress): Promise<SavedAddress> {
-    const existing = await dbReadRepo(SavedAddress).findOne({ where: { user: { id: userId }, title: createAddressDto.title } });
+  async createSavedAddress(
+    userId: number,
+    createAddressDto: TCreateSavedAddress,
+  ): Promise<SavedAddress> {
+    const existing = await dbReadRepo(SavedAddress).findOne({
+      where: { user: { id: userId }, title: createAddressDto.title },
+    });
     if (existing) {
-      throw new UserAlreadyExistsError(`Address with title ${createAddressDto.title} already exists for this user.`);
+      throw new UserAlreadyExistsError(
+        `Address with title ${createAddressDto.title} already exists for this user.`,
+      );
     }
-    const newAddress = dbRepo(SavedAddress).create({ ...createAddressDto, user: { id: userId } });
+    const newAddress = dbRepo(SavedAddress).create({
+      ...createAddressDto,
+      user: { id: userId },
+    });
     return await dbRepo(SavedAddress).save(newAddress);
   }
 
-  async updateSavedAddress(userId: number, addressId: number, updateAddressDto: TUpdateSavedAddress): Promise<UpdateResult> {
+  async updateSavedAddress(
+    userId: number,
+    addressId: number,
+    updateAddressDto: TUpdateSavedAddress,
+  ): Promise<UpdateResult> {
     if (updateAddressDto.title) {
-      const existing = await dbReadRepo(SavedAddress).findOne({ where: { user: { id: userId }, title: updateAddressDto.title } });
+      const existing = await dbReadRepo(SavedAddress).findOne({
+        where: { user: { id: userId }, title: updateAddressDto.title },
+      });
       if (existing && existing.id !== addressId) {
-        throw new UserAlreadyExistsError(`Address with title ${updateAddressDto.title} already exists for this user.`);
+        throw new UserAlreadyExistsError(
+          `Address with title ${updateAddressDto.title} already exists for this user.`,
+        );
       }
     }
-    return await dbRepo(SavedAddress).update({ id: addressId, user: { id: userId } }, updateAddressDto);
+    return await dbRepo(SavedAddress).update(
+      { id: addressId, user: { id: userId } },
+      updateAddressDto,
+    );
   }
 
-  async deleteSavedAddress(userId: number, addressId: number): Promise<DeleteResult> {
-    return await dbRepo(SavedAddress).delete({ id: addressId, user: { id: userId } });
+  async deleteSavedAddress(
+    userId: number,
+    addressId: number,
+  ): Promise<DeleteResult> {
+    return await dbRepo(SavedAddress).delete({
+      id: addressId,
+      user: { id: userId },
+    });
   }
 
   async getSavedAddresses(userId: number): Promise<SavedAddress[]> {
-    return await dbReadRepo(SavedAddress).find({ where: { user: { id: userId } } });
+    return await dbReadRepo(SavedAddress).find({
+      where: { user: { id: userId } },
+    });
   }
 }

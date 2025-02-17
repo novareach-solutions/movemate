@@ -4,7 +4,10 @@ import Stripe from "stripe";
 
 import { Agent } from "../../entity/Agent";
 import { logger } from "../../logger";
-import { MissingStripeApiKeyException } from "../../shared/errors/stripe";
+import {
+  MissingStripeApiKeyException,
+  StripeRefundFailedException,
+} from "../../shared/errors/stripe";
 import {
   TConnectAccountRequest,
   TCreateSubscriptionRequest,
@@ -362,6 +365,100 @@ export class StripeService {
     } catch (error) {
       logger.error(
         `StripeService.createTransfer: Failed to create transfer to ${params.destination}`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Creates a refund for a payment intent through Stripe API
+   * @param params - Parameters for creating a refund
+   * @returns Promise resolving to the created Stripe.Refund object
+   */
+  async createRefund(params: {
+    paymentIntent: string;
+    amount?: number;
+    reason?: string;
+    metadata?: Record<string, string>;
+  }): Promise<Stripe.Refund> {
+    try {
+      // First verify the payment intent exists and is in a refundable state
+      const paymentIntent = await this.stripe.paymentIntents.retrieve(
+        params.paymentIntent,
+      );
+
+      if (!paymentIntent) {
+        logger.error(
+          `StripeService.createRefund: Payment intent ${params.paymentIntent} not found`,
+        );
+        throw new NotFoundException("Payment intent not found");
+      }
+
+      if (paymentIntent.status !== "succeeded") {
+        logger.error(
+          `StripeService.createRefund: Payment intent ${params.paymentIntent} is not in a refundable state`,
+        );
+        throw new StripeRefundFailedException(
+          "Payment is not in a refundable state",
+        );
+      }
+
+      const refundParams: Stripe.RefundCreateParams = {
+        payment_intent: params.paymentIntent,
+        reason:
+          (params.reason as Stripe.RefundCreateParams.Reason) ||
+          "requested_by_customer",
+      };
+
+      // Add amount if partial refund
+      if (params.amount) {
+        refundParams.amount = Math.round(params.amount * 100);
+      }
+
+      // Add metadata if provided
+      if (params.metadata) {
+        refundParams.metadata = params.metadata;
+      }
+
+      const refund = await this.stripe.refunds.create(refundParams);
+
+      logger.info(
+        `StripeService.createRefund: Created refund ${refund.id} for payment intent ${params.paymentIntent}`,
+      );
+
+      return refund;
+    } catch (error) {
+      logger.error(
+        `StripeService.createRefund: Failed to create refund for payment intent ${params.paymentIntent}`,
+        error,
+      );
+
+      if (error instanceof StripeRefundFailedException) {
+        throw error;
+      }
+
+      throw new StripeRefundFailedException(
+        error.message || "Failed to process refund",
+      );
+    }
+  }
+
+  /**
+   * Retrieves a refund by its ID
+   * @param refundId - The ID of the refund to retrieve
+   * @returns Promise resolving to the Stripe.Refund object
+   */
+  async getRefund(refundId: string): Promise<Stripe.Refund> {
+    try {
+      const refund = await this.stripe.refunds.retrieve(refundId);
+
+      logger.info(`StripeService.getRefund: Retrieved refund ${refundId}`);
+
+      return refund;
+    } catch (error) {
+      logger.error(
+        `StripeService.getRefund: Failed to retrieve refund ${refundId}`,
         error,
       );
       throw error;

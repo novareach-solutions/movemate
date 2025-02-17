@@ -5,13 +5,18 @@ import { Agent } from "../../entity/Agent";
 import { Payment } from "../../entity/Payment";
 import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import { OrderStatusEnum, PaymentStatusEnum } from "../../shared/enums";
+import { UserNotFoundError } from "../../shared/errors/user";
 import {
   TCreateOrderRequest,
   TOrderResponse,
+  TPaymentStatus,
+  TRefundRequest,
+  TRefundResponse,
 } from "../../shared/types/payment.types";
 import { dbReadRepo, dbRepo } from "../database/database.service";
 import { StripeService } from "./stripe.service";
 
+// *** Customer Specific Payment Service ***
 @Injectable()
 export class PaymentService {
   constructor(private readonly stripeService: StripeService) {}
@@ -74,6 +79,74 @@ export class PaymentService {
     };
   }
 
+  async getPaymentStatus(paymentId: string): Promise<TPaymentStatus> {
+    const payment = await dbReadRepo(Payment).findOne({
+      where: { stripePaymentIntentId: paymentId },
+    });
+
+    if (!payment) {
+      throw new NotFoundException("Payment not found");
+    }
+
+    return {
+      id: payment.stripePaymentIntentId,
+      status: payment.status,
+      amount: payment.amount,
+
+      currency: "aud", // Add currency to Payment entity if not exists
+      createdAt: payment.createdAt,
+      updatedAt: payment.updatedAt,
+      failureReason: payment.failureReason,
+    };
+  }
+
+  async getCustomerPayments(customerId: number): Promise<Payment[]> {
+    if (!customerId) {
+      throw new UserNotFoundError("Customer ID is required");
+    }
+    return await dbReadRepo(Payment).find({
+      where: {
+        order: {
+          customerId,
+        },
+      },
+      relations: ["order"],
+      order: {
+        createdAt: "DESC",
+      },
+    });
+  }
+
+  async requestRefund(
+    paymentId: string,
+    data: TRefundRequest,
+  ): Promise<TRefundResponse> {
+    const payment = await dbReadRepo(Payment).findOne({
+      where: { stripePaymentIntentId: paymentId },
+    });
+
+    if (!payment) {
+      throw new NotFoundException("Payment not found");
+    }
+
+    const refund = await this.stripeService.createRefund({
+      paymentIntent: paymentId,
+      amount: data.amount || payment.amount,
+      reason: data.reason,
+    });
+
+    // Update payment status
+    await dbRepo(Payment).update(payment.id, {
+      status: PaymentStatusEnum.REFUNDED,
+    });
+
+    return {
+      id: refund.id,
+      amount: refund.amount / 100,
+      status: refund.status as "succeeded" | "pending" | "failed",
+      createdAt: new Date(refund.created * 1000),
+    };
+  }
   /**
    * The function `handlePaymentSuccess` updates payment and order statuses, and agent wallet balance
    * if applicable, based on a successful payment with a given payment intent ID. Used in the stripe

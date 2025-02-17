@@ -1,4 +1,8 @@
-import { AgentStatusEnum, AgentTypeEnum, ApprovalStatusEnum } from "../../shared/enums";
+import {
+  AgentStatusEnum,
+  AgentTypeEnum,
+  ApprovalStatusEnum,
+} from "../../shared/enums";
 import { TCreateUser, TUpdateUser } from "../user/user.types";
 
 export type TAgent = {
@@ -34,9 +38,9 @@ export type TAgentVehicle = {
   registrationExpiryDate?: Date;
   vehicleRegoImageUrl: string;
   approvalStatus: ApprovalStatusEnum;
-}
+};
 
-export type DocumentError = {
+export type TDocumentError = {
   id: string;
   heading: string;
   text: string;

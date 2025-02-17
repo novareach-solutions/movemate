@@ -18,6 +18,7 @@ import { Response } from "express";
 import { UpdateResult } from "typeorm";
 
 import { Agent } from "../../entity/Agent";
+import { AgentDocument } from "../../entity/AgentDocument";
 import { RequiredDocument } from "../../entity/RequiredDocument";
 import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import {
@@ -36,18 +37,16 @@ import {
   ApprovalStatusEnum,
   UserRoleEnum,
 } from "../../shared/enums";
-import { UnauthorizedError } from "../../shared/errors/authErrors";
 import { AuthGuard } from "../../shared/guards/auth.guard";
-import { OnboardingGuard } from "../../shared/guards/onboarding.guard";
 import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { AgentService } from "./agent.service";
-<<<<<<< Updated upstream
-import { TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
-=======
-import { DocumentError, TAgent, TAgentDocument, TAgentPartial } from "./agent.types";
-import { AgentDocument } from "../../entity/AgentDocument";
->>>>>>> Stashed changes
+import {
+  TAgent,
+  TAgentDocument,
+  TAgentPartial,
+  TDocumentError,
+} from "./agent.types";
 
 @ApiTags("Agent")
 @Controller("agent")
@@ -57,13 +56,13 @@ export class AgentController {
   constructor(
     private readonly agentService: AgentService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   // *** Agent Sign Up, Status and List Specific Controllers ***
   @Post("signup")
   @AgentSignUpSwagger()
   async create(
-    @Req() request: ICustomRequest,
+    // @Req() request: ICustomRequest, // TODO: Removed for now by @shettydev as it is not in use
     @Body() agent: TAgent,
     @Res({ passthrough: true }) response: Response,
   ): Promise<IApiResponse<{ agent: Agent; accessToken: string }>> {
@@ -179,7 +178,7 @@ export class AgentController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.AGENT)
   async getMyDocuments(
-    @Req() request: ICustomRequest
+    @Req() request: ICustomRequest,
   ): Promise<IApiResponse<AgentDocument[]>> {
     const agentId = request.user.agent.id;
     const documents = await this.agentService.getAgentDocuments(agentId);
@@ -218,10 +217,12 @@ export class AgentController {
   async setOwnAgentStatus(
     @Body() body: { status: AgentStatusEnum },
     @Req() request: ICustomRequest,
-  ): Promise<IApiResponse<UpdateResult | DocumentError[]>> {
+  ): Promise<IApiResponse<UpdateResult | TDocumentError[]>> {
     const { status } = body;
     const agentId = request.user.agent.id;
-    this.logger.debug(`AgentController.setOwnAgentStatus: Setting status for agent ${agentId} to ${status}`);
+    this.logger.debug(
+      `AgentController.setOwnAgentStatus: Setting status for agent ${agentId} to ${status}`,
+    );
     const result = await this.agentService.setAgentStatus(agentId, status);
     if ("errors" in result) {
       return {
@@ -230,15 +231,16 @@ export class AgentController {
         data: result.errors,
       };
     }
-    this.logger.log(`AgentController.setOwnAgentStatus: Status for agent ${agentId} set to ${status}.`, result);
+    this.logger.log(
+      `AgentController.setOwnAgentStatus: Status for agent ${agentId} set to ${status}.`,
+      result,
+    );
     return {
       success: true,
       message: `Agent status updated to ${status}.`,
       data: result,
     };
   }
-
-
 
   @Get("profile/:id")
   // @UseGuards(AuthGuard, RoleGuard)

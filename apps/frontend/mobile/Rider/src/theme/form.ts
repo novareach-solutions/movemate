@@ -38,9 +38,9 @@ export const formStyles = StyleSheet.create({
     paddingVertical: 12,
     marginTop: 20,
     alignItems: 'center',
-    flexDirection:"row",
+    flexDirection: 'row',
     justifyContent: 'center',
-    gap:10
+    gap: 10,
   },
   buttonEnabled: {
     backgroundColor: colors.purple,

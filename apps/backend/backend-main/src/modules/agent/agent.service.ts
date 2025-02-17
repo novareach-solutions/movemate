@@ -7,6 +7,7 @@ import { DeleteResult, In, QueryRunner, UpdateResult } from "typeorm";
 
 import { Agent } from "../../entity/Agent";
 import { AgentDocument } from "../../entity/AgentDocument";
+import { AgentVehicle } from "../../entity/AgentVehicle";
 import { RequiredDocument } from "../../entity/RequiredDocument";
 import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import { User } from "../../entity/User";
@@ -31,13 +32,12 @@ import { dbReadRepo, dbRepo } from "../database/database.service";
 import { MediaService } from "../media/media.service";
 import { RedisService } from "../redis/redis.service";
 import {
-  DocumentError,
   TAgent,
   TAgentDocument,
   TAgentPartial,
+  TDocumentError,
 } from "./agent.types";
 import { radii } from "./agents.constants";
-import { AgentVehicle } from "../../entity/AgentVehicle";
 
 @Injectable()
 export class AgentService {
@@ -54,23 +54,42 @@ export class AgentService {
     agent: TAgent,
   ): Promise<{ agent: Agent; accessToken: string; refreshToken: string }> {
     const { abnNumber, user, vehicles } = agent;
-    const queryRunner: QueryRunner = dbRepo(Agent).manager.connection.createQueryRunner();
+    const queryRunner: QueryRunner =
+      dbRepo(Agent).manager.connection.createQueryRunner();
     await queryRunner.startTransaction();
 
     try {
-      this.logger.debug(`AgentService.createAgent: Checking if agent with ABN ${abnNumber} exists.`);
-      const existingAgent = await queryRunner.manager.findOne(Agent, { where: { abnNumber } });
+      this.logger.debug(
+        `AgentService.createAgent: Checking if agent with ABN ${abnNumber} exists.`,
+      );
+      const existingAgent = await queryRunner.manager.findOne(Agent, {
+        where: { abnNumber },
+      });
       if (existingAgent) {
-        this.logger.error(`AgentService.createAgent: Agent with ABN ${abnNumber} already exists.`);
-        throw new UserAlreadyExistsError(`Agent with ABN number ${abnNumber} already exists.`);
+        this.logger.error(
+          `AgentService.createAgent: Agent with ABN ${abnNumber} already exists.`,
+        );
+        throw new UserAlreadyExistsError(
+          `Agent with ABN number ${abnNumber} already exists.`,
+        );
       }
 
-      this.logger.debug(`AgentService.createAgent: Checking if user with phone ${user.phoneNumber} or email ${user.email} exists.`);
-      const existingUserByPhone = await queryRunner.manager.findOne(User, { where: { phoneNumber: user.phoneNumber } });
-      const existingUserByEmail = await queryRunner.manager.findOne(User, { where: { email: user.email } });
+      this.logger.debug(
+        `AgentService.createAgent: Checking if user with phone ${user.phoneNumber} or email ${user.email} exists.`,
+      );
+      const existingUserByPhone = await queryRunner.manager.findOne(User, {
+        where: { phoneNumber: user.phoneNumber },
+      });
+      const existingUserByEmail = await queryRunner.manager.findOne(User, {
+        where: { email: user.email },
+      });
       if (existingUserByPhone || existingUserByEmail) {
-        this.logger.error(`AgentService.createAgent: User with phone ${user.phoneNumber} or email ${user.email} already exists.`);
-        throw new UserAlreadyExistsError(`User with phone number or email already exists.`);
+        this.logger.error(
+          `AgentService.createAgent: User with phone ${user.phoneNumber} or email ${user.email} already exists.`,
+        );
+        throw new UserAlreadyExistsError(
+          `User with phone number or email already exists.`,
+        );
       }
 
       this.logger.debug(`AgentService.createAgent: Creating user record.`);
@@ -107,14 +126,18 @@ export class AgentService {
       );
       const refreshToken = this.tokenService.generateRefreshToken(savedUser.id);
 
-      this.logger.debug(`AgentService.createAgent: Agent with ID ${savedAgent.id} created successfully.`);
+      this.logger.debug(
+        `AgentService.createAgent: Agent with ID ${savedAgent.id} created successfully.`,
+      );
       await queryRunner.commitTransaction();
 
       return { agent: savedAgent, accessToken, refreshToken };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(`AgentService.createAgent: Error occurred - ${error}`);
-      throw new InternalServerErrorException(`Failed to create agent: ${error}`);
+      throw new InternalServerErrorException(
+        `Failed to create agent: ${error}`,
+      );
     } finally {
       await queryRunner.release();
     }
@@ -314,7 +337,7 @@ export class AgentService {
   async setAgentStatus(
     agentId: number,
     status: AgentStatusEnum,
-  ): Promise<UpdateResult | { errors: DocumentError[] }> {
+  ): Promise<UpdateResult | { errors: TDocumentError[] }> {
     this.logger.debug(
       `AgentService.setAgentStatus: Setting status for agent ID ${agentId} to ${status}.`,
     );

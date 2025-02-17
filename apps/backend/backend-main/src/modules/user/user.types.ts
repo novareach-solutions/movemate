@@ -41,7 +41,6 @@ export type TCreateSavedAddress = {
 
 export type TUpdateSavedAddress = Partial<TCreateSavedAddress>;
 
-
 /**
  * Data Transfer Object for retrieving user profile based on specific criteria.
  */

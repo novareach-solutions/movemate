@@ -127,11 +127,11 @@ export class AuthService {
     }
   }
 
-  async generateTokens(
+  generateTokens(
     userId: number,
     phoneNumber: string,
     role: UserRoleEnum,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): { accessToken: string; refreshToken: string } {
     const accessToken = this.tokenService.generateAccessToken(
       userId,
       phoneNumber,

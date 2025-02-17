@@ -8,9 +8,7 @@ export const ZCreateAccountSchema = z.object({
   address: z.string().min(1, 'Street Address is required'),
   suburb: z.string().min(1, 'Suburb is required'),
   state: z.string().min(1, 'State is required'),
-  postalCode: z
-    .string()
-    .regex(/^\d{4,6}$/, 'Postal Code must be 4-6 digits'),
+  postalCode: z.string().regex(/^\d{4,6}$/, 'Postal Code must be 4-6 digits'),
   role: z.string(),
 });
 
