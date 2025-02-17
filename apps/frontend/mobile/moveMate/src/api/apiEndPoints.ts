@@ -19,7 +19,11 @@ const apiEndpoints = {
   leaveAReview: createEndpoint("/order/send-package/:orderId/review"),
   getOrderDetails: createEndpoint("/order/send-package/:orderId"),
   assignRider: createEndpoint("assign-rider/:orderId"),
-  createPaymentIntent: createEndpoint("/payment/create-payment-intent"),
+  // User Payment
+  createPaymentIntent: createEndpoint("/payments/create-intent"),
+  requestRefund: createEndpoint("/payments/:paymentId/refund"),
+  paymentStatus: createEndpoint("/payments/:paymentId/status"),
+  getCustomerPayments: createEndpoint("/payments/customer/:customerId"),
 };
 
 export default apiEndpoints;

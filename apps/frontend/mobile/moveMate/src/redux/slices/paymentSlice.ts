@@ -1,26 +1,42 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import apiClient from "../../api/apiClient";
 import apiEndpoints from "../../api/apiEndPoints";
-import axios from "axios";
 import { SimpleToast } from "../../utils/helpers";
 
+// Types
 interface PaymentState {
   loading: boolean;
   error: string | null;
   paymentSuccess: boolean;
-  paymentIntentId: string | null;
-  orderDetails: {
-    packageType: string;
-    deliveryInstructions: string;
-    senderInfo: {
-      name: string;
-      phone: string;
-    };
-    receiverInfo: {
-      name: string;
-      phone: string;
-    };
-  } | null;
+  paymentHistory: Payment[];
+  currentPayment: {
+    clientSecret: string | null;
+    paymentIntentId: string | null;
+    amount: number | null;
+    currency: string | null;
+    status: string | null;
+  };
+}
+
+interface Payment {
+  id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  failureReason?: string;
+}
+
+interface CreatePaymentIntentRequest {
+  amount: number;
+  currency: string;
+  description?: string;
+}
+
+interface RefundRequest {
+  amount?: number;
+  reason?: string;
 }
 
 // Initial state
@@ -28,108 +44,96 @@ const initialState: PaymentState = {
   loading: false,
   error: null,
   paymentSuccess: false,
-  paymentIntentId: null,
-  orderDetails: null,
+  paymentHistory: [],
+  currentPayment: {
+    clientSecret: null,
+    paymentIntentId: null,
+    amount: null,
+    currency: null,
+    status: null,
+  },
 };
 
-// Payload structure for payment
-interface PaymentPayload {
-  amount: number;
-  paymentMethod: string;
-  cardDetails: {
-    cardNumber: string;
-    expiryDate: string;
-    cvv: string;
-  };
-}
-
-interface CreatePaymentIntentPayload {
-  amount: number;
-  currency: string;
-  orderDetails: PaymentState["orderDetails"];
-}
-
-interface ConfirmPaymentPayload {
-  paymentMethodId: string;
-  returnUrl: string;
-}
-
-// Process payment
-export const processPayment = createAsyncThunk(
-  apiEndpoints.processPayment,
-  async (payload: PaymentPayload, { rejectWithValue }) => {
+// Thunks
+export const createPaymentIntent = createAsyncThunk(
+  "payment/createIntent",
+  async (data: CreatePaymentIntentRequest, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(
-        apiEndpoints.processPayment,
-        payload,
+        apiEndpoints.createPaymentIntent,
+        data,
+      );
+      return response.data.data;
+    } catch (error: any) {
+      SimpleToast(
+        error.response?.data?.message || "Payment intent creation failed",
+      );
+      return rejectWithValue(
+        error.response?.data?.message || "Payment intent creation failed",
+      );
+    }
+  },
+);
+
+export const getPaymentHistory = createAsyncThunk(
+  "payment/history",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get("/payments/history");
+      return response.data.data;
+    } catch (error: any) {
+      SimpleToast(
+        error.response?.data?.message || "Failed to fetch payment history",
+      );
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch payment history",
+      );
+    }
+  },
+);
+
+export const getPaymentStatus = createAsyncThunk(
+  "payment/status",
+  async (paymentId: string, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(
+        apiEndpoints.paymentStatus.replace(":paymentId", paymentId),
+      );
+      return response.data.data;
+    } catch (error: any) {
+      SimpleToast(
+        error.response?.data?.message || "Failed to fetch payment status",
+      );
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch payment status",
+      );
+    }
+  },
+);
+
+export const requestRefund = createAsyncThunk(
+  "payment/refund",
+  async (
+    { paymentId, data }: { paymentId: string; data: RefundRequest },
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await apiClient.post(
+        apiEndpoints.requestRefund.replace(":paymentId", paymentId),
+        data,
       );
       SimpleToast(response.data.message);
-      return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          console.error("API Error:", error.response.data);
-          return rejectWithValue(
-            error.response.data?.message || "Payment failed",
-          );
-        } else if (error.request) {
-          console.error("No response received:", error.request);
-          return rejectWithValue(
-            "No response from server. Please try again later.",
-          );
-        }
-      }
-      console.error("Unexpected Error:", error);
-      return rejectWithValue("An unexpected error occurred. Please try again.");
+      return response.data.data;
+    } catch (error: any) {
+      SimpleToast(error.response?.data?.message || "Refund request failed");
+      return rejectWithValue(
+        error.response?.data?.message || "Refund request failed",
+      );
     }
   },
 );
 
-export const createPaymentIntent = createAsyncThunk(
-  "payment/createPaymentIntent",
-  async (payload: CreatePaymentIntentPayload, { rejectWithValue }) => {
-    try {
-      const response = await apiClient.post(apiEndpoints.createPaymentIntent, {
-        amount: payload.amount,
-        currency: payload.currency,
-        metadata: {
-          orderDetails: JSON.stringify(payload.orderDetails),
-        },
-      });
-      return response.data;
-    } catch (error) {
-      return handlePaymentError(error, rejectWithValue);
-    }
-  },
-);
-
-export const confirmPayment = createAsyncThunk(
-  "payment/confirmPayment",
-  async (payload: ConfirmPaymentPayload, { rejectWithValue, getState }) => {
-    try {
-      const response = await apiClient.post(apiEndpoints.confirmPayment, {
-        paymentIntentId: getState().payment.paymentIntentId,
-        paymentMethodId: payload.paymentMethodId,
-        returnUrl: payload.returnUrl,
-      });
-      SimpleToast(response.data.message);
-      return response.data;
-    } catch (error) {
-      return handlePaymentError(error, rejectWithValue);
-    }
-  },
-);
-
-const handlePaymentError = (error: any, rejectWithValue: any) => {
-  if (axios.isAxiosError(error)) {
-    const message = error.response?.data?.message || "Payment failed";
-    SimpleToast(message);
-    return rejectWithValue(message);
-  }
-  SimpleToast("Payment processing failed");
-  return rejectWithValue("An unexpected error occurred");
-};
-
+// Slice
 const paymentSlice = createSlice({
   name: "payment",
   initialState,
@@ -138,28 +142,16 @@ const paymentSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.paymentSuccess = false;
-      state.paymentIntentId = null;
-      state.orderDetails = null;
+      state.currentPayment = {
+        clientSecret: null,
+        paymentIntentId: null,
+        amount: null,
+        currency: null,
+        status: null,
+      };
     },
   },
   extraReducers: (builder) => {
-    // Process Payment
-    builder
-      .addCase(processPayment.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.paymentSuccess = false;
-      })
-      .addCase(processPayment.fulfilled, (state) => {
-        state.loading = false;
-        state.paymentSuccess = true;
-      })
-      .addCase(processPayment.rejected, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.error = action.payload;
-        state.paymentSuccess = false;
-      });
-
     // Create Payment Intent
     builder
       .addCase(createPaymentIntent.pending, (state) => {
@@ -168,31 +160,69 @@ const paymentSlice = createSlice({
       })
       .addCase(createPaymentIntent.fulfilled, (state, action) => {
         state.loading = false;
-        state.paymentIntentId = action.payload.paymentIntentId;
-        state.orderDetails = action.payload.orderDetails;
+        state.currentPayment = {
+          clientSecret: action.payload.clientSecret,
+          paymentIntentId: action.payload.paymentIntentId,
+          amount: action.payload.amount,
+          currency: action.payload.currency,
+          status: action.payload.status,
+        };
       })
       .addCase(createPaymentIntent.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
 
-    // Confirm Payment
+    // Get Payment History
     builder
-      .addCase(confirmPayment.pending, (state) => {
+      .addCase(getPaymentHistory.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(confirmPayment.fulfilled, (state) => {
+      .addCase(getPaymentHistory.fulfilled, (state, action) => {
         state.loading = false;
-        state.paymentSuccess = true;
+        state.paymentHistory = action.payload;
       })
-      .addCase(confirmPayment.rejected, (state, action) => {
+      .addCase(getPaymentHistory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Get Payment Status
+    builder
+      .addCase(getPaymentStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getPaymentStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentPayment = {
+          ...state.currentPayment,
+          status: action.payload.status,
+        };
+      })
+      .addCase(getPaymentStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Request Refund
+    builder
+      .addCase(requestRefund.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(requestRefund.fulfilled, (state) => {
+        state.loading = false;
+        // You might want to update the payment status or history here
+      })
+      .addCase(requestRefund.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
   },
 });
 
-// Export the reducer
+// Export actions and reducer
 export const { resetPaymentState } = paymentSlice.actions;
 export default paymentSlice.reducer;

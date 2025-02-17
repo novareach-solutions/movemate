@@ -5,6 +5,7 @@ import { Agent } from "../../entity/Agent";
 import { Payment } from "../../entity/Payment";
 import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import { OrderStatusEnum, PaymentStatusEnum } from "../../shared/enums";
+import { UserNotFoundError } from "../../shared/errors/user";
 import {
   TCreateOrderRequest,
   TOrderResponse,
@@ -100,6 +101,9 @@ export class PaymentService {
   }
 
   async getCustomerPayments(customerId: number): Promise<Payment[]> {
+    if (!customerId) {
+      throw new UserNotFoundError("Customer ID is required");
+    }
     return await dbReadRepo(Payment).find({
       where: {
         order: {
