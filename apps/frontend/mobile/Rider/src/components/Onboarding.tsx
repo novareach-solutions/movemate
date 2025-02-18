@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,16 +7,15 @@ import {
   Dimensions,
   FlatList,
   TouchableOpacity,
-  TextStyle,
   NativeSyntheticEvent,
   NativeScrollEvent,
   ImageSourcePropType,
+  TextStyle,
 } from 'react-native';
 import {typography} from '../theme/typography';
 import {colors} from '../theme/colors';
-import {images} from '../assets/images/images';
-// import {useNavigation} from '@react-navigation/native';
-// import {AuthScreens} from '../navigation/ScreenNames';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AuthScreens, DeliverAPackage} from '../navigation/ScreenNames';
 
 const {width, height} = Dimensions.get('window');
 
@@ -24,7 +23,6 @@ interface Slide {
   id: number;
   title: string;
   subtitle: string;
-  image: ImageSourcePropType;
   description: string;
 }
 
@@ -33,14 +31,13 @@ const slides: Slide[] = [
     id: 0,
     title: 'Become our trusted service provider',
     subtitle: '',
-    image: images.introImage1,
     description: 'Join us today!',
   },
 ];
 
 const Onboarding: React.FC = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  // const navigation = useNavigation();
+  const navigation = useNavigation();
 
   const updateSlidePosition = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
@@ -49,20 +46,22 @@ const Onboarding: React.FC = () => {
   };
 
   const handleNavigation = () => {
-    // navigation.navigate(AuthScreens.Login);
+    navigation.navigate(AuthScreens.SignupNumber);
+    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
+    // navigation.navigate(DeliverAPackage.EnterABN);
+    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
-
-  const Footer = () => (
-    <View style={styles.footer}>
-      <TouchableOpacity onPress={handleNavigation} style={styles.button}>
-        <Text style={styles.buttonText}>
-          {currentSlideIndex === slides.length - 1
-            ? 'Get Started'
-            : 'Continue >'}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+  const handleLogin = () => {
+    navigation.navigate(AuthScreens.Login);
+    // navigation.navigate(DeliverAPackage.Home);
+    // navigation.navigate(DeliverAPackage.CompleteProfile);
+    // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
+    // navigation.navigate(DeliverAPackage.EnterABN);
+    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
+    // navigation.navigate(DeliverAPackage.UploadDocuments);
+  };
 
   return (
     <View style={styles.container}>
@@ -74,60 +73,74 @@ const Onboarding: React.FC = () => {
         onMomentumScrollEnd={updateSlidePosition}
         renderItem={({item}) => (
           <View style={styles.slide}>
-            <Image source={item.image} style={styles.image} />
+            <Image
+              source={require('../assets/images/womanHoldingPackage.png')}
+              style={styles.image}
+            />
             <Text style={styles.title}>
-              {item.title} <Text style={styles.subtitle}>{item.subtitle}</Text>
+              {item.title}
+              <Text style={styles.subtitle}>{item.subtitle}</Text>
             </Text>
             <Text style={styles.description}>{item.description}</Text>
           </View>
         )}
       />
-      <Footer />
+      <View style={styles.footer}>
+        <TouchableOpacity onPress={handleNavigation} style={styles.button}>
+          <Text style={styles.buttonText}>
+            {currentSlideIndex === slides.length - 1
+              ? 'Get Started'
+              : 'Continue >'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleLogin} style={styles.secondaryButton}>
+          <Text style={styles.secondaryButtonText}>Login</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: colors.white},
-  slide: {width, alignItems: 'center', justifyContent: 'flex-start'},
-  image: {resizeMode: 'cover'},
+  slide: {width, alignItems: 'flex-start', justifyContent: 'flex-start'},
+  image: {
+    resizeMode: 'cover',
+    width: '100%',
+    height: height * 0.6,
+  },
   title: {
     fontSize: typography.fontSize.large,
     fontFamily: typography.fontFamily.regular,
     color: colors.text.primary,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
+    marginTop: 20,
+    paddingHorizontal: 20,
   },
   subtitle: {color: colors.purple},
   description: {
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
-    textAlign: 'center',
+    textAlign: 'left',
     marginTop: 10,
     color: colors.text.primary,
     paddingHorizontal: 20,
     fontWeight: typography.fontWeight.medium as TextStyle['fontWeight'],
   },
   footer: {
-    height: height * 0.21,
-    justifyContent: 'space-between',
+    position: 'absolute',
+    bottom: 30,
+    width: '100%',
     alignItems: 'center',
   },
-  indicatorContainer: {flexDirection: 'row', marginTop: 20},
-  indicator: {
-    height: 10,
-    width: 10,
-    backgroundColor: '#ccc',
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  activeIndicator: {backgroundColor: colors.purple},
   button: {
     backgroundColor: colors.purple,
-    width: '80%',
+    width: '90%',
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
+    marginBottom: 10,
   },
   buttonText: {
     color: colors.white,
@@ -135,11 +148,20 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
   },
-  skip: {
+  secondaryButton: {
+    borderWidth: 1,
+    borderColor: colors.purple,
+    width: '90%',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  secondaryButtonText: {
     color: colors.purple,
-    marginTop: 10,
+    fontFamily: typography.fontFamily.regular,
     fontSize: typography.fontSize.medium,
-    fontWeight: typography.fontWeight.medium as TextStyle['fontWeight'],
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
   },
 });
 

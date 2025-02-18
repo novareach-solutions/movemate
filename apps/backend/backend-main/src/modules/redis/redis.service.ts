@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy } from "@nestjs/common";
+import { Injectable, Logger, OnModuleDestroy } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import Redis, { RedisOptions } from "ioredis";
 
@@ -6,7 +6,9 @@ import { logger } from "../../logger";
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
-  private readonly redisClient: Redis;
+  private readonly redisClient: Redis; // For general commands
+  private readonly subscriberClient: Redis; // For Pub/Sub
+  private readonly logger = new Logger(RedisService.name);
 
   constructor(private readonly configService: ConfigService) {
     const redisOptions: RedisOptions = {
@@ -14,23 +16,42 @@ export class RedisService implements OnModuleDestroy {
       port: this.configService.get<number>("REDIS_PORT"),
     };
     this.redisClient = new Redis(redisOptions);
+    this.subscriberClient = new Redis(redisOptions);
 
     this.redisClient.on("connect", () => {
-      logger.info("Connected to Redis server");
+      this.logger.debug("Connected to Redis server (General Client)");
+    });
+
+    this.subscriberClient.on("connect", () => {
+      this.logger.debug("Connected to Redis server (Subscriber Client)");
     });
 
     this.redisClient.on("error", (error: unknown) => {
-      logger.error("Error connecting to Redis:", error);
+      this.logger.error("Error connecting to Redis (General Client):", error);
+    });
+
+    this.subscriberClient.on("error", (error: unknown) => {
+      this.logger.error(
+        "Error connecting to Redis (Subscriber Client):",
+        error,
+      );
     });
   }
 
+  // Methods for general Redis commands
   async set(
     key: string,
     value: any,
     expiryMode: "EX" = "EX",
     time?: number,
   ): Promise<void> {
-    await this.redisClient.set(key, value, expiryMode, time || 300);
+    logger.debug(`Setting Redis key: ${key}, value: ${value}`);
+    try {
+      await this.redisClient.set(key, value, expiryMode, time || 300);
+    } catch (error) {
+      logger.error(`Failed to set Redis key ${key}:`, error);
+      throw error;
+    }
   }
 
   async incr(key: string): Promise<number> {
@@ -42,7 +63,15 @@ export class RedisService implements OnModuleDestroy {
   }
 
   async get(key: string): Promise<string | null> {
-    return await this.redisClient.get(key);
+    logger.debug(`Fetching Redis key: ${key}`);
+    try {
+      const value = await this.redisClient.get(key);
+      logger.debug(`Fetched Redis key: ${key}, value: ${value}`);
+      return value;
+    } catch (error) {
+      logger.error(`Failed to fetch Redis key ${key}:`, error);
+      throw error;
+    }
   }
 
   async del(key: string): Promise<number> {
@@ -53,12 +82,17 @@ export class RedisService implements OnModuleDestroy {
     return await this.redisClient.ttl(key);
   }
 
-  getClient(): Redis {
+  getSubscriberClient(): Redis {
+    return this.subscriberClient;
+  }
+
+  getGeneralClient(): Redis {
     return this.redisClient;
   }
 
   async onModuleDestroy(): Promise<void> {
     await this.redisClient.quit();
-    logger.info("Redis client disconnected");
+    await this.subscriberClient.quit();
+    this.logger.debug("Redis clients disconnected");
   }
 }

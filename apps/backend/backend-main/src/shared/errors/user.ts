@@ -103,3 +103,27 @@ export class UserDocumentAlreadyExistsError extends UserFacingError {
     this.statusCode = 409;
   }
 }
+
+export class UserExpiryDateRequiredError extends UserFacingError {
+  constructor(message?: string) {
+    super(message || "Expiry date is required for this document.");
+    this.name = "UserExpiryDateRequiredError";
+    this.statusCode = 400;
+  }
+}
+
+export class UserHasRunningOrderError extends UserFacingError {
+  constructor(message?: string) {
+    super(message || "User already has a running order");
+    this.name = "UserHasRunningOrderError";
+    this.statusCode = 409;
+  }
+}
+
+export class UserLicensePlateAlreadyExistsError extends UserFacingError {
+  constructor(message?: string) {
+    super(message || "License plate number already exists");
+    this.name = "UserLicensePlateAlreadyExistsError";
+    this.statusCode = 409;
+  }
+}

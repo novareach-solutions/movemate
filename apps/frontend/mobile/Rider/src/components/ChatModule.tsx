@@ -1,0 +1,214 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+  Image,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
+import Header from './Header';
+import SendIcon from '../assets/icons/sendIcon.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+interface Message {
+  id: string;
+  content: string;
+  senderId: number;
+  time: string;
+  senderImage?: string;
+}
+
+interface ChatModuleProps {
+  messages: Message[];
+  onSend: (message: string) => void;
+  headerTitle: string;
+  onReport?: () => void;
+}
+
+const ChatModule: React.FC<ChatModuleProps> = ({ messages, onSend }) => {
+  const [inputText, setInputText] = useState('');
+  const [senderId, setSenderId] = useState<string | null>(null); // Added state for senderId
+
+  useEffect(() => {
+    const fetchSenderId = async () => {
+      const id = await AsyncStorage.getItem('userId');
+      setSenderId(id);
+    };
+    fetchSenderId();
+  }, []);
+
+  const handleSend = () => {
+    if (inputText.trim()) {
+      onSend(inputText.trim());
+      setInputText('');
+    }
+  };
+
+  const renderMessageBubble = ({ item }: { item: Message }) => {
+    const isUser = item.senderId.toString() === senderId;
+    return (
+      <View style={styles.messageWrapper}>
+        <View
+          style={[
+            styles.messageBubble,
+            isUser ? styles.userMessage : styles.receiverMessage,
+          ]}
+        >
+          {!isUser && item.senderImage && (
+            <Image
+              source={{ uri: item.senderImage }}
+              style={styles.senderImage}
+            />
+          )}
+          <View
+            style={[styles.textContainer, isUser && styles.userTextContainer]}
+          >
+            <Text
+              style={[
+                styles.messageText,
+                isUser ? styles.userText : styles.receiverText,
+              ]}
+            >
+              {item.content}
+            </Text>
+          </View>
+        </View>
+        <Text
+          style={[
+            styles.timeText,
+            isUser ? styles.userTimeText : styles.receiverTimeText,
+          ]}
+        >
+          {item.time}
+        </Text>
+      </View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header logo isBack />
+      <FlatList
+        data={messages}
+        renderItem={renderMessageBubble}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.messageList}
+        inverted
+      />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={80}
+      >
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.inputField}
+            placeholder="Enter message..."
+            placeholderTextColor={colors.text.primaryGrey}
+            value={inputText}
+            onChangeText={setInputText}
+          />
+          <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+            <SendIcon style={styles.sendIcon} />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  messageWrapper: {
+    marginBottom: 15,
+    alignItems: 'flex-start',
+  },
+  messageBubble: {
+    flexDirection: 'row',
+    maxWidth: '70%',
+  },
+  userMessage: {
+    alignSelf: 'flex-end',
+    flexDirection: 'row-reverse',
+  },
+  receiverMessage: {
+    alignSelf: 'flex-start',
+  },
+  senderImage: {
+    width: 35,
+    height: 35,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  textContainer: {
+    backgroundColor: colors.white,
+    borderRadius: 8,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: colors.border.primary,
+  },
+  userTextContainer: {
+    backgroundColor: colors.purple,
+    borderColor: colors.purple,
+  },
+  messageText: {
+    fontSize: typography.fontSize.medium,
+  },
+  userText: {
+    color: colors.white,
+  },
+  receiverText: {
+    color: colors.text.primary,
+  },
+  timeText: {
+    fontSize: typography.fontSize.small,
+    color: colors.text.primaryGrey,
+    marginTop: 5,
+  },
+  userTimeText: {
+    alignSelf: 'flex-end',
+    marginRight: 5,
+  },
+  receiverTimeText: {
+    alignSelf: 'flex-start',
+    marginLeft: 45,
+  },
+  messageList: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: colors.border.primary,
+    backgroundColor: colors.white,
+  },
+  inputField: {
+    flex: 1,
+    backgroundColor: colors.lightButtonBackground,
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    fontSize: typography.fontSize.medium,
+    color: colors.text.primary,
+  },
+  sendButton: {},
+  sendIcon: {
+    width: 20,
+    height: 20,
+    tintColor: colors.white,
+  },
+});
+
+export default ChatModule;

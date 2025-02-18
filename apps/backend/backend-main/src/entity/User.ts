@@ -12,8 +12,8 @@ export class User extends BaseEntity {
   phoneNumber: string;
 
   @Column({
-    type: "enum",
-    enum: UserRoleEnum,
+    type: "varchar",
+    default: UserRoleEnum.CUSTOMER,
   })
   role: UserRoleEnum;
 
@@ -37,4 +37,7 @@ export class User extends BaseEntity {
 
   @Column({ type: "integer", nullable: true })
   postalCode: number;
+
+  @Column({ type: "varchar", nullable: true })
+  stripeCustomerId: string;
 }

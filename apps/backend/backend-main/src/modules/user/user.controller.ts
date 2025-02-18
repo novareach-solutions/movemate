@@ -3,108 +3,81 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
-  ParseUUIDPipe,
+  ParseIntPipe,
   Patch,
   Post,
   Req,
+  Res,
   UseGuards,
 } from "@nestjs/common";
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from "@nestjs/swagger";
+import { ConfigService } from "@nestjs/config";
+import { ApiTags } from "@nestjs/swagger";
+import { Response } from "express";
 import { DeleteResult, UpdateResult } from "typeorm";
 
 import { User } from "../../entity/User";
 import { Roles } from "../../shared/decorators/roles.decorator";
+import {
+  UserDeleteProfileByIdSwagger,
+  UserGetByIdSwagger,
+  UserGetProfileByIdSwagger,
+  UserPatchProfileByIdSwagger,
+  UserPostSignUpSwagger,
+} from "../../shared/decorators/user/user.decorators";
 import { UserRoleEnum } from "../../shared/enums";
 import { UnauthorizedError } from "../../shared/errors/authErrors";
 import { AuthGuard } from "../../shared/guards/auth.guard";
 import { OnboardingGuard } from "../../shared/guards/onboarding.guard";
+import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
-import {
-  CreateUserDto,
-  GetUserProfileDto,
-  UpdateUserDto,
-} from "./dto/user.dto";
 import { UserService } from "./user.service";
-import { TCreateUser, TGetUserProfile, TUpdateUser } from "./user.types";
-@ApiTags("Users")
+import { TCreateSavedAddress, TCreateUser, TGetUserProfile, TUpdateSavedAddress, TUpdateUser } from "./user.types";
+import { SavedAddress } from "../../entity/SavedAddress";
+
+@ApiTags("User")
 @Controller("user")
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  private readonly logger = new Logger(UserController.name);
+  constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService,
+  ) {}
 
   /**
    * Create a new user.
    * POST /user/signup
    */
   @Post("signup")
-  @UseGuards(OnboardingGuard)
-  @ApiOperation({
-    summary: "Create new user",
-    description: "Create a new customer account after OTP verification",
-  })
-  @ApiBody({ type: CreateUserDto })
-  @ApiResponse({
-    status: 201,
-    description: "User created successfully",
-    schema: {
-      example: {
-        success: true,
-        message: "User created successfully.",
-        data: 1, // userId
-      },
-    },
-  })
-  @ApiResponse({
-    status: 409,
-    description: "User already exists",
-    schema: {
-      example: {
-        success: false,
-        message:
-          "User with the provided email john.doe@example.com or phone number +61412345678 already exists.",
-        statusCode: 409,
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Phone number mismatch",
-    schema: {
-      example: {
-        success: false,
-        message:
-          "The provided phone number does not match the authenticated user's phone number.",
-        statusCode: 401,
-      },
-    },
-  })
+  @UserPostSignUpSwagger()
   async createUser(
     @Body() createUserDto: TCreateUser,
     @Req() request: ICustomRequest,
-  ): Promise<IApiResponse<number>> {
-    const phoneNumberFromGuard = request.user.phoneNumber;
-    if (
-      createUserDto.phoneNumber &&
-      createUserDto.phoneNumber !== phoneNumberFromGuard
-    ) {
-      throw new UnauthorizedError(
-        "The provided phone number does not match the authenticated user's phone number.",
-      );
-    }
-    createUserDto.phoneNumber = phoneNumberFromGuard;
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<IApiResponse<{ accessToken: string; userId: number }>> {
     createUserDto.role = UserRoleEnum.CUSTOMER;
-    const userId = await this.userService.createUser(createUserDto);
+
+    this.logger.debug(
+      `UserController.createUser: Creating user with data: ${JSON.stringify(
+        createUserDto,
+      )}`,
+    );
+
+    const { accessToken, refreshToken, userId } =
+      await this.userService.createUser(createUserDto);
+
+    response.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: this.configService.get<string>("ENVIRONMENT") === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
+    });
+
     return {
       success: true,
       message: "User created successfully.",
-      data: userId,
+      data: { accessToken, userId },
     };
   }
 
@@ -113,54 +86,27 @@ export class UserController {
    * GET /user/me
    */
   @Get()
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth("JWT-auth")
-  @ApiOperation({
-    summary: "Get current user profile",
-    description: "Retrieve the authenticated customer's profile",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "User profile retrieved successfully",
-    schema: {
-      example: {
-        success: true,
-        message: "User profile retrieved successfully.",
-        data: {
-          id: 1,
-          phoneNumber: "+61412345678",
-          role: UserRoleEnum.CUSTOMER,
-          firstName: "John",
-          lastName: "Doe",
-          email: "john.doe@example.com",
-          street: "123 Main St",
-          suburb: "Sydney",
-          state: "NSW",
-          postalCode: 2000,
-          createdAt: "2024-03-26T10:00:00.000Z",
-          updatedAt: "2024-03-26T10:00:00.000Z",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: "User not found",
-    schema: {
-      example: {
-        success: false,
-        message: "User not found",
-        statusCode: 404,
-      },
-    },
-  })
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.CUSTOMER)
+  @UserGetByIdSwagger()
   async getCurrentUser(
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<User>> {
     const userId = request.user.id;
 
+    this.logger.debug(
+      `UserController.getCurrentUser: Retrieving user profile for user ID: ${userId}`,
+    );
+
     const user = await this.userService.getUserById(userId);
+
+    if (!user) {
+      this.logger.error(
+        `UserController.getCurrentUser: User with ID ${userId} not found.`,
+      );
+      throw new UnauthorizedError(`User with ID ${userId} not found.`);
+    }
+
     return {
       success: true,
       message: "User profile retrieved successfully.",
@@ -173,58 +119,25 @@ export class UserController {
    * GET /user/profile/:id
    */
   @Get("profile/:id")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
-  @ApiBearerAuth("JWT-auth")
-  @ApiOperation({
-    summary: "Get user by ID (Admin)",
-    description: "Retrieve a user's profile by their ID. Admin access only.",
-  })
-  @ApiParam({
-    name: "id",
-    type: "string",
-    format: "uuid",
-    description: "User ID",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "User profile retrieved successfully",
-    schema: {
-      example: {
-        success: true,
-        message: "User profile retrieved successfully.",
-        data: {
-          id: 1,
-          phoneNumber: "+61412345678",
-          role: UserRoleEnum.CUSTOMER,
-          firstName: "John",
-          lastName: "Doe",
-          email: "john.doe@example.com",
-          street: "123 Main St",
-          suburb: "Sydney",
-          state: "NSW",
-          postalCode: 2000,
-          createdAt: "2024-03-26T10:00:00.000Z",
-          updatedAt: "2024-03-26T10:00:00.000Z",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: "User not found",
-    schema: {
-      example: {
-        success: false,
-        message: "User not found",
-        statusCode: 404,
-      },
-    },
-  })
+  @UserGetProfileByIdSwagger()
   async getUserById(
-    @Param("id", ParseUUIDPipe) id: number,
+    @Param("id", ParseIntPipe) id: number,
   ): Promise<IApiResponse<User>> {
+    this.logger.debug(
+      `UserController.getUserById: Retrieving user with ID ${id}`,
+    );
     const user = await this.userService.getUserById(id);
+    if (!user) {
+      this.logger.error(
+        `UserController.getUserById: User with ID ${id} not found.`,
+      );
+      throw new UnauthorizedError(`User with ID ${id} not found.`);
+    }
+    this.logger.log(
+      `UserController.getUserById: User with ID ${id} retrieved successfully.`,
+    );
     return {
       success: true,
       message: "User profile retrieved successfully.",
@@ -237,54 +150,29 @@ export class UserController {
    * POST /user/profile
    */
   @Post("profile")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
-  @ApiBearerAuth("JWT-auth")
-  @ApiOperation({
-    summary: "Get user by criteria (Admin)",
-    description:
-      "Search for a user by email or phone number. Admin access only.",
-  })
-  @ApiBody({ type: GetUserProfileDto })
-  @ApiResponse({
-    status: 200,
-    description: "User profile retrieved successfully",
-    schema: {
-      example: {
-        success: true,
-        message: "User profile retrieved successfully.",
-        data: {
-          id: 1,
-          phoneNumber: "+61412345678",
-          role: UserRoleEnum.CUSTOMER,
-          firstName: "John",
-          lastName: "Doe",
-          email: "john.doe@example.com",
-          street: "123 Main St",
-          suburb: "Sydney",
-          state: "NSW",
-          postalCode: 2000,
-          createdAt: "2024-03-26T10:00:00.000Z",
-          updatedAt: "2024-03-26T10:00:00.000Z",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: "User not found",
-    schema: {
-      example: {
-        success: false,
-        message: "User not found",
-        statusCode: 404,
-      },
-    },
-  })
+  @UserGetProfileByIdSwagger()
   async getUserProfile(
     @Body() getUserProfileDto: TGetUserProfile,
   ): Promise<IApiResponse<User>> {
+    this.logger.debug(
+      `UserController.getUserProfile: Retrieving user profile with data: ${JSON.stringify(
+        getUserProfileDto,
+      )}`,
+    );
     const user = await this.userService.getUserProfile(getUserProfileDto);
+    if (!user) {
+      this.logger.error(
+        `UserController.getUserProfile: User with criteria ${JSON.stringify(
+          getUserProfileDto,
+        )} not found.`,
+      );
+      throw new UnauthorizedError(`User not found.`);
+    }
+    this.logger.log(
+      `UserController.getUserProfile: User profile retrieved successfully.`,
+    );
     return {
       success: true,
       message: "User profile retrieved successfully.",
@@ -297,41 +185,14 @@ export class UserController {
    * GET /user/list
    */
   @Get("list")
-  @UseGuards(AuthGuard)
-  @Roles(UserRoleEnum.ADMIN)
-  @ApiBearerAuth("JWT-auth")
-  @ApiOperation({
-    summary: "Get all users (Admin)",
-    description: "Retrieve a list of all users. Admin access only.",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Users retrieved successfully",
-    schema: {
-      example: {
-        success: true,
-        message: "All users retrieved successfully.",
-        data: [
-          {
-            id: 1,
-            phoneNumber: "+61412345678",
-            role: UserRoleEnum.CUSTOMER,
-            firstName: "John",
-            lastName: "Doe",
-            email: "john.doe@example.com",
-            street: "123 Main St",
-            suburb: "Sydney",
-            state: "NSW",
-            postalCode: 2000,
-            createdAt: "2024-03-26T10:00:00.000Z",
-            updatedAt: "2024-03-26T10:00:00.000Z",
-          },
-        ],
-      },
-    },
-  })
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRoleEnum.ADMIN)
   async getAllUsers(): Promise<IApiResponse<User[]>> {
+    this.logger.debug(`UserController.getAllUsers: Retrieving all users.`);
     const users = await this.userService.getAllUsers();
+    this.logger.log(
+      `UserController.getAllUsers: All users retrieved successfully.`,
+    );
     return {
       success: true,
       message: "All users retrieved successfully.",
@@ -344,51 +205,22 @@ export class UserController {
    * PUT /user/profile/:id
    */
   @Patch("profile/:id")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
-  @ApiBearerAuth("JWT-auth")
-  @ApiOperation({
-    summary: "Update user profile (Admin)",
-    description: "Update a user's profile information. Admin access only.",
-  })
-  @ApiParam({
-    name: "id",
-    type: "string",
-    format: "uuid",
-    description: "User ID",
-  })
-  @ApiBody({ type: UpdateUserDto })
-  @ApiResponse({
-    status: 200,
-    description: "User profile updated successfully",
-    schema: {
-      example: {
-        success: true,
-        message: "User profile updated successfully.",
-        data: {
-          generatedMaps: [],
-          raw: [],
-          affected: 1,
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: "User not found",
-    schema: {
-      example: {
-        success: false,
-        message: "User with ID 1 not found",
-        statusCode: 404,
-      },
-    },
-  })
+  @UserPatchProfileByIdSwagger()
   async updateUser(
-    @Param("id", ParseUUIDPipe) id: number,
+    @Param("id", ParseIntPipe) id: number,
     @Body() updateUserDto: TUpdateUser,
   ): Promise<IApiResponse<UpdateResult>> {
+    this.logger.debug(
+      `UserController.updateUser: Updating user with ID ${id} with data: ${JSON.stringify(
+        updateUserDto,
+      )}`,
+    );
     const result = await this.userService.updateUser(id, updateUserDto);
+    this.logger.log(
+      `UserController.updateUser: User profile updated successfully for user ID ${id}.`,
+    );
     return {
       success: true,
       message: "User profile updated successfully.",
@@ -401,52 +233,105 @@ export class UserController {
    * DELETE /user/profile/:id
    */
   @Delete("profile/:id")
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN)
-  @ApiBearerAuth("JWT-auth")
-  @ApiOperation({
-    summary: "Delete user (Admin)",
-    description: "Soft delete a user account. Admin access only.",
-  })
-  @ApiParam({
-    name: "id",
-    type: "string",
-    format: "uuid",
-    description: "User ID",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "User deleted successfully",
-    schema: {
-      example: {
-        success: true,
-        message: "User deleted successfully.",
-        data: {
-          raw: [],
-          affected: 1,
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: "User not found",
-    schema: {
-      example: {
-        success: false,
-        message: "User not found",
-        statusCode: 404,
-      },
-    },
-  })
+  @UserDeleteProfileByIdSwagger()
   async deleteUser(
-    @Param("id", ParseUUIDPipe) id: string,
+    @Param("id", ParseIntPipe) id: string,
   ): Promise<IApiResponse<DeleteResult>> {
+    this.logger.debug(`UserController.deleteUser: Deleting user with ID ${id}`);
     const result = await this.userService.deleteUser(id);
+    this.logger.log(
+      `UserController.deleteUser: User deleted successfully for user ID ${id}.`,
+    );
     return {
       success: true,
       message: "User deleted successfully.",
       data: result,
     };
   }
+
+  @Get("currentstatus")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async getCurrentOrder(
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<{ order: any | null }>> {
+    const userId = request.user.id;
+
+    this.logger.debug(
+      `UserController.getCurrentOrder: Checking ongoing orders for user ID: ${userId}`,
+    );
+
+    const ongoingOrder = await this.userService.getCurrentOrder(userId);
+
+    if (ongoingOrder) {
+      this.logger.log(
+        `UserController.getCurrentOrder: Ongoing order found for user ID: ${userId}`,
+      );
+      return {
+        success: true,
+        message: "Ongoing order found.",
+        data: { order: ongoingOrder },
+      };
+    } else {
+      this.logger.log(
+        `UserController.getCurrentOrder: No ongoing order found for user ID: ${userId}`,
+      );
+      return {
+        success: true,
+        message: "No ongoing order found.",
+        data: { order: null },
+      };
+    }
+  }
+
+  @Post("address")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async createAddress(
+    @Body() createAddressDto: TCreateSavedAddress,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<SavedAddress>> {
+    const userId = request.user.id;
+    const address = await this.userService.createSavedAddress(userId, createAddressDto);
+    return { success: true, message: "Address created successfully.", data: address };
+  }
+
+  @Patch("address/:id")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async updateAddress(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() updateAddressDto: TUpdateSavedAddress,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<UpdateResult>> {
+    const userId = request.user.id;
+    const result = await this.userService.updateSavedAddress(userId, id, updateAddressDto);
+    return { success: true, message: "Address updated successfully.", data: result };
+  }
+
+  @Delete("address/:id")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async deleteAddress(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<DeleteResult>> {
+    const userId = request.user.id;
+    const result = await this.userService.deleteSavedAddress(userId, id);
+    return { success: true, message: "Address deleted successfully.", data: result };
+  }
+
+  @Get("address")
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRoleEnum.CUSTOMER)
+  async getAddresses(
+    @Req() request: ICustomRequest,
+  ): Promise<IApiResponse<SavedAddress[]>> {
+    const userId = request.user.id;
+    const addresses = await this.userService.getSavedAddresses(userId);
+    return { success: true, message: "Addresses retrieved successfully.", data: addresses };
+  }
+
 }
