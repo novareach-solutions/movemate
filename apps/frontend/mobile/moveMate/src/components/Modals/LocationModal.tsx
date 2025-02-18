@@ -401,8 +401,11 @@ const LocationModal: React.FC<LocationModalProps> = ({
 
                 <ScrollView contentContainerStyle={styles.addressForm}>
                   <View style={styles.addMapContainer}>
-                    <Mapbox.MapView style={styles.detailAddressMapImage} styleURL="mapbox://styles/mapbox/light-v11">
-                      <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [151.209900, -33.865143]} />
+                    <Mapbox.MapView style={styles.detailAddressMapImage} styleURL="mapbox://styles/mapbox/light-v11" projection="mercator" >
+                      <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [151.209900, -33.865143]}
+                      animationMode="none"
+                      animationDuration={0}
+                      />
 
                       {coordinates && (
                         <Mapbox.PointAnnotation id={`marker-${coordinates[0]}-${coordinates[1]}`} coordinate={coordinates}>
@@ -728,7 +731,7 @@ const styles = StyleSheet.create({
   addessInMap: {
     position: 'absolute',
     flex: 1,
-    top: 100,
+    top: 132,
     left: 35,
     backgroundColor: colors.white,
     padding: 10,
