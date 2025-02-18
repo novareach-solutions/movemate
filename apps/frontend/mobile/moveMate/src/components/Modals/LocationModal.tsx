@@ -22,7 +22,7 @@ import { colors } from "../../theme/colors";
 // import { fetchPlaceSuggestions } from "../../api/mapboxAPI";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from "react-native-svg";
-import Mapbox from '@rnmapbox/maps';
+// import Mapbox from '@rnmapbox/maps';
 import { getCurrentLocation, requestLocation } from "../../utils/helpers";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { updateDropLoaction, updatePickupLoaction } from "../../redux/slices/deliverAPackageSlice";
@@ -35,7 +35,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { formStyles } from "../../theme/form";
 import { mapSuggestions } from "../../api/mapboxAPI";
 
-Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+// Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 type FormFields = z.infer<typeof addressSchema>;
 
@@ -328,13 +328,9 @@ const LocationModal: React.FC<LocationModalProps> = ({
                 title="Add Location"
               />
               <View style={styles.mapContainer}>
-                <View>
-                  <Mapbox.MapView style={styles.mapImage} 
-                    projection="mercator"
-                  styleURL="mapbox://styles/mapbox/light-v11">
-                    <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates?.length ? coordinates : [151.209900, -33.865143]} animationMode="none"
-   animationDuration={0}
-  />
+                {/* <View>
+                  <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+                    <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [151.209900, -33.865143]} />
 
                     {coordinates && (
                       <Mapbox.PointAnnotation id={`marker-${coordinates[0]}-${coordinates[1]}`} coordinate={coordinates}>
@@ -346,7 +342,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
                     )}
                   </Mapbox.MapView>
 
-                </View>
+                </View> */}
                 <View style={styles.addressContainer}>
                   {/* Address Section */}
                   <View style={styles.addressRow}>
@@ -401,7 +397,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
 
                 <ScrollView contentContainerStyle={styles.addressForm}>
                   <View style={styles.addMapContainer}>
-                    <Mapbox.MapView style={styles.detailAddressMapImage} styleURL="mapbox://styles/mapbox/light-v11">
+                    {/* <Mapbox.MapView style={styles.detailAddressMapImage} styleURL="mapbox://styles/mapbox/light-v11">
                       <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates || [151.209900, -33.865143]} />
 
                       {coordinates && (
@@ -411,7 +407,7 @@ const LocationModal: React.FC<LocationModalProps> = ({
                           </View>
                         </Mapbox.PointAnnotation>
                       )}
-                    </Mapbox.MapView>
+                    </Mapbox.MapView> */}
 
                   </View>
                   <View style={styles.addessInMap}>

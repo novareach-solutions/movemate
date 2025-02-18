@@ -14,11 +14,11 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { assignOrder, getOrederDetails } from "../../../redux/slices/deliverAPackageSlice";
 import { useNavigation } from "@react-navigation/native";
 import { CustomerScreens } from "../../../navigation/ScreenNames";
-import Mapbox from '@rnmapbox/maps';
+// import Mapbox from '@rnmapbox/maps';
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_DRIVING_URL } from "../../../constants";
 import Header from "../../../components/Header";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
+// Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 
 const routeLineStyle = {
@@ -140,25 +140,21 @@ const OrderAcceptScreen = () => {
       {/* Map Section */}
       <View style={styles.mapContainer}>
         <View>
-          <Mapbox.MapView style={styles.mapImage} projection="mercator"  styleURL="mapbox://styles/mapbox/light-v11">
-            <Mapbox.Camera zoomLevel={12} centerCoordinate={pickupLocation || [151.209900, -33.865143]} animationMode="none"
-   animationDuration={0} />
+          {/* <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
+            <Mapbox.Camera zoomLevel={12} centerCoordinate={pickupLocation || [151.209900, -33.865143]} />
 
-            {/* Pickup Marker */}
             <Mapbox.PointAnnotation id="pickup" coordinate={pickupLocation}>
               <View style={styles.markerContainer}>
                 <View style={[styles.marker, { borderColor: "green" }]} />
               </View>
             </Mapbox.PointAnnotation>
 
-            {/* Drop Marker */}
             <Mapbox.PointAnnotation id="drop" coordinate={dropLocation}>
               <View style={styles.markerContainer}>
                 <View style={[styles.marker, { borderColor: "red" }]} />
               </View>
             </Mapbox.PointAnnotation>
 
-            {/* Route Line */}
             {routeCoords.length > 0 && (
               <Mapbox.ShapeSource
                 id="routeSource"
@@ -175,7 +171,7 @@ const OrderAcceptScreen = () => {
               </Mapbox.ShapeSource>
 
             )}
-          </Mapbox.MapView>
+          </Mapbox.MapView> */}
 
         </View>
         {/* <Image
