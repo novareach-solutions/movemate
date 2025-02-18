@@ -24,12 +24,13 @@ interface DocumentReviewProps {
       title: string;
       uploadedImage: string;
       onUploadSuccess: () => any;
+      value: string;
     };
   };
 }
 
 const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
-  const {title, uploadedImage, onUploadSuccess} = route.params;
+  const {title, uploadedImage, onUploadSuccess, value} = route.params;
   const [image, setImage] = useState(uploadedImage);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const dispatch = useAppDispatch();
@@ -37,7 +38,7 @@ const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
 
   const handleSubmit = async () => {
     const payload = {
-      name: title.replace(' ', '_').toUpperCase(),
+      name: value,
       description: `${title} front and back`,
       url: image,
     };

@@ -70,7 +70,7 @@ const SelectServiceScreen: React.FC = () => {
         <View style={styles.container}>
           <View style={styles.serviceText}>
             <TitleDescription
-              title="Choose Your Service"
+              title="Get Started With Your Services"
               description="Select the service you want to offer"
             />
           </View>
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
   },
   cardTitle: {
-    fontSize: typography.fontSize.medium,
+    fontSize: typography.fontSize.semiMedium,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.text.primary,
   },
@@ -131,8 +131,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 110,
+    height: 110,
     resizeMode: 'contain',
   },
   arrow: {

@@ -1,3 +1,4 @@
+// screens/EnterABNScreen.tsx
 import React from 'react';
 import {
   View,
@@ -10,6 +11,7 @@ import {
   TouchableWithoutFeedback,
   Platform,
   KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
 import Header from '../../components/Header';
 import StepIndicator from '../../components/StepIndicator';
@@ -21,7 +23,7 @@ import {
   DeliverAPackageParamList,
 } from '../../navigation/ScreenNames';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {useAppDispatch, useAppSelector} from '../../redux/hook';
+import {useAppDispatch} from '../../redux/hook';
 import {setSignupData} from '../../redux/slices/authSlice';
 import {z} from 'zod';
 import {useForm, Controller} from 'react-hook-form';
@@ -60,11 +62,15 @@ const EnterABNScreen: React.FC = () => {
       <Header logo isBack />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{flex: 1}}>
+        style={styles.container}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
             <StepIndicator current={3} total={5} />
-            <View style={styles.content}>
+            <ScrollView
+              style={styles.scrollView}
+              contentContainerStyle={styles.contentContainer}
+              keyboardShouldPersistTaps="handled">
               <TitleDescription
                 title="Enter your ABN details"
                 description="Add your ABN to get started"
@@ -101,7 +107,7 @@ const EnterABNScreen: React.FC = () => {
                   </View>
                 )}
               />
-            </View>
+            </ScrollView>
 
             {/* Fixed Footer with full-width Continue button */}
             <View style={styles.footer}>
@@ -141,14 +147,19 @@ const EnterABNScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: colors.white,
   },
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: colors.white,
   },
-  content: {
+  scrollView: {
     flex: 1,
+    paddingHorizontal: 20,
+  },
+  contentContainer: {
+    paddingVertical: 20,
+    paddingBottom: 100,
   },
   footer: {
     borderTopWidth: 1,
@@ -156,6 +167,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingVertical: 15,
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   fullWidthButton: {
     width: '100%',

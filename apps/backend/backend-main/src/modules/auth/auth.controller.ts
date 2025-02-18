@@ -20,6 +20,7 @@ import {
   AuthPostRefreshTokenSwagger,
 } from "../../shared/decorators/auth/auth.decorators";
 import { UserRoleEnum } from "../../shared/enums";
+import { UserAccessDeniedError } from "../../shared/errors/user";
 import { IApiResponse } from "../../shared/interface";
 import { AuthService } from "./auth.service";
 @ApiTags("Auth")
@@ -52,6 +53,7 @@ export class AuthController {
   @AuthPostOtpVerifySwagger()
   async verifyOtp(
     @Body() body: { phoneNumber: string; otp: string },
+    @Query("role") role: UserRoleEnum, // new query parameter for role
     @Res({ passthrough: true }) response: Response,
   ): Promise<void> {
     const { phoneNumber, otp } = body;
@@ -61,6 +63,15 @@ export class AuthController {
       await this.authService.verifyOtpAndLogin(phoneNumber, otp);
 
     if (user) {
+      console.log(role);
+      // If a role is provided, check that it matches the user's actual role.
+      if (role && user.role !== role) {
+        this.logger.error(
+          `AuthController.verifyOtp: Role mismatch for ${phoneNumber}. Expected ${role}, got ${user.role}`,
+        );
+        throw new UserAccessDeniedError("User role mismatch.");
+      }
+
       const responseData: {
         status: "existing_user" | "new_user";
         userId: number;
@@ -82,7 +93,7 @@ export class AuthController {
         httpOnly: true,
         secure: this.configService.get<string>("ENVIRONMENT") === "production",
         sameSite: "strict",
-        maxAge: 60 * 60 * 24 * 7 * 1000,
+        maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
       });
 
       response.json({
