@@ -1,13 +1,15 @@
 // src/api/apiEndPoints.ts
 
-const baseURL = 'http://192.168.29.63:3000';
+const baseURL = 'https://backend.vamoose.com.au';
 
 const createEndpoint = (path: string) => `${baseURL}${path}`;
 
 const apiEndPoints = {
   baseURL,
   requestOtp: createEndpoint('/auth/otp/request'),
+  // verifyOtp: createEndpoint('/auth/otp/verify'),
   verifyOtp: createEndpoint('/auth/otp/verify?role=AGENT'),
+  login: createEndpoint('/auth/login'),
   refreshToken: createEndpoint('/auth/refresh-token'),
   agentSignup: createEndpoint('/agent/signup'),
   fetchProfile: createEndpoint('/agent/profile'),

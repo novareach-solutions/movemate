@@ -38,6 +38,13 @@
 <key>NSLocationWhenInUseUsageDescription</key>
 <string>This app requires access to your location.</string>
 
+<key>NSPhotoLibraryUsageDescription</key>
+<string>We need access to your photo library to upload images.</string>
+
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>We need permission to save images to your library.</string>
+
+
 <key>NSCameraUsageDescription</key>
   <string>We need your Camera to provide better services.</string>
   <key>NSContactsUsageDescription</key>

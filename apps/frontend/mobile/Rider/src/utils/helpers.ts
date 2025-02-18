@@ -10,7 +10,7 @@ import {
   request,
   RESULTS,
 } from 'react-native-permissions';
-import {Linking, Platform} from 'react-native';
+import {Alert, Linking, PermissionsAndroid, Platform} from 'react-native';
 
 export const isAndroid = Platform.OS === 'android';
 let IS_TOKEN_EXPIRED = false;
@@ -98,3 +98,51 @@ export const getCurrentLocation = (
     },
   );
 };
+
+export const requestPhotoLibraryPermission = async () => {
+  if (Platform.OS === 'ios') {
+    const result = await check(PERMISSIONS.IOS.PHOTO_LIBRARY);
+    if (result === RESULTS.DENIED || result === RESULTS.LIMITED) {
+      const permissionResponse = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
+      if (permissionResponse !== RESULTS.GRANTED) {
+        Alert.alert('Permission Denied', 'Please enable photo library access in settings.');
+        return false;
+      }
+    }
+  } else if (Platform.OS === 'android') {
+    const result = await check(PERMISSIONS.ANDROID.READ_MEDIA_IMAGES); // For Android 13+
+    if (result === RESULTS.DENIED) {
+      const permissionResponse = await request(PERMISSIONS.ANDROID.READ_MEDIA_IMAGES);
+      if (permissionResponse !== RESULTS.GRANTED) {
+        Alert.alert('Permission Denied', 'Please enable storage access in settings.');
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
+export const requestCameraPermission = async () => {
+  if (Platform.OS === 'ios') {
+    return true; // iOS handles permissions automatically
+  }
+
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+      {
+        title: 'Camera Permission',
+        message: 'This app requires access to your camera.',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      }
+    );
+
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  } catch (error) {
+    console.error('Camera permission error:', error);
+    return false;
+  }
+};
+

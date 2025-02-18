@@ -1,5 +1,6 @@
-import React, {ReactNode} from 'react';
+import React, {ReactNode, useEffect, useState} from 'react';
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   AppScreens,
@@ -46,6 +47,7 @@ import PickUpOrderDetailsScreen from '../Screens/PickUpOrderDetailsScreen';
 import DropOffOrderDetailsScreen from '../Screens/DropOffOrderDetailsScreen';
 import EarningsDetailsScreen from '../Screens/EarningDetailsScreen';
 import EnterDriverLicenseDetailsScreen from '../Screens/DeliverPackage/EnterDriverLicenseDetailsScreen';
+import { ActivityIndicator, View } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -62,9 +64,44 @@ const RiderTheme = {
 };
 
 const App: React.FC<AppNavigatorProps> = ({children}) => {
+  const [initialRoute, setInitialRoute] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        const userStatus = await AsyncStorage.getItem('user_status');
+
+        if (accessToken && userStatus === 'existing_user') {
+          setInitialRoute(DeliverAPackage.Home);
+        } else if (accessToken && userStatus === 'new_user') {
+          setInitialRoute(AuthScreens.SelectService);
+        } else {
+          setInitialRoute(AuthScreens.Onboarding);
+        }
+      } catch (error) {
+        console.log('Error retrieving user data:', error);
+        setInitialRoute(AuthScreens.Onboarding);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkUserStatus();
+  }, []);
+
+  if (isLoading || !initialRoute) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer theme={RiderTheme}>
-      <Stack.Navigator initialRouteName={AuthScreens.Onboarding}>
+      <Stack.Navigator initialRouteName={initialRoute}>
         <Stack.Screen
           name={AuthScreens.Onboarding}
           component={Onboarding}

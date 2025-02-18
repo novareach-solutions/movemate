@@ -3,12 +3,12 @@ import {
   InternalServerErrorException,
   Logger,
 } from "@nestjs/common";
-import { DeleteResult,UpdateResult } from "typeorm";
+import { DeleteResult, UpdateResult } from "typeorm";
 
 import { AgentVehicle } from "../../../entity/AgentVehicle";
 import { ApprovalStatusEnum } from "../../../shared/enums";
 import { UserLicensePlateAlreadyExistsError } from "../../../shared/errors/user";
-import { dbReadRepo,dbRepo } from "../../database/database.service";
+import { dbReadRepo, dbRepo } from "../../database/database.service";
 import { TAgentVehicle } from "../agent.types";
 
 @Injectable()

@@ -1251,6 +1251,27 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-date-picker (5.0.10):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-geolocation-service (5.3.1):
     - React
   - react-native-safe-area-context (5.1.0):
@@ -1682,13 +1703,13 @@ PODS:
     - React-Core
     - React-RCTImage
     - TOCropViewController (~> 2.7.4)
-  - rnmapbox-maps (10.1.33):
+  - rnmapbox-maps (10.1.35):
     - MapboxMaps (~> 10.19.0)
     - React
     - React-Core
-    - rnmapbox-maps/DynamicLibrary (= 10.1.33)
+    - rnmapbox-maps/DynamicLibrary (= 10.1.35)
     - Turf
-  - rnmapbox-maps/DynamicLibrary (10.1.33):
+  - rnmapbox-maps/DynamicLibrary (10.1.35):
     - DoubleConversion
     - hermes-engine
     - MapboxMaps (~> 10.19.0)
@@ -1947,6 +1968,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-simple-toast (from `../node_modules/react-native-simple-toast`)
@@ -2072,6 +2094,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-date-picker:
+    :path: "../node_modules/react-native-date-picker"
   react-native-geolocation-service:
     :path: "../node_modules/react-native-geolocation-service"
   react-native-safe-area-context:
@@ -2195,6 +2219,7 @@ SPEC CHECKSUMS:
   React-logger: 697873f06b8ba436e3cddf28018ab4741e8071b6
   React-Mapbuffer: c79216258c659d70cdebaf76f8c110cc46dce8db
   React-microtasksnativemodule: 8d918db5d7c4526de2a0a4692d878a21b338c3f0
+  react-native-date-picker: d366d738b5f74c185c35dadfd4b2a4baa477164f
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-safe-area-context: e0625eb857b816dff4aca46e125759cb0927e225
   react-native-simple-toast: 47d4cca6211e1bf6a9e696ca881c8a4f65608986
@@ -2230,7 +2255,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: 381d041f80e6bf7983d2c058a34362e6a362ce01
   RNGestureHandler: 73e6b3eb6a65c764f0bca44b6ab5ac259d316a96
   RNImageCropPicker: 64b6bec9ec185ee59b71a93d7058816bd0e1916e
-  rnmapbox-maps: 22c0c850926f1031b7ac7b3c18b67cc9aa262c3a
+  rnmapbox-maps: 2d2a7d4da822bf0d23a251a268fe5a558eb2448f
   RNPermissions: 683054afb9a98809b8e3bec4bbbc64fbfe7ee8db
   RNReanimated: ddc60075b382b872662cadaf9972b07d52a8fce7
   RNScreens: c5be23653cbe82a7e44c7719af3465e2f152c791

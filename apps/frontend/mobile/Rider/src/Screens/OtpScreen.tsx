@@ -11,12 +11,13 @@ import {
   TextStyle,
   Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, DeliverAPackage} from '../navigation/ScreenNames';
 import {useAppDispatch} from '../redux/hook';
-import {verifyOtp, requestOtp} from '../redux/slices/authSlice';
+import {verifyOtp, requestOtp, login} from '../redux/slices/authSlice';
 import Header from '../components/Header';
 
 interface OtpScreenProps {
@@ -74,14 +75,22 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
       const response = await dispatch(
         verifyOtp({phone: phoneNumber, otp: enteredOtp}),
       ).unwrap();
+      // const response = await dispatch(
+      //   login({phone: phoneNumber, otp: enteredOtp}),
+      // ).unwrap();
       console.log('OTP Verification Successful!', response);
 
-      // Navigate based on the status returned from the API
-      if (response.data.status === 'existing_user') {
-        navigation.navigate(DeliverAPackage.Home);
-      } else {
-        navigation.navigate(AuthScreens.SelectService);
-      }
+      const status = response.data.status;
+
+      // Store status in AsyncStorage
+      await AsyncStorage.setItem('user_status', status);
+
+      // Navigate based on status
+    if (status === 'existing_user') {
+      navigation.navigate(DeliverAPackage.Home);
+    } else {
+      navigation.navigate(AuthScreens.SelectService);
+    }
     } catch (err: any) {
       console.log('OTP Verification failed', err);
       setError(true);

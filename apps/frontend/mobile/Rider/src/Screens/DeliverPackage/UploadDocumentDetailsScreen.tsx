@@ -11,6 +11,7 @@ import Header from '../../components/Header';
 import PhotoPickerModal from '../../components/common/PhotoPickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
 import {colors} from '../../theme/colors';
+import { requestCameraPermission, requestPhotoLibraryPermission } from '../../utils/helpers';
 
 const DAPUploadDocumentDetailsScreen = () => {
   const route = useRoute();
@@ -23,62 +24,104 @@ const DAPUploadDocumentDetailsScreen = () => {
     setIsPhotoOptionVisible(true);
   };
 
-  const handleTakePhoto = () => {
-    // setIsPhotoOptionVisible(false);
-    console.log('isPhotoOptionVisible', isPhotoOptionVisible);
-    setImage('https://picsum.photos/200/300');
-    setIsPhotoOptionVisible(false);
-    navigation.navigate(AppScreens.DocumentReview, {
-      title,
-      value,
-      uploadedImage: 'https://picsum.photos/200/300',
-    });
-    // Placeholder for camera functionality
-  };
-
-  const handleChooseFromGallery = () => {
-    setIsPhotoOptionVisible(false);
-    ImagePicker.openPicker({
-      width: 300,
-      height: 400,
-      cropping: true,
-    })
-      .then(photo => {
-        setImage(photo.path);
-        // Navigation will happen without uploading
-        navigation.navigate(AppScreens.DocumentReview, {
-          title,
-          value,
-          uploadedImage: photo.path,
-        });
-
-        // Commented out the API call
-        /*
-        const formData = new FormData();
-        formData.append('file', {
-          uri: photo.path,
-          type: photo.mime,
-          name: photo.filename || `photo_${Date.now()}.jpg`,
-        });
-
-        dispatch(uploadMedia(formData))
-          .unwrap()
-          .then(response => {
-            if (response) {
-              const uploadedImage = response.url;
-              navigation.navigate(AppScreens.DocumentReview, { title, uploadedImage });
-            }
-          })
-          .catch(error => {
-            console.error('Upload failed:', error);
-          });
-        */
-      })
-      .catch(error => {
-        console.log('Gallery error:', error);
+  const handleTakePhoto = async () => {
+    // console.log('Opening camera...');
+  
+    // // Request camera permission
+    // const hasPermission = await requestCameraPermission();
+    // console.log('Camera permission granted:', hasPermission);
+  
+    // if (!hasPermission) {
+    //   console.log('Permission denied. Cannot open camera.');
+    //   return;
+    // }
+  
+    try {
+      // Open camera
+      const photo = await ImagePicker.openCamera({
+        width: 300,
+        height: 400,
+        cropping: true,
       });
+  
+      console.log('Captured Image:', photo.path);
+  
+      // Set image and navigate
+      setImage(photo.path);
+      navigation.navigate(AppScreens.DocumentReview, {
+        title,
+        value,
+        uploadedImage: photo.path,
+      });
+  
+      // Close modal AFTER capturing photo
+      setIsPhotoOptionVisible(false);
+    } catch (error) {
+      console.log('Camera error:', error);
+    }
   };
 
+  const handleChooseFromGallery = async () => {
+    console.log('Opening gallery picker...');
+  
+    // Check for permission
+    const hasPermission = await requestPhotoLibraryPermission();
+    console.log('Gallery permission granted:', hasPermission);
+  
+    if (!hasPermission) {
+      console.log('Permission denied. Cannot open gallery.');
+      return;
+    }
+  
+    try {
+      // Clean up previous selections (prevents caching issues)
+      await ImagePicker.clean();
+      
+      // Open gallery picker
+      const photo = await ImagePicker.openPicker({
+        width: 300,
+        height: 400,
+        cropping: true,
+      });
+  
+      console.log('Selected Image:', photo.path);
+  
+      // Set image and navigate
+      setImage(photo.path);
+      navigation.navigate(AppScreens.DocumentReview, {
+        title,
+        value,
+        uploadedImage: photo.path,
+      });
+
+       /*
+  //       const formData = new FormData();
+  //       formData.append('file', {
+  //         uri: photo.path,
+  //         type: photo.mime,
+  //         name: photo.filename || `photo_${Date.now()}.jpg`,
+  //       });
+
+  //       dispatch(uploadMedia(formData))
+  //         .unwrap()
+  //         .then(response => {
+  //           if (response) {
+  //             const uploadedImage = response.url;
+  //             navigation.navigate(AppScreens.DocumentReview, { title, uploadedImage });
+  //           }
+  //         })
+  //         .catch(error => {
+  //           console.error('Upload failed:', error);
+  //         });
+  //       */
+  
+      // Close modal AFTER selection
+      setIsPhotoOptionVisible(false);
+    } catch (error) {
+      console.log('Gallery error:', error);
+    }
+  };
+  
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <Header logo isBack />

@@ -1,4 +1,4 @@
-import { Column, Entity, Index,ManyToOne, RelationId } from "typeorm";
+import { Column, Entity, Index, ManyToOne, RelationId } from "typeorm";
 
 import { ApprovalStatusEnum } from "../shared/enums";
 import { Agent } from "./Agent";
