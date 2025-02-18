@@ -330,14 +330,18 @@ const LocationModal: React.FC<LocationModalProps> = ({
               <View style={styles.mapContainer}>
                 <View>
                   <Mapbox.MapView style={styles.mapImage} 
+                    projection="mercator"
                   styleURL="mapbox://styles/mapbox/light-v11">
-                    <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates?.length ? coordinates : [151.209900, -33.865143]}  />
+                    <Mapbox.Camera zoomLevel={14} centerCoordinate={coordinates?.length ? coordinates : [151.209900, -33.865143]} animationMode="none"
+   animationDuration={0}
+  />
 
                     {coordinates && (
                       <Mapbox.PointAnnotation id={`marker-${coordinates[0]}-${coordinates[1]}`} coordinate={coordinates}>
                         <View style={styles.markerContainer}>
                           <View style={styles.marker} />
                         </View>
+                     
                       </Mapbox.PointAnnotation>
                     )}
                   </Mapbox.MapView>

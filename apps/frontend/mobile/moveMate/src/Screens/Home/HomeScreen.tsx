@@ -147,7 +147,7 @@ const CustomerHomeScreen = () => {
                     }}
                 />
             </View>
-{/* 
+
             {(isOngoingOrderModal && orderStatus !== "CANCELED") && (
                 <View style={styles.ongoingOrderBanner}>
                     <TouchableOpacity style={styles.ongoingOrderButton} onPress={handleOngoingNavigation}>
@@ -168,7 +168,7 @@ const CustomerHomeScreen = () => {
                         <WhiteArrow />
                     </TouchableOpacity>
                 </View>
-            )} */}
+            )}
 
 
 

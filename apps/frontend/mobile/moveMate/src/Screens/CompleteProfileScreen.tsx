@@ -131,7 +131,7 @@ const [loading, setLoading] = useState(false);
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={{ flex: 1, padding: 16 }}>
             <Header logo bgColor={colors.lightGrey}/>
-            <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+            <ScrollView contentContainerStyle={{ paddingBottom: 20,paddingTop:20 }}>
               <Text style={styles.title}>Complete your Profile</Text>
               <Text style={styles.subTitle}>Add your details to get started</Text>
               <View style={formStyles.inputWrapper}>
@@ -291,11 +291,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   inputLabel: {
-    fontSize: typography.fontSize.medium,
+    fontSize: typography.fontSize.semiMedium,
     fontWeight: typography.fontWeight.semiBold as TextStyle['fontWeight'],
     fontFamily: typography.fontFamily.regular,
     color: colors.text.primaryGrey,
     marginBottom: 7,
+    
   },
   title: {
     fontSize: typography.fontSize.large,
@@ -307,7 +308,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
     color: colors.text.subText,
-    marginBottom: 20,
+    marginBottom: 50,
     marginTop: 10,
     fontWeight: typography.fontWeight.medium as TextStyle['fontWeight'],
   },
@@ -321,6 +322,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    height:55,
   },
   errorText: {
     color: colors.error,

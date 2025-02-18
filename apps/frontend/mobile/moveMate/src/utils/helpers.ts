@@ -8,6 +8,7 @@ import {
   RESULTS,
 } from 'react-native-permissions';
 import {Linking, Platform} from 'react-native';
+import EventSource from 'react-native-event-source';
 
 export const isAndroid = Platform.OS === 'android';
 let IS_TOKEN_EXPIRED = false;
@@ -95,5 +96,19 @@ export const getCurrentLocation = (callback?: (response: GeoPosition) => void): 
   );
 };
 
+export const connectToNotifications = (userId: number) => {
+  const eventSource = new EventSource(`https://your-server.com/api/notifications/events/${userId}`);
+
+  eventSource.onopen = () => {
+    console.log('SSE connection established');
+  };
+
+  eventSource.onerror = (error) => {
+    console.error('SSE connection error:', error);
+    eventSource.close();
+  };
+
+  return eventSource;
+};
 
   

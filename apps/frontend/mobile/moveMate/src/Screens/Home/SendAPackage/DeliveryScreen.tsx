@@ -68,7 +68,7 @@ const DeliveryTrackingScreen = () => {
       fetchRoute();
       console.log('executedRoute')
       // }
-    }, 4500);
+    }, 500);
 
   }, [pickupLocation, dropLocation]);
 
@@ -117,8 +117,9 @@ const DeliveryTrackingScreen = () => {
       {/* Map Section */}
       <View style={styles.mapContainer}>
         <View>
-          <Mapbox.MapView style={styles.mapImage} styleURL="mapbox://styles/mapbox/light-v11">
-            <Mapbox.Camera zoomLevel={12} centerCoordinate={pickupLocation || [151.209900, -33.865143]} />
+          <Mapbox.MapView style={styles.mapImage} projection="mercator" styleURL="mapbox://styles/mapbox/light-v11">
+            <Mapbox.Camera zoomLevel={12} centerCoordinate={pickupLocation || [151.209900, -33.865143]} animationMode="none"
+   animationDuration={0} />
 
             {/* Pickup Marker */}
             <Mapbox.PointAnnotation id="pickup" coordinate={pickupLocation}>

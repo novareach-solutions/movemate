@@ -20,7 +20,8 @@ const apiEndpoints = {
     leaveAReview:createEndpoint('/order/send-package/:orderId/review'),
     getOrderDetails:createEndpoint('/order/send-package/:orderId'),
     assignRider:createEndpoint('assign-rider/:orderId'),
-    currentStatus:createEndpoint('/user/currentstatus')
+    currentStatus:createEndpoint('/user/currentstatus'),
+    orderNotification:createEndpoint('/api/notifications/events/')
   };
   
   export default apiEndpoints;

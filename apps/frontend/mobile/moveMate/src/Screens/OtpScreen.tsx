@@ -157,7 +157,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
             ) : (
               <TouchableOpacity onPress={handleResend}>
                 <Text>
-                  Resend code <Text style={styles.timer}>again</Text>
+                  <Text style={styles.timer}>Resend code</Text>
                 </Text>
               </TouchableOpacity>
             )}
@@ -227,6 +227,7 @@ const styles = StyleSheet.create({
   },
   timer: {
     color: colors.purple,
+    fontWeight:'bold'
   },
 });
 

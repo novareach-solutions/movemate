@@ -1,8 +1,5 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {AppScreens} from '../navigation/ScreenNames';
-import OrderScreen from './OrderScreen';
-// import NotificationScreen from './Offerscreen';
-import AccountScreen from './AccountScreen';
 import {Image, StyleSheet} from 'react-native';
 import {colors} from '../theme/colors';
 import {images} from '../assets/images/images';
@@ -18,10 +15,10 @@ const AppLayoutScreen = () => {
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
-        tabBarStyle: {backgroundColor: colors.white},
+        tabBarStyle: {backgroundColor: colors.white,paddingTop:8,height:100,alignItems:'center'},
         tabBarActiveTintColor: colors.purple,
         tabBarInactiveTintColor: colors.text.subText,
-        tabBarLabelStyle: {fontSize: 12},
+        tabBarLabelStyle: {fontSize: 13},
         headerShown: false,
         // Removed invalid `tabBarLabelPosition`
         tabBarIcon: ({color}) => {
