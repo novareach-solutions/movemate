@@ -16,6 +16,8 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   signupData: AgentSignupPayload | null;
+  phoneNumber: string | null;
+  currentLocation: any;
 }
 
 const initialState: AuthState = {
@@ -23,6 +25,8 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   signupData: null,
+  phoneNumber: null,
+  currentLocation: null,
 };
 
 interface AgentSignupPayload {
@@ -35,13 +39,20 @@ interface AgentSignupPayload {
     suburb: string;
     state: string;
     postalCode: number;
+    phoneNumber: string;
   };
   agentType: string;
   abnNumber: string;
-  vehicleMake: string;
-  vehicleModel: string;
-  vehicleYear: number;
   profilePhoto: string;
+  driverLicenseNumber?: string;
+  driverLicenseExpiryDate?: Date;
+  vehicles: {
+    vehicleMake: string;
+    vehicleModel: string;
+    licensePlateNumber: string;
+    registrationExpiryDate?: Date;
+    vehicleRegoImageUrl?: string;
+  }[];
 }
 
 interface AgentDoc {
@@ -100,7 +111,7 @@ export const uploadMedia = createAsyncThunk(
       } else {
         errorMessage = 'An unexpected error occurred.';
       }
-      Alert.alert('Upload Media Error', errorMessage); // Display an alert for the error
+      // Alert.alert('Upload Media Error', errorMessage); // Display an alert for the error
       return rejectWithValue(errorMessage);
     }
   },
@@ -115,12 +126,20 @@ export const verifyOtp = createAsyncThunk(
         phoneNumber: phone,
         otp,
       });
-      console.log(response.headers)
-      // Store onboarding token if present in the response headers
-      const onboardingToken = response.headers['onboarding_token'];
-      if (onboardingToken) {
-        await saveToken('onboardingToken', onboardingToken);
-        console.log('Onboarding Token Stored:', onboardingToken);
+
+      const data = response.data.data;
+      console.log('login response', data);
+
+      if (data.status === 'existing_user' && data.accessToken) {
+        const {accessToken, agentId, userId} = data;
+        await saveToken('accessToken', accessToken);
+        await saveToken('userId', String(userId));
+        if (agentId !== undefined) {
+          await saveToken('agentId', String(agentId));
+        }
+        SimpleToast('Login successful.');
+      } else if (data.status === 'new_user') {
+        SimpleToast('New user detected.');
       }
 
       return response.data;
@@ -133,7 +152,7 @@ export const verifyOtp = createAsyncThunk(
       } else {
         console.error('Unexpected Error:', error);
       }
-      Alert.alert('Verify OTP Error', errorMessage); // Display an alert for the error
+      Alert.alert('Verify OTP Error', errorMessage);
       return rejectWithValue(errorMessage);
     }
   },
@@ -275,6 +294,13 @@ const authSlice = createSlice({
         state.signupData = action.payload as AgentSignupPayload;
       }
     },
+    updatePhoneNumber: (state, action) => {
+      state.phoneNumber = action.payload;
+    },
+
+    updateCurrentLocation: (state, action) => {
+      state.currentLocation = action.payload;
+    },
   },
   extraReducers: builder => {
     // Handle agentSignup
@@ -319,6 +345,7 @@ const authSlice = createSlice({
       })
       .addCase(verifyOtp.fulfilled, state => {
         state.loading = false;
+        state.isAuthenticated = true;
       })
       .addCase(verifyOtp.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
@@ -381,5 +408,6 @@ const authSlice = createSlice({
 });
 
 // Export the actions and reducer
-export const {logout, setSignupData} = authSlice.actions;
+export const {logout, setSignupData, updatePhoneNumber, updateCurrentLocation} =
+  authSlice.actions;
 export default authSlice.reducer;

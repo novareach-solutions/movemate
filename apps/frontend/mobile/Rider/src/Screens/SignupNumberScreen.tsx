@@ -16,16 +16,17 @@ import {colors} from '../theme/colors';
 import {typography} from '../theme/typography';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, AuthScreensParamList} from '../navigation/ScreenNames';
-import {useAppDispatch} from '../redux/hook';
+import {useAppDispatch, useAppSelector} from '../redux/hook';
 import Header from '../components/Header';
 import Logo from '../assets/icons/logo.svg';
-import {requestOtp} from '../redux/slices/authSlice';
+import {requestOtp, updatePhoneNumber} from '../redux/slices/authSlice';
 
 const {width} = Dimensions.get('window');
 
 const SignupNumberScreen: React.FC = () => {
   const phoneInput = useRef<PhoneInput>(null);
   const navigation = useNavigation<NavigationProp<AuthScreensParamList>>();
+
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isFilled, setIsFilled] = useState(false);
   const [isFocused, setIsFocused] = useState(false); // Track focus state
@@ -40,6 +41,7 @@ const SignupNumberScreen: React.FC = () => {
   const handleSendCode = async () => {
     try {
       await dispatch(requestOtp({phone: phoneNumber})).unwrap();
+      dispatch(updatePhoneNumber(phoneNumber));
       navigation.navigate(AuthScreens.Otp, {phoneNumber});
     } catch {
       console.log('Request Otp failed');
@@ -54,12 +56,12 @@ const SignupNumberScreen: React.FC = () => {
     <SafeAreaView
       style={{
         flex: 1,
+        backgroundColor: colors.white,
       }}>
-      <Header isBack />
+      <Header logo />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
-          <Logo style={styles.logo} />
-          <Text style={styles.heading}>Create an Account</Text>
+          <Text style={styles.heading}>Welcome To Vamoose!</Text>
           <Text style={styles.subheading}>
             Enter phone number and we’ll send you a verification code
           </Text>
@@ -113,7 +115,6 @@ const styles = StyleSheet.create({
     width: width * 0.3,
     height: width * 0.3,
     resizeMode: 'contain',
-    marginBottom: 30,
     alignSelf: 'center',
   },
   heading: {
@@ -121,6 +122,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.purple,
     textAlign: 'left',
+    marginTop: 30,
     marginBottom: 10,
   },
   subheading: {

@@ -1,6 +1,6 @@
 // src/components/DeliveryModal.tsx
 
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -12,10 +12,10 @@ import {
   TextStyle,
   Image,
 } from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { colors } from '../../theme/colors';
-import { formStyles } from '../../theme/form';
-import { typography } from '../../theme/typography';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
+import {colors} from '../../theme/colors';
+import {formStyles} from '../../theme/form';
+import {typography} from '../../theme/typography';
 import PurplePhone from '../../assets/icons/purplePhone.svg';
 import PurpleMessage from '../../assets/icons/purpleMessage.svg';
 import PurpleDoNotRing from '../../assets/icons/purpleDoNotRing.svg';
@@ -24,22 +24,26 @@ import Camera from '../../assets/icons/camera.svg';
 import PhotoPickerModal from '../common/PhotoPickerModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
-import { useAppDispatch, useAppSelector } from '../../redux/hook';
-import { RootState } from '../../redux/store';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
+import {RootState} from '../../redux/store';
 import {
   completeOrder,
   fetchOngoingOrder,
   uploadProofOfDelivery,
 } from '../../redux/slices/orderSlice';
-import { SendPackageOrder } from '../../redux/slices/types/sendAPackage';
-import { uploadMedia } from '../../redux/slices/authSlice';
+import {SendPackageOrder} from '../../redux/slices/types/sendAPackage';
+import {uploadMedia} from '../../redux/slices/authSlice';
 import {
   AppScreens,
   AppScreensParamList,
   DeliverAPackage,
 } from '../../navigation/ScreenNames';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
-import { InfoRow } from './Order/OrderModal';
+import {InfoRow} from './Order/OrderModal';
+import OrderInfoCard from '../OrderInfoCard';
+import RedCircle from '../../assets/icons/redCircle.svg';
+import PickuplocationAvatar from '../../assets/icons/pickuplocationAvatar.svg';
+import DropOfflocationAvatar from '../../assets/icons/droplocationAvatar.svg';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -47,9 +51,9 @@ interface DeliveryModalProps {
   order: SendPackageOrder;
 }
 
-const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
+const DeliveryModal: React.FC<DeliveryModalProps> = ({order}) => {
   // Animated height: collapsed = 22% and expanded = 75% of screen height.
-  const [height] = useState(new Animated.Value(SCREEN_HEIGHT * 0.18));
+  const [height] = useState(new Animated.Value(SCREEN_HEIGHT * 0.2));
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Photo-related state.
@@ -59,13 +63,15 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
-  const currentOrder = useAppSelector((state: RootState) => state.order.ongoingOrder);
+  const currentOrder = useAppSelector(
+    (state: RootState) => state.order.ongoingOrder,
+  );
   const dispatch = useAppDispatch();
 
   const handleExpand = () => {
     setIsExpanded(true);
     Animated.timing(height, {
-      toValue: SCREEN_HEIGHT * 0.75,
+      toValue: SCREEN_HEIGHT * 1,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -74,7 +80,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
   const handleCollapse = () => {
     setIsExpanded(false);
     Animated.timing(height, {
-      toValue: SCREEN_HEIGHT * 0.18,
+      toValue: SCREEN_HEIGHT * 0.2,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -99,10 +105,10 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
       height: 400,
       cropping: true,
     })
-      .then(async (photo) => {
+      .then(async photo => {
         await uploadAndSetPhoto(photo);
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('Camera error:', error);
         Alert.alert('Error', 'Failed to take photo. Please try again.');
       });
@@ -115,10 +121,10 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
       height: 400,
       cropping: true,
     })
-      .then(async (photo) => {
+      .then(async photo => {
         await uploadAndSetPhoto(photo);
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('Gallery error:', error);
         Alert.alert('Error', 'Failed to select photo. Please try again.');
       });
@@ -153,7 +159,9 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
 
   const handleDone = async () => {
     try {
-      await dispatch(uploadProofOfDelivery({ orderId: order.id, url: uploadedImageUrl })).unwrap();
+      await dispatch(
+        uploadProofOfDelivery({orderId: order.id, url: uploadedImageUrl}),
+      ).unwrap();
       await dispatch(fetchOngoingOrder()).unwrap();
     } catch (error: any) {
       console.error('Failed to upload proof of delivery:', error);
@@ -174,7 +182,8 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
 
   const handleOrderDelivered = async () => {
     try {
-      await dispatch(completeOrder({ orderId: currentOrder.id })).unwrap();
+      await dispatch(completeOrder({orderId: currentOrder.id})).unwrap();
+      console.log('navigate to earning details screen');
       navigation.navigate(DeliverAPackage.EarningsDetails);
     } catch (error) {
       console.error('Error completing order:', error);
@@ -203,7 +212,7 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
 
   return (
     <View style={styles.absoluteContainer}>
-      <Animated.View style={[styles.modalContainer, { height }]}>
+      <Animated.View style={[styles.modalContainer, {height}]}>
         {/* Drag indicator toggles expand/collapse */}
         <TouchableOpacity onPress={togglePanel}>
           <View style={styles.dragIndicator} />
@@ -212,86 +221,110 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ order }) => {
         {/* When collapsed, show a summary via InfoRow */}
         <View style={styles.location}>
           {!isExpanded && (
-         <View>   
-      
-            </View>
+            <InfoRow
+              iconSource={RedCircle}
+              text={`${order?.senderName} (${order.dropLocation?.addressLine1})`}
+            />
           )}
         </View>
 
-        {/* Header Section */}
-        <View style={styles.header}>
-          <View style={{ width: '70%' }}>
-            <Text style={styles.driverName}>{order.customer?.firstName}</Text>
-            <Text style={styles.deliveryAddress}>{order.dropLocation?.addressLine1}</Text>
-          </View>
-          <View style={styles.headerIcons}>
-            <TouchableOpacity>
-              <PurplePhone style={styles.icon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={navigateChatScreen}>
-              <PurpleMessage style={styles.icon} />
-            </TouchableOpacity>
-          </View>
-        </View>
+        {isExpanded && (
+          <>
+            <InfoRow
+              iconSource={DropOfflocationAvatar}
+              text={`Drop-off Contact`}
+            />
+            <OrderInfoCard
+              title={order.receiverName || 'N/A'}
+              subtitle={order.dropLocation?.addressLine1 || 'N/A'}
+              onPressLeftIcon={() => Alert.alert('Call Customer')}
+              onPressRightIcon={navigateChatScreen}
+              LeftIcon={PurplePhone}
+              RightIcon={PurpleMessage}
+            />
+            <View
+              style={{
+                marginTop: 10,
+              }}
+            />
 
-        {/* Delivery Instructions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Delivery Instructions</Text>
-          <View style={styles.instructionsContainer}>
-            <View style={styles.instructionRow}>
-              {order.deliveryInstructions === 'Do not ring the bell' ? (
-                <PurpleDoNotRing style={styles.instructionIcon} />
-              ) : (
-                <PurpleDoor style={styles.instructionIcon} />
-              )}
-              <Text style={styles.instructionText}>{order.deliveryInstructions}</Text>
+            <InfoRow
+              iconSource={PickuplocationAvatar}
+              text={`Pickup Contact`}
+            />
+            <OrderInfoCard
+              title={order.senderName || 'N/A'}
+              subtitle={order.pickupLocation?.addressLine1 || 'N/A'}
+              onPressLeftIcon={() => Alert.alert('Call Customer')}
+              onPressRightIcon={navigateChatScreen}
+              LeftIcon={PurplePhone}
+              RightIcon={PurpleMessage}
+            />
+
+            {/* Delivery Instructions */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Delivery Instructions</Text>
+              <View style={styles.instructionsContainer}>
+                <View style={styles.instructionRow}>
+                  {order.deliveryInstructions === 'Do not ring the bell' ? (
+                    <PurpleDoNotRing style={styles.instructionIcon} />
+                  ) : (
+                    <PurpleDoor style={styles.instructionIcon} />
+                  )}
+                  <Text style={styles.instructionText}>
+                    {order.deliveryInstructions}
+                  </Text>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
 
-        {/* Items to Deliver */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Items to Deliver</Text>
-          <Text style={styles.itemText}>• {order.packageType}</Text>
-        </View>
+            {/* Items to Deliver */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Items to Deliver</Text>
+              <Text style={styles.itemText}>• {order.packageType}</Text>
+            </View>
 
-        {/* Proof of Delivery */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Proof of Delivery</Text>
-          <Text style={styles.proofText}>Take a photo to confirm delivery</Text>
-          <TouchableOpacity
-            style={
-              hasPhoto
-                ? styles.viewPhotoButton
-                : [formStyles.button, formStyles.buttonEnabled]
-            }
-            onPress={hasPhoto ? handleViewPhoto : openPhotoPickerModal}
-          >
-            {!hasPhoto && <Camera />}
-            <Text
-              style={
-                hasPhoto
-                  ? styles.viewPhotoText
-                  : [formStyles.buttonText, formStyles.buttonTextEnabled]
-              }
-            >
-              {hasPhoto ? 'View Photo' : 'Take Photo'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+            {/* Proof of Delivery */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Proof of Delivery</Text>
+              <Text style={styles.proofText}>
+                Take a photo to confirm delivery
+              </Text>
+              <TouchableOpacity
+                style={
+                  hasPhoto
+                    ? styles.viewPhotoButton
+                    : [formStyles.button, formStyles.buttonEnabled]
+                }
+                onPress={hasPhoto ? handleViewPhoto : openPhotoPickerModal}>
+                {!hasPhoto && <Camera />}
+                <Text
+                  style={
+                    hasPhoto
+                      ? styles.viewPhotoText
+                      : [formStyles.buttonText, formStyles.buttonTextEnabled]
+                  }>
+                  {hasPhoto ? 'View Photo' : 'Take Photo'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+        {/* Header Section */}
 
         {/* Order Delivered Button */}
-        <TouchableOpacity
-          style={[
-            formStyles.button,
-            formStyles.buttonSuccess,
-            { opacity: hasPhoto ? 1 : 0.5 },
-          ]}
-          onPress={handleOrderDelivered}
-          disabled={!hasPhoto}
-        >
-          <Text style={formStyles.buttonText}>Order Delivered</Text>
-        </TouchableOpacity>
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={[
+              formStyles.button,
+              formStyles.buttonSuccess,
+              {opacity: hasPhoto ? 1 : 0.5},
+            ]}
+            onPress={handleOrderDelivered}
+            disabled={!hasPhoto}>
+            <Text style={formStyles.buttonText}>Order Delivered</Text>
+          </TouchableOpacity>
+        </View>
       </Animated.View>
 
       {/* Confirm Photo Modal */}
@@ -319,7 +352,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    borderRadius:12
+    borderRadius: 12,
   },
   modalContainer: {
     width: '100%',
@@ -376,7 +409,8 @@ const styles = StyleSheet.create({
     tintColor: colors.text.primary,
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 15,
+    marginTop: 15,
   },
   sectionTitle: {
     fontSize: typography.fontSize.medium,
@@ -443,6 +477,12 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
     fontFamily: typography.fontFamily.regular,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
   },
 });
 

@@ -1,6 +1,6 @@
 // src/components/OrderExpandedModal.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -11,14 +11,14 @@ import {
   Alert,
   TextStyle,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
-import { colors } from '../../theme/colors';
-import { formStyles } from '../../theme/form';
-import { typography } from '../../theme/typography';
+import {colors} from '../../theme/colors';
+import {formStyles} from '../../theme/form';
+import {typography} from '../../theme/typography';
 import ConfirmPhotoModal from './ConfirmPhotoModal';
 import PhotoPickerModal from '../common/PhotoPickerModal';
 import {
@@ -27,19 +27,21 @@ import {
   updateItemVerifiedPhoto,
   updateOrderStatus,
 } from '../../redux/slices/orderSlice';
-import { uploadMedia } from '../../redux/slices/authSlice';
-import { RootState } from '../../redux/store';
-import { OrderStatusEnum } from '../../redux/slices/types/enums';
-import { SendPackageOrder } from '../../redux/slices/types/sendAPackage';
-import { AppScreens, DeliverAPackage } from '../../navigation/ScreenNames';
-import { InfoRow } from './Order/OrderModal';
+import {uploadMedia} from '../../redux/slices/authSlice';
+import {RootState} from '../../redux/store';
+import {OrderStatusEnum} from '../../redux/slices/types/enums';
+import {SendPackageOrder} from '../../redux/slices/types/sendAPackage';
+import {AppScreens, DeliverAPackage} from '../../navigation/ScreenNames';
+import {InfoRow} from './Order/OrderModal';
 
 // Icon imports (kept as-is)
-import GreenCircle from "../../assets/icons/greenCircle.svg";
+import GreenCircle from '../../assets/icons/greenCircle.svg';
 import PurplePhone from '../../assets/icons/purplePhone.svg';
 import PurpleMessage from '../../assets/icons/purpleMessage.svg';
-import PickUpNotes from "../../assets/icons/pickupNotes.svg";
-import Cart from "../../assets/icons/cart.svg";
+import PickUpNotes from '../../assets/icons/pickupNotes.svg';
+import Cart from '../../assets/icons/cart.svg';
+import OrderInfoCard from '../OrderInfoCard';
+import PickUpIcon from '../../assets/icons/pickuplocationAvatar.svg';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -49,31 +51,30 @@ interface ExpandedModalProps {
   disableClose?: boolean;
 }
 
-const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
-  order,
-}) => {
+const OrderExpandedModal: React.FC<ExpandedModalProps> = ({order}) => {
   // The component is always rendered. Its height animates between 22% (collapsed)
   // and 75–80% (expanded) of the screen.
-  const [height] = useState(new Animated.Value(SCREEN_HEIGHT * 0.2));
   const [isExpanded, setIsExpanded] = useState(true);
+  const [height] = useState(
+    new Animated.Value(
+      isExpanded ? SCREEN_HEIGHT * 0.85 : SCREEN_HEIGHT * 0.26,
+    ),
+  );
   const [isConfirmPhotoVisible, setIsConfirmPhotoVisible] = useState(false);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const currentOrder = useSelector((state: RootState) => state.order.ongoingOrder);
-
-  // Optionally, perform any effect when the order changes.
-  useEffect(() => {
-    // ...
-  }, [order]);
+  const currentOrder = useSelector(
+    (state: RootState) => state.order.ongoingOrder,
+  );
 
   // Expand to 75% of screen height
   const handleExpand = () => {
     setIsExpanded(true);
     Animated.timing(height, {
-      toValue: SCREEN_HEIGHT * 0.75,
+      toValue: SCREEN_HEIGHT * 0.85,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -83,7 +84,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   const handleCollapse = () => {
     setIsExpanded(false);
     Animated.timing(height, {
-      toValue: SCREEN_HEIGHT * 0.22,
+      toValue: SCREEN_HEIGHT * 0.26,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -113,7 +114,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
         updateItemVerifiedPhoto({
           orderId: currentOrder.id,
           url: uploadedImageUrl,
-        })
+        }),
       ).unwrap();
       const fetchResponse = await dispatch(fetchOngoingOrder()).unwrap();
       if (!fetchResponse) {
@@ -121,7 +122,10 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
       }
     } catch (error: any) {
       console.error('Failed to update photo or refresh order:', error);
-      Alert.alert('Error', error.message || 'Failed to update photo or refresh order.');
+      Alert.alert(
+        'Error',
+        error.message || 'Failed to update photo or refresh order.',
+      );
     }
     setIsConfirmPhotoVisible(false);
   };
@@ -129,7 +133,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
   const handleOrderAction = async () => {
     if (currentOrder?.status === OrderStatusEnum.ACCEPTED) {
       try {
-        await dispatch(startOrder({ orderId: currentOrder.id })).unwrap();
+        await dispatch(startOrder({orderId: currentOrder.id})).unwrap();
         await dispatch(fetchOngoingOrder()).unwrap();
       } catch (error: any) {
         console.error('Failed to start order:', error);
@@ -141,10 +145,12 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
           updateOrderStatus({
             orderId: currentOrder.id,
             status: OrderStatusEnum.PICKEDUP_ORDER,
-          })
+          }),
         ).unwrap();
         await dispatch(fetchOngoingOrder()).unwrap();
-        navigation.navigate(DeliverAPackage.DropOffOrderDetails, { order: currentOrder });
+        navigation.navigate(DeliverAPackage.DropOffOrderDetails, {
+          order: currentOrder,
+        });
       } catch (error: any) {
         console.error('Failed to update order status:', error);
         Alert.alert('Error', error.message || 'Failed to update order status.');
@@ -213,7 +219,7 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
       }
     } catch (error: any) {
       console.error('Upload failed:', error);
-      Alert.alert('Upload Failed', error.message || 'Please try again.');
+      // Alert.alert('Upload Failed', error.message || 'Please try again.');
     }
   };
 
@@ -237,24 +243,27 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
 
   const isVerifyItemsDisabled =
     currentOrder?.status === OrderStatusEnum.ACCEPTED ||
-    (currentOrder?.status === OrderStatusEnum.PENDING && !currentOrder.itemVerifiedPhoto);
+    (currentOrder?.status === OrderStatusEnum.PENDING &&
+      !currentOrder.itemVerifiedPhoto);
 
   const isOrderPickedUpDisabled =
-    !currentOrder?.itemVerifiedPhoto && currentOrder?.status !== OrderStatusEnum.ACCEPTED;
+    !currentOrder?.itemVerifiedPhoto &&
+    currentOrder?.status !== OrderStatusEnum.ACCEPTED;
 
   return (
     <View style={styles.absoluteContainer}>
-      <Animated.View style={[styles.modalContainer, { height }]}>
+      <Animated.View style={[styles.modalContainer, {height}]}>
         {/* Drag indicator at top */}
         <TouchableOpacity
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          onPress={togglePanel}
-        >
+          hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+          onPress={togglePanel}>
           <View style={styles.dragIndicator} />
         </TouchableOpacity>
 
         <Text style={styles.title}>
-          {order.status === OrderStatusEnum.ACCEPTED ? 'Order Accepted' : 'Arriving in 10 mins'}
+          {order.status === OrderStatusEnum.ACCEPTED
+            ? 'Order Accepted'
+            : 'Arriving in 10 mins'}
         </Text>
 
         <View style={styles.location}>
@@ -269,36 +278,36 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
         {isExpanded && (
           <>
             <View style={styles.sectionContainer}>
-              <InfoRow iconSource={GreenCircle} text="PickUp Details" bold />
-              <View style={styles.pickUpDetails}>
-                <View style={styles.pickUpDetailsTextContainer}>
-                  <Text style={styles.infoBoldText}>{currentOrder?.senderName}</Text>
-                  <Text style={styles.infoText}>
-                    {`${currentOrder.pickupLocation?.addressLine1} ${currentOrder.pickupLocation?.addressLine2}` ||
-                      'N/A'}
-                  </Text>
-                </View>
-                <View style={styles.pickupIcons}>
-                  <TouchableOpacity onPress={() => Alert.alert('Call Driver')}>
-                    <PurplePhone />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={navigateChatScreen}>
-                    <PurpleMessage />
-                  </TouchableOpacity>
-                </View>
-              </View>
+              <InfoRow iconSource={PickUpIcon} text="PickUp Details" bold />
+              <OrderInfoCard
+                title={currentOrder?.senderName || 'N/A'}
+                subtitle={
+                  `${currentOrder.pickupLocation?.addressLine1} ${currentOrder.pickupLocation?.addressLine2}` ||
+                  'N/A'
+                }
+                onPressLeftIcon={() => Alert.alert('Call Driver')}
+                onPressRightIcon={navigateChatScreen}
+                LeftIcon={PurplePhone}
+                RightIcon={PurpleMessage}
+              />
             </View>
 
             <View style={styles.sectionContainer}>
               <InfoRow iconSource={PickUpNotes} text="Pickup Notes" bold />
-              <View style={styles.pickUpDetails}>
-                <Text style={styles.infoText}>{order.deliveryInstructions}</Text>
+              <View style={styles.pickupNotesContainer}>
+                <Text style={styles.infoText}>
+                  {order.deliveryInstructions}
+                </Text>
               </View>
             </View>
 
             <View style={styles.sectionContainer}>
               <InfoRow iconSource={Cart} text="Items to Pickup" bold />
-              <View style={[styles.itemsContainer, styles.pickUpDetailsTextContainer]}>
+              <View
+                style={[
+                  styles.itemsContainer,
+                  styles.pickUpDetailsTextContainer,
+                ]}>
                 <Text style={styles.itemText}>• {order.packageType}</Text>
                 <TouchableOpacity
                   style={[
@@ -317,17 +326,17 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
                       }
                     }
                   }}
-                  disabled={isVerifyItemsDisabled}
-                >
+                  disabled={isVerifyItemsDisabled}>
                   <Text
                     style={[
                       currentOrder.itemVerifiedPhoto
                         ? styles.viewImageText
                         : styles.verifyItemsText,
                       isVerifyItemsDisabled && styles.buttonTextDisabled,
-                    ]}
-                  >
-                    {currentOrder.itemVerifiedPhoto ? 'View Image' : 'Verify Items'}
+                    ]}>
+                    {currentOrder.itemVerifiedPhoto
+                      ? 'View Image'
+                      : 'Verify Items'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -340,17 +349,19 @@ const OrderExpandedModal: React.FC<ExpandedModalProps> = ({
           <TouchableOpacity
             style={[
               formStyles.button,
-              isOrderPickedUpDisabled ? styles.buttonDisabled : formStyles.buttonSuccess,
+              isOrderPickedUpDisabled
+                ? styles.buttonDisabled
+                : formStyles.buttonSuccess,
             ]}
             onPress={handleOrderAction}
-            disabled={isOrderPickedUpDisabled}
-          >
+            disabled={isOrderPickedUpDisabled}>
             <Text
               style={[
                 formStyles.buttonText,
-                isOrderPickedUpDisabled ? styles.buttonTextDisabled : formStyles.buttonTextEnabled,
-              ]}
-            >
+                isOrderPickedUpDisabled
+                  ? styles.buttonTextDisabled
+                  : formStyles.buttonTextEnabled,
+              ]}>
               {getButtonText()}
             </Text>
           </TouchableOpacity>
@@ -434,7 +445,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    backgroundColor: '#F6F6F6',
+    borderRadius: 12,
   },
   pickUpDetailsTextContainer: {
     flexDirection: 'column',
@@ -504,6 +518,9 @@ const styles = StyleSheet.create({
   },
   collapsedSummary: {
     marginVertical: 10,
+  },
+  pickupNotesContainer: {
+    paddingVertical: 15,
   },
 });
 

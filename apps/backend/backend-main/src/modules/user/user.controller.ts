@@ -17,6 +17,7 @@ import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import { DeleteResult, UpdateResult } from "typeorm";
 
+import { SavedAddress } from "../../entity/SavedAddress";
 import { User } from "../../entity/User";
 import { Roles } from "../../shared/decorators/roles.decorator";
 import {
@@ -33,8 +34,13 @@ import { OnboardingGuard } from "../../shared/guards/onboarding.guard";
 import { RoleGuard } from "../../shared/guards/roles.guard";
 import { IApiResponse, ICustomRequest } from "../../shared/interface";
 import { UserService } from "./user.service";
-import { TCreateSavedAddress, TCreateUser, TGetUserProfile, TUpdateSavedAddress, TUpdateUser } from "./user.types";
-import { SavedAddress } from "../../entity/SavedAddress";
+import {
+  TCreateSavedAddress,
+  TCreateUser,
+  TGetUserProfile,
+  TUpdateSavedAddress,
+  TUpdateUser,
+} from "./user.types";
 
 @ApiTags("User")
 @Controller("user")
@@ -294,8 +300,15 @@ export class UserController {
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<SavedAddress>> {
     const userId = request.user.id;
-    const address = await this.userService.createSavedAddress(userId, createAddressDto);
-    return { success: true, message: "Address created successfully.", data: address };
+    const address = await this.userService.createSavedAddress(
+      userId,
+      createAddressDto,
+    );
+    return {
+      success: true,
+      message: "Address created successfully.",
+      data: address,
+    };
   }
 
   @Patch("address/:id")
@@ -307,8 +320,16 @@ export class UserController {
     @Req() request: ICustomRequest,
   ): Promise<IApiResponse<UpdateResult>> {
     const userId = request.user.id;
-    const result = await this.userService.updateSavedAddress(userId, id, updateAddressDto);
-    return { success: true, message: "Address updated successfully.", data: result };
+    const result = await this.userService.updateSavedAddress(
+      userId,
+      id,
+      updateAddressDto,
+    );
+    return {
+      success: true,
+      message: "Address updated successfully.",
+      data: result,
+    };
   }
 
   @Delete("address/:id")
@@ -320,7 +341,11 @@ export class UserController {
   ): Promise<IApiResponse<DeleteResult>> {
     const userId = request.user.id;
     const result = await this.userService.deleteSavedAddress(userId, id);
-    return { success: true, message: "Address deleted successfully.", data: result };
+    return {
+      success: true,
+      message: "Address deleted successfully.",
+      data: result,
+    };
   }
 
   @Get("address")
@@ -331,7 +356,10 @@ export class UserController {
   ): Promise<IApiResponse<SavedAddress[]>> {
     const userId = request.user.id;
     const addresses = await this.userService.getSavedAddresses(userId);
-    return { success: true, message: "Addresses retrieved successfully.", data: addresses };
+    return {
+      success: true,
+      message: "Addresses retrieved successfully.",
+      data: addresses,
+    };
   }
-
 }

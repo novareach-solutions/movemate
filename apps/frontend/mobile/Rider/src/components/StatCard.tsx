@@ -13,9 +13,9 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({icon: Icon, value, label}) => {
   return (
     <View style={styles.container}>
-      <Icon width={40} height={50} />
-      <Text style={styles.value}>{value}</Text>
+      {/* <Icon width={40} height={50} /> */}
       <Text style={styles.label}>{label}</Text>
+      <Text style={styles.value}>{value}</Text>
     </View>
   );
 };
@@ -25,12 +25,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   value: {
-    fontSize: typography.fontSize.medium,
+    fontSize: 21,
     fontWeight: '600',
     color: colors.text.primary,
   },
   label: {
-    fontSize: typography.fontSize.small,
+    fontSize: typography.fontSize.medium,
     color: colors.text.subText,
   },
 });

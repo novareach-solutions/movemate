@@ -28,6 +28,7 @@ export type AppScreensParamList = {
   DocumentReviewScreen: {
     title: string;
     uploadedImage: any;
+    value: string;
   };
 };
 
@@ -53,6 +54,7 @@ export type DeliverAPackageParamList = {
   EnterABNScreen: undefined;
   AddProfilePhotoScreen: undefined;
   HomeScreen: undefined;
+  EnterDriverLicenseDetailsScreen: undefined;
 };
 
 export const DeliverAPackage = {
@@ -67,6 +69,7 @@ export const DeliverAPackage = {
   PickUpOrderDetails: 'PickUpOrderDetailsScreen',
   DropOffOrderDetails: 'DropOffOrderDetailsScreen',
   EarningsDetails: 'EarningsDetailsScreen',
+  EnterDriverLicenseDetails: 'EnterDriverLicenseDetailsScreen',
 } as const;
 
 export type BuyFromStoreParamList = {

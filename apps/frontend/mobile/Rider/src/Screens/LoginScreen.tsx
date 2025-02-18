@@ -54,6 +54,7 @@ const LoginScreen: React.FC = () => {
     <SafeAreaView
       style={{
         flex: 1,
+        backgroundColor: colors.white,
       }}>
       <Header isBack />
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
