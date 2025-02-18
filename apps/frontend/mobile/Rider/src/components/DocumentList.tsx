@@ -24,7 +24,7 @@ import PurpleArrow from '../assets/icons/purpleArrow.svg';
 interface Document {
   id: string;
   title: string;
-  value:string;
+  value: string;
 }
 
 interface DocumentListProps {
@@ -32,7 +32,7 @@ interface DocumentListProps {
   title: string;
   description: string;
   documents: Document[];
-  onCardPress: (title: string,value:string) => void;
+  onCardPress: (title: string, value: string) => void;
 }
 
 const DocumentList: React.FC<DocumentListProps> = ({
@@ -46,7 +46,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
   const renderItem = ({item}: {item: Document}) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => onCardPress(item.title,item.value)}>
+      onPress={() => onCardPress(item.title, item.value)}>
       <Text style={styles.cardText}>{item.title}</Text>
       <PurpleArrow />
     </TouchableOpacity>
@@ -54,7 +54,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
 
   return (
     <SafeAreaView style={{flex: 1}}>
-      <Header logo isBack />
+      <Header logo />
       <View style={styles.container}>
         <StepIndicator
           current={stepIndicator.current}

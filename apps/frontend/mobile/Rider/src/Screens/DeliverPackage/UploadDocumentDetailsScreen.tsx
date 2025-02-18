@@ -10,11 +10,11 @@ import {SafeAreaView} from 'react-native';
 import Header from '../../components/Header';
 import PhotoPickerModal from '../../components/common/PhotoPickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
-import { colors } from '../../theme/colors';
+import {colors} from '../../theme/colors';
 
 const DAPUploadDocumentDetailsScreen = () => {
   const route = useRoute();
-  const {title,value} = route.params;
+  const {title, value} = route.params;
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
   const [image, setImage] = useState('');
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
@@ -25,9 +25,9 @@ const DAPUploadDocumentDetailsScreen = () => {
 
   const handleTakePhoto = () => {
     // setIsPhotoOptionVisible(false);
-    console.log('isPhotoOptionVisible', isPhotoOptionVisible)
+    console.log('isPhotoOptionVisible', isPhotoOptionVisible);
     setImage('https://picsum.photos/200/300');
-    setIsPhotoOptionVisible(false)
+    setIsPhotoOptionVisible(false);
     navigation.navigate(AppScreens.DocumentReview, {
       title,
       value,
@@ -80,7 +80,7 @@ const DAPUploadDocumentDetailsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1,backgroundColor: colors.white}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <Header logo isBack />
       <DocumentUpload
         title={title}
@@ -98,15 +98,14 @@ const DAPUploadDocumentDetailsScreen = () => {
         onUpload={handleUpload}
       />
       {/* Photo Options Modal */}
-      {
-        isPhotoOptionVisible && <PhotoPickerModal
-        isVisible={isPhotoOptionVisible}
-        onClose={() => setIsPhotoOptionVisible(false)}
-        onTakePhoto={handleTakePhoto}
-        onChooseFromGallery={handleChooseFromGallery}
-      />
-      }
-      
+      {isPhotoOptionVisible && (
+        <PhotoPickerModal
+          isVisible={isPhotoOptionVisible}
+          onClose={() => setIsPhotoOptionVisible(false)}
+          onTakePhoto={handleTakePhoto}
+          onChooseFromGallery={handleChooseFromGallery}
+        />
+      )}
     </SafeAreaView>
   );
 };

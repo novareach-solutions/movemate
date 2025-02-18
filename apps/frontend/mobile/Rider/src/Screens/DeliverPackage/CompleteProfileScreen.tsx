@@ -1,15 +1,15 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
 import ProfileForm from '../../components/ProfileForm';
 import StepIndicator from '../../components/StepIndicator';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { colors } from '../../theme/colors';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {colors} from '../../theme/colors';
 import {
   DeliverAPackage,
   DeliverAPackageParamList,
 } from '../../navigation/ScreenNames';
-import { useAppDispatch, useAppSelector } from '../../redux/hook';
-import { setSignupData } from '../../redux/slices/authSlice';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
+import {setSignupData} from '../../redux/slices/authSlice';
 import Header from '../../components/Header';
 
 type FormFields = {
@@ -38,20 +38,20 @@ const DAPCompleteProfileScreen = () => {
       suburb: formData.suburb,
       state: formData.state,
       postalCode: Number(formData.postalCode),
-      phoneNumber: phoneNumber
+      phoneNumber: phoneNumber,
     };
 
     console.log('user', user);
 
-    await dispatch(setSignupData({ user }));
+    await dispatch(setSignupData({user}));
     navigation.navigate(DeliverAPackage.EnterVehicleDetails);
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <Header logo isBack />
       <View style={styles.container}>
-        <StepIndicator current={1} total={5} />
+        <StepIndicator current={1} total={6} />
         <ProfileForm
           title="Complete your Profile"
           description="Let’s get to know you. Provide your details to kick-start your journey!"

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -11,22 +11,22 @@ import {
   TextStyle,
   Alert,
 } from 'react-native';
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AuthScreens, DeliverAPackage } from '../navigation/ScreenNames';
-import { useAppDispatch } from '../redux/hook';
-import { verifyOtp, requestOtp } from '../redux/slices/authSlice';
+import {colors} from '../theme/colors';
+import {typography} from '../theme/typography';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {AuthScreens, DeliverAPackage} from '../navigation/ScreenNames';
+import {useAppDispatch} from '../redux/hook';
+import {verifyOtp, requestOtp} from '../redux/slices/authSlice';
 import Header from '../components/Header';
 
 interface OtpScreenProps {
   route: {
-    params: { phoneNumber: string; login: boolean };
+    params: {phoneNumber: string; login: boolean};
   };
 }
 
-const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
-  const { phoneNumber } = route.params;
+const OtpScreen: React.FC<OtpScreenProps> = ({route}) => {
+  const {phoneNumber} = route.params;
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [error, setError] = useState(false);
@@ -36,7 +36,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer((prev) => (prev > 0 ? prev - 1 : 0));
+      setTimer(prev => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -72,7 +72,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
     try {
       // Always dispatch verifyOtp, regardless of login vs. signup
       const response = await dispatch(
-        verifyOtp({ phone: phoneNumber, otp: enteredOtp })
+        verifyOtp({phone: phoneNumber, otp: enteredOtp}),
       ).unwrap();
       console.log('OTP Verification Successful!', response);
 
@@ -96,7 +96,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
     inputs.current[0]?.focus();
 
     try {
-      await dispatch(requestOtp({ phone: phoneNumber })).unwrap();
+      await dispatch(requestOtp({phone: phoneNumber})).unwrap();
       console.log('OTP Resent Successfully!');
     } catch (error) {
       console.log('OTP Resend Failed', error);
@@ -104,47 +104,47 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <Header logo isBack />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <View style={styles.titleDesccontainer}>
             <Text style={styles.header}>Enter verification code</Text>
             <Text style={styles.subtext}>
-              Enter the 4-digit verification code sent to your phone: {phoneNumber}
+              Enter the 4-digit verification code sent to your phone:{' '}
+              {phoneNumber}
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
-                onPress={() => navigation.goBack()}
-              >
+                onPress={() => navigation.goBack()}>
                 <Text style={styles.changeHighlight}>Change</Text>
               </TouchableOpacity>
             </Text>
           </View>
 
-          <View style={{ marginBottom: 30 }}>
+          <View style={{marginBottom: 30}}>
             <View style={styles.otpContainer}>
               {otp.map((digit, index) => (
                 <TextInput
                   key={index}
-                  ref={(ref) => (inputs.current[index] = ref!)}
+                  ref={ref => (inputs.current[index] = ref!)}
                   style={[
                     styles.input,
                     error
-                      ? { borderColor: colors.error }
+                      ? {borderColor: colors.error}
                       : digit
-                      ? { borderColor: colors.purple }
-                      : { borderColor: colors.border.primary },
+                        ? {borderColor: colors.purple}
+                        : {borderColor: colors.border.primary},
                   ]}
                   keyboardType="numeric"
                   maxLength={1}
                   value={digit}
                   selectTextOnFocus
-                  onChangeText={(value) => handleChange(value, index)}
-                  onKeyPress={(event) => handleKeyPress(event, index)}
+                  onChangeText={value => handleChange(value, index)}
+                  onKeyPress={event => handleKeyPress(event, index)}
                 />
               ))}
             </View>
@@ -155,8 +155,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
                   fontSize: 14,
                   color: colors.error,
                   marginVertical: 10,
-                }}
-              >
+                }}>
                 An error occurred, please try again.
               </Text>
             )}
@@ -165,16 +164,14 @@ const OtpScreen: React.FC<OtpScreenProps> = ({ route }) => {
           <TouchableOpacity
             style={[
               styles.button,
-              otp.every((digit) => digit) && styles.buttonFilled,
+              otp.every(digit => digit) && styles.buttonFilled,
             ]}
-            onPress={handleVerify}
-          >
+            onPress={handleVerify}>
             <Text
               style={[
                 styles.buttonText,
-                otp.every((digit) => digit) && styles.buttonTextFilled,
-              ]}
-            >
+                otp.every(digit => digit) && styles.buttonTextFilled,
+              ]}>
               Verify Now
             </Text>
           </TouchableOpacity>
@@ -214,6 +211,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     textAlign: 'center',
     fontSize: 18,
+    color: colors.black,
   },
   button: {
     borderWidth: 1,

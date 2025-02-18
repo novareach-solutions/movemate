@@ -1,4 +1,5 @@
-import { Entity, Column, ManyToOne, JoinColumn, Index } from "typeorm";
+import { Column, Entity, Index,JoinColumn, ManyToOne } from "typeorm";
+
 import { BaseEntity } from "./BaseEntity";
 import { User } from "./User";
 
@@ -8,7 +9,10 @@ export class SavedAddress extends BaseEntity {
   @Column({ type: "int", nullable: false })
   userId: number;
 
-  @ManyToOne(() => User, { deferrable: "INITIALLY IMMEDIATE", onDelete: "CASCADE" })
+  @ManyToOne(() => User, {
+    deferrable: "INITIALLY IMMEDIATE",
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "userId" })
   user: User;
 

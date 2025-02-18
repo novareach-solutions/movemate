@@ -16,8 +16,8 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   signupData: AgentSignupPayload | null;
-  phoneNumber:string | null;
-  currentLocation:any;
+  phoneNumber: string | null;
+  currentLocation: any;
 }
 
 const initialState: AuthState = {
@@ -25,8 +25,8 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   signupData: null,
-  phoneNumber:null,
-  currentLocation:null
+  phoneNumber: null,
+  currentLocation: null,
 };
 
 interface AgentSignupPayload {
@@ -39,14 +39,20 @@ interface AgentSignupPayload {
     suburb: string;
     state: string;
     postalCode: number;
-    phoneNumber:string;
+    phoneNumber: string;
   };
   agentType: string;
   abnNumber: string;
-  vehicleMake: string;
-  vehicleModel: string;
-  vehicleYear: number;
   profilePhoto: string;
+  driverLicenseNumber?: string;
+  driverLicenseExpiryDate?: Date;
+  vehicles: {
+    vehicleMake: string;
+    vehicleModel: string;
+    licensePlateNumber: string;
+    registrationExpiryDate?: Date;
+    vehicleRegoImageUrl?: string;
+  }[];
 }
 
 interface AgentDoc {
@@ -114,21 +120,18 @@ export const uploadMedia = createAsyncThunk(
 // Verify OTP
 export const verifyOtp = createAsyncThunk(
   'auth/verifyOtp',
-  async (
-    { phone, otp }: { phone: string; otp: string },
-    { rejectWithValue },
-  ) => {
+  async ({phone, otp}: {phone: string; otp: string}, {rejectWithValue}) => {
     try {
       const response = await apiClient.post(apiEndPoints.verifyOtp, {
         phoneNumber: phone,
         otp,
       });
 
-          const data = response.data.data;
-console.log("login response",data)
+      const data = response.data.data;
+      console.log('login response', data);
 
       if (data.status === 'existing_user' && data.accessToken) {
-        const { accessToken, agentId, userId } = data;
+        const {accessToken, agentId, userId} = data;
         await saveToken('accessToken', accessToken);
         await saveToken('userId', String(userId));
         if (agentId !== undefined) {
@@ -154,7 +157,6 @@ console.log("login response",data)
     }
   },
 );
-
 
 // Login
 export const login = createAsyncThunk(
@@ -293,14 +295,12 @@ const authSlice = createSlice({
       }
     },
     updatePhoneNumber: (state, action) => {
-    
-        state.phoneNumber = action.payload;
-
+      state.phoneNumber = action.payload;
     },
 
-    updateCurrentLocation:(state,action)=>{
-      state.currentLocation = action.payload
-    }
+    updateCurrentLocation: (state, action) => {
+      state.currentLocation = action.payload;
+    },
   },
   extraReducers: builder => {
     // Handle agentSignup
@@ -408,5 +408,6 @@ const authSlice = createSlice({
 });
 
 // Export the actions and reducer
-export const {logout, setSignupData,updatePhoneNumber,updateCurrentLocation} = authSlice.actions;
+export const {logout, setSignupData, updatePhoneNumber, updateCurrentLocation} =
+  authSlice.actions;
 export default authSlice.reducer;

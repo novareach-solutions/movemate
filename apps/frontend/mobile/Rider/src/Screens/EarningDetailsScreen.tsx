@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import EarningsModal from '../components/Modals/EarningsModal';
-import { colors } from '../theme/colors';
-import { useNavigation } from '@react-navigation/native';
-import { DeliverAPackage } from '../navigation/ScreenNames';
+import {colors} from '../theme/colors';
+import {useNavigation} from '@react-navigation/native';
+import {DeliverAPackage} from '../navigation/ScreenNames';
 // import Mapbox from '@rnmapbox/maps';
-import { MAPBOX_ACCESS_TOKEN } from "../utils/constants";
-import { useDispatch } from 'react-redux';
-import { useAppDispatch } from '../redux/hook';
-import { fetchOngoingOrder } from '../redux/slices/orderSlice';
+import {MAPBOX_ACCESS_TOKEN} from '../utils/constants';
+import {useDispatch} from 'react-redux';
+import {useAppDispatch} from '../redux/hook';
+import {fetchOngoingOrder} from '../redux/slices/orderSlice';
 // Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 const EarningsDetailsScreen: React.FC = () => {
   const [isEarningsModalVisible, setIsEarningsModalVisible] =
@@ -21,13 +21,12 @@ const EarningsDetailsScreen: React.FC = () => {
   };
 
   const handleCloseEarningsModal = async () => {
-    await dispatch(fetchOngoingOrder()).unwrap();
-    console.log("navigate to earning details screen")
+    console.log('navigate to earning details screen');
     navigation.reset({
       index: 0,
-      routes: [{ name: DeliverAPackage.Home, params: { orderComplete: true } }],
+      routes: [{name: DeliverAPackage.Home, params: {orderComplete: true}}],
     });
-    
+
     setIsEarningsModalVisible(false);
   };
 

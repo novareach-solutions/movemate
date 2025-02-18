@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -11,24 +11,32 @@ import {
 } from 'react-native';
 import StatCard from '../../components/StatCard';
 import HelpButton from '../../components/HelpButton';
-import { AppScreens, DeliverAPackage, ProfileScreens } from '../../navigation/ScreenNames';
-import { useSelector, useDispatch } from 'react-redux';
+import {
+  AppScreens,
+  DeliverAPackage,
+  ProfileScreens,
+} from '../../navigation/ScreenNames';
+import {useSelector, useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   AgentStatusEnum,
   updateAgentStatus,
 } from '../../redux/slices/agentSlice';
-import { MAPBOX_ACCESS_TOKEN } from "../../utils/constants";
+import {MAPBOX_ACCESS_TOKEN} from '../../utils/constants';
 // import Mapbox from "@rnmapbox/maps"
-import { showOrderModal, fetchOngoingOrder } from '../../redux/slices/orderSlice';
-import { io } from 'socket.io-client';
+import {showOrderModal, fetchOngoingOrder} from '../../redux/slices/orderSlice';
+import {io} from 'socket.io-client';
 import apiClient from '../../api/apiClient';
 import apiEndPoints from '../../api/apiEndPoints';
-import { RootState } from '../../redux/store';
-import { OrderStatusEnum } from '../../redux/slices/types/enums';
-import { colors } from '../../theme/colors';
-import { NavigationProp, useIsFocused, useNavigation } from '@react-navigation/native';
-import { AppScreensParamList } from '../../navigation/ScreenNames';
+import {RootState} from '../../redux/store';
+import {OrderStatusEnum} from '../../redux/slices/types/enums';
+import {colors} from '../../theme/colors';
+import {
+  NavigationProp,
+  useIsFocused,
+  useNavigation,
+} from '@react-navigation/native';
+import {AppScreensParamList} from '../../navigation/ScreenNames';
 import Header from '../../components/Header';
 import Money from '../../assets/icons/money.svg';
 import Order from '../../assets/icons/orders.svg';
@@ -40,13 +48,16 @@ import BlackArrow from '../../assets/icons/blackArrow.svg';
 
 interface HomeScreenProps {
   route: {
-    params: { orderComplete: boolean };
+    params: {orderComplete: boolean};
   };
 }
+interface DocumentError {
+  id: string;
+  heading: string;
+  text: string;
+}
 
-
-
-const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({route}) => {
   const [isOnline, setIsOnline] = useState(false);
   const [drawerHeight] = useState(new Animated.Value(0));
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +66,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
   const [agentId, setAgentId] = useState<string | null>(null);
   // Measured height of error content
   const [measuredErrorHeight, setMeasuredErrorHeight] = useState(0);
-  const { orderComplete = false } = route.params || {};
+  const {orderComplete = false} = route.params || {};
+  const [apiErrors, setApiErrors] = useState<DocumentError[]>([]);
 
   const navigation = useNavigation<NavigationProp<AppScreensParamList>>();
   const dispatch = useDispatch();
@@ -73,8 +85,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
       heading: 'Account Not Approved',
       text: 'Your account is not approved yet. Please Contact Admin',
       target: AppScreens.FAQScreen,
-    }
-
+    },
   ];
 
   const updateLocationAPI = async (latitude: number, longitude: number) => {
@@ -115,22 +126,35 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
     setIsLoading(true);
     // Clear previous error state
     setHasError(false);
+    setApiErrors([]);
 
     try {
-      const statusEnum = newStatus ? AgentStatusEnum.ONLINE : AgentStatusEnum.OFFLINE;
-      await updateAgentStatus(statusEnum);
-      console.log(`✅ Agent status set to ${statusEnum}`);
-      setIsOnline(newStatus);
+      const statusEnum = newStatus
+        ? AgentStatusEnum.ONLINE
+        : AgentStatusEnum.OFFLINE;
+      const result = await updateAgentStatus(statusEnum);
+      console.log(result);
 
-      // Close drawer if no error
-      Animated.timing(drawerHeight, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
+      // If the returned data is an array, assume these are document errors.
+      if (Array.isArray(result.data)) {
+        setApiErrors(result.data);
+        setHasError(true);
+      } else {
+        console.log(`✅ Agent status set to ${statusEnum}`);
+        setIsOnline(newStatus);
+        // Clear error state if the update is successful.
+        setHasError(false);
+        setApiErrors([]);
+        // Animate the drawer closing if it's open.
+        Animated.timing(drawerHeight, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: false,
+        }).start();
+      }
     } catch (error) {
       console.error('❌ Failed to update status:', error);
-      // Set error flag so that the error drawer is shown.
+      // Handle network or unexpected errors here.
       setHasError(true);
     } finally {
       setIsLoading(false);
@@ -166,7 +190,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
     const socket = io(apiEndPoints.baseURL);
     socket.on('connect', () => {
       console.log('Connected to WebSocket server');
-      socket.emit('joinRoom', { agentId: numericAgentId });
+      socket.emit('joinRoom', {agentId: numericAgentId});
       console.log(`Joined room for agentId: ${numericAgentId}`);
     });
     socket.on('disconnect', () => {
@@ -199,21 +223,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
         await dispatch(fetchOngoingOrder());
       }
     };
-  
+
     fetchOrder();
   }, [agentId, dispatch, isFocused]);
-  
 
   useEffect(() => {
     if (isFocused) {
-      console.log("Home Screen", ongoingOrder, orderComplete);
+      console.log('Home Screen', ongoingOrder, orderComplete);
       if (ongoingOrder && !orderComplete) {
         if (ongoingOrder.status === OrderStatusEnum.PICKEDUP_ORDER) {
           navigation.navigate(DeliverAPackage.DropOffOrderDetails, {
             order: ongoingOrder,
           });
         } else {
-          console.log("Navigating", ongoingOrder);
+          console.log('Navigating', ongoingOrder);
           navigation.navigate(DeliverAPackage.PickUpOrderDetails, {
             order: ongoingOrder,
           });
@@ -222,38 +245,49 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
     }
   }, [isFocused, ongoingOrder, orderComplete, navigation]);
 
-  const renderErrorContent = useCallback(() => (
-    <View>
-      <View style={styles.errorTitleContainer}>
-        <View style={styles.errorTitle}><Warning width={25} height={25} /><Text style={{
-          fontSize: 16,
-          fontWeight: 'bold',
-          color: colors.white
-        }}> Actions Required</Text></View>
-      </View>
-      <View style={styles.errorContainer}>
-        {errorItemsData.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            style={styles.errorItem}
-            onPress={() => navigation.navigate(item.target)}>
-            <View style={styles.errorItemContent}>
-              <View style={styles.errorTextContainer}>
-                <Text style={styles.errorHeading}>{item.heading}</Text>
-                <Text style={styles.errorText}>{item.text}</Text>
+  const renderErrorContent = useCallback(
+    () => (
+      <View>
+        <View style={styles.errorTitleContainer}>
+          <View style={styles.errorTitle}>
+            <Warning width={25} height={25} />
+            <Text
+              style={{fontSize: 16, fontWeight: 'bold', color: colors.white}}>
+              {' '}
+              Actions Required
+            </Text>
+          </View>
+        </View>
+        <View style={styles.errorContainer}>
+          {apiErrors.map(item => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.errorItem}
+              onPress={() => {
+                // For document errors with these specific IDs, navigate to the Documents page.
+                // Feel free to add more logic or IDs as necessary.
+                if (
+                  item.id === 'documentMissing' ||
+                  item.id === 'documentNotApproved'
+                ) {
+                  navigation.navigate(ProfileScreens.Documents);
+                }
+                // For other error IDs, you might add a different navigation or action.
+              }}>
+              <View style={styles.errorItemContent}>
+                <View style={styles.errorTextContainer}>
+                  <Text style={styles.errorHeading}>{item.heading}</Text>
+                  <Text style={styles.errorText}>{item.text}</Text>
+                </View>
+                <BlackArrow style={{transform: [{rotate: '180deg'}]}} />
               </View>
-              <BlackArrow
-                style={{
-                  transform: [{ rotate: '180deg' }]
-                }}
-              />
-
-            </View>
-          </TouchableOpacity>
-        ))}
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
-    </View>
-  ), [navigation]);
+    ),
+    [apiErrors, navigation],
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -276,7 +310,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
           <StatCard icon={Distance} value="1.5 hr" label="TIME" />
         </View>
       </View>
-
 
       {/* Status Button */}
       <View style={styles.statusContainer}>
@@ -308,7 +341,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
       </View>
 
       {/* Sliding Drawer */}
-      <Animated.View style={[styles.drawer, { height: drawerHeight }]}>
+      <Animated.View style={[styles.drawer, {height: drawerHeight}]}>
         {hasError && renderErrorContent()}
       </Animated.View>
 
@@ -316,8 +349,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
       {hasError && (
         <View
           style={styles.hiddenContainer}
-          onLayout={(event) => {
-            const { height } = event.nativeEvent.layout;
+          onLayout={event => {
+            const {height} = event.nativeEvent.layout;
             // Only update if height has changed and is greater than zero
             if (height > 0 && measuredErrorHeight !== height) {
               setMeasuredErrorHeight(height);
@@ -341,7 +374,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     position: 'relative',
-    backgroundColor: colors.darkGreen
+    backgroundColor: colors.darkGreen,
   },
   mapImage: {
     width: '100%',
@@ -353,7 +386,7 @@ const styles = StyleSheet.create({
     marginTop: -100,
     backgroundColor: colors.white,
     borderTopLeftRadius: 25,
-    borderTopRightRadius: 25
+    borderTopRightRadius: 25,
   },
   statusButton: {
     width: 80,
@@ -391,10 +424,10 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: "#FBF4FF",
-    position: "absolute",
+    backgroundColor: '#FBF4FF',
+    position: 'absolute',
     top: 80,
-    width: "95%",
+    width: '95%',
     alignSelf: 'center',
     paddingHorizontal: 10,
     paddingVertical: 25,
@@ -410,29 +443,27 @@ const styles = StyleSheet.create({
   drawer: {
     backgroundColor: colors.white,
     overflow: 'hidden',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: {width: 0, height: -2},
     paddingHorizontal: 0,
     paddingTop: 10,
   },
   errorTitleContainer: {
-    backgroundColor: "#D81A00",
+    backgroundColor: '#D81A00',
     paddingVertical: 20,
     paddingHorizontal: 10,
   },
   errorTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   errorContainer: {
-    backgroundColor: "#FFF3F3",
+    backgroundColor: '#FFF3F3',
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
@@ -448,7 +479,7 @@ const styles = StyleSheet.create({
   },
   errorTextContainer: {
     flex: 1,
-    gap: 10
+    gap: 10,
   },
   errorHeading: {
     fontSize: 16,

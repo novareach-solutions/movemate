@@ -7,6 +7,7 @@ import { DeleteResult, In, QueryRunner, UpdateResult } from "typeorm";
 
 import { Agent } from "../../entity/Agent";
 import { AgentDocument } from "../../entity/AgentDocument";
+import { AgentVehicle } from "../../entity/AgentVehicle";
 import { RequiredDocument } from "../../entity/RequiredDocument";
 import { SendPackageOrder } from "../../entity/SendPackageOrder";
 import { User } from "../../entity/User";
@@ -37,7 +38,6 @@ import {
   TAgentPartial,
 } from "./agent.types";
 import { radii } from "./agents.constants";
-import { AgentVehicle } from "../../entity/AgentVehicle";
 
 @Injectable()
 export class AgentService {
@@ -54,30 +54,47 @@ export class AgentService {
     agent: TAgent,
   ): Promise<{ agent: Agent; accessToken: string; refreshToken: string }> {
     const { abnNumber, user, vehicles } = agent;
-    const queryRunner: QueryRunner = dbRepo(Agent).manager.connection.createQueryRunner();
+    const queryRunner: QueryRunner =
+      dbRepo(Agent).manager.connection.createQueryRunner();
     await queryRunner.startTransaction();
-  
+    console.log("AGENT", agent);
+
     try {
-      this.logger.debug(`AgentService.createAgent: Checking if agent with ABN ${abnNumber} exists.`);
-      const existingAgent = await queryRunner.manager.findOne(Agent, { where: { abnNumber } });
+      this.logger.debug(`Checking if agent with ABN ${abnNumber} exists.`);
+      const existingAgent = await queryRunner.manager.findOne(Agent, {
+        where: { abnNumber },
+      });
       if (existingAgent) {
-        this.logger.error(`AgentService.createAgent: Agent with ABN ${abnNumber} already exists.`);
-        throw new UserAlreadyExistsError(`Agent with ABN number ${abnNumber} already exists.`);
+        this.logger.error(`Agent with ABN ${abnNumber} already exists.`);
+        throw new UserAlreadyExistsError(
+          `Agent with ABN number ${abnNumber} already exists.`,
+        );
       }
-  
-      this.logger.debug(`AgentService.createAgent: Checking if user with phone ${user.phoneNumber} or email ${user.email} exists.`);
-      const existingUserByPhone = await queryRunner.manager.findOne(User, { where: { phoneNumber: user.phoneNumber } });
-      const existingUserByEmail = await queryRunner.manager.findOne(User, { where: { email: user.email } });
+
+      this.logger.debug(
+        `Checking if user with phone ${user.phoneNumber} or email ${user.email} exists.`,
+      );
+      const existingUserByPhone = await queryRunner.manager.findOne(User, {
+        where: { phoneNumber: user.phoneNumber },
+      });
+      const existingUserByEmail = await queryRunner.manager.findOne(User, {
+        where: { email: user.email },
+      });
+
       if (existingUserByPhone || existingUserByEmail) {
-        this.logger.error(`AgentService.createAgent: User with phone ${user.phoneNumber} or email ${user.email} already exists.`);
-        throw new UserAlreadyExistsError(`User with phone number or email already exists.`);
+        this.logger.error(
+          `User with phone ${user.phoneNumber} or email ${user.email} already exists.`,
+        );
+        throw new UserAlreadyExistsError(
+          `User with phone number or email already exists.`,
+        );
       }
-  
-      this.logger.debug(`AgentService.createAgent: Creating user record.`);
+
+      this.logger.debug(`Creating user record.`);
       const newUser = queryRunner.manager.create(User, user);
       const savedUser = await queryRunner.manager.save(User, newUser);
-  
-      this.logger.debug(`AgentService.createAgent: Creating agent record.`);
+
+      this.logger.debug(`Creating agent record.`);
       const newAgent = queryRunner.manager.create(Agent, {
         agentType: agent.agentType,
         abnNumber: agent.abnNumber,
@@ -86,42 +103,53 @@ export class AgentService {
         approvalStatus: ApprovalStatusEnum.PENDING,
         userId: savedUser.id,
         driverLicenseNumber: agent.driverLicenseNumber,
-        driverLicenseExpiryDate: agent.driverLicenseExpiryDate,
+        driverLicenseExpiryDate: agent.driverLicenseExpiryDate
+          ? new Date(agent.driverLicenseExpiryDate).toISOString().split("T")[0] // Ensure YYYY-MM-DD format
+          : null,
       });
       const savedAgent = await queryRunner.manager.save(Agent, newAgent);
-  
-      // If vehicles are provided, create each vehicle record.
+
+      // Handle Vehicles
       if (vehicles && vehicles.length > 0) {
+        this.logger.debug(
+          `Creating vehicle records for agent ID ${savedAgent.id}.`,
+        );
         for (const vehicle of vehicles) {
           const newVehicle = queryRunner.manager.create(AgentVehicle, {
             ...vehicle,
             agentId: savedAgent.id,
+            registrationExpiryDate: vehicle.registrationExpiryDate
+              ? new Date(vehicle.registrationExpiryDate)
+                  .toISOString()
+                  .split("T")[0] // Ensure YYYY-MM-DD format
+              : null,
           });
           await queryRunner.manager.save(AgentVehicle, newVehicle);
         }
       }
-  
-      // Generate tokens for the user.
+
+      // Generate tokens
       const accessToken = this.tokenService.generateAccessToken(
         savedUser.id,
         savedUser.phoneNumber,
         savedUser.role,
       );
       const refreshToken = this.tokenService.generateRefreshToken(savedUser.id);
-  
-      this.logger.debug(`AgentService.createAgent: Agent with ID ${savedAgent.id} created successfully.`);
+
+      this.logger.debug(`Agent created successfully with ID ${savedAgent.id}.`);
       await queryRunner.commitTransaction();
-  
+
       return { agent: savedAgent, accessToken, refreshToken };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      this.logger.error(`AgentService.createAgent: Error occurred - ${error}`);
-      throw new InternalServerErrorException(`Failed to create agent: ${error}`);
+      this.logger.error(`Error occurred during agent creation: ${error}`);
+      throw new InternalServerErrorException(
+        `Failed to create agent: ${error.message}`,
+      );
     } finally {
       await queryRunner.release();
     }
   }
-  
 
   async getOngoingOrder(agentId: number): Promise<SendPackageOrder | null> {
     return await dbReadRepo(SendPackageOrder).findOne({
@@ -321,17 +349,47 @@ export class AgentService {
     this.logger.debug(
       `AgentService.setAgentStatus: Setting status for agent ID ${agentId} to ${status}.`,
     );
+
     if (status === AgentStatusEnum.ONLINE) {
-      const documents = await this.getAgentDocuments(agentId);
-      const unapprovedDocs = documents.filter(
-        (doc) => doc.approvalStatus !== ApprovalStatusEnum.APPROVED,
-      );
-      if (unapprovedDocs.length > 0) {
-        const errors = unapprovedDocs.map((doc) => ({
-          id: "document",
-          heading: `${doc.name} Not ${doc.approvalStatus}`,
-          text: `Your ${doc.name} is ${doc.approvalStatus.toLowerCase()}. Please reupload.`,
-        }));
+      const agentDocuments = await this.getAgentDocuments(agentId);
+
+      const agentDocMap = new Map<string, AgentDocument>();
+      agentDocuments.forEach((doc) => agentDocMap.set(doc.name, doc));
+
+      // Fetch the agent to determine its type (if not already available)
+      const agent = await dbRepo(Agent).findOne({
+        where: {
+          id: agentId,
+        },
+      });
+      if (!agent) {
+        throw new Error("Agent not found");
+      }
+
+      const requiredDocuments = await dbRepo(RequiredDocument).find({
+        where: { agentType: agent.agentType, isRequired: true },
+      });
+
+      const errors: DocumentError[] = [];
+
+      requiredDocuments.forEach((reqDoc) => {
+        const agentDoc = agentDocMap.get(reqDoc.name);
+        if (!agentDoc) {
+          errors.push({
+            id: "documentMissing",
+            heading: `${reqDoc.name} Not Uploaded`,
+            text: `Your ${reqDoc.name} is missing. Please upload it.`,
+          });
+        } else if (agentDoc.approvalStatus !== ApprovalStatusEnum.APPROVED) {
+          errors.push({
+            id: "documentNotApproved",
+            heading: `${reqDoc.name} Not Approved`,
+            text: `Your ${reqDoc.name} is ${agentDoc.approvalStatus.toLowerCase()}. Please reupload.`,
+          });
+        }
+      });
+
+      if (errors.length > 0) {
         return { errors };
       }
     }
@@ -348,16 +406,14 @@ export class AgentService {
     longitude: number,
   ): Promise<void> {
     logger.debug(`Updating location for agent ID ${agentId}`);
-    const agent = await this.getAgentById(agentId);
-
-    if (agent.approvalStatus !== ApprovalStatusEnum.APPROVED) {
-      logger.error(
-        `AgentService.setAgentStatus: Cannot update location. Agent ID ${agentId} not approved.`,
-      );
-      throw new UserAccessDeniedError(
-        "Cannot update location. Agent is not approved.",
-      );
-    }
+    // if (agent.approvalStatus !== ApprovalStatusEnum.APPROVED) {
+    //   logger.error(
+    //     `AgentService.setAgentStatus: Cannot update location. Agent ID ${agentId} not approved.`,
+    //   );
+    //   throw new UserAccessDeniedError(
+    //     "Cannot update location. Agent is not approved.",
+    //   );
+    // }
 
     if (!longitude || !latitude || isNaN(latitude) || isNaN(longitude)) {
       throw new InternalServerErrorException(

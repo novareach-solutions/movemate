@@ -1,5 +1,5 @@
 // components/AutoCompleteInput.tsx
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,8 @@ import {
   StyleSheet,
   TextStyle,
 } from 'react-native';
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
+import {colors} from '../theme/colors';
+import {typography} from '../theme/typography';
 
 interface AutoCompleteInputProps {
   label: string;
@@ -32,8 +32,8 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
 
   useEffect(() => {
     if (value) {
-      const filtered = suggestions.filter((sugg) =>
-        sugg.toLowerCase().includes(value.toLowerCase())
+      const filtered = suggestions.filter(sugg =>
+        sugg.toLowerCase().includes(value.toLowerCase()),
       );
       setFilteredSuggestions(filtered);
     } else {
@@ -53,7 +53,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
         style={styles.input}
         placeholder={placeholder}
         value={value}
-        onChangeText={(text) => {
+        onChangeText={text => {
           onValueChange(text);
           setShowSuggestions(true);
         }}
@@ -64,7 +64,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
           <FlatList
             data={filteredSuggestions}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
+            renderItem={({item}) => (
               <TouchableOpacity
                 style={styles.suggestionItem}
                 onPress={() => handleSelect(item)}>
@@ -80,7 +80,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 15,
+    marginTop: 20,
     position: 'relative',
   },
   label: {

@@ -16,10 +16,10 @@ import {typography} from '../theme/typography';
 import {colors} from '../theme/colors';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthScreens, DeliverAPackage} from '../navigation/ScreenNames';
-import { getCurrentLocation, requestLocation } from '../utils/helpers';
-import { mapSuggestions } from '../api/mapboxApi';
-import { updateCurrentLocation } from '../redux/slices/authSlice';
-import { useDispatch } from 'react-redux';
+import {getCurrentLocation, requestLocation} from '../utils/helpers';
+import {mapSuggestions} from '../api/mapboxApi';
+import {updateCurrentLocation} from '../redux/slices/authSlice';
+import {useDispatch} from 'react-redux';
 const {width, height} = Dimensions.get('window');
 
 interface Slide {
@@ -50,10 +50,9 @@ const Onboarding: React.FC = () => {
 
   useEffect(() => {
     setTimeout(() => {
-
       requestLocationpermission();
     }, 1000);
-  }, [])
+  }, []);
 
   const requestLocationpermission = () => {
     // if (locationStatus) {
@@ -75,7 +74,7 @@ const Onboarding: React.FC = () => {
     if (data?.coords) {
       const latitude = await data?.coords?.latitude;
       const longitude = await data?.coords?.longitude;
-      mapSuggestions(longitude, latitude, responseCallback)
+      mapSuggestions(longitude, latitude, responseCallback);
       const altitude = await data?.coords?.altitude;
       const horizontal_accuracy = await data?.coords?.accuracy;
       const vertical_accuracy = await data?.coords?.altitudeAccuracy;
@@ -83,7 +82,6 @@ const Onboarding: React.FC = () => {
       const timestamp = await data?.timestamp;
       if (latitude && longitude) {
         const isAllowed = await requestLocation();
-
       }
     }
   };
@@ -94,14 +92,16 @@ const Onboarding: React.FC = () => {
       address: data.place_name,
       latitude: data.center[1],
       longitude: data.center[0],
-      suburb: data.context?.find((c: any) => c.id.includes("place"))?.text || "",
-      state: data.context?.find((c: any) => c.id.includes("region"))?.text || "",
-      postalCode: data.context?.find((c: any) => c.id.includes("postcode"))?.text || "",
-    }
-    console.log('locationData', locationData)
+      suburb:
+        data.context?.find((c: any) => c.id.includes('place'))?.text || '',
+      state:
+        data.context?.find((c: any) => c.id.includes('region'))?.text || '',
+      postalCode:
+        data.context?.find((c: any) => c.id.includes('postcode'))?.text || '',
+    };
+    console.log('locationData', locationData);
     dispatch(updateCurrentLocation(locationData));
-  }
-
+  };
 
   const handleNavigation = () => {
     navigation.navigate(AuthScreens.SignupNumber);
@@ -110,15 +110,6 @@ const Onboarding: React.FC = () => {
     // navigation.navigate(DeliverAPackage.DropOffOrderDetails);
     // navigation.navigate(DeliverAPackage.PickUpOrderDetails);
     // navigation.navigate(DeliverAPackage.EarningsDetails);
-    // navigation.navigate(DeliverAPackage.AddProfilePhoto);
-    // navigation.navigate(DeliverAPackage.UploadDocuments);
-  };
-  const handleLogin = () => {
-    navigation.navigate(AuthScreens.Login);
-    // navigation.navigate(DeliverAPackage.Home);
-    // navigation.navigate(DeliverAPackage.CompleteProfile);
-    // navigation.navigate(DeliverAPackage.EnterVehicleDetails);
-    // navigation.navigate(DeliverAPackage.EnterABN);
     // navigation.navigate(DeliverAPackage.AddProfilePhoto);
     // navigation.navigate(DeliverAPackage.UploadDocuments);
   };
@@ -167,7 +158,7 @@ const styles = StyleSheet.create({
   image: {
     resizeMode: 'cover',
     width: '100%',
-    height: height * 0.6,
+    height: height * 0.68,
   },
   title: {
     fontSize: typography.fontSize.large,

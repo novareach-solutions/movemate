@@ -1,5 +1,8 @@
 import Toast from 'react-native-simple-toast';
-import Geolocation, { GeoPosition, GeoError } from 'react-native-geolocation-service';
+import Geolocation, {
+  GeoPosition,
+  GeoError,
+} from 'react-native-geolocation-service';
 import {
   check,
   openSettings,
@@ -13,13 +16,12 @@ export const isAndroid = Platform.OS === 'android';
 let IS_TOKEN_EXPIRED = false;
 let IS_NETWORK_ERROR = false;
 // SimpleToast
-export function SimpleToast(message:string, toastTimer = false) {
-    Toast.show(message, toastTimer ? Toast.LONG : Toast.SHORT);
-  }
+export function SimpleToast(message: string, toastTimer = false) {
+  Toast.show(message, toastTimer ? Toast.LONG : Toast.SHORT);
+}
 
 export const replaceOrderId = (endpoint: string, orderId: string | number) =>
-    endpoint.replace(':orderId', orderId.toString());
-
+  endpoint.replace(':orderId', orderId.toString());
 
 //location permission
 export const checkLocation = async () => {
@@ -50,9 +52,9 @@ export const requestLocation = async () => {
     LOCATION = PERMISSIONS.IOS.LOCATION_WHEN_IN_USE;
   }
   try {
-    console.log('LOCATION', LOCATION)
+    console.log('LOCATION', LOCATION);
     const status = await request(LOCATION);
-    console.log('status', status)
+    console.log('status', status);
     if (status === RESULTS.DENIED) {
       //request for permission
       return false;
@@ -76,7 +78,9 @@ export const requestLocation = async () => {
   }
 };
 
-export const getCurrentLocation = (callback?: (response: GeoPosition) => void): void => {
+export const getCurrentLocation = (
+  callback?: (response: GeoPosition) => void,
+): void => {
   Geolocation.getCurrentPosition(
     (response: GeoPosition) => {
       if (callback) {
@@ -90,10 +94,7 @@ export const getCurrentLocation = (callback?: (response: GeoPosition) => void): 
       enableHighAccuracy: true,
       timeout: 15000,
       maximumAge: 10000,
-      accuracy: { ios: 'bestForNavigation' },
+      accuracy: {ios: 'bestForNavigation'},
     },
   );
 };
-
-
-  

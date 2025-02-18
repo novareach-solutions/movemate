@@ -1,31 +1,32 @@
 // src/screens/PickUpOrderDetailsScreen.tsx
 
-import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { SendPackageOrder } from '../redux/slices/types/sendAPackage';
-import { colors } from '../theme/colors';
+import React, {useEffect, useState} from 'react';
+import {View, Image, StyleSheet} from 'react-native';
+import {useRoute} from '@react-navigation/native';
+import {SendPackageOrder} from '../redux/slices/types/sendAPackage';
+import {colors} from '../theme/colors';
 // import Mapbox from "@rnmapbox/maps"
 import OrderExpandedModal from '../components/Modals/ExpandedModal';
 
 // import Mapbox from '@rnmapbox/maps';
-import { MAPBOX_ACCESS_TOKEN, MAPBOX_DRIVING_URL } from "../utils/constants";
-import { useAppSelector } from '../redux/hook';
+import {MAPBOX_ACCESS_TOKEN, MAPBOX_DRIVING_URL} from '../utils/constants';
+import {useAppSelector} from '../redux/hook';
 const routeLineStyle = {
   lineColor: colors.purple,
   lineWidth: 3,
 };
 // Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 const PickUpOrderDetailsScreen: React.FC = () => {
-  const currentLocationData = useAppSelector(state => state.auth.currentLocation);
+  const currentLocationData = useAppSelector(
+    state => state.auth.currentLocation,
+  );
   const [routeCoords, setRouteCoords] = useState<[number, number][]>([]);
   const route = useRoute();
-  const { order } = route.params as { order: SendPackageOrder };
+  const {order} = route.params as {order: SendPackageOrder};
 
   if (!order) {
     return null;
   }
-  
 
   // const order = {
   //   pickupLocation:{
@@ -60,7 +61,6 @@ const PickUpOrderDetailsScreen: React.FC = () => {
 
   // }, []);
   // console.log('currentLocationData', currentLocationData)
-
 
   return (
     <View style={styles.container}>
@@ -116,8 +116,14 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'cover',
   },
-  markerContainer: { alignItems: "center", justifyContent: "center" },
-  marker: { width: 20, height: 20, borderRadius: 10, borderWidth: 5, backgroundColor: colors.white },
+  markerContainer: {alignItems: 'center', justifyContent: 'center'},
+  marker: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 5,
+    backgroundColor: colors.white,
+  },
 });
 
 export default PickUpOrderDetailsScreen;

@@ -24,13 +24,13 @@ interface DocumentReviewProps {
       title: string;
       uploadedImage: string;
       onUploadSuccess: () => any;
-      value:string
+      value: string;
     };
   };
 }
 
 const DocumentReviewScreen: React.FC<DocumentReviewProps> = ({route}) => {
-  const {title, uploadedImage, onUploadSuccess,value} = route.params;
+  const {title, uploadedImage, onUploadSuccess, value} = route.params;
   const [image, setImage] = useState(uploadedImage);
   const [isPhotoOptionVisible, setIsPhotoOptionVisible] = useState(false);
   const dispatch = useAppDispatch();

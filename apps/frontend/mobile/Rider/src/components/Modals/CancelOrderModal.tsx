@@ -7,8 +7,8 @@ import {
   StyleSheet,
   TextStyle,
 } from 'react-native';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
+import {colors} from '../../theme/colors';
+import {typography} from '../../theme/typography';
 
 interface CancelOrderModalProps {
   isVisible: boolean;
@@ -31,7 +31,8 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
         <View style={styles.modalContainer}>
           <Text style={styles.title}>Are you sure?</Text>
           <Text style={styles.description}>
-            Rejection may impact your acceptance rate, which can affect your overall performance score.
+            Rejection may impact your acceptance rate, which can affect your
+            overall performance score.
           </Text>
 
           <TouchableOpacity style={styles.goBackButton} onPress={onClose}>
@@ -60,13 +61,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     alignItems: 'center',
-    paddingBottom: 30,
+    // paddingBottom: 30,
   },
   title: {
     fontSize: typography.fontSize.large,
     fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
     color: colors.text.primary,
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   description: {
     fontSize: typography.fontSize.medium,

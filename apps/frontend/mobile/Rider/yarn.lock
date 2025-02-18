@@ -7888,6 +7888,11 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-native-confirmation-code-field@^7.4.0:
+  version "7.4.0"
+  resolved "https://registry.npmjs.org/react-native-confirmation-code-field/-/react-native-confirmation-code-field-7.4.0.tgz"
+  integrity sha512-Kw7rD0RXi6vZnt0Y67nkSW2wYmZFdnxJ23yxkKm3jqwvSxAvaA1NP3h3MHSPmJd25l0WK/+fjXOeCliDqWZ9rw==
+
 react-native-country-picker-modal@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/react-native-country-picker-modal/-/react-native-country-picker-modal-2.0.0.tgz"
@@ -7899,6 +7904,11 @@ react-native-country-picker-modal@^2.0.0:
     node-emoji "1.10.0"
     prop-types "15.7.2"
     react-async-hook "3.6.1"
+
+react-native-date-picker@^5.0.10:
+  version "5.0.10"
+  resolved "https://registry.npmjs.org/react-native-date-picker/-/react-native-date-picker-5.0.10.tgz"
+  integrity sha512-W4AXcoFXXNFhG2fItRWp5UrgiU6PJM7bW06KDl+NeWPActSzunMQkQWjMuucOsrlyfCudTyV1n3hskHRGzDeow==
 
 react-native-drawer-layout@^4.1.1:
   version "4.1.1"
@@ -7996,6 +8006,11 @@ react-native-simple-toast@^3.3.2:
   resolved "https://registry.npmjs.org/react-native-simple-toast/-/react-native-simple-toast-3.3.2.tgz"
   integrity sha512-jtZa5VXLDc3Rr+1a2eYyviakxOXP8U9AFYp1VWlslApi0wkiNeyAQ4yLZbIY8nayrbHTUSkERiDzKoCsy9v7Dw==
 
+react-native-sms-retriever@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/react-native-sms-retriever/-/react-native-sms-retriever-1.1.1.tgz"
+  integrity sha512-WRwiITfssx59+TB1iEMmjB7w4OTkatR34js5+4a4pP2jMXJ4aLdXK0hOtHxl8ciS8aIejdd49Sz8AXonlvtdRw==
+
 react-native-svg-transformer@^1.5.0:
   version "1.5.0"
   resolved "https://registry.npmjs.org/react-native-svg-transformer/-/react-native-svg-transformer-1.5.0.tgz"
@@ -8036,7 +8051,7 @@ react-native-web@*, react-native-web@0.9.x:
     prop-types "^15.6.0"
     react-timer-mixin "^0.13.4"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.65 <1.0", react-native@>=0.40.0, react-native@>=0.57, react-native@>=0.59.0, react-native@>=0.60, react-native@>=0.69.9, react-native@>=0.70.0, react-native@>=0.71.0, react-native@0.76.5:
+react-native@*, "react-native@^0.0.0-0 || >=0.65 <1.0", "react-native@>= 0.64.3", react-native@>=0.40.0, react-native@>=0.57, react-native@>=0.59.0, react-native@>=0.60, react-native@>=0.64.0, react-native@>=0.69.9, react-native@>=0.70.0, react-native@>=0.71.0, react-native@0.76.5:
   version "0.76.5"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.76.5.tgz"
   integrity sha512-op2p2kB+lqMF1D7AdX4+wvaR0OPFbvWYs+VBE7bwsb99Cn9xISrLRLAgFflZedQsa5HvnOGrULhtnmItbIKVVw==
@@ -8113,7 +8128,7 @@ react-test-renderer@18.3.1:
 react-timer-mixin@^0.13.4:
   version "0.13.4"
 
-react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", react@^16.13.1, react@^16.14.0, react@^16.3.0, "react@^16.8.0 || ^17 || ^18 || ^19", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.9.0 || ^17.0.0 || ^18 || ^19", "react@^18.0 || ^19", react@^18.2.0, react@^18.3.1, "react@>= 18.2.0", react@>=16, react@>=16.5.1, react@>=16.8, react@>=17.0.0, react@>=18.1.0, react@16.x.x, react@18.3.1:
+react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", react@^16.13.1, react@^16.14.0, react@^16.3.0, "react@^16.8.0 || ^17 || ^18 || ^19", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.9.0 || ^17.0.0 || ^18 || ^19", "react@^18.0 || ^19", react@^18.2.0, react@^18.3.1, "react@>= 17.0.1", "react@>= 18.2.0", react@>=16, react@>=16.4.0, react@>=16.5.1, react@>=16.8, react@>=17.0.0, react@>=18.1.0, react@16.x.x, react@18.3.1:
   version "18.3.1"
   resolved "https://registry.npmjs.org/react/-/react-18.3.1.tgz"
   integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==

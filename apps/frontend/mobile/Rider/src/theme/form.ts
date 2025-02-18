@@ -11,7 +11,7 @@ export const formStyles = StyleSheet.create({
     marginBottom: 7,
   },
   inputWrapper: {
-    marginBottom: 15,
+    marginTop: 20,
   },
   input: {
     borderWidth: 1,
@@ -21,7 +21,7 @@ export const formStyles = StyleSheet.create({
     fontSize: typography.fontSize.medium,
     fontFamily: typography.fontFamily.regular,
     color: colors.text.primary,
-    backgroundColor:'#FDFDFD'
+    backgroundColor: '#FDFDFD',
   },
   focusedInput: {
     borderColor: colors.purple,
@@ -32,16 +32,15 @@ export const formStyles = StyleSheet.create({
   errorText: {
     color: colors.error,
     fontSize: typography.fontSize.small,
-    marginTop: 5,
   },
   button: {
     borderRadius: 12,
     paddingVertical: 12,
     marginTop: 20,
     alignItems: 'center',
-    flexDirection:"row",
+    flexDirection: 'row',
     justifyContent: 'center',
-    gap:10
+    gap: 10,
   },
   buttonEnabled: {
     backgroundColor: colors.purple,
@@ -87,7 +86,7 @@ export const formStyles = StyleSheet.create({
   },
   suggestionBox: {
     position: 'absolute',
-    top: 50,
+    top: 100,
     left: 0,
     right: 0,
     backgroundColor: '#fff',

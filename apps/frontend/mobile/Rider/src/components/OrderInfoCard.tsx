@@ -1,7 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextStyle } from 'react-native';
-import { typography } from '../theme/typography';
-import { colors } from '../theme/colors';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextStyle,
+} from 'react-native';
+import {typography} from '../theme/typography';
+import {colors} from '../theme/colors';
 
 interface OrderInfoCardProps {
   title: string;
@@ -50,7 +56,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: "#F6F6F6",
+    backgroundColor: '#F6F6F6',
     borderRadius: 12,
   },
   textContainer: {
@@ -60,7 +66,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: typography.fontSize.medium,
     color: colors.text.primary,
-    fontWeight: typography.fontWeight.bold as TextStyle["fontWeight"],
+    fontWeight: typography.fontWeight.bold as TextStyle['fontWeight'],
   },
   subtitle: {
     fontSize: typography.fontSize.medium,

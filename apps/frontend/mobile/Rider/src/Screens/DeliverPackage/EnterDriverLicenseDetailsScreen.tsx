@@ -1,5 +1,4 @@
-// screens/EnterVehicleDetailsScreen.tsx
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   SafeAreaView,
@@ -12,13 +11,11 @@ import {
   Platform,
   ScrollView,
   KeyboardAvoidingView,
-  Alert,
 } from 'react-native';
 import Header from '../../components/Header';
 import StepIndicator from '../../components/StepIndicator';
 import {colors} from '../../theme/colors';
 import {formStyles} from '../../theme/form';
-import DatePicker from 'react-native-date-picker';
 import {
   DeliverAPackage,
   DeliverAPackageParamList,
@@ -26,72 +23,47 @@ import {
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {useAppDispatch} from '../../redux/hook';
 import {setSignupData} from '../../redux/slices/authSlice';
-import {australianCarData} from '../../utils/australianCarData';
 import {useForm, Controller} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {ZVehicleSchema} from '../../utils/zod/Registration';
 import TitleDescription from '../../components/TitleDescription';
-// Note: AutoCompleteInput is imported from the file for dropdown autocomplete
-import AutoCompleteInput from '../../components/Dropdown';
+import {ZDriverLicenseSchema} from '../../utils/zod/Registration';
+import DatePicker from 'react-native-date-picker';
 
 type FormFields = {
-  make: string;
-  model: string;
-  year: string;
-  licensePlate: string;
-  registrationExpiry: string;
+  driverLicenseNumber: string;
+  driverLicenseExpiryDate: string;
 };
 
-const EnterVehicleDetailsScreen: React.FC = () => {
+const EnterDriverLicenseDetailsScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<NavigationProp<DeliverAPackageParamList>>();
-  const [registrationExpiry, setRegistrationExpiry] = useState<Date | null>(
-    new Date(),
-  );
   const [open, setOpen] = useState(false);
+  const [driverLicenseExpiryDate, setDriverLicenseExpiryDate] =
+    useState<Date | null>(null);
 
   const {
     control,
     handleSubmit,
-    watch,
-    trigger,
     formState: {isValid, errors},
   } = useForm<FormFields>({
-    resolver: zodResolver(ZVehicleSchema),
+    resolver: zodResolver(ZDriverLicenseSchema),
     mode: 'onChange',
     defaultValues: {
-      make: '',
-      model: '',
-      year: '',
-      licensePlate: '',
-      registrationExpiry: '',
+      driverLicenseNumber: '',
+      driverLicenseExpiryDate: '',
     },
   });
-
-  const selectedMake = watch('make');
-
-  const vehicleMakes = australianCarData.map(item => item.make);
-
-  // Get the models for the selected make
-  const vehicleModels =
-    selectedMake && australianCarData.find(item => item.make === selectedMake)
-      ? australianCarData.find(item => item.make === selectedMake)!.models
-      : [];
 
   // onSubmit handler
   const onSubmit = async (data: FormFields) => {
     Keyboard.dismiss();
-    const vehicleDetails = {
-      vehicleMake: data.make,
-      vehicleModel: data.model,
-      vehicleYear: Number(data.year),
-      licensePlate: data.licensePlate,
-      registrationExpiry: registrationExpiry?.toISOString(),
-      agentType: 'DELIVERY',
+    const driverLicenseDetails = {
+      driverLicenseNumber: data.driverLicenseNumber,
+      driverLicenseExpiryDate: data.driverLicenseExpiryDate,
     };
 
-    await dispatch(setSignupData(vehicleDetails));
-    navigation.navigate(DeliverAPackage.EnterDriverLicenseDetails);
+    await dispatch(setSignupData(driverLicenseDetails));
+    navigation.navigate(DeliverAPackage.EnterABN);
   };
 
   return (
@@ -102,91 +74,28 @@ const EnterVehicleDetailsScreen: React.FC = () => {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.container}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
-          <StepIndicator current={2} total={6} />
-          {/* Wrap fields in a ScrollView to allow scrolling */}
+          <StepIndicator current={1} total={5} />
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.contentContainer}
             keyboardShouldPersistTaps="handled">
             <TitleDescription
-              title="Enter your vehicle details"
-              description="Add your details to get started"
+              title="Enter Your Driver's License Details"
+              description="Provide your driver’s license number and expiry date"
             />
 
-            {/* Make AutoComplete Input */}
+            {/* Driver License Number Input */}
             <Controller
               control={control}
-              name="make"
-              render={({field: {onChange, value}}) => (
-                <AutoCompleteInput
-                  label="Make"
-                  placeholder="Type to search for your vehicle make"
-                  suggestions={vehicleMakes}
-                  value={value}
-                  onValueChange={val => onChange(val)}
-                />
-              )}
-            />
-            {errors.make && (
-              <Text style={formStyles.errorText}>{errors.make.message}</Text>
-            )}
-
-            {/* Model AutoComplete Input */}
-            <Controller
-              control={control}
-              name="model"
-              render={({field: {onChange, value}}) => (
-                <AutoCompleteInput
-                  label="Model"
-                  placeholder="Type to search for your vehicle model"
-                  suggestions={vehicleModels}
-                  value={value}
-                  onValueChange={onChange}
-                />
-              )}
-            />
-            {errors.model && (
-              <Text style={formStyles.errorText}>{errors.model.message}</Text>
-            )}
-
-            {/* Year Input */}
-            <Controller
-              control={control}
-              name="year"
-              render={({field: {onChange, value}}) => (
-                <View style={formStyles.inputWrapper}>
-                  <Text style={formStyles.inputLabel}>Year</Text>
-                  <TextInput
-                    style={formStyles.input}
-                    placeholder="Enter year of manufacture"
-                    keyboardType="numeric"
-                    value={value}
-                    onChangeText={onChange}
-                    placeholderTextColor={colors.text.subText}
-                    returnKeyType="done"
-                    onSubmitEditing={Keyboard.dismiss}
-                    blurOnSubmit={Platform.OS === 'ios'}
-                    maxLength={4}
-                  />
-                </View>
-              )}
-            />
-            {errors.year && (
-              <Text style={formStyles.errorText}>{errors.year.message}</Text>
-            )}
-
-            {/* License Plate Number Input */}
-            <Controller
-              control={control}
-              name="licensePlate"
+              name="driverLicenseNumber"
               render={({field: {onChange, value}}) => (
                 <View style={formStyles.inputWrapper}>
                   <Text style={formStyles.inputLabel}>
-                    License Plate Number
+                    Driver's License Number
                   </Text>
                   <TextInput
                     style={formStyles.input}
-                    placeholder="Enter your license plate number"
+                    placeholder="Enter your driver’s license number"
                     value={value}
                     onChangeText={onChange}
                     placeholderTextColor={colors.text.subText}
@@ -196,24 +105,25 @@ const EnterVehicleDetailsScreen: React.FC = () => {
                 </View>
               )}
             />
-            {errors.licensePlate && (
+            {errors.driverLicenseNumber && (
               <Text style={formStyles.errorText}>
-                {errors.licensePlate.message}
+                {errors.driverLicenseNumber.message}
               </Text>
             )}
 
-            {/* Registration Expiry Date Input */}
+            {/* Driver License Expiry Date Input */}
+            {/* Driver License Expiry Date Input */}
             <Controller
               control={control}
-              name="registrationExpiry"
+              name="driverLicenseExpiryDate"
               render={({field: {onChange, value}}) => (
                 <View style={formStyles.inputWrapper}>
                   <Text style={formStyles.inputLabel}>
-                    Registration Expiry Date
+                    Driver's License Expiry Date
                   </Text>
                   <TouchableOpacity
                     onPress={() => setOpen(true)}
-                    style={[formStyles.input]}>
+                    style={formStyles.input}>
                     <Text
                       style={{
                         color: value
@@ -228,13 +138,13 @@ const EnterVehicleDetailsScreen: React.FC = () => {
                   <DatePicker
                     modal
                     open={open}
-                    date={registrationExpiry || new Date()}
-                    mode="date" // Ensures time is not included
-                    minimumDate={new Date()} // Prevent past dates
+                    date={driverLicenseExpiryDate || new Date()}
+                    mode="date" // Ensures only the date is selected
+                    minimumDate={new Date()} // Prevents past dates
                     onConfirm={date => {
                       setOpen(false);
-                      setRegistrationExpiry(date);
-                      onChange(date.toISOString().split('T')[0]); // Store only the date part
+                      setDriverLicenseExpiryDate(date);
+                      onChange(date.toISOString().split('T')[0]); // Stores only the date part
                     }}
                     onCancel={() => setOpen(false)}
                   />
@@ -242,11 +152,13 @@ const EnterVehicleDetailsScreen: React.FC = () => {
               )}
             />
 
-            {errors.registrationExpiry && (
+            {errors.driverLicenseExpiryDate && (
               <Text style={formStyles.errorText}>
-                {errors.registrationExpiry.message}
+                {errors.driverLicenseExpiryDate.message}
               </Text>
             )}
+
+            <View style={{height: 100}} />
           </ScrollView>
 
           {/* Footer with Continue button */}
@@ -301,7 +213,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border.primary,
     backgroundColor: colors.white,
-    paddingBottom: 10,
+    paddingVertical: 15,
     alignItems: 'center',
     paddingHorizontal: 20,
   },
@@ -310,4 +222,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnterVehicleDetailsScreen;
+export default EnterDriverLicenseDetailsScreen;

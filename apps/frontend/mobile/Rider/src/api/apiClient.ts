@@ -32,7 +32,6 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-
     config.headers['Content-Type'] = 'application/json';
 
     const curlCommand = generateCurlCommand(config);

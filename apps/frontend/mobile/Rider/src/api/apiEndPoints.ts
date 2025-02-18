@@ -1,14 +1,13 @@
 // src/api/apiEndPoints.ts
 
-const baseURL = 'http://192.168.29.63:3000'; 
+const baseURL = 'http://192.168.29.63:3000';
 
 const createEndpoint = (path: string) => `${baseURL}${path}`;
 
 const apiEndPoints = {
   baseURL,
   requestOtp: createEndpoint('/auth/otp/request'),
-  verifyOtp: createEndpoint('/auth/otp/verify'),
-  login: createEndpoint('/auth/login?role=AGENT'),
+  verifyOtp: createEndpoint('/auth/otp/verify?role=AGENT'),
   refreshToken: createEndpoint('/auth/refresh-token'),
   agentSignup: createEndpoint('/agent/signup'),
   fetchProfile: createEndpoint('/agent/profile'),

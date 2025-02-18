@@ -45,6 +45,7 @@ import DAPUploadDocumentDetailsScreen from '../Screens/DeliverPackage/UploadDocu
 import PickUpOrderDetailsScreen from '../Screens/PickUpOrderDetailsScreen';
 import DropOffOrderDetailsScreen from '../Screens/DropOffOrderDetailsScreen';
 import EarningsDetailsScreen from '../Screens/EarningDetailsScreen';
+import EnterDriverLicenseDetailsScreen from '../Screens/DeliverPackage/EnterDriverLicenseDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -109,6 +110,11 @@ const App: React.FC<AppNavigatorProps> = ({children}) => {
         <Stack.Screen
           name={DeliverAPackage.EnterVehicleDetails}
           component={EnterVehicleDetailsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={DeliverAPackage.EnterDriverLicenseDetails}
+          component={EnterDriverLicenseDetailsScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen

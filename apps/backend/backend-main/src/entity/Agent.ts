@@ -8,6 +8,7 @@ import {
   RelationId,
   Unique,
 } from "typeorm";
+
 import {
   AgentStatusEnum,
   AgentTypeEnum,
@@ -15,10 +16,10 @@ import {
   SubscripionStatusEnum,
 } from "../shared/enums";
 import { AgentSubscription } from "./AgentSubscription";
+import { AgentVehicle } from "./AgentVehicle";
 import { BaseEntity } from "./BaseEntity";
 import { Payment } from "./Payment";
 import { User } from "./User";
-import { AgentVehicle } from "./AgentVehicle";
 
 @Index("IDX_agent_userId", ["userId"], { where: '"deletedAt" IS NULL' })
 @Index("IDX_agent_status", ["status"], { where: '"deletedAt" IS NULL' })
@@ -51,11 +52,9 @@ export class Agent extends BaseEntity {
   @Column({ type: "varchar", nullable: true })
   profilePhoto: string;
 
-  // New field for driver license number
   @Column({ type: "varchar", nullable: true })
   driverLicenseNumber: string;
 
-  // New field for driver license expiry date
   @Column({ type: "timestamp", nullable: true })
   driverLicenseExpiryDate: Date;
 
